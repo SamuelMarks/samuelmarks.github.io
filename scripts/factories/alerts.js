@@ -7,9 +7,13 @@ AlertsFactory.factory('Alerts', function () {
 
     return {
         addAlert: function (msg, type) {
-            if (_alerts.indexOf(msg) === -1) {
-                _alerts.push({msg: msg, type: typeof type === "undefined" ? "info" : type});
-            }
+            var alert = {msg: msg, type: typeof type === "undefined" ? "info" : type};
+            var exists = false;
+            _alerts.forEach(function (elem) {
+                if (elem.msg === alert.msg) exists = true;
+            });
+            // ^ indexOf wasn't working, so this workaround ^
+            if (!exists) _alerts.push(alert);
         },
         closeAlert: function (index) {
             _alerts.splice(index, 1);

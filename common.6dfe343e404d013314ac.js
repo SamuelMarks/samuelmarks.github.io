@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{Hbxf:function(n,e,d){"use strict";d.d(e,"a",function(){return o});var o=[".pad[_ngcontent-%COMP%]{padding:0 3em}.docs-markdown-code[_ngcontent-%COMP%]{display:block;padding:0 0 1em 1em;white-space:pre-line}"]}}]);

@@ -1,6 +1,5 @@
 Samuel Marks docs site
 ======================
-
 Bunch of guides for using my projects.
 
 Eventually will end up with links to subprojects (organisations); and very little actual content.

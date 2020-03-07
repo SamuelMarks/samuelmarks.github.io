@@ -1,5 +1,8 @@
 Samuel Marks docs site
 ======================
+[![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![GitHub Pages](https://github.com/SamuelMarks/SamuelMarks-www/workflows/GitHub%20Pages/badge.svg)
+
 Bunch of guides for using my projects.
 
 Eventually will end up with links to subprojects (organisations); and very little actual content.

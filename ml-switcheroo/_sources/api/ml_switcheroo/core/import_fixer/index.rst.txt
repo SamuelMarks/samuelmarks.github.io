@@ -1,0 +1,143 @@
+ml_switcheroo.core.import_fixer
+===============================
+
+.. py:module:: ml_switcheroo.core.import_fixer
+
+.. autoapi-nested-parse::
+
+   Import Management Transformer for ml-switcheroo.
+
+   This module is responsible for reading the AST's import references and remapping them
+   based on the data provided by SemanticsManager (Feature 024).
+
+   It performs:
+   1.  **Pruning**: Removes source framework imports (e.g. `import torch`) unless preserved.
+   2.  **Remapping**: Maps submodules (e.g. `from torch import nn` -> `from flax import linen as nn`).
+   3.  **Smart Injection**: Dynamically injects target framework imports and standard aliases
+       (e.g., `import tensorflow as tf`, `import mlx.core as mx`) only when used in the code body.
+
+   Dependencies:
+       Uses `ml_switcheroo.core.scanners` to detect name usage in the code body.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.import_fixer.FRAMEWORK_ALIAS_MAP
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.import_fixer.ImportFixer
+
+
+Module Contents
+---------------
+
+.. py:data:: FRAMEWORK_ALIAS_MAP
+
+.. py:class:: ImportFixer(source_fw: str, target_fw: str, submodule_map: Dict[str, Tuple[str, Optional[str], Optional[str]]], preserve_source: bool = False)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   LibCST Transformer that manages top-level imports.
+
+   .. attribute:: source_fw
+
+      The root package name to remove (e.g., "torch").
+
+      :type: str
+
+   .. attribute:: target_fw
+
+      The root package name to ensure exists (e.g., "jax").
+
+      :type: str
+
+   .. attribute:: submodule_map
+
+      Map of "source.mod" -> (target_root, target_sub, alias).
+
+      :type: Dict
+
+   .. attribute:: preserve_source
+
+      If True, prevents automatic removal of source_fw imports.
+
+      :type: bool
+
+   .. attribute:: _target_found
+
+      Result tracker for idempotency.
+
+      :type: bool
+
+   .. attribute:: _defined_names
+
+      Tracks names explicitly defined by imports to prevent re-injection.
+
+      :type: Set[str]
+
+
+   .. py:attribute:: source_fw
+
+
+   .. py:attribute:: target_fw
+
+
+   .. py:attribute:: submodule_map
+
+
+   .. py:attribute:: preserve_source
+      :value: False
+
+
+
+   .. py:method:: leave_Import(original_node: libcst.Import, updated_node: libcst.Import) -> Union[libcst.Import, libcst.RemovalSentinel]
+
+      Inspects 'import ...' statements.
+      Checks aliases against submodule_map or prunes matches to source_fw.
+
+      :param original_node: The original CST node.
+      :param updated_node: The CST node with transformed children.
+
+      :returns: The modified node or RemovalSentinel if prune is required.
+
+
+
+   .. py:method:: leave_ImportFrom(original_node: libcst.ImportFrom, updated_node: libcst.ImportFrom) -> Union[libcst.ImportFrom, libcst.RemovalSentinel]
+
+      Inspects 'from ... import ...' statements.
+      Checks module+name against submodule_map.
+
+      :param original_node: The original CST node.
+      :param updated_node: The CST node with transformed children.
+
+      :returns: The modified node or RemovalSentinel.
+
+
+
+   .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
+
+      Post-process module to inject imports intelligently.
+
+      Logic:
+      1. Identifies insertion point (after __future__ and docstrings).
+      2. Injects 'import target' only if needed (not found AND used).
+      3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage.
+      4. Injects submodule mappings (e.g., from flax import linen) if usage requires it.
+
+      :param original_node: The original CST module.
+      :param updated_node: The CST module after children transformations.
+
+      :returns: The final CST module with injected imports.
+
+
+

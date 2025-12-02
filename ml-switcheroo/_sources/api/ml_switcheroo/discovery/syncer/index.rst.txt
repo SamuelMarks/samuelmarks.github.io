@@ -1,0 +1,67 @@
+ml_switcheroo.discovery.syncer
+==============================
+
+.. py:module:: ml_switcheroo.discovery.syncer
+
+.. autoapi-nested-parse::
+
+   Discovery Tool for linking Framework implementations to Standards.
+
+   This module scans installed libraries (e.g., Torch, JAX, TensorFlow, MLX) for
+   functions that match the names defined in the Semantic Knowledge Base.
+   It performs signature verification to ensure the found function is compatible
+   with the abstract specification.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.discovery.syncer.SEARCH_PATHS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.discovery.syncer.FrameworkSyncer
+
+
+Module Contents
+---------------
+
+.. py:data:: SEARCH_PATHS
+
+.. py:class:: FrameworkSyncer
+
+   Links abstract operations to concrete framework implementations.
+
+   This class iterates through known modules of a target framework, looking for
+   callables that match the operation names defined in the Semantic Knowledge Base.
+   It verifies that potential matches have compatible signatures before linking them.
+
+   .. attribute:: console
+
+      A configured Rich console for logging output.
+
+
+   .. py:attribute:: console
+
+
+   .. py:method:: sync(tier_data: Dict[str, Any], framework: str) -> None
+
+      Updates the 'variants' dict in tier_data by hunting for ops in the target framework.
+
+      It attempts to import modules defined in `SEARCH_PATHS` for the given framework.
+      If a function with a matching name and compatible signature is found, it is
+      recorded in the `tier_data` dictionary under the `variants` key.
+
+      :param tier_data: The Semantic Knowledge Base (dictionary of operations).
+                        This dictionary is modified in-place.
+      :param framework: The target framework name (e.g., 'torch', 'tensorflow', 'mlx').
+
+
+

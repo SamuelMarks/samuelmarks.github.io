@@ -1,0 +1,117 @@
+ml_switcheroo.core.rewriter.structure
+=====================================
+
+.. py:module:: ml_switcheroo.core.rewriter.structure
+
+.. autoapi-nested-parse::
+
+   Structural Rewriting Logic.
+
+   This module provides the `StructureMixin`, a component of the PivotRewriter
+   responsible for transforming the scaffolding of Python code: Class definitions
+   and Function definitions.
+
+   It implements logic for:
+   1.  **Inheritance Warping**: Swapping framework base classes (e.g., `torch.nn.Module`
+       ↔ `flax.nnx.Module`).
+   2.  **Signature Transformation**: Injecting or stripping framework-specific
+       state arguments (e.g., `rngs`) in constructors.
+   3.  **Method Renaming**: Mapping `forward` ↔ `__call__`.
+   4.  **Constructor Logic Injection**: Ensuring `super().__init__()` is present
+       when targeting PyTorch.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.structure.StructureMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming structural elements (Classes, Functions).
+
+   .. attribute:: _in_module_class
+
+      Inherited from BaseRewriter. True if currently
+      traversing a Neural Network Module class.
+
+      :type: bool
+
+   .. attribute:: _signature_stack
+
+      Inherited from BaseRewriter.
+      Tracks current function signature state.
+
+      :type: List[SignatureContext]
+
+
+   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
+
+      Visits a class definition to detect Neural Module context.
+
+      It inspects base classes to determine if the class is a framework-specific
+      Neural Module (Torch or Flax NNX). This sets the `_in_module_class` flag,
+      enabling method renaming and signature fixups nested within.
+
+      :param node: The libCST ClassDef node.
+
+      :returns: True to traverse children.
+
+
+
+   .. py:method:: leave_ClassDef(_original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
+
+      Rewrites class inheritance for the target framework.
+
+      If the class was identified as a Neural Module, this method swaps the
+      base class:
+      - Target JAX: `torch.nn.Module` → `flax.nnx.Module`
+      - Target Torch: `flax.nnx.Module` → `torch.nn.Module`
+
+      :param original_node: The original CST node (unused).
+      :param updated_node: The CST node with transformed children.
+
+      :returns: The transformed ClassDef node.
+
+
+
+   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
+
+      Visits function definitions to track signature context.
+
+      Captures existing arguments to allow smart injection/stripping later.
+      Pushes a new `SignatureContext` onto the stack.
+
+      :param node: The CST FunctionDef node.
+
+      :returns: True to traverse children.
+
+
+
+   .. py:method:: leave_FunctionDef(_original_node: libcst.FunctionDef, updated_node: libcst.FunctionDef) -> libcst.CSTNode
+
+      Finalizes function transformations.
+
+      Applies:
+      1.  **Method Renaming**: `forward` ↔ `__call__`.
+      2.  **Signature Modification**: Injecting/Stripping `rngs` for Flax NNX support.
+      3.  **Plugin Injection**: Applying args requested by plugins.
+      4.  **Preamble Injection**: Inserting setup code (like `super().__init__()` or RNG split).
+
+      :param original_node: The original CST node.
+      :param updated_node: The CST node with transformed children.
+
+      :returns: The transformed FunctionDef node.
+
+
+

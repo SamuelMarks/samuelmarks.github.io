@@ -1,0 +1,58 @@
+ml_switcheroo.core.rewriter.normalization
+=========================================
+
+.. py:module:: ml_switcheroo.core.rewriter.normalization
+
+.. autoapi-nested-parse::
+
+   Normalization Helpers for AST Rewriting (The Argument Pivot).
+
+   This module provides the `NormalizationMixin`, a component of the `PivotRewriter`
+   responsible for reshaping function arguments and call structures during translation.
+
+   ## The Pivot Strategy
+
+   The core challenge is translating `FrameworkA.op(a=1, b=2)` to `FrameworkB.op(x=1, y=2)`
+   where the argument names and order might differ. We solve this using an
+   "Abstract Standard" (The Pivot) derived from the Array API or ONNX specs.
+
+   1.  **Ingest (Source -> Abstract)**:
+       Map provided source arguments to Abstract names.
+       e.g., Source `dim` maps to Abstract `axis`.
+
+   2.  **Pivot (Alignment)**:
+       Reorder arguments to match the Abstract Standard signature `(x, axis, keepdims)`.
+
+   3.  **Project (Abstract -> Target)**:
+       Map Abstract names to Target framework argument names.
+       e.g., Abstract `axis` maps to Target `axes`.
+
+   **Recursive Transformation Note**:
+   By using `updated_node` for values and `original_node` for structure, we ensure
+   that nested calls (e.g., `abs(neg(x))`) are correctly transformed inside-out
+   before being reordered.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.normalization.NormalizationMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin class providing argument normalization and operator transformation logic.
+
+   Designed to be mixed into `PivotRewriter`. It relies on `self.semantics` to
+   retrieve the argument specifications (`std_args`) and mapping rules.
+
+

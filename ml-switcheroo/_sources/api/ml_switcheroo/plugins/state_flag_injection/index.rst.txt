@@ -1,0 +1,66 @@
+ml_switcheroo.plugins.state_flag_injection
+==========================================
+
+.. py:module:: ml_switcheroo.plugins.state_flag_injection
+
+.. autoapi-nested-parse::
+
+   Plugin for injecting state flags (e.g., training=False).
+
+   This module handles the translation of imperative state mutations (like `model.eval()`)
+   into functional arguments passed to subsequent calls.
+
+   Logic:
+   1. Detects `model.eval()` or `model.train()` statements in the current scope.
+   2. Tracks the state of specific variables (e.g. `model` is in evaluation mode)
+      inside the `HookContext` metadata.
+   3. Intercepts calls to those variables (e.g. `model(x)`).
+   4. Injects a keyword argument (e.g. `model(x, training=False)`).
+   5. Strips the original mutation statement to avoid runtime errors in stateless frameworks.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.state_flag_injection.inject_training_flag_call
+   ml_switcheroo.plugins.state_flag_injection.capture_eval_state
+
+
+Module Contents
+---------------
+
+.. py:function:: inject_training_flag_call(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Rewrites a call site to inject state flags if the object was previously mutated.
+
+   Triggers:
+       Operations marked with `requires_plugin: "inject_training_flag"`.
+       Typically attached to the `__call__` or `forward` definition of a neural module.
+
+   :param node: The function call (e.g. `model(x)`).
+   :param ctx: Hook Context containing metadata.
+
+   :returns: Modified call with injected kwargs (e.g. `model(x, training=False)`).
+
+
+.. py:function:: capture_eval_state(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Intercepts `model.eval()` or `model.train()` to track state in Context.
+
+   Triggers:
+       Operations mapping `torch.nn.Module.eval` etc.
+
+   Action:
+       1. Identifies the receiver object (`model`).
+       2. Updates `ctx.metadata` with `training=False/True`.
+       3. Returns a no-op/null call to strip the operation from output code.
+
+   :param node: The call node (e.g. `model.eval()`).
+   :param ctx: Hook Context providing metadata storage.
+
+   :returns: A no-op CST node (so the statement effectively disappears or becomes harmless).
+
+

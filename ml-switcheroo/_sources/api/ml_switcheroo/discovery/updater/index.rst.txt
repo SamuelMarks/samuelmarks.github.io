@@ -1,0 +1,65 @@
+ml_switcheroo.discovery.updater
+===============================
+
+.. py:module:: ml_switcheroo.discovery.updater
+
+.. autoapi-nested-parse::
+
+   Discovery Module for updating Semantic Knowledge Base.
+
+   This module scans installed packages (like 'torch') for APIs that are NOT present
+   in the current Semantic Knowledge Base. It generates a gap analysis report and,
+   optionally, automatically merges these missing definitions into the appropriate
+   JSON tier files (`k_array_api.json` vs `k_neural_net.json`).
+
+   Includes Rich-based reporting for better developer experience.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.discovery.updater.MappingsUpdater
+
+
+Module Contents
+---------------
+
+.. py:class:: MappingsUpdater(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Identifies and remediates gaps between installed packages and Semantic JSONs.
+
+   .. attribute:: semantics
+
+      The loaded knowledge base.
+
+      :type: SemanticsManager
+
+   .. attribute:: inspector
+
+      Static analysis tool for scanning packages.
+
+      :type: ApiInspector
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: inspector
+
+
+   .. py:method:: update_package(package_name: str, auto_merge: bool = False, report_path: Optional[pathlib.Path] = None) -> Dict[str, Any]
+
+      Scans a package, identifies missing mappings, and updates the knowledge base.
+
+      :param package_name: The library to scan (e.g., 'torch').
+      :param auto_merge: If True, writes new entries directly to k_*.json files.
+      :param report_path: If provided, writes the raw missing dict to this JSON path.
+
+      :returns: The dictionary of missing APIs found.
+      :rtype: Dict[str, Any]
+
+
+

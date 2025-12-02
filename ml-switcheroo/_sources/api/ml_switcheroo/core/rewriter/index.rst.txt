@@ -1,0 +1,311 @@
+ml_switcheroo.core.rewriter
+===========================
+
+.. py:module:: ml_switcheroo.core.rewriter
+
+.. autoapi-nested-parse::
+
+   Rewriter Package.
+
+   This package provides the `PivotRewriter` class, composed of several mixins
+   to handle specific aspects of the AST transformation:
+   - Structure: Class and Function definitions (including NNX bidirectional support).
+   - Calls: Function invocations and operator overloading.
+   - Attributes: Attribute access and assignment tracking.
+   - Normalization: Argument mapping and infix rewriting.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/core/rewriter/attributes/index
+   /api/ml_switcheroo/core/rewriter/base/index
+   /api/ml_switcheroo/core/rewriter/calls/index
+   /api/ml_switcheroo/core/rewriter/normalization/index
+   /api/ml_switcheroo/core/rewriter/structure/index
+   /api/ml_switcheroo/core/rewriter/types/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.CallMixin
+   ml_switcheroo.core.rewriter.NormalizationMixin
+   ml_switcheroo.core.rewriter.AttributeMixin
+   ml_switcheroo.core.rewriter.StructureMixin
+   ml_switcheroo.core.rewriter.BaseRewriter
+   ml_switcheroo.core.rewriter.PivotRewriter
+
+
+Package Contents
+----------------
+
+.. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming Call nodes and unpacking Assignments.
+
+
+   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
+
+      Handles assignment unwrapping for Functional -> OOP transitions.
+
+      Scenario: `y, updates = layer.apply(vars, x)`
+      Target:   `y = layer(x)` (NNX/Torch style)
+
+      If we detected that a call was rewritten from a functional pattern
+      returning multiple values (outputs + state) to an OOP pattern
+      returning a single value, we must also simplify the assignment targets.
+
+
+
+   .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
+
+      Rewrites function calls.
+
+
+
+.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin class providing argument normalization and operator transformation logic.
+
+   Designed to be mixed into `PivotRewriter`. It relies on `self.semantics` to
+   retrieve the argument specifications (`std_args`) and mapping rules.
+
+
+.. py:class:: AttributeMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming attributes and tracking assignments.
+
+
+   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
+
+      Track stateful assignments (e.g. self.layer = Linear(...)) to determine
+      if an object variable requires special handling later.
+
+
+
+   .. py:method:: leave_Attribute(original: libcst.Attribute, updated: libcst.Attribute) -> libcst.BaseExpression
+
+      Visits attributes (e.g. torch.float32).
+
+
+
+.. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming structural elements (Classes, Functions).
+
+   .. attribute:: _in_module_class
+
+      Inherited from BaseRewriter. True if currently
+      traversing a Neural Network Module class.
+
+      :type: bool
+
+   .. attribute:: _signature_stack
+
+      Inherited from BaseRewriter.
+      Tracks current function signature state.
+
+      :type: List[SignatureContext]
+
+
+   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
+
+      Visits a class definition to detect Neural Module context.
+
+      It inspects base classes to determine if the class is a framework-specific
+      Neural Module (Torch or Flax NNX). This sets the `_in_module_class` flag,
+      enabling method renaming and signature fixups nested within.
+
+      :param node: The libCST ClassDef node.
+
+      :returns: True to traverse children.
+
+
+
+   .. py:method:: leave_ClassDef(_original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
+
+      Rewrites class inheritance for the target framework.
+
+      If the class was identified as a Neural Module, this method swaps the
+      base class:
+      - Target JAX: `torch.nn.Module` → `flax.nnx.Module`
+      - Target Torch: `flax.nnx.Module` → `torch.nn.Module`
+
+      :param original_node: The original CST node (unused).
+      :param updated_node: The CST node with transformed children.
+
+      :returns: The transformed ClassDef node.
+
+
+
+   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
+
+      Visits function definitions to track signature context.
+
+      Captures existing arguments to allow smart injection/stripping later.
+      Pushes a new `SignatureContext` onto the stack.
+
+      :param node: The CST FunctionDef node.
+
+      :returns: True to traverse children.
+
+
+
+   .. py:method:: leave_FunctionDef(_original_node: libcst.FunctionDef, updated_node: libcst.FunctionDef) -> libcst.CSTNode
+
+      Finalizes function transformations.
+
+      Applies:
+      1.  **Method Renaming**: `forward` ↔ `__call__`.
+      2.  **Signature Modification**: Injecting/Stripping `rngs` for Flax NNX support.
+      3.  **Plugin Injection**: Applying args requested by plugins.
+      4.  **Preamble Injection**: Inserting setup code (like `super().__init__()` or RNG split).
+
+      :param original_node: The original CST node.
+      :param updated_node: The CST node with transformed children.
+
+      :returns: The transformed FunctionDef node.
+
+
+
+.. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   The base class for AST transformation traversal.
+
+   It maintains the state required to navigate Python's scoping rules and
+   import systems, providing helper methods for the specific Mixins (Calls,
+   Structure, Attributes) to resolve names and report issues.
+
+   .. attribute:: semantics
+
+      The loaded knowledge base of API mappings.
+
+      :type: SemanticsManager
+
+   .. attribute:: config
+
+      Configuration for the current run (strict mode, etc).
+
+      :type: RuntimeConfig
+
+   .. attribute:: source_fw
+
+      The string identifier of the source framework (e.g., 'torch').
+
+      :type: str
+
+   .. attribute:: target_fw
+
+      The string identifier of the target framework (e.g., 'jax').
+
+      :type: str
+
+   .. attribute:: strict_mode
+
+      If True, unknown APIs trigger failure markers instead of pass-through.
+
+      :type: bool
+
+   .. attribute:: ctx
+
+      The context object passed to plugins.
+
+      :type: HookContext
+
+   .. attribute:: _scope_stack
+
+      A stack of scopes, tracking variables identified
+      as stateful (e.g., neural network layers assigned to `self`).
+
+      :type: List[Set[str]]
+
+   .. attribute:: _signature_stack
+
+      Stack tracking function signature details
+      to support argument injection (like `rng`).
+
+      :type: List[SignatureContext]
+
+   .. attribute:: _alias_map
+
+      Map of local names to fully qualified paths
+      (e.g., `{'nn': 'torch.nn', 'F': 'torch.nn.functional'}`).
+
+      :type: Dict[str, str]
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: config
+
+
+   .. py:attribute:: strict_mode
+
+
+   .. py:attribute:: ctx
+
+
+   .. py:method:: visit_Import(node: libcst.Import) -> Optional[bool]
+
+      Scans `import ...` statements to populate the alias map.
+      Example: `import torch.nn as nn` -> `_alias_map['nn'] = 'torch.nn'`.
+
+
+
+   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> Optional[bool]
+
+      Scans `from ... import ...` statements to populate the alias map.
+      Example: `from torch import nn` -> `_alias_map['nn'] = 'torch.nn'`.
+
+
+
+   .. py:method:: visit_SimpleStatementLine(node: libcst.SimpleStatementLine) -> Optional[bool]
+
+      Resets error tracking at the start of each line.
+      Errors bubble up from children (Expressions) to this Statement handler.
+
+
+
+   .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      If errors occurred during processing of this line's children (e.g. failing
+      to rewrite a function call), wrap the line in an `EscapeHatch`.
+
+      Prioritizes errors (reverting to original code) over warnings (using updated code).
+
+
+
+.. py:class:: PivotRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`calls.CallMixin`, :py:obj:`normalization.NormalizationMixin`, :py:obj:`attributes.AttributeMixin`, :py:obj:`structure.StructureMixin`, :py:obj:`base.BaseRewriter`
+
+
+   The main AST transformer for ml-switcheroo.
+
+   Inherits functionality from component identifiers (Mixins) and the base
+   transformer logic. This class is the entry point for the ASTEngine.
+
+

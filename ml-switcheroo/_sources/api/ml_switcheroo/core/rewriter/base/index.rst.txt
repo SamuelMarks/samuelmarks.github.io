@@ -1,0 +1,143 @@
+ml_switcheroo.core.rewriter.base
+================================
+
+.. py:module:: ml_switcheroo.core.rewriter.base
+
+.. autoapi-nested-parse::
+
+   Base Rewriter Implementation with Alias and Scope Resolution.
+
+   This module provides the `BaseRewriter` class, which serves as the foundation for
+   the `PivotRewriter`. It handles:
+   1.  **State Management**: Tracking the current scope (global vs class vs function)
+       to handle stateful variable detection.
+   2.  **Alias Resolution**: Tracking `import as` statements to resolve `t.abs` back
+       to `torch.abs` or `np.sum` to `numpy.sum`.
+   3.  **Error Reporting**: Collecting failures during the AST walk to be bubbled
+       up to the `ASTEngine`.
+   4.  **Hook Infrastructure**: initializing the `HookContext` used by plugins.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.base.BaseRewriter
+
+
+Module Contents
+---------------
+
+.. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   The base class for AST transformation traversal.
+
+   It maintains the state required to navigate Python's scoping rules and
+   import systems, providing helper methods for the specific Mixins (Calls,
+   Structure, Attributes) to resolve names and report issues.
+
+   .. attribute:: semantics
+
+      The loaded knowledge base of API mappings.
+
+      :type: SemanticsManager
+
+   .. attribute:: config
+
+      Configuration for the current run (strict mode, etc).
+
+      :type: RuntimeConfig
+
+   .. attribute:: source_fw
+
+      The string identifier of the source framework (e.g., 'torch').
+
+      :type: str
+
+   .. attribute:: target_fw
+
+      The string identifier of the target framework (e.g., 'jax').
+
+      :type: str
+
+   .. attribute:: strict_mode
+
+      If True, unknown APIs trigger failure markers instead of pass-through.
+
+      :type: bool
+
+   .. attribute:: ctx
+
+      The context object passed to plugins.
+
+      :type: HookContext
+
+   .. attribute:: _scope_stack
+
+      A stack of scopes, tracking variables identified
+      as stateful (e.g., neural network layers assigned to `self`).
+
+      :type: List[Set[str]]
+
+   .. attribute:: _signature_stack
+
+      Stack tracking function signature details
+      to support argument injection (like `rng`).
+
+      :type: List[SignatureContext]
+
+   .. attribute:: _alias_map
+
+      Map of local names to fully qualified paths
+      (e.g., `{'nn': 'torch.nn', 'F': 'torch.nn.functional'}`).
+
+      :type: Dict[str, str]
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: config
+
+
+   .. py:attribute:: strict_mode
+
+
+   .. py:attribute:: ctx
+
+
+   .. py:method:: visit_Import(node: libcst.Import) -> Optional[bool]
+
+      Scans `import ...` statements to populate the alias map.
+      Example: `import torch.nn as nn` -> `_alias_map['nn'] = 'torch.nn'`.
+
+
+
+   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> Optional[bool]
+
+      Scans `from ... import ...` statements to populate the alias map.
+      Example: `from torch import nn` -> `_alias_map['nn'] = 'torch.nn'`.
+
+
+
+   .. py:method:: visit_SimpleStatementLine(node: libcst.SimpleStatementLine) -> Optional[bool]
+
+      Resets error tracking at the start of each line.
+      Errors bubble up from children (Expressions) to this Statement handler.
+
+
+
+   .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      If errors occurred during processing of this line's children (e.g. failing
+      to rewrite a function call), wrap the line in an `EscapeHatch`.
+
+      Prioritizes errors (reverting to original code) over warnings (using updated code).
+
+
+

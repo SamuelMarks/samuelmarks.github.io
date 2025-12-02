@@ -1,0 +1,133 @@
+ml_switcheroo.core.engine
+=========================
+
+.. py:module:: ml_switcheroo.core.engine
+
+.. autoapi-nested-parse::
+
+   Orchestration Engine for AST Transformations.
+
+   This module provides the high-level `ASTEngine` class which parses source code,
+   applies the sequence of Transformer passes (Purity Analysis, Dependency Scan,
+   Rewriting, Import Fixing), and emits the final source code.
+
+   It returns structured `ConversionResult` objects to enable rich reporting.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.engine.ConversionResult
+   ml_switcheroo.core.engine.ASTEngine
+
+
+Module Contents
+---------------
+
+.. py:class:: ConversionResult(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Structured result of a single file conversion.
+
+   .. attribute:: code
+
+      The transpiled source code string.
+
+   .. attribute:: errors
+
+      List of error messages or warnings encountered (e.g. from Escape Hatch).
+
+   .. attribute:: success
+
+      True if the AST was parseable and processed without critical crashes.
+
+
+   .. py:attribute:: code
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: errors
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: success
+      :type:  bool
+      :value: True
+
+
+
+   .. py:property:: has_errors
+      :type: bool
+
+
+      Returns True if any errors were recorded.
+
+
+.. py:class:: ASTEngine(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: str = 'torch', target: str = 'jax', strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None)
+
+   The main compilation unit.
+
+   .. attribute:: semantics
+
+      Database of mappings.
+
+      :type: SemanticsManager
+
+   .. attribute:: config
+
+      The full configuration container (Frameworks, Strict Mode, Plugin Settings).
+
+      :type: RuntimeConfig
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: source
+
+
+   .. py:attribute:: target
+
+
+   .. py:attribute:: strict_mode
+
+
+   .. py:method:: parse(code: str) -> libcst.Module
+
+      Parses source string into a LibCST Module.
+
+
+
+   .. py:method:: to_source(tree: libcst.Module) -> str
+
+      Converts CST back to source string.
+
+
+
+   .. py:method:: run(code: str) -> ConversionResult
+
+      Executes the full transpilation pipeline.
+
+      Steps:
+      0a. Purity Analysis (if targeting JAX): Flag unsafe side-effects.
+      0b. Dependency Analysis: Flag unmapped 3rd party libraries.
+      1. Rewrite Call usages (Semantic Pivot).
+      2. Scan for lingering source references.
+      3. Feature-driven Import Fixing.
+
+      :param code: The input source string.
+
+      :returns: Object containing transformed code and error logs.
+      :rtype: ConversionResult
+
+
+

@@ -1,0 +1,78 @@
+ml_switcheroo.cli.matrix
+========================
+
+.. py:module:: ml_switcheroo.cli.matrix
+
+.. autoapi-nested-parse::
+
+   Compatibility Matrix rendering logic.
+
+   This module is responsible for generating the visual comparison table between
+   supported frameworks. It extracts operation mapping statuses from the
+   `SemanticsManager` and presents them either as a formatted Rich table (CLI)
+   or structured JSON data (Web Interface).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.cli.matrix.CompatibilityMatrix
+
+
+Module Contents
+---------------
+
+.. py:class:: CompatibilityMatrix(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Logic for generating the Framework Compatibility Matrix.
+
+   It queries the Knowledge Base to determine which operations have defined
+   variants for specific backends.
+
+   .. attribute:: semantics
+
+      The loaded knowledge base.
+
+      :type: SemanticsManager
+
+   .. attribute:: console
+
+      Rich console for rendering outputs.
+
+      :type: Console
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: console
+
+
+   .. py:method:: get_json() -> List[Dict[str, str]]
+
+      Returns the compatibility matrix as structured data.
+
+      Useful for web interfaces or downstream tools that need to render
+      the table dynamically (e.g. in React/Angular).
+
+      :returns: A list of row objects.
+                Each dictionary contains:
+                    - 'operation': The abstract operation name.
+                    - 'tier': The semantic category.
+                    - '{engine}': The status icon for that engine (e.g. 'torch': '✅').
+      :rtype: List[Dict[str, str]]
+
+
+
+   .. py:method:: render() -> None
+
+      Generates and prints the compatibility table to the console.
+
+      Uses the same underlying logic as `get_json` but formats it into
+      a Rich Table with colored columns.
+
+
+

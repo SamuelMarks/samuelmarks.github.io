@@ -1,0 +1,58 @@
+ml_switcheroo.core.rewriter.calls
+=================================
+
+.. py:module:: ml_switcheroo.core.rewriter.calls
+
+.. autoapi-nested-parse::
+
+   Call Rewriting Logic.
+
+   Handles function invocation usage (`leave_Call`) and Assignment Unwrapping.
+   Includes functionality for:
+   - Lifecycle method stripping (e.g. `.to()`, `.cpu()`).
+   - Functional -> OOP Unwrapping (removing `.apply` and tuple unpacking).
+   - Stateful object management.
+   - Standard API pivots.
+   - Plugin dispatch.
+   - Constructor logic injection (RNG management).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.calls.CallMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming Call nodes and unpacking Assignments.
+
+
+   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
+
+      Handles assignment unwrapping for Functional -> OOP transitions.
+
+      Scenario: `y, updates = layer.apply(vars, x)`
+      Target:   `y = layer(x)` (NNX/Torch style)
+
+      If we detected that a call was rewritten from a functional pattern
+      returning multiple values (outputs + state) to an OOP pattern
+      returning a single value, we must also simplify the assignment targets.
+
+
+
+   .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
+
+      Rewrites function calls.
+
+
+

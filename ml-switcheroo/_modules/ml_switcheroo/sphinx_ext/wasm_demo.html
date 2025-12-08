@@ -51,8 +51,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css?v=9140b820" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -60,8 +60,8 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="../../../_static/trace_render.js"></script>
-    <script src="../../../_static/switcheroo_demo.js"></script>
+    <script src="../../../_static/trace_render.js?v=690b4e4b"></script>
+    <script src="../../../_static/switcheroo_demo.js?v=35f6526a"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -652,7 +652,6 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">docutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">nodes</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">docutils.parsers.rst</span><span class="w"> </span><span class="kn">import</span> <span class="n">Directive</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sphinx.util.fileutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy_asset</span>
 
 
 <div class="viewcode-block" id="SwitcherooDemo">
@@ -666,11 +665,11 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SwitcherooDemo.run">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/sphinx_ext/wasm_demo/index.html#ml_switcheroo.sphinx_ext.SwitcherooDemo.run">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="c1"># 1. Locate the Wheel</span>
+    <span class="c1"># 1. Locate the Wheel (Best effort for render time, though actual copy happens later)</span>
     <span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
     <span class="n">dist_dir</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s2">"dist"</span>
 
-    <span class="n">wheel_name</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">wheel_name</span> <span class="o">=</span> <span class="s2">"ml_switcheroo-latest-py3-none-any.whl"</span>
     <span class="k">if</span> <span class="n">dist_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
       <span class="n">wheels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dist_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.whl"</span><span class="p">))</span>
       <span class="k">if</span> <span class="n">wheels</span><span class="p">:</span>
@@ -721,12 +720,11 @@ window.addEventListener("load", load);
 <span class="s2">                    &lt;/div&gt;</span>
 <span class="s2">                &lt;/div&gt;</span>
 
-<span class="s2">                &lt;!-- NEW: Example Selector Toolbar --&gt;</span>
+<span class="s2">                &lt;!-- Example Selector Toolbar --&gt;</span>
 <span class="s2">                &lt;div class="example-toolbar"&gt;</span>
 <span class="s2">                    &lt;span class="label"&gt;Load Example:&lt;/span&gt;</span>
 <span class="s2">                    &lt;select id="select-example" class="material-select-sm"&gt;</span>
 <span class="s2">                        &lt;option value="" disabled selected&gt;-- Select a Pattern --&lt;/option&gt;</span>
-<span class="s2">                        &lt;!-- Populated by JS --&gt;</span>
 <span class="s2">                    &lt;/select&gt;</span>
 <span class="s2">                &lt;/div&gt;</span>
 
@@ -758,7 +756,6 @@ window.addEventListener("load", load);
 <span class="s2">                &lt;/div&gt;</span>
 <span class="s2">            &lt;/div&gt;</span>
 
-<span class="s2">            &lt;!-- Moved Console Group OUTSIDE demo-interface so it can be shown standalone on error --&gt;</span>
 <span class="s2">            &lt;div class="console-group"&gt;</span>
 <span class="s2">                &lt;div class="editor-label"&gt;Engine Logs&lt;/div&gt;</span>
 <span class="s2">                &lt;pre id="console-output"&gt;Waiting for engine...&lt;/pre&gt;</span>
@@ -776,51 +773,80 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_directive</span><span class="p">(</span><span class="s2">"switcheroo_demo"</span><span class="p">,</span> <span class="n">SwitcherooDemo</span><span class="p">)</span>
 
-  <span class="c1"># -- Syntax Highlighting dependencies --</span>
+  <span class="c1"># External Deps</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_css_file</span><span class="p">(</span><span class="s2">"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css"</span><span class="p">)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_js_file</span><span class="p">(</span><span class="s2">"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"</span><span class="p">)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_js_file</span><span class="p">(</span><span class="s2">"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"</span><span class="p">)</span>
 
+  <span class="c1"># Internal Assets (Order matters)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_css_file</span><span class="p">(</span><span class="s2">"switcheroo_demo.css"</span><span class="p">)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_css_file</span><span class="p">(</span><span class="s2">"trace_graph.css"</span><span class="p">)</span>
-
-  <span class="c1"># Crucial Order: Load Graph Renderer Logic BEFORE Logic Logic that uses it</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_js_file</span><span class="p">(</span><span class="s2">"trace_render.js"</span><span class="p">)</span>
   <span class="n">app</span><span class="o">.</span><span class="n">add_js_file</span><span class="p">(</span><span class="s2">"switcheroo_demo.js"</span><span class="p">)</span>
 
-  <span class="n">app</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"build-finished"</span><span class="p">,</span> <span class="n">copy_assets_and_wheel</span><span class="p">)</span>
-  <span class="k">return</span> <span class="p">{</span><span class="s2">"version"</span><span class="p">:</span> <span class="s2">"0.8"</span><span class="p">,</span> <span class="s2">"parallel_read_safe"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"parallel_write_safe"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+  <span class="c1"># 1. Hook: Inject static path (Let Sphinx handle copying JS/CSS)</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"builder-inited"</span><span class="p">,</span> <span class="n">add_static_path</span><span class="p">)</span>
+
+  <span class="c1"># 2. Hook: Copy Wheel file (Manual logic as it is external to package)</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">"build-finished"</span><span class="p">,</span> <span class="n">copy_wheel_and_reqs</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="p">{</span><span class="s2">"version"</span><span class="p">:</span> <span class="s2">"0.9"</span><span class="p">,</span> <span class="s2">"parallel_read_safe"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"parallel_write_safe"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 
-<div class="viewcode-block" id="copy_assets_and_wheel">
-<a class="viewcode-back" href="../../../api/ml_switcheroo/sphinx_ext/wasm_demo/index.html#ml_switcheroo.sphinx_ext.copy_assets_and_wheel">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">copy_assets_and_wheel</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+<div class="viewcode-block" id="add_static_path">
+<a class="viewcode-back" href="../../../api/ml_switcheroo/sphinx_ext/wasm_demo/index.html#ml_switcheroo.sphinx_ext.add_static_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_static_path</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">"""</span>
+<span class="sd">  Injects the extension's static directory into Sphinx's configuration.</span>
+<span class="sd">  Sphinx will automatically copy everything in this directory to _static/.</span>
+<span class="sd">  """</span>
+  <span class="n">static_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">"static"</span>
+  <span class="k">if</span> <span class="n">static_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="c1"># Ensure it's an absolute path string</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">html_static_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">static_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🔧 [Switcheroo] Injected extension static path: </span><span class="si">{</span><span class="n">static_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️ [Switcheroo] Static path not found: </span><span class="si">{</span><span class="n">static_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="copy_wheel_and_reqs">
+<a class="viewcode-back" href="../../../api/ml_switcheroo/sphinx_ext/wasm_demo/index.html#ml_switcheroo.sphinx_ext.copy_wheel_and_reqs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">copy_wheel_and_reqs</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">exception</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">"""</span>
+<span class="sd">  Copies the .whl file and requirements.txt from the project root/dist</span>
+<span class="sd">  to the build's _static folder.</span>
+<span class="sd">  """</span>
   <span class="k">if</span> <span class="n">exception</span><span class="p">:</span>
     <span class="k">return</span>
+
+  <span class="c1"># Logic to find project root from installed location or dev mode</span>
+  <span class="c1"># Assuming standard layout: src/ml_switcheroo/sphinx_ext/wasm_demo.py</span>
   <span class="n">here</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+  <span class="c1"># Go up: sphinx_ext -&gt; ml_switcheroo -&gt; src -&gt; PROJECT_ROOT</span>
   <span class="n">root_dir</span> <span class="o">=</span> <span class="n">here</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-  <span class="n">static_src</span> <span class="o">=</span> <span class="n">here</span> <span class="o">/</span> <span class="s2">"static"</span>
-  <span class="n">static_dst</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">outdir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"_static"</span>
+
   <span class="n">dist_dir</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s2">"dist"</span>
+  <span class="n">static_dst</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">outdir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"_static"</span>
+  <span class="n">static_dst</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-  <span class="c1"># 1. Copy JS/CSS</span>
-  <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">static_src</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
-    <span class="n">copy_asset</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">static_dst</span><span class="p">))</span>
-
-    <span class="c1"># 2. Copy requirements.txt explicitly so JS can Fetch it</span>
+  <span class="c1"># Copy requirements.txt</span>
   <span class="n">reqs_file</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s2">"requirements.txt"</span>
   <span class="k">if</span> <span class="n">reqs_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
     <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">reqs_file</span><span class="p">,</span> <span class="n">static_dst</span> <span class="o">/</span> <span class="s2">"requirements.txt"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"📄 [WASM] Copied requirements.txt to _static/"</span><span class="p">)</span>
 
-    <span class="c1"># 3. Copy Wheel</span>
+    <span class="c1"># Copy Wheel</span>
   <span class="k">if</span> <span class="n">dist_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
     <span class="n">wheels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dist_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.whl"</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">wheels</span><span class="p">:</span>
       <span class="n">latest</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">wheels</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-      <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">latest</span><span class="p">,</span> <span class="n">static_dst</span> <span class="o">/</span> <span class="n">latest</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"📦 [WASM] Copied </span><span class="si">{</span><span class="n">latest</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to _static/"</span><span class="p">)</span></div>
+      <span class="n">target_file</span> <span class="o">=</span> <span class="n">static_dst</span> <span class="o">/</span> <span class="n">latest</span><span class="o">.</span><span class="n">name</span>
+      <span class="c1"># Only copy if changed or missing</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">target_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">target_file</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">&lt;</span> <span class="n">latest</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">latest</span><span class="p">,</span> <span class="n">target_file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"📦 [WASM] Copied </span><span class="si">{</span><span class="n">latest</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to _static/"</span><span class="p">)</span></div>
 
 </pre></div>
 

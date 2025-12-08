@@ -51,8 +51,8 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css?v=9140b820" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -60,8 +60,8 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="../../../_static/trace_render.js"></script>
-    <script src="../../../_static/switcheroo_demo.js"></script>
+    <script src="../../../_static/trace_render.js?v=690b4e4b"></script>
+    <script src="../../../_static/switcheroo_demo.js?v=35f6526a"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -700,7 +700,9 @@ window.addEventListener("load", load);
 <span class="nd">@register_hook</span><span class="p">(</span><span class="s2">"unroll_inplace_ops"</span><span class="p">)</span>
 <div class="viewcode-block" id="unroll_inplace_ops">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/plugins/inplace_unroll/index.html#ml_switcheroo.plugins.inplace_unroll.unroll_inplace_ops">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">unroll_inplace_ops</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Expr</span><span class="p">],</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Assign</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Expr</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">BinaryOperation</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unroll_inplace_ops</span><span class="p">(</span>
+  <span class="n">node</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Expr</span><span class="p">],</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Assign</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Expr</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">BinaryOperation</span><span class="p">]:</span>
 <span class="w">  </span><span class="sd">"""</span>
 <span class="sd">  Plugin Hook: Transforms in-place method calls to functional assignments.</span>
 
@@ -778,11 +780,7 @@ window.addEventListener("load", load);
     <span class="c1"># x.add_(y) -&gt; x + y</span>
     <span class="c1"># Ensure arg is clean (remove comma if present)</span>
     <span class="n">right_operand</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-    <span class="k">return</span> <span class="n">cst</span><span class="o">.</span><span class="n">BinaryOperation</span><span class="p">(</span>
-      <span class="n">left</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span>
-      <span class="n">operator</span><span class="o">=</span><span class="n">infix_map</span><span class="p">[</span><span class="n">clean_name</span><span class="p">],</span>
-      <span class="n">right</span><span class="o">=</span><span class="n">right_operand</span>
-    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cst</span><span class="o">.</span><span class="n">BinaryOperation</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">infix_map</span><span class="p">[</span><span class="n">clean_name</span><span class="p">],</span> <span class="n">right</span><span class="o">=</span><span class="n">right_operand</span><span class="p">)</span>
 
   <span class="c1"># 5. Strategy B: Construct Functional Method Call (Fallback)</span>
   <span class="c1"># x.unknown_(y) -&gt; x.unknown(y)</span>

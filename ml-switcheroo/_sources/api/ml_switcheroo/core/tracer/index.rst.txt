@@ -1,0 +1,170 @@
+ml_switcheroo.core.tracer
+=========================
+
+.. py:module:: ml_switcheroo.core.tracer
+
+.. autoapi-nested-parse::
+
+   Transpilation Trace Logger.
+
+   This module provides the infrastructure to record the step-by-step execution
+   of the transpiler. It captures:
+   1. Lifecycle Phases (Parsing, Analysis, Rewriting).
+   2. Semantics Matches (Found `torch.abs` -> Map to `Abs` op).
+   3. AST Mutations (Node A transformed to Node B).
+
+   The output is a structured list of Event Log dictionaries suitable for JSON serialization.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.tracer.TraceEventType
+   ml_switcheroo.core.tracer.TraceEvent
+   ml_switcheroo.core.tracer.TraceLogger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.tracer.get_tracer
+   ml_switcheroo.core.tracer.reset_tracer
+
+
+Module Contents
+---------------
+
+.. py:class:: TraceEventType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   str(object='') -> str
+   str(bytes_or_buffer[, encoding[, errors]]) -> str
+
+   Create a new string object from the given object. If encoding or
+   errors is specified, then the object must expose a data buffer
+   that will be decoded using the given encoding and error handler.
+   Otherwise, returns the result of object.__str__() (if defined)
+   or repr(object).
+   encoding defaults to 'utf-8'.
+   errors defaults to 'strict'.
+
+
+   .. py:attribute:: PHASE_START
+      :value: 'phase_start'
+
+
+
+   .. py:attribute:: PHASE_END
+      :value: 'phase_end'
+
+
+
+   .. py:attribute:: MATCH_SEMANTICS
+      :value: 'match_semantics'
+
+
+
+   .. py:attribute:: AST_MUTATION
+      :value: 'ast_mutation'
+
+
+
+   .. py:attribute:: ANALYSIS_WARNING
+      :value: 'analysis_warning'
+
+
+
+   .. py:attribute:: IMPORT_ACTION
+      :value: 'import_action'
+
+
+
+   .. py:attribute:: INSPECTION
+      :value: 'inspection'
+
+
+
+.. py:class:: TraceEvent
+
+   .. py:attribute:: id
+      :type:  str
+
+
+   .. py:attribute:: type
+      :type:  TraceEventType
+
+
+   .. py:attribute:: timestamp
+      :type:  float
+
+
+   .. py:attribute:: description
+      :type:  str
+
+
+   .. py:attribute:: parent_id
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: metadata
+      :type:  Dict[str, Any]
+
+
+.. py:class:: TraceLogger
+
+   Records transpilation events for visualization.
+   Designed to be injected into the Engine and Rewriter.
+
+
+   .. py:method:: start_phase(name: str, description: str = '') -> str
+
+      Starts a nested phase (e.g., 'Rewriting Function X'). Returns Phase ID.
+
+
+
+   .. py:method:: end_phase()
+
+      Ends the current active phase.
+
+
+
+   .. py:method:: log_match(source_api: str, target_api: str, abstract_op: str)
+
+      Logs a Semantic Match event.
+
+
+
+   .. py:method:: log_mutation(node_type: str, before: str, after: str)
+
+      Logs an AST transformation.
+
+
+
+   .. py:method:: log_warning(message: str)
+
+
+   .. py:method:: log_inspection(node_str: str, outcome: str, detail: str = '')
+
+      Logs a decision point where no change occurred.
+
+
+
+   .. py:method:: export() -> List[Dict[str, Any]]
+
+      Returns list of dicts for JSON serialization.
+
+
+
+.. py:function:: get_tracer() -> TraceLogger
+
+.. py:function:: reset_tracer()
+

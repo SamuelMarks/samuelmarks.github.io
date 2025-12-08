@@ -1,0 +1,43 @@
+ml_switcheroo.plugins.device_allocator
+======================================
+
+.. py:module:: ml_switcheroo.plugins.device_allocator
+
+.. autoapi-nested-parse::
+
+   Plugin for translating Device Allocation logic.
+
+   This module provides AST transformations to map PyTorch device object construction
+   to target framework semantics (JAX, MLX, TensorFlow).
+
+   Supported Mappings:
+   - JAX: `jax.devices('gpu')[0]`
+   - MLX: `mx.Device(mx.gpu, 0)`
+   - TF: `tf.device('GPU:0')`
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.device_allocator.transform_device_allocator
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_device_allocator(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.BaseExpression
+
+   Plugin Hook: Transforms device construction calls.
+
+   Triggers:
+       Operations marked with `requires_plugin: "device_allocator"` (e.g., `torch.device`).
+
+   :param node: The original CST Call node.
+   :param ctx: HookContext for config access.
+
+   :returns: A CST Expression representing the target device access.
+
+

@@ -1,0 +1,192 @@
+adapters
+========
+
+.. py:module:: adapters
+
+.. autoapi-nested-parse::
+
+   Framework Adapter Registry for Input Fuzzing and Output Normalization.
+
+   This module provides the interface and registration mechanism for converting
+   NumPy arrays into framework-specific tensors (e.g., Torch, JAX, TensorFlow, MLX)
+   AND converting those tensors back into NumPy arrays for verification.
+
+   Refactor:
+       Adapters can now implement `get_import_stmts`, `get_creation_syntax`, and
+       `get_numpy_conversion_syntax` to act as TemplateProviders for the Registry Sync logic.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   adapters.FrameworkAdapter
+   adapters.TorchAdapter
+   adapters.JaxAdapter
+   adapters.TensorFlowAdapter
+   adapters.MLXAdapter
+   adapters.NumpyAdapter
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   adapters.register_adapter
+   adapters.get_adapter
+
+
+Module Contents
+---------------
+
+.. py:class:: FrameworkAdapter
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol definition for a Framework Adapter.
+   Implementations must provide a mechanism to convert a NumPy array
+   into the target framework's native tensor format.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts data between formats.
+
+
+
+.. py:class:: TorchAdapter
+
+   Default adapter for PyTorch.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:method:: get_import_stmts() -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_creation_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_numpy_conversion_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+.. py:class:: JaxAdapter
+
+   Default adapter for JAX.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:method:: get_import_stmts() -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_creation_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_numpy_conversion_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+.. py:class:: TensorFlowAdapter
+
+   Adapter for TensorFlow.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:method:: get_import_stmts() -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_creation_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_numpy_conversion_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+.. py:class:: MLXAdapter
+
+   Adapter for Apple MLX.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:method:: get_import_stmts() -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_creation_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_numpy_conversion_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+.. py:class:: NumpyAdapter
+
+   Universal Adapter to normalize any framework tensor back to a NumPy array.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:method:: get_import_stmts() -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_creation_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_numpy_conversion_syntax(var_name: str) -> str
+      :classmethod:
+
+
+
+.. py:function:: register_adapter(framework: str, adapter_cls: Type[FrameworkAdapter]) -> None
+
+   Registers a new framework adapter.
+
+   :param framework: The canonical name of the framework (e.g., 'tensorflow').
+   :param adapter_cls: A class implementing the convert method.
+
+
+.. py:function:: get_adapter(framework: str) -> Optional[FrameworkAdapter]
+
+   Retrieves an instantiated adapter for the requested framework.
+
+   :param framework: The framework name.
+
+   :returns: An instance of the adapter, or None if not registered.
+
+

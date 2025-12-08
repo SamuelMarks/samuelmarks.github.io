@@ -1,0 +1,38 @@
+ml_switcheroo.plugins.io_handler
+================================
+
+.. py:module:: ml_switcheroo.plugins.io_handler
+
+.. autoapi-nested-parse::
+
+   Plugin for handling Input/Output (IO) Serialization.
+
+   This module maps PyTorch serialization (`torch.save`, `torch.load`) to
+   target-specific I/O routines.
+
+   Supported Targets:
+   - JAX: `orbax.checkpoint.PyTreeCheckpointer().save/restore`
+   - Numpy: `np.save(file, arr)` / `np.load(file)`
+   - TensorFlow (basic): `tf.io.write_file(filename, contents)` / `tf.io.read_file`
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.io_handler.transform_io_calls
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_io_calls(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Hook to rewrite save/load calls to framework-specific IO routines.
+
+   Triggers:
+       `torch.save` and `torch.load`.
+
+

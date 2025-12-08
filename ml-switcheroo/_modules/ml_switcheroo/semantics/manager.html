@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -543,7 +548,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -653,6 +658,7 @@ window.addEventListener("load", load);
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
 
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">):</span>
   <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
@@ -664,6 +670,7 @@ window.addEventListener("load", load);
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SemanticTier</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.testing.registry_sync</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.semantics.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpDefinition</span>
 
 
 <div class="viewcode-block" id="resolve_semantics_dir">
@@ -676,6 +683,8 @@ window.addEventListener("load", load);
 
 
 <span class="c1"># Standard Fallback Templates (Bootstrap)</span>
+<span class="c1"># Note: These are now also defined in k_test_templates.json.</span>
+<span class="c1"># We keep them here for safe fallback if the JSON is missing or corrupt.</span>
 <span class="n">_DEFAULT_TEMPLATES</span> <span class="o">=</span> <span class="p">{</span>
   <span class="s2">"torch"</span><span class="p">:</span> <span class="p">{</span>
     <span class="s2">"import"</span><span class="p">:</span> <span class="s2">"import torch"</span><span class="p">,</span>
@@ -705,6 +714,14 @@ window.addEventListener("load", load);
   <span class="p">},</span>
 <span class="p">}</span>
 
+<span class="c1"># Default import conventions (if not overridden by JSON)</span>
+<span class="n">_DEFAULT_ALIASES</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s2">"jax"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"module"</span><span class="p">:</span> <span class="s2">"jax.numpy"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">:</span> <span class="s2">"jnp"</span><span class="p">},</span>
+  <span class="s2">"tensorflow"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"module"</span><span class="p">:</span> <span class="s2">"tensorflow"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">:</span> <span class="s2">"tf"</span><span class="p">},</span>
+  <span class="s2">"mlx"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"module"</span><span class="p">:</span> <span class="s2">"mlx.core"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">:</span> <span class="s2">"mx"</span><span class="p">},</span>
+  <span class="s2">"numpy"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"module"</span><span class="p">:</span> <span class="s2">"numpy"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">:</span> <span class="s2">"np"</span><span class="p">},</span>
+<span class="p">}</span>
+
 
 <div class="viewcode-block" id="SemanticsManager">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager">[docs]</a>
@@ -727,7 +744,7 @@ window.addEventListener("load", load);
     <span class="bp">self</span><span class="o">.</span><span class="n">framework_configs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 
-    <span class="c1"># Initialize with hardcoded defaults, but allow overwriting</span>
+    <span class="c1"># 1. Initialize with hardcoded defaults</span>
 <div class="viewcode-block" id="SemanticsManager.test_templates">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager.test_templates">[docs]</a>
     <span class="bp">self</span><span class="o">.</span><span class="n">test_templates</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DEFAULT_TEMPLATES</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
@@ -737,15 +754,18 @@ window.addEventListener("load", load);
     <span class="bp">self</span><span class="o">.</span><span class="n">_key_origins</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_validation_status</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">_load_knowledge_graph</span><span class="p">()</span>
-
-    <span class="c1"># Sync code-defined logic on top of defaults/JSON</span>
+    <span class="c1"># 2. Sync code-defined logic (Registry Adapters)</span>
+    <span class="c1"># We do this BEFORE loading JSON so the file on disk acts as the final override.</span>
     <span class="n">code_templates</span> <span class="o">=</span> <span class="n">TemplateGenerator</span><span class="o">.</span><span class="n">generate_templates</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_templates</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">fw</span><span class="p">,</span> <span class="n">tpl</span> <span class="ow">in</span> <span class="n">code_templates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
       <span class="k">if</span> <span class="n">fw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_templates</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_templates</span><span class="p">[</span><span class="n">fw</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tpl</span><span class="p">)</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_templates</span><span class="p">[</span><span class="n">fw</span><span class="p">]</span> <span class="o">=</span> <span class="n">tpl</span>
+
+    <span class="c1"># 3. Load Knowledge Graph (JSON files)</span>
+    <span class="c1"># This merges k_test_templates.json on top of the code/defaults.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_load_knowledge_graph</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SemanticsManager.load_validation_report">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager.load_validation_report">[docs]</a>
@@ -782,12 +802,20 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="SemanticsManager.update_definition">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager.update_definition">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">update_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abstract_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">abstract_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_data</span>
+    <span class="c1"># Attempt to validate update before applying</span>
+    <span class="k">try</span><span class="p">:</span>
+      <span class="n">validated</span> <span class="o">=</span> <span class="n">OpDefinition</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+      <span class="n">final_data</span> <span class="o">=</span> <span class="n">validated</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"❌ Cannot update invalid definition for '</span><span class="si">{</span><span class="n">abstract_id</span><span class="si">}</span><span class="s2">': </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+      <span class="k">return</span>
 
-    <span class="n">variants</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"variants"</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">abstract_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_data</span>
+
+    <span class="n">variants</span> <span class="o">=</span> <span class="n">final_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"variants"</span><span class="p">,</span> <span class="p">{})</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">impl</span> <span class="ow">in</span> <span class="n">variants</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
       <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">impl</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"api"</span> <span class="ow">in</span> <span class="n">impl</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reverse_index</span><span class="p">[</span><span class="n">impl</span><span class="p">[</span><span class="s2">"api"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">abstract_id</span><span class="p">,</span> <span class="n">new_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reverse_index</span><span class="p">[</span><span class="n">impl</span><span class="p">[</span><span class="s2">"api"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">abstract_id</span><span class="p">,</span> <span class="n">final_data</span><span class="p">)</span>
 
     <span class="n">tier_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_origins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">abstract_id</span><span class="p">,</span> <span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="s2">"k_array_api.json"</span>
@@ -803,7 +831,7 @@ window.addEventListener("load", load);
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
           <span class="n">file_content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
-        <span class="n">file_content</span><span class="p">[</span><span class="n">abstract_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_data</span>
+        <span class="n">file_content</span><span class="p">[</span><span class="n">abstract_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_data</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
           <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">file_content</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -865,8 +893,16 @@ window.addEventListener("load", load);
             <span class="ne">UserWarning</span><span class="p">,</span>
           <span class="p">)</span>
 
-      <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">details</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_key_origins</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tier</span><span class="o">.</span><span class="n">value</span>
+      <span class="c1"># Feature 093: Schema Validation</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">validated_op</span> <span class="o">=</span> <span class="n">OpDefinition</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">details</span><span class="p">)</span>
+        <span class="c1"># Convert back to dict for internal storage to maintain dict-access API compatibility</span>
+        <span class="n">stored_dict</span> <span class="o">=</span> <span class="n">validated_op</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">stored_dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key_origins</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tier</span><span class="o">.</span><span class="n">value</span>
+      <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️  Skipping invalid definition '</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s2">' in </span><span class="si">{</span><span class="n">tier</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">continue</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_merge_imports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_imports</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">src_mod</span><span class="p">,</span> <span class="n">details</span> <span class="ow">in</span> <span class="n">new_imports</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -948,6 +984,27 @@ window.addEventListener("load", load);
 
     <span class="c1"># Fallback to Hardcoded Defaults (important for tests verifying fallback)</span>
     <span class="k">return</span> <span class="n">_DEFAULT_TEMPLATES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">framework</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SemanticsManager.get_framework_aliases">
+<a class="viewcode-back" href="../../../api/ml_switcheroo/semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager.get_framework_aliases">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">get_framework_aliases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+    <span class="c1"># Start with defaults</span>
+    <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">fw</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">_DEFAULT_ALIASES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="n">result</span><span class="p">[</span><span class="n">fw</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">"module"</span><span class="p">],</span> <span class="n">conf</span><span class="p">[</span><span class="s2">"alias"</span><span class="p">])</span>
+
+    <span class="c1"># Override with loaded configs</span>
+    <span class="n">config_source</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"framework_configs"</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="k">for</span> <span class="n">fw</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">config_source</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="n">alias_conf</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"alias"</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">alias_conf</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">alias_conf</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">alias_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"module"</span><span class="p">)</span>
+        <span class="n">alias</span> <span class="o">=</span> <span class="n">alias_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"name"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mod</span> <span class="ow">and</span> <span class="n">alias</span><span class="p">:</span>
+          <span class="n">result</span><span class="p">[</span><span class="n">fw</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">alias</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
 </div>
 
 </pre></div>

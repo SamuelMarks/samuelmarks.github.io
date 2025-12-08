@@ -20,6 +20,11 @@ ml_switcheroo.plugins.rng_threading
    This ensures standard PyTorch calls like `torch.randn(..., generator=g)` become
    `jax.random.normal(..., key=key)`.
 
+   **Configuration**:
+   Users can customize the variable naming via `pyproject.toml` or CLI args:
+   - `rng_arg_name`: Name of the argument injected into signature (default: "rng").
+   - `key_var_name`: Name of the local key variable split from rng (default: "key").
+
 
 
 Functions
@@ -42,7 +47,8 @@ Module Contents
        Examples: `torch.nn.functional.dropout`, `torch.randn`, `torch.bernoulli`.
 
    :param node: The original CST Call node (e.g., `torch.dropout(x, 0.5)`).
-   :param ctx: The HookContext used to request global scope changes (signature/preamble).
+   :param ctx: The HookContext used to request global scope changes (signature/preamble)
+               and read configuration.
 
    :returns: The transformed CST Call node with the 'key' keyword argument appended
              and 'generator' arguments removed.

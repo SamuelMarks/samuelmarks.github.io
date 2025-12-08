@@ -21,14 +21,6 @@ ml_switcheroo.core.import_fixer
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   ml_switcheroo.core.import_fixer.FRAMEWORK_ALIAS_MAP
-
-
 Classes
 -------
 
@@ -40,9 +32,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: FRAMEWORK_ALIAS_MAP
-
-.. py:class:: ImportFixer(source_fw: str, target_fw: str, submodule_map: Dict[str, Tuple[str, Optional[str], Optional[str]]], preserve_source: bool = False)
+.. py:class:: ImportFixer(source_fw: str, target_fw: str, submodule_map: Dict[str, Tuple[str, Optional[str], Optional[str]]], alias_map: Optional[Dict[str, Tuple[str, str]]] = None, preserve_source: bool = False)
 
    Bases: :py:obj:`libcst.CSTTransformer`
 
@@ -64,6 +54,12 @@ Module Contents
    .. attribute:: submodule_map
 
       Map of "source.mod" -> (target_root, target_sub, alias).
+
+      :type: Dict
+
+   .. attribute:: alias_map
+
+      Map of "fw_name" -> (module_to_import, local_alias).
 
       :type: Dict
 
@@ -93,6 +89,9 @@ Module Contents
 
 
    .. py:attribute:: submodule_map
+
+
+   .. py:attribute:: alias_map
 
 
    .. py:attribute:: preserve_source
@@ -131,7 +130,7 @@ Module Contents
       Logic:
       1. Identifies insertion point (after __future__ and docstrings).
       2. Injects 'import target' only if needed (not found AND used).
-      3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage.
+      3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage via `alias_map`.
       4. Injects submodule mappings (e.g., from flax import linen) if usage requires it.
 
       :param original_node: The original CST module.

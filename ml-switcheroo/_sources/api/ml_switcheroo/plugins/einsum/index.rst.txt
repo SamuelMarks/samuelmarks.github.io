@@ -1,0 +1,42 @@
+ml_switcheroo.plugins.einsum
+============================
+
+.. py:module:: ml_switcheroo.plugins.einsum
+
+.. autoapi-nested-parse::
+
+   Plugin for normalizing Einsum calls.
+
+   Standardizes `einsum` arguments so the equation string is always the first argument.
+   This is required because JAX enforces `einsum(equation, *operands)`, whereas
+   PyTorch historically allowed `einsum(operand, operand, equation)`.
+
+   This plugin handles both the argument shuffling AND the API renaming (since plugins
+   override the default renaming logic in the Rewriter).
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.einsum.normalize_einsum
+
+
+Module Contents
+---------------
+
+.. py:function:: normalize_einsum(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Plugin Hook: Rotates arguments to place the equation string first and renames function.
+
+   Triggers:
+       Operations mapping to `einsum` with `requires_plugin: "einsum_normalizer"`.
+
+   :param node: The original CST Call node.
+   :param ctx: HookContext.
+
+   :returns: The transformed CST Call node.
+
+

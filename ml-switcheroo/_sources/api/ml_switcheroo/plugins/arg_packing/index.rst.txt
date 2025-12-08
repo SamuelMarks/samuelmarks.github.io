@@ -1,0 +1,50 @@
+ml_switcheroo.plugins.arg_packing
+=================================
+
+.. py:module:: ml_switcheroo.plugins.arg_packing
+
+.. autoapi-nested-parse::
+
+   Plugin for packing variable positional arguments into a sequence (tuple/list).
+
+   Essential for mapping vararg APIs (like `torch.permute(x, 0, 2, 1)`) to sequence-based
+   APIs (like `jax.numpy.transpose(x, axes=(0, 2, 1))`).
+
+   Strategy:
+   1.  Identify the operation (e.g. `permute_dims`).
+   2.  Lookup the target API (e.g. `jax.numpy.transpose`).
+   3.  Separate the primary input argument (first positional) from the varargs.
+   4.  Pack the trailing varargs into a `Tuple` node.
+   5.  Construct the new call with the sequence passed as a keyword argument (e.g. `axes=...`).
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.arg_packing.pack_varargs
+
+
+Module Contents
+---------------
+
+.. py:function:: pack_varargs(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Plugin Hook: Packs trailing positional arguments into a keyword tuple.
+
+   Triggers:
+       Operations marked with `requires_plugin: "pack_varargs"`.
+       Designed for `permute_dims` (torch.permute -> jax.numpy.transpose).
+
+   Transformation:
+       Input:  `torch.permute(x, 0, 2, 1)`
+       Output: `jax.numpy.transpose(x, axes=(0, 2, 1))`
+
+   :param node: The original CST Call node.
+   :param ctx: HookContext for API lookup.
+
+   :returns: The transformed CST Call node.
+
+

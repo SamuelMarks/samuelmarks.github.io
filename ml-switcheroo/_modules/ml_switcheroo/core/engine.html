@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -543,7 +548,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -660,6 +665,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.scanners</span><span class="w"> </span><span class="kn">import</span> <span class="n">UsageScanner</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.analysis.purity</span><span class="w"> </span><span class="kn">import</span> <span class="n">PurityScanner</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.analysis.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">DependencyScanner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.analysis.lifecycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">InitializationTracker</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">RuntimeConfig</span>
 
 
@@ -787,7 +793,8 @@ window.addEventListener("load", load);
 
 <span class="sd">    Steps:</span>
 <span class="sd">    0a. Purity Analysis (if targeting JAX): Flag unsafe side-effects.</span>
-<span class="sd">    0b. Dependency Analysis: Flag unmapped 3rd party libraries.</span>
+<span class="sd">    0b. Lifecycle Analysis: Detect dynamic attribute definition.</span>
+<span class="sd">    0c. Dependency Analysis: Flag unmapped 3rd party libraries.</span>
 <span class="sd">    1. Rewrite Call usages (Semantic Pivot).</span>
 <span class="sd">    2. Scan for lingering source references.</span>
 <span class="sd">    3. Feature-driven Import Fixing.</span>
@@ -810,7 +817,16 @@ window.addEventListener("load", load);
       <span class="n">purity_scanner</span> <span class="o">=</span> <span class="n">PurityScanner</span><span class="p">()</span>
       <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">purity_scanner</span><span class="p">)</span>
 
-    <span class="c1"># Pass 0b: Dependency Analysis (Validation)</span>
+    <span class="c1"># Pass 0b: Lifecycle Analysis (Detect dynamic state definition)</span>
+    <span class="c1"># This is critical for converting Pythonic PyTorch to Static Graph JAX/Flax</span>
+    <span class="n">lifecycle_tracker</span> <span class="o">=</span> <span class="n">InitializationTracker</span><span class="p">()</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">lifecycle_tracker</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">lifecycle_tracker</span><span class="o">.</span><span class="n">warnings</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">lifecycle_tracker</span><span class="o">.</span><span class="n">warnings</span><span class="p">:</span>
+        <span class="n">errors_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Lifecycle Warning: </span><span class="si">{</span><span class="n">warning</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="c1"># Pass 0c: Dependency Analysis (Validation)</span>
     <span class="c1"># Identifies imports like 'pandas', 'cv2' that aren't mapped in semantics.</span>
     <span class="n">dep_scanner</span> <span class="o">=</span> <span class="n">DependencyScanner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
     <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">dep_scanner</span><span class="p">)</span>
@@ -833,14 +849,16 @@ window.addEventListener("load", load);
       <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">scanner</span><span class="p">)</span>
       <span class="n">should_preserve</span> <span class="o">=</span> <span class="n">scanner</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
 
-      <span class="c1"># Sub-step 2b: Retrieve Data-Driven Import Maps</span>
+      <span class="c1"># Sub-step 2b: Retrieve Data-Driven Import Maps &amp; Alias Config</span>
       <span class="n">submodule_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="o">.</span><span class="n">get_import_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">target_framework</span><span class="p">)</span>
+      <span class="n">alias_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="o">.</span><span class="n">get_framework_aliases</span><span class="p">()</span>
 
       <span class="c1"># Sub-step 2c: Fix imports</span>
       <span class="n">fixer</span> <span class="o">=</span> <span class="n">ImportFixer</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_framework</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">target_framework</span><span class="p">,</span>
         <span class="n">submodule_map</span><span class="o">=</span><span class="n">submodule_map</span><span class="p">,</span>
+        <span class="n">alias_map</span><span class="o">=</span><span class="n">alias_map</span><span class="p">,</span>
         <span class="n">preserve_source</span><span class="o">=</span><span class="n">should_preserve</span><span class="p">,</span>
       <span class="p">)</span>
       <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">fixer</span><span class="p">)</span>

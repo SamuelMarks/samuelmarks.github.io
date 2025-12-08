@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -543,7 +548,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -655,6 +660,11 @@ window.addEventListener("load", load);
 
 <span class="sd">This ensures standard PyTorch calls like `torch.randn(..., generator=g)` become</span>
 <span class="sd">`jax.random.normal(..., key=key)`.</span>
+
+<span class="sd">**Configuration**:</span>
+<span class="sd">Users can customize the variable naming via `pyproject.toml` or CLI args:</span>
+<span class="sd">- `rng_arg_name`: Name of the argument injected into signature (default: "rng").</span>
+<span class="sd">- `key_var_name`: Name of the local key variable split from rng (default: "key").</span>
 <span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
@@ -688,7 +698,8 @@ window.addEventListener("load", load);
 
 <span class="sd">  Args:</span>
 <span class="sd">      node: The original CST Call node (e.g., `torch.dropout(x, 0.5)`).</span>
-<span class="sd">      ctx: The HookContext used to request global scope changes (signature/preamble).</span>
+<span class="sd">      ctx: The HookContext used to request global scope changes (signature/preamble)</span>
+<span class="sd">           and read configuration.</span>
 
 <span class="sd">  Returns:</span>
 <span class="sd">      The transformed CST Call node with the 'key' keyword argument appended</span>
@@ -699,37 +710,39 @@ window.addEventListener("load", load);
   <span class="k">if</span> <span class="n">ctx</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">!=</span> <span class="s2">"jax"</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">node</span>
 
-  <span class="c1"># 1. Request Signature Injection</span>
-  <span class="c1"># We ask the context to ensure 'rng' is present in the function definition.</span>
-  <span class="c1"># The Rewrite Engine is responsible for checking if 'rng' already exists</span>
-  <span class="c1"># to avoid duplication.</span>
-  <span class="n">ctx</span><span class="o">.</span><span class="n">inject_signature_arg</span><span class="p">(</span><span class="s2">"rng"</span><span class="p">)</span>
+  <span class="c1"># 1. Configuration</span>
+  <span class="c1"># Read variable name preferences from user config</span>
+  <span class="n">rng_arg</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">raw_config</span><span class="p">(</span><span class="s2">"rng_arg_name"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"rng"</span><span class="p">)</span>
+  <span class="n">key_var</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">raw_config</span><span class="p">(</span><span class="s2">"key_var_name"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">"key"</span><span class="p">)</span>
 
-  <span class="c1"># 2. Request Preamble Injection</span>
+  <span class="c1"># 2. Request Signature Injection</span>
+  <span class="c1"># We ask the context to ensure 'rng' (or custom name) is present in the function definition.</span>
+  <span class="c1"># The Rewrite Engine is responsible for checking if it already exists to avoid duplication.</span>
+  <span class="n">ctx</span><span class="o">.</span><span class="n">inject_signature_arg</span><span class="p">(</span><span class="n">rng_arg</span><span class="p">)</span>
+
+  <span class="c1"># 3. Request Preamble Injection</span>
   <span class="c1"># We inject the splitting logic at the top of the function body.</span>
-  <span class="c1"># This creates a fresh 'key' for use in the current scope.</span>
-  <span class="c1"># The Rewrite Engine ensures this line is only added once per function.</span>
-  <span class="n">ctx</span><span class="o">.</span><span class="n">inject_preamble</span><span class="p">(</span><span class="s2">"rng, key = jax.random.split(rng)"</span><span class="p">)</span>
+  <span class="c1"># Example: "rng, key = jax.random.split(rng)"</span>
+  <span class="n">split_stmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">rng_arg</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">key_var</span><span class="si">}</span><span class="s2"> = jax.random.split(</span><span class="si">{</span><span class="n">rng_arg</span><span class="si">}</span><span class="s2">)"</span>
+  <span class="n">ctx</span><span class="o">.</span><span class="n">inject_preamble</span><span class="p">(</span><span class="n">split_stmt</span><span class="p">)</span>
 
-  <span class="c1"># 3. Clean Arguments</span>
+  <span class="c1"># 4. Clean Arguments</span>
   <span class="c1"># Remove Torch-specific legacy RNG arguments like 'generator'</span>
   <span class="n">cleaned_args</span> <span class="o">=</span> <span class="n">_remove_generator_arg</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
 
-  <span class="c1"># 4. Modify the Call</span>
-  <span class="c1"># Create the `key=key` argument node.</span>
+  <span class="c1"># 5. Modify the Call</span>
+  <span class="c1"># Create the `key=key_var` argument node.</span>
+  <span class="c1"># Note: The keyword "key" matches standard JAX API (e.g. random.normal(key=...)).</span>
+  <span class="c1"># The value matches the local variable we split in the preamble.</span>
   <span class="n">key_arg</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span>
-    <span class="n">keyword</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"key"</span><span class="p">),</span>  <span class="c1"># FIXED: was 'kword', correct is 'keyword'</span>
-    <span class="n">value</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"key"</span><span class="p">),</span>
+    <span class="n">keyword</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"key"</span><span class="p">),</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">key_var</span><span class="p">),</span>
     <span class="n">equal</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">AssignEqual</span><span class="p">(</span><span class="n">whitespace_before</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">SimpleWhitespace</span><span class="p">(</span><span class="s2">""</span><span class="p">),</span> <span class="n">whitespace_after</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">SimpleWhitespace</span><span class="p">(</span><span class="s2">""</span><span class="p">)),</span>
   <span class="p">)</span>
 
   <span class="c1"># Append our new key argument to the cleaned list</span>
   <span class="n">new_args</span> <span class="o">=</span> <span class="n">cleaned_args</span> <span class="o">+</span> <span class="p">[</span><span class="n">key_arg</span><span class="p">]</span>
 
-  <span class="c1"># Return the modified node.</span>
-  <span class="c1"># Note: The API name mapping (e.g., swapping torch.dropout -&gt; jax.random.bernoulli)</span>
-  <span class="c1"># is handled by the standard semantic mapping logic within the Rewriter</span>
-  <span class="c1"># either before or after this hook runs, preserving the structure we build here.</span>
   <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">new_args</span><span class="p">)</span></div>
 
 </pre></div>

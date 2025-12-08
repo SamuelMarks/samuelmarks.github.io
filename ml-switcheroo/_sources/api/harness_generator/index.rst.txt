@@ -1,0 +1,67 @@
+harness_generator
+=================
+
+.. py:module:: harness_generator
+
+.. autoapi-nested-parse::
+
+   Integration Test Harness Generator.
+
+   This module is responsible for creating temporary verification scripts (harnesses)
+   that dynamically import the original Source code and the converted Target code,
+   feed them identical inputs, and verify that their outputs match.
+
+   Crucially, the generated harness is **Standalone**: it does not import from
+   the `ml_switcheroo` package, allowing verification in isolated environments.
+
+   **Update (Split-Brain Fix)**:
+   Uses `CodeExtractor` to inject the *actual* code of `InputFuzzer` into the harness script,
+   eliminating the duplicated `StandaloneFuzzer` maintained in string templates.
+   This ensures that type hint improvements in the main codebase are automatically
+   reflected in the verification harness.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   harness_generator.HarnessGenerator
+
+
+Module Contents
+---------------
+
+.. py:class:: HarnessGenerator
+
+   Generates a standalone Python script to verify transpilation correctness.
+   Dynamically extracts the `InputFuzzer` logic to embed it within the script.
+
+   .. attribute:: extractor
+
+      Utility to source code from runtime objects.
+
+      :type: CodeExtractor
+
+
+   .. py:attribute:: extractor
+
+
+   .. py:method:: generate(source_file: pathlib.Path, target_file: pathlib.Path, output_harness: pathlib.Path, source_fw: str = 'torch', target_fw: str = 'jax', semantics: Optional[Dict[str, Any]] = None) -> None
+
+      Writes the standalone verification script to disk.
+
+      It reads the source code of `InputFuzzer` and injects it into the template,
+      renaming it to `StandaloneFuzzer` to match the template's expectations if needed,
+      or simply using the extracted class.
+
+      :param source_file: Path to the original source code.
+      :param target_file: Path to the converted source code.
+      :param output_harness: Where to save the `verify_xyz.py` script.
+      :param source_fw: Name of source framework (for fuzzer adaptation).
+      :param target_fw: Name of target framework (for fuzzer adaptation).
+      :param semantics: Optional semantics dictionary to extract type hints.
+
+
+

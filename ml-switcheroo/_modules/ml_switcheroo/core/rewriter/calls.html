@@ -52,6 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -59,6 +60,7 @@
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../../_static/trace_render.js"></script>
     <script src="../../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
@@ -652,12 +654,12 @@ window.addEventListener("load", load);
 <span class="sd">Handles function invocation usage (`leave_Call`) and Assignment Unwrapping.</span>
 <span class="sd">Includes functionality for:</span>
 <span class="sd">- Lifecycle method stripping (e.g. `.to()`, `.cpu()`).</span>
-<span class="sd">- Functional -&gt; OOP Unwrapping (removing `.apply` and tuple unpacking).</span>
+<span class="sd">- Functional -&gt; OOP Unwrapping.</span>
 <span class="sd">- Stateful object management.</span>
 <span class="sd">- Standard API pivots.</span>
 <span class="sd">- Plugin dispatch.</span>
-<span class="sd">- Constructor logic injection (RNG management).</span>
-<span class="sd">- **Output Normalization**: Adapting return values to match the Abstract Standard.</span>
+<span class="sd">- Output Normalization.</span>
+<span class="sd">- **Trace Instrumention** for visibility.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Dict</span>
@@ -667,7 +669,8 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SemanticTier</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.rewriter.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRewriter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.rewriter.normalization</span><span class="w"> </span><span class="kn">import</span> <span class="n">NormalizationMixin</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.tracer</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_tracer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.utils.node_diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">capture_node_source</span><span class="p">,</span> <span class="n">diff_nodes</span>
 
 <div class="viewcode-block" id="CallMixin">
 <a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/index.html#ml_switcheroo.core.rewriter.calls.CallMixin">[docs]</a>
@@ -676,25 +679,12 @@ window.addEventListener("load", load);
 <span class="sd">  Mixin for transforming Call nodes and unpacking Assignments.</span>
 <span class="sd">  """</span>
 
-  <span class="c1"># Methods to strip completely (return receiver object)</span>
   <span class="n">_LIFECYCLE_STRIP</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"to"</span><span class="p">,</span>
-    <span class="s2">"cpu"</span><span class="p">,</span>
-    <span class="s2">"cuda"</span><span class="p">,</span>
-    <span class="s2">"detach"</span><span class="p">,</span>
-    <span class="s2">"clone"</span><span class="p">,</span>
-    <span class="s2">"requires_grad_"</span><span class="p">,</span>
-    <span class="s2">"share_memory_"</span><span class="p">,</span>
+    <span class="s2">"to"</span><span class="p">,</span> <span class="s2">"cpu"</span><span class="p">,</span> <span class="s2">"cuda"</span><span class="p">,</span> <span class="s2">"detach"</span><span class="p">,</span> <span class="s2">"clone"</span><span class="p">,</span> <span class="s2">"requires_grad_"</span><span class="p">,</span> <span class="s2">"share_memory_"</span>
   <span class="p">}</span>
 
-  <span class="c1"># Methods to strip but warn about state implications.</span>
   <span class="n">_LIFECYCLE_WARN</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"eval"</span><span class="p">,</span>
-    <span class="s2">"train"</span><span class="p">,</span>
-    <span class="s2">"half"</span><span class="p">,</span>
-    <span class="s2">"float"</span><span class="p">,</span>
-    <span class="s2">"double"</span><span class="p">,</span>
-    <span class="s2">"type"</span><span class="p">,</span>
+    <span class="s2">"eval"</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">,</span> <span class="s2">"half"</span><span class="p">,</span> <span class="s2">"float"</span><span class="p">,</span> <span class="s2">"double"</span><span class="p">,</span> <span class="s2">"type"</span>
   <span class="p">}</span>
 
 <div class="viewcode-block" id="CallMixin.leave_Assign">
@@ -705,35 +695,27 @@ window.addEventListener("load", load);
 
 <span class="sd">    Scenario: `y, updates = layer.apply(vars, x)`</span>
 <span class="sd">    Target:   `y = layer(x)` (NNX/Torch style)</span>
-
-<span class="sd">    If we detected that a call was rewritten from a functional pattern</span>
-<span class="sd">    returning multiple values (outputs + state) to an OOP pattern</span>
-<span class="sd">    returning a single value, we must also simplify the assignment targets.</span>
 <span class="sd">    """</span>
-    <span class="c1"># 1. Check if we are assigning from a Call</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">original_node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">):</span>
       <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">leave_Assign</span><span class="p">(</span><span class="n">original_node</span><span class="p">,</span> <span class="n">updated_node</span><span class="p">)</span>
 
-    <span class="c1"># 2. Check if the original call was '.apply' (The functional signature)</span>
-    <span class="c1"># We look at the ORIGINAL node to see what the source code intended.</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_functional_apply</span><span class="p">(</span><span class="n">original_node</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
-      <span class="c1"># Check if we have multiple targets (y, updates = ...)</span>
-      <span class="c1"># cst.Assign.targets contains a list of AssignTarget.</span>
-      <span class="c1"># Usually one AssignTarget which wraps a Tuple/List if destructuring.</span>
       <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">updated_node</span><span class="o">.</span><span class="n">targets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">targets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">target</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="p">(</span><span class="n">cst</span><span class="o">.</span><span class="n">Tuple</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">List</span><span class="p">)):</span>
-          <span class="c1"># Destructuring detected: y, updates = ...</span>
-          <span class="c1"># We assume index 0 is the prediction/output we care about in OOP.</span>
           <span class="n">elements</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">elements</span>
           <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">primary_target</span> <span class="o">=</span> <span class="n">elements</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-
-            <span class="c1"># Create new single target</span>
             <span class="n">new_target</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">AssignTarget</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">primary_target</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">new_target</span><span class="p">])</span>
 
-    <span class="c1"># Delegate to MRO (likely AttributeMixin)</span>
+            <span class="n">new_node</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">targets</span><span class="o">=</span><span class="p">[</span><span class="n">new_target</span><span class="p">])</span>
+            <span class="n">get_tracer</span><span class="p">()</span><span class="o">.</span><span class="n">log_mutation</span><span class="p">(</span>
+              <span class="s2">"Assignment Unwrapping"</span><span class="p">,</span>
+              <span class="n">capture_node_source</span><span class="p">(</span><span class="n">original_node</span><span class="p">),</span>
+              <span class="n">capture_node_source</span><span class="p">(</span><span class="n">new_node</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_node</span>
+
     <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">leave_Assign</span><span class="p">(</span><span class="n">original_node</span><span class="p">,</span> <span class="n">updated_node</span><span class="p">)</span></div>
 
 
@@ -742,55 +724,65 @@ window.addEventListener("load", load);
   <span class="k">def</span><span class="w"> </span><span class="nf">leave_Call</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">original</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">updated</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">BinaryOperation</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">UnaryOperation</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Rewrites function calls."""</span>
+<span class="w">    </span><span class="sd">"""Rewrites function calls with detailed Trace Logging."""</span>
+
+    <span class="n">result_node</span> <span class="o">=</span> <span class="n">updated</span>
     <span class="n">func_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qualified_name</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
 
-    <span class="c1"># 0a. Functional 'apply' unwrapping (Linen -&gt; NNX/Torch)</span>
-    <span class="c1"># Check against pure .apply calls on objects</span>
+    <span class="c1"># 0a. Functional 'apply' unwrapping</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_functional_apply</span><span class="p">(</span><span class="n">original</span><span class="p">):</span>
-      <span class="c1"># Transform: obj.apply(vars, x) -&gt; obj(x)</span>
-      <span class="c1"># 1. Remove '.apply' from function name</span>
-      <span class="c1"># original.func is Attribute(value=obj, attr='apply')</span>
-      <span class="c1"># new func is just 'obj' (the value)</span>
       <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
         <span class="n">receiver</span> <span class="o">=</span> <span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span>
-
-        <span class="c1"># 2. Remove first argument 'vars' (state dictionary)</span>
-        <span class="c1"># Arguments: [vars, x, y...] -&gt; [x, y...]</span>
         <span class="n">new_args</span> <span class="o">=</span> <span class="n">updated</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">updated</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">result_node</span> <span class="o">=</span> <span class="n">updated</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">new_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_diff</span><span class="p">(</span><span class="s2">"Functional Unwrap"</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="n">result_node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result_node</span>
 
-        <span class="k">return</span> <span class="n">updated</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">receiver</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">new_args</span><span class="p">)</span>
-
-    <span class="c1"># 0b. Check for Plugin First! (Override Lifecycle logic)</span>
+    <span class="c1"># 0b. Plugin Check</span>
     <span class="n">plugin_claim</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">if</span> <span class="n">func_name</span><span class="p">:</span>
       <span class="n">mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mapping</span><span class="p">(</span><span class="n">func_name</span><span class="p">)</span>
       <span class="k">if</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="s2">"requires_plugin"</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
         <span class="n">plugin_claim</span> <span class="o">=</span> <span class="kc">True</span>
 
+    <span class="c1"># 0b.2 Heuristic: In-Place Unrolling</span>
+    <span class="c1"># If no mapping was found but method ends in '_' (e.g. x.add_), try to unroll it.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">plugin_claim</span> <span class="ow">and</span> <span class="n">func_name</span> <span class="ow">and</span> <span class="n">func_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">func_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"__"</span><span class="p">):</span>
+      <span class="n">hook</span> <span class="o">=</span> <span class="n">get_hook</span><span class="p">(</span><span class="s2">"unroll_inplace_ops"</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">hook</span><span class="p">:</span>
+        <span class="n">new_node</span> <span class="o">=</span> <span class="n">hook</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_node</span> <span class="o">!=</span> <span class="n">updated</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_log_diff</span><span class="p">(</span><span class="s2">"In-place Unroll (Heuristic)"</span><span class="p">,</span> <span class="n">updated</span><span class="p">,</span> <span class="n">new_node</span><span class="p">)</span>
+          <span class="c1"># Adopt changes and update name resolution for subsequent passes</span>
+          <span class="n">updated</span> <span class="o">=</span> <span class="n">new_node</span>
+          <span class="n">func_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qualified_name</span><span class="p">(</span><span class="n">updated</span><span class="o">.</span><span class="n">operator</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">BinaryOperation</span><span class="p">)</span> <span class="k">else</span> <span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+
     <span class="c1"># 0c. Lifecycle Method Handling</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">plugin_claim</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Attribute</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">attr</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">):</span>
       <span class="n">method_name</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">attr</span><span class="o">.</span><span class="n">value</span>
 
-      <span class="c1"># Case A: Strip (x.to() -&gt; x)</span>
       <span class="k">if</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LIFECYCLE_STRIP</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">_report_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stripped framework-specific lifecycle method '.</span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">()'."</span><span class="p">)</span>
-          <span class="k">return</span> <span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span>
+          <span class="n">result_node</span> <span class="o">=</span> <span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_log_diff</span><span class="p">(</span><span class="s2">"Lifecycle Strip"</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="n">result_node</span><span class="p">)</span>
+          <span class="k">return</span> <span class="n">result_node</span>
 
-      <span class="c1"># Case B: Warn/Stub</span>
       <span class="k">if</span> <span class="n">method_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LIFECYCLE_WARN</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">_report_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ignored model state method '.</span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">()'."</span><span class="p">)</span>
-          <span class="k">return</span> <span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span>
+          <span class="n">result_node</span> <span class="o">=</span> <span class="n">updated</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">value</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_log_diff</span><span class="p">(</span><span class="s2">"Lifecycle Warn"</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="n">result_node</span><span class="p">)</span>
+          <span class="k">return</span> <span class="n">result_node</span>
 
     <span class="c1"># 1. Stateful Object Usage</span>
-    <span class="c1"># If converting TO functional (not relevant for NNX target, but kept for logic safety)</span>
     <span class="k">if</span> <span class="n">func_name</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_stateful</span><span class="p">(</span><span class="n">func_name</span><span class="p">):</span>
       <span class="n">fw_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="o">.</span><span class="n">get_framework_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span><span class="p">)</span>
       <span class="n">stateful_spec</span> <span class="o">=</span> <span class="n">fw_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"stateful_call"</span><span class="p">)</span>
       <span class="k">if</span> <span class="n">stateful_spec</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rewrite_stateful_call</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="n">stateful_spec</span><span class="p">)</span>
+        <span class="n">result_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rewrite_stateful_call</span><span class="p">(</span><span class="n">updated</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="n">stateful_spec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_diff</span><span class="p">(</span><span class="s2">"State Mechanism"</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="n">result_node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result_node</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">func_name</span><span class="p">:</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict_mode</span><span class="p">:</span>
@@ -800,6 +792,15 @@ window.addEventListener("load", load);
     <span class="c1"># 2. Standard API Rewrite Setup</span>
     <span class="n">mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mapping</span><span class="p">(</span><span class="n">func_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mapping</span><span class="p">:</span>
+      <span class="c1"># --- TRACE: Detailed Decision Log ---</span>
+      <span class="c1"># If we resolved a name but found no mapping, log it to show user we TRIED.</span>
+      <span class="c1"># This fixes the "Silent Failure" visibility issue.</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_builtin</span><span class="p">(</span><span class="n">func_name</span><span class="p">):</span>
+          <span class="n">get_tracer</span><span class="p">()</span><span class="o">.</span><span class="n">log_inspection</span><span class="p">(</span>
+              <span class="n">node_str</span><span class="o">=</span><span class="n">func_name</span><span class="p">,</span>
+              <span class="n">outcome</span><span class="o">=</span><span class="s2">"Skipped"</span><span class="p">,</span>
+              <span class="n">detail</span><span class="o">=</span><span class="s2">"No Entry in Semantics Knowledge Base"</span>
+          <span class="p">)</span>
       <span class="k">return</span> <span class="n">updated</span>
 
     <span class="n">lookup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="o">.</span><span class="n">get_definition</span><span class="p">(</span><span class="n">func_name</span><span class="p">)</span>
@@ -807,8 +808,6 @@ window.addEventListener("load", load);
       <span class="k">return</span> <span class="n">updated</span>
 
     <span class="n">abstract_id</span><span class="p">,</span> <span class="n">details</span> <span class="o">=</span> <span class="n">lookup</span>
-    <span class="n">result_node</span> <span class="o">=</span> <span class="n">updated</span>
-
     <span class="c1"># 2a. Infix / Prefix Transformation</span>
     <span class="k">if</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"transformation_type"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"infix"</span><span class="p">:</span>
       <span class="k">try</span><span class="p">:</span>
@@ -821,7 +820,7 @@ window.addEventListener("load", load);
         <span class="p">)</span>
       <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_report_failure</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Infix/Prefix transformation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">updated</span>  <span class="c1"># Abort normalization</span>
+        <span class="k">return</span> <span class="n">updated</span>
 
     <span class="c1"># 2b. Inline Lambda Transformation</span>
     <span class="k">elif</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"transformation_type"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"inline_lambda"</span><span class="p">:</span>
@@ -853,7 +852,6 @@ window.addEventListener("load", load);
         <span class="k">return</span> <span class="n">updated</span>
 
     <span class="c1"># 3. Output Normalization (Post-Processing)</span>
-    <span class="c1"># Check if target framework returns mismatched output (e.g. extra tuple args)</span>
     <span class="k">if</span> <span class="s2">"output_adapter"</span> <span class="ow">in</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">"output_adapter"</span><span class="p">]:</span>
       <span class="k">try</span><span class="p">:</span>
         <span class="n">result_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_output_adapter</span><span class="p">(</span><span class="n">result_node</span><span class="p">,</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">"output_adapter"</span><span class="p">])</span>
@@ -861,39 +859,44 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">_report_failure</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output adapter failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">updated</span>
 
-    <span class="c1"># 4. Class Construction Logic (init/call within init)</span>
+    <span class="c1"># 4. Class Construction Logic</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signature_stack</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signature_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_init</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signature_stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_module_method</span><span class="p">:</span>
       <span class="n">origins</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="p">,</span> <span class="s2">"_key_origins"</span><span class="p">,</span> <span class="p">{})</span>
       <span class="n">tier</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">abstract_id</span><span class="p">)</span>
       <span class="k">if</span> <span class="n">tier</span> <span class="o">==</span> <span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-        <span class="c1"># Note: We must check if result_node is still a Call to append kwargs.</span>
-        <span class="c1"># If it became an Expression (via infix or plugin), we skip.</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result_node</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">):</span>
           <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"jax"</span><span class="p">:</span>
             <span class="n">result_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inject_rngs_kwarg</span><span class="p">(</span><span class="n">result_node</span><span class="p">)</span>
           <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"torch"</span><span class="p">:</span>
             <span class="n">result_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_kwarg</span><span class="p">(</span><span class="n">result_node</span><span class="p">,</span> <span class="s2">"rngs"</span><span class="p">)</span>
 
+    <span class="bp">self</span><span class="o">.</span><span class="n">_log_diff</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Operation (</span><span class="si">{</span><span class="n">abstract_id</span><span class="si">}</span><span class="s2">)"</span><span class="p">,</span> <span class="n">original</span><span class="p">,</span> <span class="n">result_node</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">result_node</span></div>
 
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_is_builtin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">"""Avoid spamming logs for standard python builtins unless mapped."""</span>
+      <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"print"</span><span class="p">,</span> <span class="s2">"len"</span><span class="p">,</span> <span class="s2">"range"</span><span class="p">,</span> <span class="s2">"super"</span><span class="p">,</span> <span class="s2">"enumerate"</span><span class="p">,</span> <span class="s2">"zip"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"float"</span><span class="p">,</span> <span class="s2">"str"</span><span class="p">}</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_log_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">original</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">,</span> <span class="n">modified</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Helper to compute diff and log if changed."""</span>
+    <span class="n">src_before</span><span class="p">,</span> <span class="n">src_after</span><span class="p">,</span> <span class="n">is_changed</span> <span class="o">=</span> <span class="n">diff_nodes</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">modified</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_changed</span><span class="p">:</span>
+        <span class="n">get_tracer</span><span class="p">()</span><span class="o">.</span><span class="n">log_mutation</span><span class="p">(</span>
+            <span class="n">label</span><span class="p">,</span>
+            <span class="n">src_before</span><span class="p">,</span>
+            <span class="n">src_after</span>
+        <span class="p">)</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_apply_output_adapter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inner_node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">,</span> <span class="n">adapter_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Wraps a node with a lambda adapter to normalize output.</span>
 <span class="sd">    Transform: `node` -&gt; `(adapter_str)(node)`</span>
-<span class="sd">    Example: `max(x)` -&gt; `(lambda x: x[0])(max(x))`</span>
 <span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
-      <span class="c1"># Parse the lambda expression</span>
-      <span class="c1"># "lambda x: x[0]" -&gt; Lambda Node</span>
       <span class="n">lambda_node</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">parse_expression</span><span class="p">(</span><span class="n">adapter_str</span><span class="p">)</span>
-
-      <span class="c1"># Wrap lambda in parens for immediate invocation: (lambda...)(arg)</span>
       <span class="n">parenthesized</span> <span class="o">=</span> <span class="n">lambda_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">lpar</span><span class="o">=</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">LeftParen</span><span class="p">()],</span> <span class="n">rpar</span><span class="o">=</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">RightParen</span><span class="p">()])</span>
-
-      <span class="c1"># Construct wrapper Call</span>
-      <span class="c1"># Argument passed is determining by the inner_node expression</span>
-      <span class="c1"># We assume inner_node is an Expression (Call, Name, etc.)</span>
       <span class="k">return</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">parenthesized</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">inner_node</span><span class="p">)])</span>
     <span class="k">except</span> <span class="n">cst</span><span class="o">.</span><span class="n">ParserSyntaxError</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid syntax in output_adapter: </span><span class="si">{</span><span class="n">adapter_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -901,25 +904,10 @@ window.addEventListener("load", load);
   <span class="k">def</span><span class="w"> </span><span class="nf">_rewrite_as_inline_lambda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lambda_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">Arg</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Wraps arguments in an Immediately Invoked Lambda Expression (IIFE).</span>
-
-<span class="sd">    Transforms:</span>
-<span class="sd">        `api(args)` -&gt; `(lambda x: ...)(args)`</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        lambda_str: The lambda definition code (e.g. "lambda x: hasattr(x, '__array__')").</span>
-<span class="sd">        args: The normalized list of arguments to pass to the lambda.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        A CST Call node where the function is a parenthesized lambda expression.</span>
 <span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
-      <span class="c1"># Parse the lambda string into a CST node</span>
-      <span class="c1"># We parse it as an expression to get the Lambda node</span>
       <span class="n">parsed_expr</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">parse_expression</span><span class="p">(</span><span class="n">lambda_str</span><span class="p">)</span>
-
-      <span class="c1"># Wrap it in parentheses to ensure valid calling syntax: (lambda...)(args)</span>
       <span class="n">parenthesized_lambda</span> <span class="o">=</span> <span class="n">parsed_expr</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">lpar</span><span class="o">=</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">LeftParen</span><span class="p">()],</span> <span class="n">rpar</span><span class="o">=</span><span class="p">[</span><span class="n">cst</span><span class="o">.</span><span class="n">RightParen</span><span class="p">()])</span>
-
       <span class="k">return</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">parenthesized_lambda</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">cst</span><span class="o">.</span><span class="n">ParserSyntaxError</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid lambda syntax in semantics: </span><span class="si">{</span><span class="n">lambda_str</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -927,7 +915,6 @@ window.addEventListener("load", load);
   <span class="k">def</span><span class="w"> </span><span class="nf">_is_functional_apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Detects if a call node matches the `obj.apply` pattern used in Flax Linen.</span>
-<span class="sd">    We check if the attribute name is 'apply'.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Attribute</span><span class="p">):</span>
       <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">attr</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">"apply"</span><span class="p">:</span>

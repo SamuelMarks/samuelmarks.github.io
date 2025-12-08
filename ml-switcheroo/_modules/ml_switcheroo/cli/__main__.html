@@ -52,6 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -59,6 +60,7 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/trace_render.js"></script>
     <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
@@ -662,7 +664,6 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.cli</span><span class="w"> </span><span class="kn">import</span> <span class="n">commands</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span>
 
-
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/cli/__main__/index.html#ml_switcheroo.cli.__main__.main">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -698,6 +699,12 @@ window.addEventListener("load", load);
     <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span>
     <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">help</span><span class="o">=</span><span class="s2">"Fail on unknown APIs instead of passing them through (Overrides config)"</span><span class="p">,</span>
+  <span class="p">)</span>
+  <span class="n">cmd_conv</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+    <span class="s2">"--json-trace"</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">"Dump full execution trace (events, diffs) to a JSON file."</span>
   <span class="p">)</span>
   <span class="n">cmd_conv</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
     <span class="s2">"--config"</span><span class="p">,</span>
@@ -797,6 +804,7 @@ window.addEventListener("load", load);
       <span class="n">args</span><span class="o">.</span><span class="n">verify</span><span class="p">,</span>
       <span class="n">args</span><span class="o">.</span><span class="n">strict</span><span class="p">,</span>
       <span class="n">settings</span><span class="p">,</span>
+      <span class="n">args</span><span class="o">.</span><span class="n">json_trace</span>
     <span class="p">)</span>
 
   <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">"matrix"</span><span class="p">:</span>
@@ -830,7 +838,6 @@ window.addEventListener("load", load);
     <span class="k">return</span> <span class="n">commands</span><span class="o">.</span><span class="n">handle_gen_tests</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
 
   <span class="k">return</span> <span class="mi">0</span></div>
-
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>

@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -544,7 +549,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -650,16 +655,20 @@ window.addEventListener("load", load);
 
 <span class="sd">It implements logic for:</span>
 <span class="sd">1.  **Inheritance Warping**: Swapping framework base classes (e.g., `torch.nn.Module`</span>
-<span class="sd">    ↔ `flax.nnx.Module`).</span>
+<span class="sd">    ↔ `flax.nnx.Module` ↔ `keras.Layer`).</span>
 <span class="sd">2.  **Signature Transformation**: Injecting or stripping framework-specific</span>
 <span class="sd">    state arguments (e.g., `rngs`) in constructors.</span>
-<span class="sd">3.  **Method Renaming**: Mapping `forward` ↔ `__call__`.</span>
+<span class="sd">3.  **Method Renaming**: Mapping `forward` ↔ `__call__` ↔ `call`.</span>
 <span class="sd">4.  **Constructor Logic Injection**: Ensuring `super().__init__()` is present</span>
-<span class="sd">    when targeting PyTorch.</span>
+<span class="sd">    when targeting PyTorch or Keras.</span>
+<span class="sd">5.  **Type Hint Rewriting**: Mapping type annotations (e.g., `torch.Tensor` -&gt; `jax.Array`)</span>
+<span class="sd">    in function signatures or variable assignments.</span>
+<span class="sd">6.  **Docstring Updates**: Automatically documenting injected arguments.</span>
 <span class="sd">"""</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.rewriter.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRewriter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.rewriter.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignatureContext</span>
@@ -669,13 +678,14 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/structure/index.html#ml_switcheroo.core.rewriter.StructureMixin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StructureMixin</span><span class="p">(</span><span class="n">BaseRewriter</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">"""</span>
-<span class="sd">  Mixin for transforming structural elements (Classes, Functions).</span>
+<span class="sd">  Mixin for transforming structural elements (Classes, Functions) and Type Hints.</span>
 
 <span class="sd">  Attributes:</span>
 <span class="sd">      _in_module_class (bool): Inherited from BaseRewriter. True if currently</span>
 <span class="sd">          traversing a Neural Network Module class.</span>
 <span class="sd">      _signature_stack (List[SignatureContext]): Inherited from BaseRewriter.</span>
 <span class="sd">          Tracks current function signature state.</span>
+<span class="sd">      _in_annotation (bool): Tracks if the visitor is currently inside a type annotation.</span>
 <span class="sd">  """</span>
 
 <div class="viewcode-block" id="StructureMixin.visit_ClassDef">
@@ -685,7 +695,7 @@ window.addEventListener("load", load);
 <span class="sd">    Visits a class definition to detect Neural Module context.</span>
 
 <span class="sd">    It inspects base classes to determine if the class is a framework-specific</span>
-<span class="sd">    Neural Module (Torch or Flax NNX). This sets the `_in_module_class` flag,</span>
+<span class="sd">    Neural Module (Torch, Flax NNX, or Keras). This sets the `_in_module_class` flag,</span>
 <span class="sd">    enabling method renaming and signature fixups nested within.</span>
 
 <span class="sd">    Args:</span>
@@ -702,15 +712,7 @@ window.addEventListener("load", load);
       <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
         <span class="k">continue</span>
 
-      <span class="c1"># Robust PyTorch check</span>
-      <span class="k">if</span> <span class="s2">"Module"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">and</span> <span class="p">(</span>
-        <span class="s2">"torch.nn"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"nn."</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"nn.Module"</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"torch.nn.Module"</span>
-      <span class="p">):</span>
-        <span class="n">is_module</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">break</span>
-
-      <span class="c1"># Robust Flax check</span>
-      <span class="k">if</span> <span class="s2">"Module"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">"flax.nnx"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">"nnx"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">):</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_framework_base</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
         <span class="n">is_module</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">break</span>
 
@@ -728,20 +730,21 @@ window.addEventListener("load", load);
 
 <span class="sd">    If the class was identified as a Neural Module, this method swaps the</span>
 <span class="sd">    base class:</span>
-<span class="sd">    - Target JAX: `torch.nn.Module` → `flax.nnx.Module`</span>
-<span class="sd">    - Target Torch: `flax.nnx.Module` → `torch.nn.Module`</span>
+<span class="sd">    - Target JAX: `...` → `flax.nnx.Module`</span>
+<span class="sd">    - Target Torch: `...` → `torch.nn.Module`</span>
+<span class="sd">    - Target Keras/TF: `...` → `keras.Layer`</span>
 
 <span class="sd">    Args:</span>
+<span class="sd">        original_node: The original CST node (unused).</span>
+<span class="sd">        updated_node: The CST node with transformed children.</span>
 <div class="viewcode-block" id="StructureMixin._signature_stack">
 <a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/structure/index.html#ml_switcheroo.core.rewriter.StructureMixin._signature_stack">[docs]</a>
-<span class="sd">        original_node: The original CST node (unused).</span></div>
+</div>
 
 <div class="viewcode-block" id="StructureMixin._in_module_class">
 <a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/structure/index.html#ml_switcheroo.core.rewriter.StructureMixin._in_module_class">[docs]</a>
-<span class="sd">        updated_node: The CST node with transformed children.</span></div>
+<span class="sd">    Returns:</span></div>
 
-
-<span class="sd">    Returns:</span>
 <span class="sd">        The transformed ClassDef node.</span>
 <span class="sd">    """</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_exit_scope</span><span class="p">()</span>
@@ -753,15 +756,21 @@ window.addEventListener("load", load);
       <span class="n">new_bases</span> <span class="o">=</span> <span class="p">[]</span>
       <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">bases</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qualified_name</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="c1"># Ensure we only replace the Module inheritance, preserving mixins</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">and</span> <span class="s2">"Module"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+
+        <span class="c1"># Ensure we only replace the Module/Layer inheritance, preserving mixins</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_framework_base</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+          <span class="n">target_base</span> <span class="o">=</span> <span class="kc">None</span>
+
           <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"jax"</span><span class="p">:</span>
-            <span class="n">new_base</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_dotted_name</span><span class="p">(</span><span class="s2">"flax.nnx.Module"</span><span class="p">))</span>
-            <span class="n">new_bases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_base</span><span class="p">)</span>
-            <span class="k">continue</span>
+            <span class="n">target_base</span> <span class="o">=</span> <span class="s2">"flax.nnx.Module"</span>
           <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"torch"</span><span class="p">:</span>
-            <span class="n">new_base</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_dotted_name</span><span class="p">(</span><span class="s2">"torch.nn.Module"</span><span class="p">))</span>
-            <span class="n">new_bases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_base</span><span class="p">)</span>
+            <span class="n">target_base</span> <span class="o">=</span> <span class="s2">"torch.nn.Module"</span>
+          <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"tensorflow"</span><span class="p">,</span> <span class="s2">"keras"</span><span class="p">]:</span>
+            <span class="n">target_base</span> <span class="o">=</span> <span class="s2">"keras.Layer"</span>
+
+          <span class="k">if</span> <span class="n">target_base</span><span class="p">:</span>
+            <span class="n">new_base_node</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">Arg</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_create_dotted_name</span><span class="p">(</span><span class="n">target_base</span><span class="p">))</span>
+            <span class="n">new_bases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_base_node</span><span class="p">)</span>
             <span class="k">continue</span>
 
         <span class="n">new_bases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
@@ -812,10 +821,11 @@ window.addEventListener("load", load);
 <span class="sd">    Finalizes function transformations.</span>
 
 <span class="sd">    Applies:</span>
-<span class="sd">    1.  **Method Renaming**: `forward` ↔ `__call__`.</span>
+<span class="sd">    1.  **Method Renaming**: `forward` ↔ `__call__` ↔ `call`.</span>
 <span class="sd">    2.  **Signature Modification**: Injecting/Stripping `rngs` for Flax NNX support.</span>
 <span class="sd">    3.  **Plugin Injection**: Applying args requested by plugins.</span>
 <span class="sd">    4.  **Preamble Injection**: Inserting setup code (like `super().__init__()` or RNG split).</span>
+<span class="sd">    5.  **Docstring Updates**: Appends injected arguments to docstrings.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        original_node: The original CST node.</span>
@@ -833,14 +843,21 @@ window.addEventListener("load", load);
 
     <span class="c1"># 1. Rename Methods</span>
     <span class="k">if</span> <span class="n">sig_ctx</span><span class="o">.</span><span class="n">is_module_method</span><span class="p">:</span>
+      <span class="n">curr_name</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span>
+      <span class="n">target_name</span> <span class="o">=</span> <span class="kc">None</span>
+
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"jax"</span><span class="p">:</span>
-        <span class="c1"># PyTorch -&gt; JAX: forward -&gt; __call__</span>
-        <span class="k">if</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">"forward"</span><span class="p">:</span>
-          <span class="n">updated_node</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"__call__"</span><span class="p">))</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="s2">"__call__"</span>
       <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"torch"</span><span class="p">:</span>
-        <span class="c1"># JAX -&gt; PyTorch: __call__ -&gt; forward</span>
-        <span class="k">if</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">"__call__"</span><span class="p">:</span>
-          <span class="n">updated_node</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"forward"</span><span class="p">))</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="s2">"forward"</span>
+      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"tensorflow"</span><span class="p">,</span> <span class="s2">"keras"</span><span class="p">]:</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="s2">"call"</span>
+
+      <span class="c1"># Rename if current is a standard forward-pass method (forward, __call__, call)</span>
+      <span class="c1"># and it doesn't match target convention</span>
+      <span class="n">known_methods</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"forward"</span><span class="p">,</span> <span class="s2">"__call__"</span><span class="p">,</span> <span class="s2">"call"</span><span class="p">}</span>
+      <span class="k">if</span> <span class="n">target_name</span> <span class="ow">and</span> <span class="n">curr_name</span> <span class="ow">in</span> <span class="n">known_methods</span> <span class="ow">and</span> <span class="n">curr_name</span> <span class="o">!=</span> <span class="n">target_name</span><span class="p">:</span>
+        <span class="n">updated_node</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="n">target_name</span><span class="p">))</span>
 
     <span class="c1"># 2. Modify __init__ signature &amp; body</span>
     <span class="k">if</span> <span class="n">sig_ctx</span><span class="o">.</span><span class="n">is_init</span> <span class="ow">and</span> <span class="n">sig_ctx</span><span class="o">.</span><span class="n">is_module_method</span><span class="p">:</span>
@@ -851,8 +868,8 @@ window.addEventListener("load", load);
           <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
             <span class="n">sig_ctx</span><span class="o">.</span><span class="n">injected_args</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">"rngs"</span><span class="p">,</span> <span class="s2">"flax.nnx.Rngs"</span><span class="p">))</span>
 
-      <span class="c1"># Torch: Strip 'rngs' and ensure super().__init__()</span>
-      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="o">==</span> <span class="s2">"torch"</span><span class="p">:</span>
+      <span class="c1"># Torch / Keras: Strip 'rngs' and ensure super().__init__()</span>
+      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"torch"</span><span class="p">,</span> <span class="s2">"tensorflow"</span><span class="p">,</span> <span class="s2">"keras"</span><span class="p">]:</span>
         <span class="n">updated_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_argument_from_signature</span><span class="p">(</span><span class="n">updated_node</span><span class="p">,</span> <span class="s2">"rngs"</span><span class="p">)</span>
         <span class="n">updated_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_super_init</span><span class="p">(</span><span class="n">updated_node</span><span class="p">)</span>
 
@@ -889,8 +906,79 @@ window.addEventListener("load", load);
       <span class="p">)</span>
       <span class="n">updated_node</span> <span class="o">=</span> <span class="n">updated_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">updated_body</span><span class="p">)</span>
 
+    <span class="c1"># 5. Update Docstring with Injected Arguments</span>
+    <span class="k">if</span> <span class="n">sig_ctx</span><span class="o">.</span><span class="n">injected_args</span><span class="p">:</span>
+      <span class="n">updated_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_docstring</span><span class="p">(</span><span class="n">updated_node</span><span class="p">,</span> <span class="n">sig_ctx</span><span class="o">.</span><span class="n">injected_args</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">updated_node</span></div>
 
+
+<div class="viewcode-block" id="StructureMixin.visit_Annotation">
+<a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/structure/index.html#ml_switcheroo.core.rewriter.StructureMixin.visit_Annotation">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">visit_Annotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Annotation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Enters a type annotation node (e.g., `: torch.Tensor` or `-&gt; int`).</span>
+<span class="sd">    Sets a flag to allow `leave_Name` to rewrite type names.</span>
+<span class="sd">    """</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_in_annotation</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="StructureMixin.leave_Annotation">
+<a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/structure/index.html#ml_switcheroo.core.rewriter.StructureMixin.leave_Annotation">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">leave_Annotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Annotation</span><span class="p">,</span> <span class="n">updated_node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Annotation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">Annotation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Leaves a type annotation node. Resets the annotation flag.</span>
+<span class="sd">    """</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_in_annotation</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">updated_node</span></div>
+
+
+<div class="viewcode-block" id="StructureMixin.leave_Name">
+<a class="viewcode-back" href="../../../../api/ml_switcheroo/core/rewriter/structure/index.html#ml_switcheroo.core.rewriter.StructureMixin.leave_Name">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">leave_Name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">updated_node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">BaseExpression</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Rewrites Names found within Type Annotations.</span>
+
+<span class="sd">    If we are inside an annotation context (e.g., `x: Tensor`), we resolve</span>
+<span class="sd">    this name via aliases (e.g., `Tensor` -&gt; `torch.Tensor`), look it up</span>
+<span class="sd">    in the semantics, and rewrite it if a mapping exists (e.g., -&gt; `jax.Array`).</span>
+
+<span class="sd">    Note: Calls and Attributes (e.g. `torch.Tensor`) are handled by other mixins</span>
+<span class="sd">    or `leave_Attribute` regardless of context, but bare `Name` nodes in code</span>
+<span class="sd">    are usually variables we don't want to touch. This method is scoped strictly</span>
+<span class="sd">    to annotations to be safe.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_in_annotation"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+      <span class="n">full_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_qualified_name</span><span class="p">(</span><span class="n">original_node</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">full_name</span><span class="p">:</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mapping</span><span class="p">(</span><span class="n">full_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mapping</span> <span class="ow">and</span> <span class="s2">"api"</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+          <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_name_node</span><span class="p">(</span><span class="n">mapping</span><span class="p">[</span><span class="s2">"api"</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">updated_node</span></div>
+
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_is_framework_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Checks if the given class name corresponds to a known Framework Module class.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># PyTorch</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"torch.nn.Module"</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"nn.Module"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># Flax NNX</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"flax.nnx.Module"</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"nnx.Module"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># Keras (including TF Keras)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s2">"keras"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">"tf"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">"Layer"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">"Model"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_inject_argument_to_signature</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -948,7 +1036,7 @@ window.addEventListener("load", load);
     <span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
     <span class="n">new_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">arg_name</span><span class="p">)]</span>
 
-    <span class="c1"># Clean trailing commas on the new last element if needed</span>
+    <span class="c1"># Clean trailing commas on new last element if needed</span>
     <span class="k">if</span> <span class="n">new_params</span> <span class="ow">and</span> <span class="n">new_params</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">comma</span> <span class="o">!=</span> <span class="n">cst</span><span class="o">.</span><span class="n">MaybeSentinel</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">:</span>
       <span class="n">last</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
       <span class="n">new_params</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">comma</span><span class="o">=</span><span class="n">cst</span><span class="o">.</span><span class="n">MaybeSentinel</span><span class="o">.</span><span class="n">DEFAULT</span><span class="p">)</span>
@@ -960,7 +1048,7 @@ window.addEventListener("load", load);
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Injects `super().__init__()` into `__init__` if missing.</span>
 
-<span class="sd">    Required for valid PyTorch sub-classing. Validates if the call</span>
+<span class="sd">    Required for valid PyTorch and Keras sub-classing. Validates if the call</span>
 <span class="sd">    already exists to avoid duplication. Wraps insertion logic to respect</span>
 <span class="sd">    docstrings.</span>
 
@@ -1012,7 +1100,149 @@ window.addEventListener("load", load);
       <span class="n">insert_idx</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="n">stmts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">insert_idx</span><span class="p">,</span> <span class="n">super_stmt</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">stmts</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">stmts</span><span class="p">))</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_update_docstring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">,</span> <span class="n">injected_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]])</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">FunctionDef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Updates the function docstring to include injected arguments.</span>
+
+<span class="sd">    It parses the existing docstring (handling Google/NumPy style if possible)</span>
+<span class="sd">    and appends a new entry for arguments like `rngs` or `key`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        node: The function definition node.</span>
+<span class="sd">        injected_args: List of (name, annotation) injected.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The function definition with updated docstring.</span>
+<span class="sd">    """</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">body</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">node</span>
+
+    <span class="c1"># Check first statement for docstring</span>
+    <span class="n">stmt</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">SimpleStatementLine</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">node</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stmt</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cst</span><span class="o">.</span><span class="n">Expr</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">node</span>
+
+    <span class="n">expr_node</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr_node</span><span class="p">,</span> <span class="n">cst</span><span class="o">.</span><span class="n">SimpleString</span><span class="p">):</span>
+      <span class="c1"># Concatenated strings are complex to edit, skipping</span>
+      <span class="k">return</span> <span class="n">node</span>
+
+    <span class="n">raw_val</span> <span class="o">=</span> <span class="n">expr_node</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1"># Parse quote style</span>
+    <span class="n">quote_style</span> <span class="o">=</span> <span class="s1">'"""'</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">if</span> <span class="n">raw_val</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">"r"</span><span class="p">,</span> <span class="s2">"u"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">,</span> <span class="s2">"U"</span><span class="p">)):</span>
+      <span class="n">prefix</span> <span class="o">=</span> <span class="n">raw_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">content_start</span> <span class="o">=</span> <span class="n">raw_val</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">content_start</span> <span class="o">=</span> <span class="n">raw_val</span>
+
+    <span class="k">if</span> <span class="n">content_start</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'"""'</span><span class="p">):</span>
+      <span class="n">quote_style</span> <span class="o">=</span> <span class="s1">'"""'</span>
+    <span class="k">elif</span> <span class="n">content_start</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"'''"</span><span class="p">):</span>
+      <span class="n">quote_style</span> <span class="o">=</span> <span class="s2">"'''"</span>
+    <span class="k">elif</span> <span class="n">content_start</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'"'</span><span class="p">):</span>
+      <span class="n">quote_style</span> <span class="o">=</span> <span class="s1">'"'</span>
+    <span class="k">elif</span> <span class="n">content_start</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"'"</span><span class="p">):</span>
+      <span class="n">quote_style</span> <span class="o">=</span> <span class="s2">"'"</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">node</span>  <span class="c1"># Unknown format</span>
+
+    <span class="c1"># Extract inner content</span>
+    <span class="c1"># Remove quotes from start and end</span>
+    <span class="c1"># Note: len(quote_style) could be 1 or 3</span>
+    <span class="n">q_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">quote_style</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_start</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">q_len</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">node</span>
+
+    <span class="n">inner_text</span> <span class="o">=</span> <span class="n">content_start</span><span class="p">[</span><span class="n">q_len</span><span class="p">:</span><span class="o">-</span><span class="n">q_len</span><span class="p">]</span>
+
+    <span class="c1"># Modify</span>
+    <span class="n">new_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modify_docstring_text</span><span class="p">(</span><span class="n">inner_text</span><span class="p">,</span> <span class="n">injected_args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">new_text</span> <span class="o">==</span> <span class="n">inner_text</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">node</span>
+
+    <span class="c1"># Reconstruct</span>
+    <span class="n">new_val</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">quote_style</span><span class="si">}{</span><span class="n">new_text</span><span class="si">}{</span><span class="n">quote_style</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">new_expr</span> <span class="o">=</span> <span class="n">expr_node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">new_val</span><span class="p">)</span>
+    <span class="n">new_stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="p">[</span><span class="n">stmt</span><span class="o">.</span><span class="n">body</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">new_expr</span><span class="p">)])</span>
+    <span class="n">new_body_stmts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">body</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="n">new_body_stmts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_stmt</span>
+
+    <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">new_body_stmts</span><span class="p">))</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_modify_docstring_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Heuristic text modification.</span>
+<span class="sd">    Support Google (Args:) and NumPy (Parameters) section extraction/appending.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Detect Indentation</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lines</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">text</span>  <span class="c1"># Empty docstring?</span>
+
+    <span class="c1"># Find indentation of the prompt block (usually second line determines indentation)</span>
+    <span class="n">indent</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\s*"</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">indent</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="c1"># Fallback for single line or no indentation detected</span>
+      <span class="n">indent</span> <span class="o">=</span> <span class="s2">"    "</span>
+
+    <span class="c1"># Prepare Entries</span>
+    <span class="n">new_entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+      <span class="c1"># Skip if already present</span>
+      <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">"\b</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">\b\s*[:\(]"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">rf</span><span class="s2">"\b</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">\s+:"</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="k">continue</span>
+
+      <span class="n">entry</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">indent</span><span class="si">}{</span><span class="n">name</span><span class="si">}</span><span class="s2">: Injected state argument."</span>
+      <span class="n">new_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_entries</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">text</span>
+
+    <span class="c1"># Logic:</span>
+    <span class="c1"># 1. Look for 'Args:'</span>
+    <span class="c1"># 2. Look for 'Parameters' (NumPy style often underlined)</span>
+    <span class="c1"># 3. Else Append 'Args:' section</span>
+
+    <span class="c1"># 1. Google Style 'Args:'</span>
+    <span class="n">args_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(\n\s*Args:\s*\n)"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args_match</span><span class="p">:</span>
+      <span class="n">split_idx</span> <span class="o">=</span> <span class="n">args_match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+      <span class="n">block</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_entries</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">text</span><span class="p">[:</span><span class="n">split_idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">text</span><span class="p">[</span><span class="n">split_idx</span><span class="p">:]</span>
+
+    <span class="c1"># 2. NumPy Style 'Parameters\n--------'</span>
+    <span class="n">param_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(\n\s*Parameters\s*\n\s*[-=]+\s*\n)"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">param_match</span><span class="p">:</span>
+      <span class="n">split_idx</span> <span class="o">=</span> <span class="n">param_match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+      <span class="n">block</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_entries</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">text</span><span class="p">[:</span><span class="n">split_idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="n">text</span><span class="p">[</span><span class="n">split_idx</span><span class="p">:]</span>
+
+    <span class="c1"># 3. Append to end (if multiline)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="c1"># Try to insert before the closing quotes (which are not here, it's inner text)</span>
+      <span class="c1"># We just append at appropriate collected indentation</span>
+      <span class="n">final_indent</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^\s*"</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">""</span> <span class="k">else</span> <span class="n">indent</span>
+
+      <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="se">\n\n</span><span class="si">{</span><span class="n">final_indent</span><span class="si">}</span><span class="s2">Args:</span><span class="se">\n</span><span class="s2">"</span>
+      <span class="n">block</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">final_indent</span><span class="si">}</span><span class="s2">    </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">new_entries</span><span class="p">])</span>
+      <span class="k">return</span> <span class="n">text</span> <span class="o">+</span> <span class="n">header</span> <span class="o">+</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span>
+
+    <span class="k">return</span> <span class="n">text</span></div>
 
 </pre></div>
 

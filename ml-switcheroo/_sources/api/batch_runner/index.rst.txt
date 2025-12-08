@@ -1,0 +1,69 @@
+batch_runner
+============
+
+.. py:module:: batch_runner
+
+.. autoapi-nested-parse::
+
+   Batch Validation Runner.
+
+   Iterates over all defined semantic operations and verifies their correctness.
+   Prioritizes "Manual/Human" tests found on disk over "Auto/Robotic" fuzzing.
+   This closes the loop for Workflow B, allowing manual fixes to count as success.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   batch_runner.BatchValidator
+
+
+Module Contents
+---------------
+
+.. py:class:: BatchValidator(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Orchestrates the validation of the entire knowledge base.
+
+   .. attribute:: semantics
+
+      Knowledge base to validate.
+
+      :type: SemanticsManager
+
+   .. attribute:: runner
+
+      The fuzzing engine.
+
+      :type: EquivalenceRunner
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: runner
+
+
+   .. py:method:: run_all(verbose: bool = False, manual_test_dir: Optional[pathlib.Path] = None) -> Dict[str, bool]
+
+      Runs verification for all known APIs.
+
+      Validation Hierarchy:
+      1. **Manual Test Priority**: If a file contains `def test_<op_name>():`,
+         we assume the developer has manually verified this operation. It is
+         marked as Passing.
+      2. **Automated Fuzzing**: If no manual test exists, we unpack the
+         arguments and type hints from the spec, generate random inputs, and
+         check equivalence using `EquivalenceRunner`.
+
+      :param verbose: Show progress bar using Rich.
+      :param manual_test_dir: Directory containing manual tests to scan (default: None).
+
+      :returns: Validation status (True=Pass, False=Fail).
+      :rtype: Dict[op_name, bool]
+
+
+

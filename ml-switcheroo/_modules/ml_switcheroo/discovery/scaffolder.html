@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -543,7 +548,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -651,11 +656,9 @@ window.addEventListener("load", load);
 <span class="sd">before falling back to structural heuristics.</span>
 
 <span class="sd">Major Updates:</span>
-<span class="sd">- Feature: Signature Analysis during Fuzzy Matching. The discovery process now</span>
-<span class="sd">  penalizes or rejects matches if argument counts (arity) diverge significantly,</span>
-<span class="sd">  preventing false positives like linking unary `min(x)` to multi-arg `min(x, y)`.</span>
-<span class="sd">- Feature 07: Robust Varargs Support. If a function accepts `*args`, it is treated</span>
-<span class="sd">  as having flexible arity, skipping penalties for count mismatches.</span>
+<span class="sd">- Feature: Signature Analysis during Fuzzy Matching.</span>
+<span class="sd">- Feature 07: Robust Varargs Support.</span>
+<span class="sd">- Feature 03: Tier C (Extras) Discovery and Serialization.</span>
 <span class="sd">"""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -751,6 +754,8 @@ window.addEventListener("load", load);
     <span class="c1"># Pre-load known specs to drive categorization</span>
     <span class="n">known_neural_ops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ops_by_tier</span><span class="p">(</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="p">)</span>
     <span class="n">known_math_ops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ops_by_tier</span><span class="p">(</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="p">)</span>
+    <span class="c1"># Tier C Knowledge (if present in semantics)</span>
+    <span class="n">known_extras_ops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ops_by_tier</span><span class="p">(</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">EXTRAS</span><span class="p">)</span>
 
     <span class="n">catalogs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">fw</span> <span class="ow">in</span> <span class="n">frameworks</span><span class="p">:</span>
@@ -771,28 +776,17 @@ window.addEventListener("load", load);
       <span class="c1"># Check if this name matches a known Abstract Op from the specs</span>
       <span class="n">neural_match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_spec_op</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">known_neural_ops</span><span class="p">)</span>
       <span class="k">if</span> <span class="n">neural_match</span><span class="p">:</span>
-        <span class="c1"># Link to existing Neural definition</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">tier_b_neural</span><span class="p">,</span>
-          <span class="n">neural_match</span><span class="p">,</span>
-          <span class="n">primary_fw</span><span class="p">,</span>
-          <span class="n">api_path</span><span class="p">,</span>
-          <span class="n">details</span><span class="p">,</span>
-          <span class="n">catalogs</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tier_b_neural</span><span class="p">,</span> <span class="n">neural_match</span><span class="p">,</span> <span class="n">primary_fw</span><span class="p">,</span> <span class="n">api_path</span><span class="p">,</span> <span class="n">details</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">)</span>
         <span class="k">continue</span>
 
       <span class="n">math_match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_spec_op</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">known_math_ops</span><span class="p">)</span>
       <span class="k">if</span> <span class="n">math_match</span><span class="p">:</span>
-        <span class="c1"># Link to existing Math definition</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">tier_a_math</span><span class="p">,</span>
-          <span class="n">math_match</span><span class="p">,</span>
-          <span class="n">primary_fw</span><span class="p">,</span>
-          <span class="n">api_path</span><span class="p">,</span>
-          <span class="n">details</span><span class="p">,</span>
-          <span class="n">catalogs</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tier_a_math</span><span class="p">,</span> <span class="n">math_match</span><span class="p">,</span> <span class="n">primary_fw</span><span class="p">,</span> <span class="n">api_path</span><span class="p">,</span> <span class="n">details</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">)</span>
+        <span class="k">continue</span>
+
+      <span class="n">extras_match</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_spec_op</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">known_extras_ops</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">extras_match</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tier_c_extras</span><span class="p">,</span> <span class="n">extras_match</span><span class="p">,</span> <span class="n">primary_fw</span><span class="p">,</span> <span class="n">api_path</span><span class="p">,</span> <span class="n">details</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">)</span>
         <span class="k">continue</span>
 
       <span class="c1"># --- Strategy 2: Heuristic Fallback ---</span>
@@ -804,6 +798,11 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tier_b_neural</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">primary_fw</span><span class="p">,</span> <span class="n">api_path</span><span class="p">,</span> <span class="n">details</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">)</span>
         <span class="k">continue</span>
 
+      <span class="c1"># Heuristic: Extras Tier</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_structurally_extra</span><span class="p">(</span><span class="n">api_path</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tier_c_extras</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">primary_fw</span><span class="p">,</span> <span class="n">api_path</span><span class="p">,</span> <span class="n">details</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">)</span>
+        <span class="k">continue</span>
+
       <span class="c1"># Heuristic: Math Tier (Default)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_update_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tier_a_math</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">primary_fw</span><span class="p">,</span> <span class="n">api_path</span><span class="p">,</span> <span class="n">details</span><span class="p">,</span> <span class="n">catalogs</span><span class="p">)</span>
 
@@ -811,9 +810,9 @@ window.addEventListener("load", load);
       <span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_write_json</span><span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"k_array_api.json"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tier_a_math</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_write_json</span><span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"k_neural_net.json"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tier_b_neural</span><span class="p">)</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_write_json</span><span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"k_neural_net.json"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tier_b_neural</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_write_json</span><span class="p">(</span><span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"k_framework_extras.json"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tier_c_extras</span><span class="p">)</span></div>
 
-    <span class="c1"># Extras are typically manually curated, but could be populated here too.</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_get_ops_by_tier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tier</span><span class="p">:</span> <span class="n">SemanticTier</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Retrieves listing of known abstract operations for a given tier."""</span>
@@ -851,6 +850,25 @@ window.addEventListener("load", load);
       <span class="k">return</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">"class"</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">"Layer"</span> <span class="ow">in</span> <span class="n">api_path</span> <span class="ow">or</span> <span class="s2">"Module"</span> <span class="ow">in</span> <span class="n">api_path</span><span class="p">):</span>
       <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_is_structurally_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Determines if API is likely a Framework Utility (Tier C)."""</span>
+    <span class="n">name_lower</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">path_lower</span> <span class="o">=</span> <span class="n">api_path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Common utility keywords</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"seed"</span><span class="p">,</span> <span class="s2">"save"</span><span class="p">,</span> <span class="s2">"load"</span><span class="p">,</span> <span class="s2">"device"</span><span class="p">,</span> <span class="s2">"print"</span><span class="p">,</span> <span class="s2">"info"</span><span class="p">,</span> <span class="s2">"check"</span><span class="p">]):</span>
+      <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># Context managers / grad control</span>
+    <span class="k">if</span> <span class="s2">"grad"</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">"no_"</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="ow">or</span> <span class="s2">"enable_"</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="ow">or</span> <span class="s2">"set_"</span> <span class="ow">in</span> <span class="n">name_lower</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># Submodules usually associated with utilities</span>
+    <span class="k">if</span> <span class="s2">".utils."</span> <span class="ow">in</span> <span class="n">path_lower</span> <span class="ow">or</span> <span class="s2">".distributed."</span> <span class="ow">in</span> <span class="n">path_lower</span> <span class="ow">or</span> <span class="s2">".autograd."</span> <span class="ow">in</span> <span class="n">path_lower</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">True</span>
+
     <span class="k">return</span> <span class="kc">False</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_update_entry</span><span class="p">(</span>

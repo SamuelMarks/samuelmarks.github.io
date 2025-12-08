@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -543,7 +548,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -669,6 +674,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.importers.spec_reader</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayApiSpecImporter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.discovery.syncer</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameworkSyncer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.generated_tests.generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_plugins</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.utils.console</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
   <span class="n">console</span><span class="p">,</span>
   <span class="n">log_info</span><span class="p">,</span>
@@ -800,6 +806,16 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../api/ml_switcheroo/cli/commands/index.html#ml_switcheroo.cli.commands.handle_ci">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">handle_ci</span><span class="p">(</span><span class="n">update_readme</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">readme_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">json_report</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">"""Handles 'ci' command."""</span>
+  <span class="c1"># 1. Load Config to discover plugins (Adapters)</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">RuntimeConfig</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plugin_paths</span><span class="p">:</span>
+      <span class="n">loaded</span> <span class="o">=</span> <span class="n">load_plugins</span><span class="p">(</span><span class="n">extra_dirs</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">plugin_paths</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">loaded</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">log_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="n">loaded</span><span class="si">}</span><span class="s2"> external extensions for CI environment."</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">log_warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Could not load project config: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
   <span class="n">semantics</span> <span class="o">=</span> <span class="n">SemanticsManager</span><span class="p">()</span>
   <span class="n">log_info</span><span class="p">(</span><span class="s2">"Running Verification Suite..."</span><span class="p">)</span>
   <span class="n">validator</span> <span class="o">=</span> <span class="n">BatchValidator</span><span class="p">(</span><span class="n">semantics</span><span class="p">)</span>

@@ -51,11 +51,16 @@
     <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="_static/switcheroo_demo.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ml-switcheroo 🔄🦘" href="README.html" />
@@ -130,7 +135,7 @@
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -172,7 +177,7 @@
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -258,6 +263,8 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#index--page-root" class="md-nav__link">ml-switcheroo 🔄🦘</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#interactive-demo" class="md-nav__link">Interactive Demo</a>
+        </li>
         <li class="md-nav__item"><a href="#indices-and-tables" class="md-nav__link">Indices and tables</a>
         </li></ul>
             </nav>
@@ -279,6 +286,76 @@
   <section class="tex2jax_ignore mathjax_ignore" id="ml-switcheroo">
 <h1 id="index--page-root">ml-switcheroo 🔄🦘<a class="headerlink" href="#index--page-root" title="Link to this heading">¶</a></h1>
 <p>A Deterministic, Specification-Driven Transpiler for Deep Learning Frameworks.</p>
+<section id="interactive-demo">
+<h2 id="interactive-demo">Interactive Demo<a class="headerlink" href="#interactive-demo" title="Link to this heading">¶</a></h2>
+<p>Try it right in your browser! The engine runs entirely client-side using WebAssembly.</p>
+<div class="switcheroo-material-card" data-wheel="ml_switcheroo-0.0.1-py3-none-any.whl" id="switcheroo-wasm-root">
+<div class="demo-header">
+<div>
+<h3 style="margin:0">Live Transpiler Demo</h3>
+<small style="color:#666">Client-side WebAssembly Engine</small>
+</div>
+<span class="status-badge" id="engine-status">Offline</span>
+</div>
+<div class="splash-screen" id="demo-splash">
+<p>Initialize the engine to translate code between frameworks locally.</p>
+<button class="md-btn md-btn-primary" id="btn-load-engine">
+                    ⚡ Initialize Engine
+                </button>
+</div>
+<div id="demo-interface" style="display:none;">
+<div class="translate-toolbar">
+<div class="select-wrapper">
+<select class="material-select" id="select-src">
+<option selected="" value="torch">PyTorch</option>
+<option value="jax">JAX / Flax</option>
+<option value="numpy">NumPy</option>
+<option value="tensorflow">TensorFlow</option>
+<option value="mlx">Apple MLX</option>
+</select>
+</div>
+<button class="swap-icon-btn" id="btn-swap" title="Swap Languages">⇄</button>
+<div class="select-wrapper">
+<select class="material-select" id="select-tgt">
+<option value="torch">PyTorch</option>
+<option selected="" value="jax">JAX / Flax</option>
+<option value="numpy">NumPy</option>
+<option value="tensorflow">TensorFlow</option>
+<option value="mlx">Apple MLX</option>
+</select>
+</div>
+</div>
+<!-- NEW: Example Selector Toolbar -->
+<div class="example-toolbar">
+<span class="label">Load Example:</span>
+<select class="material-select-sm" id="select-example">
+<option disabled="" selected="" value="">-- Select a Pattern --</option>
+<!-- Populated by JS -->
+</select>
+</div>
+<div class="editor-grid">
+<div class="editor-group source-group">
+<textarea class="material-input" id="code-source" placeholder="Paste source code here..." spellcheck="false">import torch
+import torch.nn as nn
+
+class Model(nn.Module): 
+    def forward(self, x): 
+        return torch.abs(x)</textarea>
+</div>
+<div class="editor-group target-group">
+<textarea class="material-input output-bg" id="code-target" placeholder="Translation will appear here..." readonly=""></textarea>
+</div>
+</div>
+<div class="controls-bar">
+<button class="md-btn md-btn-accent" disabled="" id="btn-convert">Run Translation</button>
+</div>
+</div>
+<!-- Moved Console Group OUTSIDE demo-interface so it can be shown standalone on error -->
+<div class="console-group">
+<div class="editor-label">Engine Logs</div>
+<pre id="console-output">Waiting for engine...</pre>
+</div>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
@@ -327,6 +404,16 @@
 <li class="toctree-l3"><a class="reference internal" href="api/purity/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="api/runner/index.html">runner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/runner/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/runner/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/fuzzer/index.html">fuzzer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/fuzzer/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fuzzer/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api/console/index.html">console</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/console/index.html#attributes">Attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/console/index.html#functions">Functions</a></li>
@@ -336,6 +423,23 @@
 <li class="toctree-l2"><a class="reference internal" href="api/doc_gen/index.html">doc_gen</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/doc_gen/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/doc_gen/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/adapters/index.html">adapters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lifecycle/index.html">lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lifecycle/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lifecycle/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/generator/index.html">generator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/generator/index.html#attributes">Attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generator/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/generator/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/onnx_reader/index.html">onnx_reader</a><ul>
@@ -353,6 +457,11 @@
 <li class="toctree-l3"><a class="reference internal" href="api/dependencies/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="api/batch_runner/index.html">batch_runner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/batch_runner/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/batch_runner/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api/ml_switcheroo/index.html">ml_switcheroo</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#attributes">Attributes</a></li>
@@ -364,15 +473,31 @@
 <li class="toctree-l3"><a class="reference internal" href="api/readme_editor/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="api/registry_sync/index.html">registry_sync</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/registry_sync/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/registry_sync/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api/code_extractor/index.html">code_extractor</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/code_extractor/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/code_extractor/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/harness_generator/index.html">harness_generator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/harness_generator/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/harness_generator/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/harness_generator_template/index.html">harness_generator_template</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/harness_generator_template/index.html#attributes">Attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/harness_generator_template/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </div>
+</section>
 <section id="indices-and-tables">
 <h2 id="indices-and-tables">Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h2>
 <ul class="simple">

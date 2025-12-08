@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>fuzzer &#8212; ml-switcheroo</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/switcheroo_demo.css" />
+    <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../_static/switcheroo_demo.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";
+
+const defaultStyle = document.createElement('style');
+defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+`;
+document.head.appendChild(defaultStyle);
+
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+document.head.appendChild(fullscreenStyle);
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }
+    return false;
+};
+
+const load = async () => {
+    await mermaid.run();
+
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(load, 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(load, 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(load, 200);
+        return;
+    }
+
+    const darkTheme = isDarkTheme();
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    const modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    const allButtons = [];
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        container.appendChild(fullscreenBtn);
+        allButtons.push(fullscreenBtn);
+    });
+
+    // Update theme classes when theme changes
+    const updateTheme = () => {
+        const dark = isDarkTheme();
+        allButtons.forEach(btn => {
+            if (dark) {
+                btn.classList.add('dark-theme');
+            } else {
+                btn.classList.remove('dark-theme');
+            }
+        });
+        if (dark) {
+            modal.classList.add('dark-theme');
+            modalContent.classList.add('dark-theme');
+            closeBtn.classList.add('dark-theme');
+        } else {
+            modal.classList.remove('dark-theme');
+            modalContent.classList.remove('dark-theme');
+            closeBtn.classList.remove('dark-theme');
+        }
+    };
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+};
+
+window.addEventListener("load", load);
+</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue data-md-color-accent=light-blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#_modules/fuzzer" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../index.html" title="ml-switcheroo"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">ml-switcheroo</span>
+          <span class="md-header-nav__topic"> fuzzer </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">Module code</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../index.html" title="ml-switcheroo" class="md-nav__button md-logo">
+      
+        <img src="../_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="../index.html"
+       title="ml-switcheroo">ml-switcheroo</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Documentation</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../README.html" class="md-nav__link">ml-switcheroo 🔄🦘</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../ARCHITECTURE.html" class="md-nav__link">Architecture</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../EXTENDING.html" class="md-nav__link">Extending</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../IDEAS.html" class="md-nav__link">ml-switcheroo ideas</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Reference</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../api/index.html" class="md-nav__link">API Reference</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+    
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <h1 id="modules-fuzzer--page-root">Source code for fuzzer</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""</span>
+<span class="sd">Input Generation Engine for Semantics Verification.</span>
+
+<span class="sd">This module provides the `InputFuzzer`, responsible for creating randomized</span>
+<span class="sd">NumPy arrays, scalars, and complex container structures to feed into Framework A</span>
+<span class="sd">and Framework B during behavioral verification tests.</span>
+
+<span class="sd">## Generation Strategies</span>
+
+<span class="sd">It uses a dual-strategy approach:</span>
+
+<span class="sd">1.  **Type Hints (Semantic Validated)**:</span>
+<span class="sd">    If `spec_reader` has extracted explicit type information from the spec files,</span>
+<span class="sd">    the fuzzer parses these strings using a mini-grammar to generate compliant data.</span>
+
+<span class="sd">    **Supported Grammar:**</span>
+<span class="sd">    - Primitives: `int`, `float`, `bool`, `str`</span>
+<span class="sd">    - Structural: `List[T]`, `Tuple[T, ...]`, `Dict[K, V]`, `Optional[T]`</span>
+<span class="sd">    - Unions: `int | float`</span>
+<span class="sd">    - Domain: `Array`, `Tensor`, `dtype`</span>
+<span class="sd">    - **Symbolic Shapes (New)**: `Array['B', 'N']` (Constraint Solving)</span>
+
+<span class="sd">2.  **Heuristics (Fallback)**:</span>
+<span class="sd">    If no hints are available in the spec, it infers data types from argument names.</span>
+<span class="sd">    - `mask`, `condition` -&gt; `bool`</span>
+<span class="sd">    - `idx`, `axis`, `dim` -&gt; `int`</span>
+<span class="sd">    - `x`, `y`, `input` -&gt; `Array (float32)`</span>
+
+<span class="sd">## Safety</span>
+
+<span class="sd">The fuzzer implements `MAX_RECURSION_DEPTH` to prevent infinite loops when generating</span>
+<span class="sd">recursive or deeply nested types (e.g. `List[List[List[...]]]`).</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.testing.adapters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_adapter</span>
+
+
+<div class="viewcode-block" id="InputFuzzer">
+<a class="viewcode-back" href="../api/fuzzer/index.html#fuzzer.InputFuzzer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InputFuzzer</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">"""</span>
+<span class="sd">  Generates dummy inputs (Arrays, Scalars, Containers) for equivalence testing.</span>
+
+<span class="sd">  Prioritizes explicit Type Hints from the Knowledge Base. Falls back to</span>
+<span class="sd">  name-based heuristics if hints are missing or ambiguous (e.g., 'Any').</span>
+
+<span class="sd">  Attributes:</span>
+<span class="sd">      _seed_shape (Optional[Tuple[int, ...]]): If set, forces generation</span>
+<span class="sd">          of arrays with this specific shape.</span>
+<span class="sd">      max_depth (int): Maximum recursion depth for nested container types.</span>
+<span class="sd">  """</span>
+
+<div class="viewcode-block" id="InputFuzzer.MAX_RECURSION_DEPTH">
+<a class="viewcode-back" href="../api/fuzzer/index.html#fuzzer.InputFuzzer.MAX_RECURSION_DEPTH">[docs]</a>
+  <span class="n">MAX_RECURSION_DEPTH</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Initializes the Fuzzer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seed_shape: If provided, all generated arrays will share this shape.</span>
+<span class="sd">                    If None, a random shape is chosen per `generate_inputs` call.</span>
+<span class="sd">    """</span>
+<div class="viewcode-block" id="InputFuzzer._seed_shape">
+<a class="viewcode-back" href="../api/fuzzer/index.html#fuzzer.InputFuzzer._seed_shape">[docs]</a>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_seed_shape</span> <span class="o">=</span> <span class="n">seed_shape</span></div>
+
+<div class="viewcode-block" id="InputFuzzer.max_depth">
+<a class="viewcode-back" href="../api/fuzzer/index.html#fuzzer.InputFuzzer.max_depth">[docs]</a>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_RECURSION_DEPTH</span></div>
+
+
+<div class="viewcode-block" id="InputFuzzer.generate_inputs">
+<a class="viewcode-back" href="../api/fuzzer/index.html#fuzzer.InputFuzzer.generate_inputs">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">generate_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">hints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Creates a dictionary of {arg_name: value}.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        params: List of argument names [x, y, axis].</span>
+<span class="sd">        hints: Dictionary of {arg_name: type_string} derived from Spec.</span>
+<span class="sd">               Example: {"x": "Array['B', 'T']", "axis": "int"}.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Any]: Randomized inputs ready for Framework adaptation.</span>
+<span class="sd">    """</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Context for resolving symbolic dimensions across arguments in this call</span>
+    <span class="n">symbol_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Decide on a consistent base shape for this batch of inputs fallback</span>
+    <span class="n">base_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_random_shape</span><span class="p">()</span>
+    <span class="n">hints</span> <span class="o">=</span> <span class="n">hints</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+      <span class="n">hint</span> <span class="o">=</span> <span class="n">hints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+      <span class="c1"># Strategy 1: Explicit Type Hint</span>
+      <span class="k">if</span> <span class="n">hint</span> <span class="ow">and</span> <span class="n">hint</span> <span class="o">!=</span> <span class="s2">"Any"</span><span class="p">:</span>
+        <span class="c1"># Spec reader might return complex strings like "int | None"</span>
+        <span class="k">try</span><span class="p">:</span>
+          <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">hint</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">symbol_map</span><span class="o">=</span><span class="n">symbol_map</span><span class="p">)</span>
+          <span class="n">kwargs</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+          <span class="k">continue</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+          <span class="c1"># If parsing fails, fall back silently to heuristics</span>
+          <span class="k">pass</span>
+
+      <span class="c1"># Strategy 2: Heuristic Matching based on Name</span>
+      <span class="n">kwargs</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_by_heuristic</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="InputFuzzer.adapt_to_framework">
+<a class="viewcode-back" href="../api/fuzzer/index.html#fuzzer.InputFuzzer.adapt_to_framework">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">adapt_to_framework</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">framework</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Converts Numpy inputs to framework-specific tensor types.</span>
+<span class="sd">    Delegates to registered adapters in `ml_switcheroo.testing.adapters`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        kwargs: Input dictionary with Numpy values.</span>
+<span class="sd">        framework: "torch", "jax", "tensorflow", etc.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict with framework-specific tensors.</span>
+<span class="sd">    """</span>
+    <span class="n">adapter</span> <span class="o">=</span> <span class="n">get_adapter</span><span class="p">(</span><span class="n">framework</span><span class="p">)</span>
+
+    <span class="c1"># If no adapter found, return pure numpy/python objects (Pass-through)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">adapter</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">kwargs</span>
+
+    <span class="n">converted</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="n">converted</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">adapter</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">converted</span></div>
+
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_get_random_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Selects a random rank (1-4) and random dimensions (2-5).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of integers representing shape.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seed_shape</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seed_shape</span>
+
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rank</span><span class="p">))</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_generate_from_hint</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">type_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">base_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">symbol_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Parses a type string and generates conforming data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        type_str: The type annotation string (e.g., "Optional[int]").</span>
+<span class="sd">        base_shape: The active array shape for context.</span>
+<span class="sd">        depth: Current recursion depth to prevent stack overflow.</span>
+<span class="sd">        symbol_map: Dictionary mapping symbolic dimension names to integers.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Random data matching the type.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">symbol_map</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="c1"># Fallback if called directly without symbol context (rare)</span>
+      <span class="n">symbol_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">type_str</span> <span class="o">=</span> <span class="n">type_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># Circuit breaker for recursion</span>
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_depth</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fallback_base_value</span><span class="p">(</span><span class="n">type_str</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">)</span>
+
+    <span class="c1"># 1. Unions (A | B)</span>
+    <span class="k">if</span> <span class="s2">"|"</span> <span class="ow">in</span> <span class="n">type_str</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_pipe_top_level</span><span class="p">(</span><span class="n">type_str</span><span class="p">):</span>
+      <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">type_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"|"</span><span class="p">)]</span>
+      <span class="n">chosen</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">chosen</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span>
+
+    <span class="c1"># 2. Optional (Optional[T])</span>
+    <span class="n">match_opt</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^Optional\[(.*)]$"</span><span class="p">,</span> <span class="n">type_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_opt</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">match_opt</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span>
+
+    <span class="c1"># 3. Tuple (Tuple[T, U] or Tuple[T, ...])</span>
+    <span class="n">match_tup</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^Tuple\[(.*)]$"</span><span class="p">,</span> <span class="n">type_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_tup</span><span class="p">:</span>
+      <span class="n">inner</span> <span class="o">=</span> <span class="n">match_tup</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">if</span> <span class="s2">"..."</span> <span class="ow">in</span> <span class="n">inner</span><span class="p">:</span>
+        <span class="n">elem_type</span> <span class="o">=</span> <span class="n">inner</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">))</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">sub_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_outside_brackets</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">sub_types</span><span class="p">)</span>
+
+    <span class="c1"># 4. List/Sequence (List[T])</span>
+    <span class="n">match_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^(List|Sequence)\[(.*)]$"</span><span class="p">,</span> <span class="n">type_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_list</span><span class="p">:</span>
+      <span class="n">inner</span> <span class="o">=</span> <span class="n">match_list</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+      <span class="n">length</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+      <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">)]</span>
+
+    <span class="c1"># 5. Dict/Mapping (Dict[K, V])</span>
+    <span class="n">match_dict</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^(Dict|Mapping)\[(.*)]$"</span><span class="p">,</span> <span class="n">type_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_dict</span><span class="p">:</span>
+      <span class="n">inner</span> <span class="o">=</span> <span class="n">match_dict</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+      <span class="n">parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_outside_brackets</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">key_type</span><span class="p">,</span> <span class="n">val_type</span> <span class="o">=</span> <span class="n">parts</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">length</span><span class="p">):</span>
+          <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">key_type</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span>
+          <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_from_hint</span><span class="p">(</span><span class="n">val_type</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span>
+          <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+          <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">data</span>
+      <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="c1"># 6. None</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"None"</span><span class="p">,</span> <span class="s2">"NoneType"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># 7. Symbolic Arrays / Tensors: Array['B', 'N']</span>
+    <span class="n">match_sym</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">"^(Array|Tensor|np\.ndarray)\[(.*)]$"</span><span class="p">,</span> <span class="n">type_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match_sym</span><span class="p">:</span>
+      <span class="n">dims_str</span> <span class="o">=</span> <span class="n">match_sym</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+      <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_symbolic_shape</span><span class="p">(</span><span class="n">dims_str</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_array</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># 8. Generic Arrays / Tensors</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"Array"</span><span class="p">,</span> <span class="s2">"Tensor"</span><span class="p">,</span> <span class="s2">"np.ndarray"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_array</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">)</span>
+
+    <span class="c1"># 9. Primitives</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"int"</span><span class="p">,</span> <span class="s2">"integer"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_scalar_int</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"float"</span><span class="p">,</span> <span class="s2">"number"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_scalar_float</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">"bool"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">"str"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="s2">"test_val_"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+    <span class="c1"># 10. Dtype objects</span>
+    <span class="k">if</span> <span class="s2">"dtype"</span> <span class="ow">in</span> <span class="n">type_str</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+      <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_array</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_symbolic_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dims_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">symbol_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Parses dimensions string like "'B', 32" or "N, M".</span>
+<span class="sd">    Resolves symbols using the provided context map.</span>
+<span class="sd">    """</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Naive split by comma is usually sufficient for dimensions</span>
+    <span class="n">raw_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">raw_dims</span><span class="p">:</span>
+      <span class="c1"># Clean quotes</span>
+      <span class="n">clean</span> <span class="o">=</span> <span class="n">dim</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"'"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'"'</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">clean</span><span class="p">:</span>
+        <span class="k">continue</span>
+
+      <span class="c1"># Try explicit integer</span>
+      <span class="k">try</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+        <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">continue</span>
+      <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+      <span class="c1"># It's a symbol</span>
+      <span class="k">if</span> <span class="n">clean</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">symbol_map</span><span class="p">:</span>
+        <span class="n">symbol_map</span><span class="p">[</span><span class="n">clean</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+      <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol_map</span><span class="p">[</span><span class="n">clean</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_get_fallback_base_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""Returns a minimal value for recursion termination."""</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">"bool"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"int"</span><span class="p">,</span> <span class="s2">"integer"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"float"</span><span class="p">,</span> <span class="s2">"number"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">"str"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="s2">""</span>
+    <span class="k">if</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Array"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Tensor"</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">base_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"List"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Sequence"</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Tuple"</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">()</span>
+    <span class="k">if</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Dict"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">type_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Mapping"</span><span class="p">):</span>
+      <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_generate_by_heuristic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Fallback generation based on argument name patterns."""</span>
+    <span class="n">name_lower</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">name_lower</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"axis"</span><span class="p">,</span> <span class="s2">"dim"</span><span class="p">]:</span>
+      <span class="n">rank</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_shape</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rank</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">name_lower</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"keepdim"</span><span class="p">,</span> <span class="s2">"keepdims"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">name_lower</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"shape"</span><span class="p">,</span> <span class="s2">"size"</span><span class="p">]:</span>
+      <span class="k">return</span> <span class="n">base_shape</span>
+
+    <span class="n">heuristic_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_guess_dtype_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">heuristic_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"bool"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"float"</span><span class="p">]:</span>
+      <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">prefix</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"alpha"</span><span class="p">,</span> <span class="s2">"beta"</span><span class="p">,</span> <span class="s2">"scalar"</span><span class="p">,</span> <span class="s2">"eps"</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">heuristic_type</span> <span class="o">==</span> <span class="s2">"int"</span><span class="p">:</span>
+          <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_scalar_int</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_scalar_float</span><span class="p">()</span>
+
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_array</span><span class="p">(</span><span class="n">heuristic_type</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_array</span><span class="p">(</span><span class="s2">"float"</span><span class="p">,</span> <span class="n">base_shape</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_generate_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_lbl</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Generates a random numpy array of specific type."""</span>
+    <span class="k">if</span> <span class="n">type_lbl</span> <span class="o">==</span> <span class="s2">"bool"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_lbl</span> <span class="o">==</span> <span class="s2">"int"</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_generate_scalar_int</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_generate_scalar_float</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_guess_dtype_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Determines probable dtype based on naming conventions."""</span>
+    <span class="n">name_lower</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"mask"</span><span class="p">,</span> <span class="s2">"condition"</span><span class="p">,</span> <span class="s2">"is_"</span><span class="p">,</span> <span class="s2">"p_val"</span><span class="p">]):</span>
+      <span class="k">return</span> <span class="s2">"bool"</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">name_lower</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"idx"</span><span class="p">,</span> <span class="s2">"index"</span><span class="p">,</span> <span class="s2">"indices"</span><span class="p">,</span> <span class="s2">"k"</span><span class="p">,</span> <span class="s2">"n_"</span><span class="p">]):</span>
+      <span class="k">return</span> <span class="s2">"int"</span>
+    <span class="k">return</span> <span class="s2">"float"</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_is_pipe_top_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Checks if a pipe | exists outside of brackets []."""</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"["</span><span class="p">:</span>
+        <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span>
+      <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"]"</span><span class="p">:</span>
+        <span class="n">depth</span> <span class="o">-=</span> <span class="mi">1</span>
+      <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"|"</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_split_outside_brackets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Splits string by comma, ignoring commas inside brackets."""</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"["</span><span class="p">:</span>
+        <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">"]"</span><span class="p">:</span>
+        <span class="n">depth</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+      <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s2">","</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">current</span><span class="p">:</span>
+      <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">parts</span></div>
+
+</pre></div>
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2025, ml-switcheroo Developers.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

@@ -50,11 +50,16 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -493,7 +498,7 @@ window.addEventListener("load", load);
       
         <div class="md-flex__cell md-flex__cell--shrink">
           <div class="md-header-nav__source">
-            <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -543,7 +548,7 @@ window.addEventListener("load", load);
        title="ml-switcheroo">ml-switcheroo</a>
   </label>
     <div class="md-nav__source">
-      <a href="https://github.com/yourusername/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
 
     <div class="md-source__icon">
       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
@@ -661,19 +666,6 @@ window.addEventListener("load", load);
 <span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.scanners</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNameScanner</span><span class="p">,</span> <span class="n">get_full_name</span>
 
-<span class="c1"># Standard conventions for framework aliases</span>
-<span class="c1"># key: target_framework_name</span>
-<span class="c1"># value: (module_to_import, alias_name)</span>
-<div class="viewcode-block" id="FRAMEWORK_ALIAS_MAP">
-<a class="viewcode-back" href="../../../api/ml_switcheroo/core/import_fixer/index.html#ml_switcheroo.core.import_fixer.FRAMEWORK_ALIAS_MAP">[docs]</a>
-<span class="n">FRAMEWORK_ALIAS_MAP</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="s2">"jax"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"jax.numpy"</span><span class="p">,</span> <span class="s2">"jnp"</span><span class="p">),</span>
-  <span class="s2">"tensorflow"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"tensorflow"</span><span class="p">,</span> <span class="s2">"tf"</span><span class="p">),</span>
-  <span class="s2">"mlx"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"mlx.core"</span><span class="p">,</span> <span class="s2">"mx"</span><span class="p">),</span>
-  <span class="s2">"numpy"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"numpy"</span><span class="p">,</span> <span class="s2">"np"</span><span class="p">),</span>
-<span class="p">}</span></div>
-
-
 
 <div class="viewcode-block" id="ImportFixer">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/core/import_fixer/index.html#ml_switcheroo.core.import_fixer.ImportFixer">[docs]</a>
@@ -685,6 +677,7 @@ window.addEventListener("load", load);
 <span class="sd">      source_fw (str): The root package name to remove (e.g., "torch").</span>
 <span class="sd">      target_fw (str): The root package name to ensure exists (e.g., "jax").</span>
 <span class="sd">      submodule_map (Dict): Map of "source.mod" -&gt; (target_root, target_sub, alias).</span>
+<span class="sd">      alias_map (Dict): Map of "fw_name" -&gt; (module_to_import, local_alias).</span>
 <span class="sd">      preserve_source (bool): If True, prevents automatic removal of source_fw imports.</span>
 <span class="sd">      _target_found (bool): Result tracker for idempotency.</span>
 <span class="sd">      _defined_names (Set[str]): Tracks names explicitly defined by imports to prevent re-injection.</span>
@@ -695,6 +688,7 @@ window.addEventListener("load", load);
     <span class="n">source_fw</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">target_fw</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">submodule_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span>
+    <span class="n">alias_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">preserve_source</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
   <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -704,6 +698,8 @@ window.addEventListener("load", load);
 <span class="sd">        source_fw: The framework string to strip.</span>
 <span class="sd">        target_fw: The framework string to inject.</span>
 <span class="sd">        submodule_map: Data-driven remapping dictionary from SemanticsManager.</span>
+<span class="sd">        alias_map: Configuration for standard framework aliases (e.g. jax-&gt;(jax.numpy, jnp)).</span>
+<span class="sd">                   Added in Feature 07 to replace hardcoded map.</span>
 <span class="sd">        preserve_source: Whether to keep source imports even if matched.</span>
 <span class="sd">    """</span>
 <div class="viewcode-block" id="ImportFixer.source_fw">
@@ -717,6 +713,10 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ImportFixer.submodule_map">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/core/import_fixer/index.html#ml_switcheroo.core.import_fixer.ImportFixer.submodule_map">[docs]</a>
     <span class="bp">self</span><span class="o">.</span><span class="n">submodule_map</span> <span class="o">=</span> <span class="n">submodule_map</span></div>
+
+<div class="viewcode-block" id="ImportFixer.alias_map">
+<a class="viewcode-back" href="../../../api/ml_switcheroo/core/import_fixer/index.html#ml_switcheroo.core.import_fixer.ImportFixer.alias_map">[docs]</a>
+    <span class="bp">self</span><span class="o">.</span><span class="n">alias_map</span> <span class="o">=</span> <span class="n">alias_map</span> <span class="ow">or</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="ImportFixer.preserve_source">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/core/import_fixer/index.html#ml_switcheroo.core.import_fixer.ImportFixer.preserve_source">[docs]</a>
@@ -870,7 +870,7 @@ window.addEventListener("load", load);
 <span class="sd">    Logic:</span>
 <span class="sd">    1. Identifies insertion point (after __future__ and docstrings).</span>
 <span class="sd">    2. Injects 'import target' only if needed (not found AND used).</span>
-<span class="sd">    3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage.</span>
+<span class="sd">    3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage via `alias_map`.</span>
 <span class="sd">    4. Injects submodule mappings (e.g., from flax import linen) if usage requires it.</span>
 
 <span class="sd">    Args:</span>
@@ -892,8 +892,9 @@ window.addEventListener("load", load);
         <span class="p">)</span>
 
     <span class="c1"># -- Step 2: Check Usage of Framework Standard Aliases (e.g. 'jnp', 'tf', 'mx') --</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="ow">in</span> <span class="n">FRAMEWORK_ALIAS_MAP</span><span class="p">:</span>
-      <span class="n">module_path</span><span class="p">,</span> <span class="n">alias_name</span> <span class="o">=</span> <span class="n">FRAMEWORK_ALIAS_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span><span class="p">]</span>
+    <span class="c1"># Logic driven by self.alias_map loaded from SemanticsManager (default or custom)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias_map</span><span class="p">:</span>
+      <span class="n">module_path</span><span class="p">,</span> <span class="n">alias_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target_fw</span><span class="p">]</span>
 
       <span class="n">scanner</span> <span class="o">=</span> <span class="n">SimpleNameScanner</span><span class="p">(</span><span class="n">alias_name</span><span class="p">)</span>
       <span class="n">updated_node</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">scanner</span><span class="p">)</span>

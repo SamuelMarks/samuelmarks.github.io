@@ -52,6 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -59,6 +60,7 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="../../../_static/trace_render.js"></script>
     <script src="../../../_static/switcheroo_demo.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
@@ -659,6 +661,7 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.tracer</span><span class="w"> </span><span class="kn">import</span> <span class="n">reset_tracer</span><span class="p">,</span> <span class="n">get_tracer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.semantics.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">SemanticsManager</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.rewriter</span><span class="w"> </span><span class="kn">import</span> <span class="n">PivotRewriter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.import_fixer</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImportFixer</span>
@@ -692,6 +695,10 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ConversionResult.success">
 <a class="viewcode-back" href="../../../api/ml_switcheroo/core/engine/index.html#ml_switcheroo.core.engine.ConversionResult.success">[docs]</a>
   <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ConversionResult.trace_events">
+<a class="viewcode-back" href="../../../api/ml_switcheroo/core/engine/index.html#ml_switcheroo.core.engine.ConversionResult.trace_events">[docs]</a>
+  <span class="n">trace_events</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
 
 
   <span class="nd">@property</span>
@@ -805,17 +812,24 @@ window.addEventListener("load", load);
 <span class="sd">    Returns:</span>
 <span class="sd">        ConversionResult: Object containing transformed code and error logs.</span>
 <span class="sd">    """</span>
+    <span class="n">reset_tracer</span><span class="p">()</span>
+    <span class="n">tracer</span> <span class="o">=</span> <span class="n">get_tracer</span><span class="p">()</span>
+    <span class="n">root_phase</span> <span class="o">=</span> <span class="n">tracer</span><span class="o">.</span><span class="n">start_phase</span><span class="p">(</span><span class="s2">"Transpilation Pipeline"</span><span class="p">,</span> <span class="s2">"Full Process"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
+      <span class="n">tracer</span><span class="o">.</span><span class="n">start_phase</span><span class="p">(</span><span class="s2">"Preprocessing"</span><span class="p">,</span> <span class="s2">"Parsing &amp; Analysis"</span><span class="p">)</span>
       <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+      <span class="n">tracer</span><span class="o">.</span><span class="n">log_mutation</span><span class="p">(</span><span class="s2">"Module"</span><span class="p">,</span> <span class="s2">"(Raw Source)"</span><span class="p">,</span> <span class="s2">"(AST Parsed)"</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-      <span class="k">return</span> <span class="n">ConversionResult</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Parse Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">ConversionResult</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Parse Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">trace_events</span><span class="o">=</span><span class="n">tracer</span><span class="o">.</span><span class="n">export</span><span class="p">())</span>
 
     <span class="n">errors_log</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># Pass 0a: Purity Analysis (Specific to Functional Frameworks like JAX)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s2">"jax"</span><span class="p">:</span>
+      <span class="n">tracer</span><span class="o">.</span><span class="n">start_phase</span><span class="p">(</span><span class="s2">"Purity Check"</span><span class="p">,</span> <span class="s2">"Scanning for side-effects"</span><span class="p">)</span>
       <span class="n">purity_scanner</span> <span class="o">=</span> <span class="n">PurityScanner</span><span class="p">()</span>
       <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">purity_scanner</span><span class="p">)</span>
+      <span class="n">tracer</span><span class="o">.</span><span class="n">end_phase</span><span class="p">()</span>
 
     <span class="c1"># Pass 0b: Lifecycle Analysis (Detect dynamic state definition)</span>
     <span class="c1"># This is critical for converting Pythonic PyTorch to Static Graph JAX/Flax</span>
@@ -837,12 +851,17 @@ window.addEventListener("load", load);
       <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Warning: Unmapped 3rd-party dependencies detected: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sorted_deps</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
       <span class="n">errors_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
+    <span class="n">tracer</span><span class="o">.</span><span class="n">end_phase</span><span class="p">()</span>
+
     <span class="c1"># Pass 1: Semantic Pivot (Change usage)</span>
+    <span class="n">tracer</span><span class="o">.</span><span class="n">start_phase</span><span class="p">(</span><span class="s2">"Rewrite Engine"</span><span class="p">,</span> <span class="s2">"Visitor Traversal"</span><span class="p">)</span>
     <span class="n">rewriter</span> <span class="o">=</span> <span class="n">PivotRewriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">semantics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">rewriter</span><span class="p">)</span>
+    <span class="n">tracer</span><span class="o">.</span><span class="n">end_phase</span><span class="p">()</span>
 
     <span class="c1"># Pass 2: Import Scaffolding (Change imports)</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_framework</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">target_framework</span><span class="p">:</span>
+      <span class="n">tracer</span><span class="o">.</span><span class="n">start_phase</span><span class="p">(</span><span class="s2">"Import Fixer"</span><span class="p">,</span> <span class="s2">"Resolving Dependencies"</span><span class="p">)</span>
       <span class="c1"># Sub-step 2a: Check for lingering usages</span>
       <span class="c1"># Checks if source framework symbols remain after rewriting (e.g. Escape Hatches)</span>
       <span class="n">scanner</span> <span class="o">=</span> <span class="n">UsageScanner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source_framework</span><span class="p">)</span>
@@ -862,6 +881,7 @@ window.addEventListener("load", load);
         <span class="n">preserve_source</span><span class="o">=</span><span class="n">should_preserve</span><span class="p">,</span>
       <span class="p">)</span>
       <span class="n">tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">fixer</span><span class="p">)</span>
+      <span class="n">tracer</span><span class="o">.</span><span class="n">end_phase</span><span class="p">()</span>
 
     <span class="n">final_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_source</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
 
@@ -870,7 +890,13 @@ window.addEventListener("load", load);
       <span class="n">count</span> <span class="o">=</span> <span class="n">final_code</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"# &lt;SWITCHEROO_FAILED_TO_TRANS&gt;"</span><span class="p">)</span>
       <span class="n">errors_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> block(s) marked for manual review (Escape Hatch)."</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">ConversionResult</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">final_code</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors_log</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="n">tracer</span><span class="o">.</span><span class="n">end_phase</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ConversionResult</span><span class="p">(</span>
+      <span class="n">code</span><span class="o">=</span><span class="n">final_code</span><span class="p">,</span>
+      <span class="n">errors</span><span class="o">=</span><span class="n">errors_log</span><span class="p">,</span>
+      <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+      <span class="n">trace_events</span><span class="o">=</span><span class="n">tracer</span><span class="o">.</span><span class="n">export</span><span class="p">()</span>
+    <span class="p">)</span></div>
 </div>
 
 </pre></div>

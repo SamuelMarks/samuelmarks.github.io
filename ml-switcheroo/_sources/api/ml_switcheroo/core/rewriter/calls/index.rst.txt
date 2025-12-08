@@ -10,12 +10,12 @@ ml_switcheroo.core.rewriter.calls
    Handles function invocation usage (`leave_Call`) and Assignment Unwrapping.
    Includes functionality for:
    - Lifecycle method stripping (e.g. `.to()`, `.cpu()`).
-   - Functional -> OOP Unwrapping (removing `.apply` and tuple unpacking).
+   - Functional -> OOP Unwrapping.
    - Stateful object management.
    - Standard API pivots.
    - Plugin dispatch.
-   - Constructor logic injection (RNG management).
-   - **Output Normalization**: Adapting return values to match the Abstract Standard.
+   - Output Normalization.
+   - **Trace Instrumention** for visibility.
 
 
 
@@ -45,15 +45,11 @@ Module Contents
       Scenario: `y, updates = layer.apply(vars, x)`
       Target:   `y = layer(x)` (NNX/Torch style)
 
-      If we detected that a call was rewritten from a functional pattern
-      returning multiple values (outputs + state) to an OOP pattern
-      returning a single value, we must also simplify the assignment targets.
-
 
 
    .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
 
-      Rewrites function calls.
+      Rewrites function calls with detailed Trace Logging.
 
 
 

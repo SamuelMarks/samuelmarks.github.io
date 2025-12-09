@@ -12,12 +12,7 @@ ml_switcheroo.discovery.scaffolder
    Knowledge Base.
 
    It prioritizes matching discovered APIs against ingested Specs (ONNX, Array API)
-   before falling back to structural heuristics.
-
-   Major Updates:
-   - Feature: Signature Analysis during Fuzzy Matching.
-   - Feature 07: Robust Varargs Support.
-   - Feature 03: Tier C (Extras) Discovery and Serialization.
+   before falling back to structural heuristics provided by Framework Adapters.
 
 
 
@@ -66,6 +61,12 @@ Module Contents
 
       :type: float
 
+   .. attribute:: _cached_heuristics
+
+      Compiled regexes for categorization.
+
+      :type: Dict[str, List[re.Pattern]]
+
 
    .. py:attribute:: inspector
 
@@ -105,8 +106,8 @@ Module Contents
       Discovery Strategy:
       1. **Spec Validation**: Checks if discovered API matches a specific
          Abstract Operator already defined in the Knowledge Base (e.g., from ONNX).
-      2. **Heuristic Fallback**: If no spec match, uses naming/path conventions
-         (e.g., `.nn.` path implies Neural).
+      2. **Heuristic Fallback**: If no spec match, checks Framework Adapters
+         for regex conventions (e.g. `.nn` -> Neural).
 
       :param frameworks: List of package names (e.g. ['torch', 'jax']).
       :param output_dir: Directory to save generated JSON files.

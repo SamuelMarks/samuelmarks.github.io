@@ -5,11 +5,14 @@ ml_switcheroo.semantics.manager
 
 .. autoapi-nested-parse::
 
-   Semantics Manager for Knowledge Base Loading and Updating.
+   SemanticsManager for Knowledge Base Loading and Updating.
 
    This module is responsible for locating, loading, and merging semantic
    specification files (JSONs) into a unified Knowledge Graph.
-   It integrates with `testing.registry_sync` to auto-discover test templates.
+
+   It supports **Distributed Semantics**, allowing definitions to be split across
+   multiple files and directories (e.g., `semantics/extensions/*.json`).
+   Files are loaded recursively and merged with a tier-based priority system.
 
 
 
@@ -50,6 +53,14 @@ Module Contents
 
    Central database for semantic mappings and configuration.
 
+   Data Source Priority:
+   1. Registry Defaults (Code-defined in FrameworkAdapters).
+   2. JSON Files (User/System defined in `semantics/**/*.json`).
+      Files are loaded in the following order of precedence (Lowest to Highest):
+      - Array API (Math)
+      - Neural Net (Layers)
+      - Extensions/Extras (Patches & New Frameworks)
+
 
    .. py:attribute:: data
       :type:  Dict[str, Dict]
@@ -67,6 +78,21 @@ Module Contents
       :type:  Dict[str, Dict]
 
 
+   .. py:method:: get_all_rng_methods() -> Set[str]
+
+      Returns the consolidated set of RNG methods from all frameworks.
+
+
+
+   .. py:method:: resolve_variant(abstract_id: str, target_fw: str) -> Optional[Dict[str, Any]]
+
+      Resolves the variant definition for a given target framework, traversing inheritance.
+      Priority:
+      1. JSON-Defined Inheritance (`__frameworks__` config).
+      2. Code-Defined Inheritance (`FrameworkAdapter.inherits_from`).
+
+
+
    .. py:method:: load_validation_report(report_path: pathlib.Path) -> None
 
 
@@ -74,9 +100,6 @@ Module Contents
 
 
    .. py:method:: get_definition_by_id(abstract_id: str) -> Optional[Dict[str, Any]]
-
-
-   .. py:method:: update_definition(abstract_id: str, new_data: Dict[str, Any]) -> None
 
 
    .. py:method:: get_definition(api_name: str) -> Optional[Tuple[str, Dict]]
@@ -95,5 +118,8 @@ Module Contents
 
 
    .. py:method:: get_framework_aliases() -> Dict[str, Tuple[str, str]]
+
+
+   .. py:method:: update_definition(abstract_id: str, new_data: Dict[str, Any]) -> None
 
 

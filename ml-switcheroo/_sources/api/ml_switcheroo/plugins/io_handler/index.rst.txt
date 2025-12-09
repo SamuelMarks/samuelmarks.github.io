@@ -7,13 +7,14 @@ ml_switcheroo.plugins.io_handler
 
    Plugin for handling Input/Output (IO) Serialization.
 
-   This module maps PyTorch serialization (`torch.save`, `torch.load`) to
-   target-specific I/O routines.
+   Delegates serialization logic to the target FrameworkAdapter to ensure logic
+   remains decoupled from the core transpiler.
 
-   Supported Targets:
-   - JAX: `orbax.checkpoint.PyTreeCheckpointer().save/restore`
-   - Numpy: `np.save(file, arr)` / `np.load(file)`
-   - TensorFlow (basic): `tf.io.write_file(filename, contents)` / `tf.io.read_file`
+   Supported:
+   - `torch.save(obj, f)` rewriting.
+   - `torch.load(f)` rewriting.
+   - Arg extraction from keyword or positional parameters.
+   - Automatic preamble injection via Adapter request.
 
 
 
@@ -30,7 +31,7 @@ Module Contents
 
 .. py:function:: transform_io_calls(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
 
-   Hook to rewrite save/load calls to framework-specific IO routines.
+   Hook to rewrite save/load calls using Adapter-specific logic.
 
    Triggers:
        `torch.save` and `torch.load`.

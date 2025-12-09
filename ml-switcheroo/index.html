@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=35f6526a"></script>
+    <script src="_static/switcheroo_demo.js?v=5217a1e4"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ml-switcheroo 🔄🦘" href="README.html" />
@@ -219,14 +219,14 @@
     <li class="md-nav__item">
     
     
-      <a href="EXTENDING.html" class="md-nav__link">Extending</a>
+      <a href="EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
       
     
     </li>
@@ -292,6 +292,10 @@
 <h2 id="interactive-demo">Interactive Demo<a class="headerlink" href="#interactive-demo" title="Link to this heading">¶</a></h2>
 <p>Try it right in your browser! The engine runs entirely client-side using WebAssembly.</p>
 <div class="switcheroo-material-card" data-wheel="ml_switcheroo-0.0.1-py3-none-any.whl" id="switcheroo-wasm-root">
+<!-- Inject Protocol-Driven Examples -->
+<script>
+                window.SWITCHEROO_PRELOADED_EXAMPLES = {"torch": {"label": "Standard PyTorch Example", "srcFw": "torch", "tgtFw": "jax", "code": "import torch.nn as nn\n\nclass Simple(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.l = nn.Linear(10, 10)\n\n    def forward(self, x):\n        return self.l(x)"}, "jax": {"label": "Standard JAX / Flax Example", "srcFw": "jax", "tgtFw": "torch", "code": "from flax import nnx\n\nclass Simple(nnx.Module):\n    def __init__(self, rngs: nnx.Rngs):\n        self.l = nnx.Linear(10, 10, rngs=rngs)\n\n    def __call__(self, x):\n        return self.l(x)"}, "mlx": {"label": "Standard Apple MLX Example", "srcFw": "mlx", "tgtFw": "jax", "code": "import mlx.core as mx\n\nval = mx.abs(mx.array([-1, 2]))"}, "numpy": {"label": "Standard NumPy Example", "srcFw": "numpy", "tgtFw": "jax", "code": "import numpy as np\n\nval = np.abs([-1, 2])"}, "paxml": {"label": "Standard PaxML / Praxis Example", "srcFw": "paxml", "tgtFw": "jax", "code": "import praxis.layers as pl\nfrom praxis import base_layer\n\nclass Simple(base_layer.BaseLayer):\n    def setup(self):\n        self.l = pl.Linear(10, 10)\n\n    def __call__(self, x):\n        return self.l(x)"}, "tensorflow": {"label": "Standard TensorFlow Example", "srcFw": "tensorflow", "tgtFw": "jax", "code": "import tensorflow as tf\n\nval = tf.abs(tf.constant([-1.0, 2.0]))"}}; 
+            </script>
 <div class="demo-header">
 <div>
 <h3 style="margin:0">Live Transpiler Demo</h3>
@@ -311,9 +315,10 @@
 <select class="material-select" id="select-src">
 <option selected="" value="torch">PyTorch</option>
 <option value="jax">JAX / Flax</option>
-<option value="numpy">NumPy</option>
-<option value="tensorflow">TensorFlow</option>
 <option value="mlx">Apple MLX</option>
+<option value="numpy">NumPy</option>
+<option value="paxml">PaxML / Praxis</option>
+<option value="tensorflow">TensorFlow</option>
 </select>
 </div>
 <button class="swap-icon-btn" id="btn-swap" title="Swap Languages">⇄</button>
@@ -321,9 +326,10 @@
 <select class="material-select" id="select-tgt">
 <option value="torch">PyTorch</option>
 <option selected="" value="jax">JAX / Flax</option>
-<option value="numpy">NumPy</option>
-<option value="tensorflow">TensorFlow</option>
 <option value="mlx">Apple MLX</option>
+<option value="numpy">NumPy</option>
+<option value="paxml">PaxML / Praxis</option>
+<option value="tensorflow">TensorFlow</option>
 </select>
 </div>
 </div>
@@ -354,7 +360,7 @@ class Model(nn.Module):
 <div class="trace-container" id="trace-visualizer" style="display:none;">
 <div class="trace-row placeholder">
 <div class="trace-content" style="text-align:center;color:#999;padding:20px;">
-                            Trace events will appear here after conversion...
+                            Trace events will appear here after conversion... 
                         </div>
 </div>
 </div>
@@ -368,36 +374,39 @@ class Model(nn.Module):
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="README.html">ml-switcheroo 🔄🦘</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="README.html#key-features">⚡ Key Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="README.html#architecture">🏗️ Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="README.html#core-capabilities">⚡ Core Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#installation">📦 Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#cli-usage">🛠 CLI Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="README.html#architecture">🏗 Architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#compatibility-matrix">✅ Compatibility Matrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="README.html#contributing">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="README.html#extensibility">🔌 Extensibility</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#license">License</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ARCHITECTURE.html">Architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html#system-data-flow">🏗️ System Data Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html#the-semantic-pivot-strategy">🏗️ The Semantic Pivot Strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html#the-ecosystem-ingestion-storage">🧩 1. The Ecosystem (Ingestion &amp; Storage)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html#the-transpilation-engine-conversion">⚡ 2. The Transpilation Engine (Conversion)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html#plugin-hook-system">🔌 Plugin &amp; Hook System</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html#operational-workflows">🔁 Operational Workflows</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="EXTENDING.html">Extending</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#the-semantic-taxonomy-where-does-data-go">1. The Semantic Taxonomy (Where does data go?)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#workflow-automated-discovery">2. Workflow: Automated Discovery</a></li>
-<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#advanced-writing-ast-plugins">3. Advanced: Writing AST Plugins</a></li>
-<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#extending-validation-new-frameworks">4. Extending Validation (New Frameworks)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#configuration">5. Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EXTENDING.html">Extending ml-switcheroo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#adding-a-new-framework-or-backend">1. Adding a New Framework or Backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#mapping-semantic-operations">2. Mapping Semantic Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#extending-support-data-loaders-custom-patterns">3. Extending Support (Data Loaders &amp; Custom Patterns)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#verification">4. Verification</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="MAINTENANCE.html">Maintenance</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#updating-standards-ingestion">1. Updating Standards (Ingestion)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#syncing-implementations">2. Syncing Implementations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#verification-publishing">3. Verification &amp; Publishing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MAINTENANCE.html">Maintenance Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#ingestion-upstream-standards">1. Ingestion (Upstream Standards)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#discovery-mapping-frameworks">2. Discovery (Mapping Frameworks)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#verification-ci-loop">3. Verification (CI Loop)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#documentation-web-demo">4. Documentation &amp; Web Demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#glossary-of-artifacts">Glossary of Artifacts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="IDEAS.html">ml-switcheroo ideas</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="IDEAS.html#website">Website</a></li>
 <li class="toctree-l2"><a class="reference internal" href="IDEAS.html#advanced-features">Advanced Features</a></li>
 </ul>
 </li>
@@ -434,7 +443,6 @@ class Model(nn.Module):
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/adapters/index.html">adapters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#functions">Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#module-contents">Module Contents</a></li>
 </ul>
@@ -450,7 +458,6 @@ class Model(nn.Module):
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/generator/index.html">generator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/generator/index.html#attributes">Attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/generator/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/generator/index.html#module-contents">Module Contents</a></li>
 </ul>

@@ -2,8 +2,9 @@ let pyodide = null;
 let srcEditor = null;
 let tgtEditor = null;
 
-// --- Feature 1: Transformations Examples ---
-const EXAMPLES = {
+// --- Feature 1 & 2: Examples Configuration ---
+// Default Hardcoded Fallbacks (for dev/test without build pipeline)
+let EXAMPLES = {
     "math_ops": {
         label: "Math Operations (Torch ↔ JAX)",
         srcFw: "torch",
@@ -15,24 +16,6 @@ const EXAMPLES = {
         srcFw: "torch",
         tgtFw: "jax",
         code: `import torch.nn as nn\n\nclass SimplePerceptron(nn.Module):\n    """Basic Single-Layer Perceptron."""\n    def __init__(self, in_features, out_features):\n        super().__init__() \n        self.layer = nn.Linear(in_features, out_features)\n\n    def forward(self, x):\n        return self.layer(x)`
-    },
-    "array_dims": {
-        label: "Dimension Swapping (Permute ↔ Transpose)",
-        srcFw: "torch",
-        tgtFw: "jax",
-        code: `import torch\n\ndef transpose_batch(batch):\n    """Swaps dimensions (B, C, H, W) -> (B, H, W, C)."""\n    return torch.permute(batch, (0, 2, 3, 1))`
-    },
-    "inplace": {
-        label: "In-Place Unrolling (add_ ↔ add)",
-        srcFw: "torch",
-        tgtFw: "jax",
-        code: `def update_step(x, delta):\n    # In-place assignment ensures functional compatibility\n    # x.add_(delta) -> x = x + delta\n    x = x.add_(delta)\n    return x`
-    },
-    "rng_state": {
-        label: "RNG Injection (Dropout)",
-        srcFw: "torch",
-        tgtFw: "jax",
-        code: `import torch\nimport torch.nn.functional as F\n\ndef noisy_identity(x):\n    # Dropout requires explicit RNG keys in JAX\n    return F.dropout(x, p=0.5, training=True)`
     }
 };
 
@@ -65,7 +48,7 @@ try:
         "code": result.code, 
         "logs": process_log.export_text(), 
         "is_success": result.success, 
-        "errors": result.errors,
+        "errors": result.errors, 
         "trace_events": result.trace_events
     } 
 except Exception as e: 
@@ -73,8 +56,8 @@ except Exception as e:
         "code": "", 
         "logs": f"{process_log.export_text()}\\nCRITICAL ERROR: {str(e)}\\n{traceback.format_exc()}", 
         "is_success": False, 
-        "errors": [str(e)],
-        "trace_events": []
+        "errors": [str(e)], 
+        "trace_events": [] 
     } 
 
 json_output = json.dumps(response) 
@@ -145,6 +128,13 @@ importlib.util.find_spec("ml_switcheroo") is not None
         // --- Feature 0: Init CodeMirror ---
         // Initialize editors now that elements are visible in DOM
         initEditors();
+
+        // --- Merge Dynamic Examples ---
+        if (window.SWITCHEROO_PRELOADED_EXAMPLES) {
+            console.log("[WASM] Merging protocol-driven examples.");
+            EXAMPLES = { ...EXAMPLES, ...window.SWITCHEROO_PRELOADED_EXAMPLES };
+        }
+
         initExampleSelector();
 
         statusEl.innerText = "Ready";
@@ -153,7 +143,7 @@ importlib.util.find_spec("ml_switcheroo") is not None
         // Ensure buttons reactivated
         document.getElementById("btn-convert").disabled = false;
 
-        // Append status, preserving any log from example loader
+        // Append status
         logBox.innerText += "\nEngine initialized successfully.";
 
     } catch (err) {
@@ -200,27 +190,38 @@ function initExampleSelector() {
     // Avoid double population
     if (sel.options.length > 1) return;
 
-    // Clear default HTML placeholder
-    sel.innerHTML = "";
+    // Clear default HTML placeholder (except title), remove selected attribute from it
+    sel.innerHTML = '<option value="" disabled>-- Select a Pattern --</option>';
 
     const DEFAULT_KEY = "neural_net";
+    let defaultFound = false;
 
     // Populate
     for (const [key, details] of Object.entries(EXAMPLES)) {
         const opt = document.createElement("option");
         opt.value = key;
         opt.innerText = details.label;
-        if (key === DEFAULT_KEY) opt.selected = true;
         sel.appendChild(opt);
+
+        if (key === DEFAULT_KEY) {
+            opt.selected = true;
+            defaultFound = true;
+        }
+    }
+
+    // Force load default if present to ensure Editor matches Dropdown
+    if (defaultFound) {
+        // Fallback or ensure first item selected if no default logic
+        loadExample(DEFAULT_KEY);
+    } else {
+        // Fallback: select placeholder if default key is invalid
+        sel.querySelector('option[value=""]').selected = true;
     }
 
     // Listener
     sel.addEventListener("change", (e) => {
         loadExample(e.target.value);
     });
-
-    // Trigger loading defaults immediately
-    loadExample(DEFAULT_KEY);
 }
 
 function loadExample(key) {
@@ -297,7 +298,6 @@ async function runTranspilation() {
         }
 
         // --- Feature 05: Visualizer Integration ---
-        // Pass trace events to helper class if present
         if (result.trace_events && window.TraceGraph) {
             console.log("[WASM] Rendering Trace Graph...");
             const vis = new TraceGraph('trace-visualizer');

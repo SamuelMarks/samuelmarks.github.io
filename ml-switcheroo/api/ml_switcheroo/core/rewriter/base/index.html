@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=35f6526a"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=5217a1e4"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.calls" href="../calls/index.html" />
@@ -230,14 +230,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../../EXTENDING.html" class="md-nav__link">Extending</a>
+      <a href="../../../../../EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      <a href="../../../../../MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
       
     
     </li>
@@ -437,9 +437,13 @@
         </li>
         <li class="md-nav__item"><a href="#id1" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.config</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#id2" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.strict_mode</span></code></a>
+        <li class="md-nav__item"><a href="#id2" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.source_fw</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#id3" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.ctx</span></code></a>
+        <li class="md-nav__item"><a href="#id3" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.target_fw</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id4" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.strict_mode</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id5" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.ctx</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.visit_Import()</span></code></a>
         </li>
@@ -499,15 +503,12 @@ up to the <cite>ASTEngine</cite>.</p></li>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.base.</span></span><span class="sig-name descname"><span class="pre">BaseRewriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.base.</span></span><span class="sig-name descname"><span class="pre">BaseRewriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
 <p>The base class for AST transformation traversal.</p>
-<p>It maintains the state required to navigate Python’s scoping rules and
-import systems, providing helper methods for the specific Mixins (Calls,
-Structure, Attributes) to resolve names and report issues.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.semantics">
-<span class="sig-name descname"><span class="pre">semantics</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.semantics" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.semantics" title="Link to this definition">¶</a></dt>
 <dd><p>The loaded knowledge base of API mappings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -517,8 +518,8 @@ Structure, Attributes) to resolve names and report issues.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.config">
-<span class="sig-name descname"><span class="pre">config</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.config" title="Link to this definition">¶</a></dt>
-<dd><p>Configuration for the current run (strict mode, etc).</p>
+<span class="sig-name descname"><span class="pre">config</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the current run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig">RuntimeConfig</a></p>
@@ -547,7 +548,7 @@ Structure, Attributes) to resolve names and report issues.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.strict_mode">
-<span class="sig-name descname"><span class="pre">strict_mode</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.strict_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.strict_mode" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">strict_mode</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.strict_mode" title="Link to this definition">¶</a></dt>
 <dd><p>If True, unknown APIs trigger failure markers instead of pass-through.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -557,7 +558,7 @@ Structure, Attributes) to resolve names and report issues.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.ctx">
-<span class="sig-name descname"><span class="pre">ctx</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.ctx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.ctx" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">ctx</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.ctx" title="Link to this definition">¶</a></dt>
 <dd><p>The context object passed to plugins.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -567,7 +568,7 @@ Structure, Attributes) to resolve names and report issues.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter._scope_stack">
-<span class="sig-name descname"><span class="pre">_scope_stack</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter._scope_stack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._scope_stack" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_scope_stack</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._scope_stack" title="Link to this definition">¶</a></dt>
 <dd><p>A stack of scopes, tracking variables identified
 as stateful (e.g., neural network layers assigned to <cite>self</cite>).</p>
 <dl class="field-list simple">
@@ -578,7 +579,7 @@ as stateful (e.g., neural network layers assigned to <cite>self</cite>).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter._signature_stack">
-<span class="sig-name descname"><span class="pre">_signature_stack</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter._signature_stack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._signature_stack" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_signature_stack</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._signature_stack" title="Link to this definition">¶</a></dt>
 <dd><p>Stack tracking function signature details
 to support argument injection (like <cite>rng</cite>).</p>
 <dl class="field-list simple">
@@ -589,7 +590,7 @@ to support argument injection (like <cite>rng</cite>).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter._alias_map">
-<span class="sig-name descname"><span class="pre">_alias_map</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter._alias_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._alias_map" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_alias_map</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._alias_map" title="Link to this definition">¶</a></dt>
 <dd><p>Map of local names to fully qualified paths
 (e.g., <cite>{‘nn’: ‘torch.nn’, ‘F’: ‘torch.nn.functional’}</cite>).</p>
 <dl class="field-list simple">
@@ -600,41 +601,49 @@ to support argument injection (like <cite>rng</cite>).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">semantics</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">config</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">config</span></span><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">strict_mode</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.strict_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">source_fw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">ctx</span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.ctx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">target_fw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">strict_mode</span></span><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">ctx</span></span><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import">
-<span class="sig-name descname"><span class="pre">visit_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.visit_Import"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">visit_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import" title="Link to this definition">¶</a></dt>
 <dd><p>Scans <cite>import …</cite> statements to populate the alias map.
 Example: <cite>import torch.nn as nn</cite> -&gt; <cite>_alias_map[‘nn’] = ‘torch.nn’</cite>.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.visit_ImportFrom">
-<span class="sig-name descname"><span class="pre">visit_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.visit_ImportFrom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_ImportFrom" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">visit_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_ImportFrom" title="Link to this definition">¶</a></dt>
 <dd><p>Scans <cite>from … import …</cite> statements to populate the alias map.
 Example: <cite>from torch import nn</cite> -&gt; <cite>_alias_map[‘nn’] = ‘torch.nn’</cite>.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.visit_SimpleStatementLine">
-<span class="sig-name descname"><span class="pre">visit_SimpleStatementLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.visit_SimpleStatementLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_SimpleStatementLine" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">visit_SimpleStatementLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_SimpleStatementLine" title="Link to this definition">¶</a></dt>
 <dd><p>Resets error tracking at the start of each line.
 Errors bubble up from children (Expressions) to this Statement handler.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.leave_SimpleStatementLine">
-<span class="sig-name descname"><span class="pre">leave_SimpleStatementLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.SimpleStatementLine</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="reference internal" href="../../../../../_modules/ml_switcheroo/core/rewriter/base.html#BaseRewriter.leave_SimpleStatementLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.leave_SimpleStatementLine" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">leave_SimpleStatementLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.SimpleStatementLine</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.leave_SimpleStatementLine" title="Link to this definition">¶</a></dt>
 <dd><p>If errors occurred during processing of this line’s children (e.g. failing
 to rewrite a function call), wrap the line in an <cite>EscapeHatch</cite>.</p>
 <p>Prioritizes errors (reverting to original code) over warnings (using updated code).</p>

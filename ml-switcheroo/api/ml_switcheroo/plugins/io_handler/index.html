@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=35f6526a"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=5217a1e4"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.method_property" href="../method_property/index.html" />
@@ -229,14 +229,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending</a>
+      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
       
     
     </li>
@@ -435,18 +435,19 @@
   <section id="module-ml_switcheroo.plugins.io_handler">
 <span id="ml-switcheroo-plugins-io-handler"></span><h1 id="api-ml-switcheroo-plugins-io-handler-index--page-root">ml_switcheroo.plugins.io_handler<a class="headerlink" href="#api-ml-switcheroo-plugins-io-handler-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for handling Input/Output (IO) Serialization.</p>
-<p>This module maps PyTorch serialization (<cite>torch.save</cite>, <cite>torch.load</cite>) to
-target-specific I/O routines.</p>
-<p>Supported Targets:
-- JAX: <cite>orbax.checkpoint.PyTreeCheckpointer().save/restore</cite>
-- Numpy: <cite>np.save(file, arr)</cite> / <cite>np.load(file)</cite>
-- TensorFlow (basic): <cite>tf.io.write_file(filename, contents)</cite> / <cite>tf.io.read_file</cite></p>
+<p>Delegates serialization logic to the target FrameworkAdapter to ensure logic
+remains decoupled from the core transpiler.</p>
+<p>Supported:
+- <cite>torch.save(obj, f)</cite> rewriting.
+- <cite>torch.load(f)</cite> rewriting.
+- Arg extraction from keyword or positional parameters.
+- Automatic preamble injection via Adapter request.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.io_handler.transform_io_calls" title="ml_switcheroo.plugins.io_handler.transform_io_calls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_io_calls</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Hook to rewrite save/load calls to framework-specific IO routines.</p></td>
+<td><p>Hook to rewrite save/load calls using Adapter-specific logic.</p></td>
 </tr>
 </tbody>
 </table>
@@ -455,8 +456,8 @@ target-specific I/O routines.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.io_handler.transform_io_calls">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.io_handler.</span></span><span class="sig-name descname"><span class="pre">transform_io_calls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="reference internal" href="../../../../_modules/ml_switcheroo/plugins/io_handler.html#transform_io_calls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.plugins.io_handler.transform_io_calls" title="Link to this definition">¶</a></dt>
-<dd><p>Hook to rewrite save/load calls to framework-specific IO routines.</p>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.io_handler.</span></span><span class="sig-name descname"><span class="pre">transform_io_calls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.io_handler.transform_io_calls" title="Link to this definition">¶</a></dt>
+<dd><p>Hook to rewrite save/load calls using Adapter-specific logic.</p>
 <dl class="simple">
 <dt>Triggers:</dt><dd><p><cite>torch.save</cite> and <cite>torch.load</cite>.</p>
 </dd>

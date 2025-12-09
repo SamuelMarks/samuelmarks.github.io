@@ -26,6 +26,7 @@ Functions
 
 .. autoapisummary::
 
+   ml_switcheroo.config.get_framework_priority_order
    ml_switcheroo.config.parse_cli_key_values
 
 
@@ -38,6 +39,17 @@ Module Contents
 
 .. py:data:: T
 
+.. py:function:: get_framework_priority_order() -> List[str]
+
+   Returns a list of framework keys sorted by UI Priority.
+
+   Logic:
+   1. Retrieve registered frameworks.
+   2. Instantiate adapter to read 'ui_priority'.
+   3. Sort by priority (asc), then by name (asc) for stability.
+   4. Frameworks without adapters sort to the end (priority 999).
+
+
 .. py:class:: RuntimeConfig(/, **data: Any)
 
    Bases: :py:obj:`pydantic.BaseModel`
@@ -47,11 +59,15 @@ Module Contents
 
 
    .. py:attribute:: source_framework
-      :type:  ml_switcheroo.enums.SupportedEngine
+      :type:  str
+      :value: 'torch'
+
 
 
    .. py:attribute:: target_framework
-      :type:  ml_switcheroo.enums.SupportedEngine
+      :type:  str
+      :value: 'jax'
+
 
 
    .. py:attribute:: strict_mode
@@ -78,13 +94,18 @@ Module Contents
 
 
 
-   .. py:class:: Config
+   .. py:method:: validate_framework(v: str) -> str
+      :classmethod:
+
+
+      Ensures the framework is registered in the system.
+
 
 
    .. py:method:: parse_plugin_settings(schema: Type[T]) -> T
 
 
-   .. py:method:: load(source: Optional[Union[str, ml_switcheroo.enums.SupportedEngine]] = None, target: Optional[Union[str, ml_switcheroo.enums.SupportedEngine]] = None, strict_mode: Optional[bool] = None, plugin_settings: Optional[Dict[str, Any]] = None, validation_report: Optional[pathlib.Path] = None, search_path: Optional[pathlib.Path] = None) -> RuntimeConfig
+   .. py:method:: load(source: Optional[str] = None, target: Optional[str] = None, strict_mode: Optional[bool] = None, plugin_settings: Optional[Dict[str, Any]] = None, validation_report: Optional[pathlib.Path] = None, search_path: Optional[pathlib.Path] = None) -> RuntimeConfig
       :classmethod:
 
 

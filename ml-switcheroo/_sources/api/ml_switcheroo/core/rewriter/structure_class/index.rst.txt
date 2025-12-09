@@ -1,0 +1,52 @@
+ml_switcheroo.core.rewriter.structure_class
+===========================================
+
+.. py:module:: ml_switcheroo.core.rewriter.structure_class
+
+.. autoapi-nested-parse::
+
+   Class Structure Rewriting Logic.
+
+   Handles transformations relative to class definitions, specifically:
+   1.  Inheritance Warping: Swapping base classes (e.g. `torch.nn.Module` -> `flax.nnx.Module`).
+   2.  Context Tracking: Setting flags for nested methods (neural vs generic).
+
+   Refactor Note:
+       Logic is now fully dynamic. It queries the SemanticsManager for registered
+       framework traits to identify module bases, rather than using hardcoded literals.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: ClassStructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming ClassDef nodes.
+
+   .. attribute:: _known_module_bases
+
+      A cached set of fully qualified
+      class names that act as Neural Module bases (e.g., 'torch.nn.Module').
+      Populated based on registered adapters and JSON config.
+
+      :type: Optional[Set[str]]
+
+
+   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
+
+
+   .. py:method:: leave_ClassDef(_original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
+
+

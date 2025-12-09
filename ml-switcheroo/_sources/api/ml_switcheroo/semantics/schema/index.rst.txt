@@ -7,11 +7,8 @@ ml_switcheroo.semantics.schema
 
    Pydantic Schemas for Semantic Knowledge Base.
 
-   This module defines the data structure of the JSON mapping files (`k_array_api.json`, etc.).
-   It serves as the formal specification for:
-   1.  **OpDefinition**: The top-level abstract operation entry.
-   2.  **Variant**: Framework-specific implementation details.
-   3.  **Output Normalization**: The `output_adapter` field used to align return signatures.
+   This module defines the data structure of the JSON mapping files (`k_array_api.json`, etc.)
+   and the Framework Configuration blocks.
 
 
 
@@ -20,12 +17,220 @@ Classes
 
 .. autoapisummary::
 
+   ml_switcheroo.semantics.schema.StructuralTraits
+   ml_switcheroo.semantics.schema.FrameworkAlias
+   ml_switcheroo.semantics.schema.FrameworkTraits
    ml_switcheroo.semantics.schema.Variant
    ml_switcheroo.semantics.schema.OpDefinition
+   ml_switcheroo.semantics.schema.SemanticsFile
 
 
 Module Contents
 ---------------
+
+.. py:class:: StructuralTraits(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Defines structural patterns for a framework to guide generic rewriters.
+   This allows adding new frameworks (like MLX, TinyGrad) without editing python code.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: module_base
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: forward_method
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: requires_super_init
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: init_method_name
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: inject_magic_args
+      :type:  List[Tuple[str, Optional[str]]]
+      :value: None
+
+
+
+   .. py:attribute:: strip_magic_args
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: lifecycle_strip_methods
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: lifecycle_warn_methods
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: impurity_methods
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: jit_static_args
+      :type:  List[str]
+      :value: None
+
+
+
+.. py:class:: FrameworkAlias(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Usage docs: https://docs.pydantic.dev/2.10/concepts/models/
+
+   A base class for creating Pydantic models.
+
+   .. attribute:: __class_vars__
+
+      The names of the class variables defined on the model.
+
+   .. attribute:: __private_attributes__
+
+      Metadata about the private attributes of the model.
+
+   .. attribute:: __signature__
+
+      The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+   .. attribute:: __pydantic_complete__
+
+      Whether model building is completed, or if there are still undefined fields.
+
+   .. attribute:: __pydantic_core_schema__
+
+      The core schema of the model.
+
+   .. attribute:: __pydantic_custom_init__
+
+      Whether the model has a custom `__init__` function.
+
+   .. attribute:: __pydantic_decorators__
+
+      Metadata containing the decorators defined on the model.
+      This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+
+   .. attribute:: __pydantic_generic_metadata__
+
+      Metadata for generic models; contains data used for a similar purpose to
+      __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+
+   .. attribute:: __pydantic_parent_namespace__
+
+      Parent namespace of the model, used for automatic rebuilding of models.
+
+   .. attribute:: __pydantic_post_init__
+
+      The name of the post-init method for the model, if defined.
+
+   .. attribute:: __pydantic_root_model__
+
+      Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+
+   .. attribute:: __pydantic_serializer__
+
+      The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+
+   .. attribute:: __pydantic_validator__
+
+      The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+   .. attribute:: __pydantic_fields__
+
+      A dictionary of field names and their corresponding [`FieldInfo`][pydantic.fields.FieldInfo] objects.
+
+   .. attribute:: __pydantic_computed_fields__
+
+      A dictionary of computed field names and their corresponding [`ComputedFieldInfo`][pydantic.fields.ComputedFieldInfo] objects.
+
+   .. attribute:: __pydantic_extra__
+
+      A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+      is set to `'allow'`.
+
+   .. attribute:: __pydantic_fields_set__
+
+      The names of fields explicitly set during instantiation.
+
+   .. attribute:: __pydantic_private__
+
+      Values of private attributes set on the model instance.
+
+
+   .. py:attribute:: module
+      :type:  str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+.. py:class:: FrameworkTraits(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for a framework's structural behavior.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: extends
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: alias
+      :type:  Optional[FrameworkAlias]
+      :value: None
+
+
+
+   .. py:attribute:: stateful_call
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: traits
+      :type:  Optional[StructuralTraits]
+      :value: None
+
+
 
 .. py:class:: Variant(/, **data: Any)
 
@@ -109,6 +314,31 @@ Module Contents
 
    .. py:attribute:: variants
       :type:  Dict[str, Optional[Variant]]
+      :value: None
+
+
+
+.. py:class:: SemanticsFile(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Schema representing an entire semantics JSON file.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: frameworks
+      :type:  Optional[Dict[str, FrameworkTraits]]
+      :value: None
+
+
+
+   .. py:attribute:: imports
+      :type:  Optional[Dict[str, Any]]
       :value: None
 
 

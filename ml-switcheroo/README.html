@@ -62,7 +62,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=35f6526a"></script>
+    <script src="_static/switcheroo_demo.js?v=5217a1e4"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -582,15 +584,17 @@ window.addEventListener("load", load);
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#readme--page-root" class="md-nav__link">ml-switcheroo 🔄🦘</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#key-features" class="md-nav__link">⚡ Key Features</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#architecture" class="md-nav__link">🏗️ Architecture</a>
+        </li>
+        <li class="md-nav__item"><a href="#core-capabilities" class="md-nav__link">⚡ Core Capabilities</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#the-semantic-pivot-ast-engine" class="md-nav__link">1. The Semantic Pivot (AST Engine)</a>
+        <li class="md-nav__item"><a href="#the-semantic-pivot" class="md-nav__link">1. The Semantic Pivot</a>
         </li>
         <li class="md-nav__item"><a href="#structural-state-rewriting" class="md-nav__link">2. Structural & State Rewriting</a>
         </li>
         <li class="md-nav__item"><a href="#safety-analysis" class="md-nav__link">3. Safety & Analysis</a>
         </li>
-        <li class="md-nav__item"><a href="#discovery-verification" class="md-nav__link">4. Discovery & Verification</a>
+        <li class="md-nav__item"><a href="#verification-engine" class="md-nav__link">4. Verification Engine</a>
         </li></ul>
             </nav>
         </li>
@@ -600,17 +604,15 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#transpilation" class="md-nav__link">Transpilation</a>
         </li>
-        <li class="md-nav__item"><a href="#knowledge-base-management" class="md-nav__link">Knowledge Base Management</a>
+        <li class="md-nav__item"><a href="#discovery-learning" class="md-nav__link">Discovery & Learning</a>
         </li>
         <li class="md-nav__item"><a href="#verification-ci" class="md-nav__link">Verification (CI)</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#architecture" class="md-nav__link">🏗 Architecture</a>
-        </li>
         <li class="md-nav__item"><a href="#compatibility-matrix" class="md-nav__link">✅ Compatibility Matrix</a>
         </li>
-        <li class="md-nav__item"><a href="#contributing" class="md-nav__link">Contributing</a>
+        <li class="md-nav__item"><a href="#extensibility" class="md-nav__link">🔌 Extensibility</a>
         </li>
         <li class="md-nav__item"><a href="#license" class="md-nav__link">License</a>
         </li></ul>
@@ -625,7 +627,14 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="#key-features" class="md-nav__link">⚡ Key Features</a>
+      <a href="#architecture" class="md-nav__link">🏗️ Architecture</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#core-capabilities" class="md-nav__link">⚡ Core Capabilities</a>
       
     
     </li>
@@ -646,13 +655,6 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="#architecture" class="md-nav__link">🏗 Architecture</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
       <a href="#compatibility-matrix" class="md-nav__link">✅ Compatibility Matrix</a>
       
     
@@ -660,7 +662,7 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="#contributing" class="md-nav__link">Contributing</a>
+      <a href="#extensibility" class="md-nav__link">🔌 Extensibility</a>
       
     
     </li>
@@ -683,14 +685,14 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="EXTENDING.html" class="md-nav__link">Extending</a>
+      <a href="EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
       
     
     </li>
@@ -729,15 +731,17 @@ window.addEventListener("load", load);
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#readme--page-root" class="md-nav__link">ml-switcheroo 🔄🦘</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#key-features" class="md-nav__link">⚡ Key Features</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#architecture" class="md-nav__link">🏗️ Architecture</a>
+        </li>
+        <li class="md-nav__item"><a href="#core-capabilities" class="md-nav__link">⚡ Core Capabilities</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#the-semantic-pivot-ast-engine" class="md-nav__link">1. The Semantic Pivot (AST Engine)</a>
+        <li class="md-nav__item"><a href="#the-semantic-pivot" class="md-nav__link">1. The Semantic Pivot</a>
         </li>
         <li class="md-nav__item"><a href="#structural-state-rewriting" class="md-nav__link">2. Structural & State Rewriting</a>
         </li>
         <li class="md-nav__item"><a href="#safety-analysis" class="md-nav__link">3. Safety & Analysis</a>
         </li>
-        <li class="md-nav__item"><a href="#discovery-verification" class="md-nav__link">4. Discovery & Verification</a>
+        <li class="md-nav__item"><a href="#verification-engine" class="md-nav__link">4. Verification Engine</a>
         </li></ul>
             </nav>
         </li>
@@ -747,17 +751,15 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#transpilation" class="md-nav__link">Transpilation</a>
         </li>
-        <li class="md-nav__item"><a href="#knowledge-base-management" class="md-nav__link">Knowledge Base Management</a>
+        <li class="md-nav__item"><a href="#discovery-learning" class="md-nav__link">Discovery & Learning</a>
         </li>
         <li class="md-nav__item"><a href="#verification-ci" class="md-nav__link">Verification (CI)</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#architecture" class="md-nav__link">🏗 Architecture</a>
-        </li>
         <li class="md-nav__item"><a href="#compatibility-matrix" class="md-nav__link">✅ Compatibility Matrix</a>
         </li>
-        <li class="md-nav__item"><a href="#contributing" class="md-nav__link">Contributing</a>
+        <li class="md-nav__item"><a href="#extensibility" class="md-nav__link">🔌 Extensibility</a>
         </li>
         <li class="md-nav__item"><a href="#license" class="md-nav__link">License</a>
         </li></ul>
@@ -785,114 +787,153 @@ window.addEventListener("load", load);
 <a class="reference external" href="https://www.python.org/downloads/"><img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10+-blue.svg"/></a>
 <a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000.svg"/></a>
 <a class="reference external" href="https://samuelmarks.github.io/ml-switcheroo/"><img alt="Interactive docs" src="https://img.shields.io/badge/interactive-docs-silver"/></a></p>
-<p><strong>ml-switcheroo</strong> converts Deep Learning models between frameworks (primarily <strong>PyTorch</strong> ↔ <strong>JAX/Flax</strong>) using strict
-Abstract Syntax Tree (AST) / Concrete Syntax Tree (CST) manipulation.</p>
-<p>Unlike LLM-based coding assistants which “guess” output, ml-switcheroo uses a <strong>Knowledge Base</strong> derived from official
-specifications (<a class="reference external" href="https://github.com/onnx/onnx">ONNX</a>, <a class="reference internal" href="#(https://data-apis.org/array-api/latest/)"><span class="xref myst">Python Array API</span></a>) to perform mathematically guaranteed translations. If a translation is
-ambiguous, it protects your code with an “Escape Hatch” rather than generating broken logic.</p>
+<p><strong>ml-switcheroo</strong> is a rigorous AST-based transpiler designed to convert Deep Learning code between frameworks (PyTorch,
+JAX/Flax, TensorFlow, etc.) without hallucination.</p>
+<p>Unlike LLM-based assistants, it uses a strict <strong>Semantic Knowledge Base</strong> derived from official
+specifications (<a class="reference external" href="https://github.com/onnx/onnx">ONNX</a>, <a class="reference external" href="https://data-apis.org/array-api/latest/">Python Array API</a>) to
+perform mathematically guaranteed translations. It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem using a Hub-and-Spoke model:
+all frameworks map to an <strong>Abstract Standard</strong>, which then maps to the target.</p>
 <hr class="docutils"/>
-<p>Here is a diagram visualizing the flow from Specifications/Code → Discovery → The Knowledge Base → The
-Transpilation Engine.</p>
+<section id="architecture">
+<h2 id="architecture">🏗️ Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
+<p>Code is parsed into an Abstract Syntax Tree (AST), analyzed for safety, pivoted through the Abstract Standard, and
+reconstructed for the target framework.</p>
 <!-- prettier-ignore -->
 <pre class="mermaid">
         graph TD
-%% =================================================================================
-%% STYLE DEFINITIONS
-%% =================================================================================
-    classDef source fill: #ea4335, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px, ry: 5px;
-    classDef semantics fill: #f9ab00, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans Medium', rx: 5px, ry: 5px;
-    classDef engine fill: #4285f4, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px, ry: 5px;
-    classDef plugin fill: #57caff, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans Medium', rx: 5px, ry: 5px;
-    classDef target fill: #34a853, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px, ry: 5px;
-    classDef codeBlock fill: #ffffff, stroke: #20344b, stroke-width: 1px, color: #20344b, font-family: 'Roboto Mono Normal', text-align: left;
+    %% =================================================================================
+    %% THEME CONFIGURATION
+    %% Colors: Blue 500 (#4285f4), Green 500 (#34a853), Yellow 600 (#f9ab00), Red 500 (#ea4335)
+    %% Navy (#20344b), White (#ffffff)
+    %% =================================================================================
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b,stroke-width:1px;
+    
+    %% Input: Red 500
+    classDef source fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    
+    %% Processing: Blue 500
+    classDef engine fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    
+    %% Data/KB: Yellow 600
+    classDef kb fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    
+    %% Output: Green 500
+    classDef target fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    
+    %% Extensions: Halftone Blue
+    classDef plugin fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    
+    %% Verification: Halftone Green
+    classDef verify fill:#5cdb6d,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
 
-%% =================================================================================
-%% 1. INPUT LAYER
-%% =================================================================================
-    subgraph Inputs [" Phase 1: Inputs "]
-        direction TB
-        style Inputs fill: #ffffff, stroke: #20344b, stroke-width: 0px, color: #20344b
-        SRC_FILE("&lt;b&gt;📄 Input Source (PyTorch)&lt;/b&gt;"):::source
-        SRC_CODE("import torch.nn as nn&lt;br/&gt;import torch&lt;br/&gt;&lt;br/&gt;class Model(&lt;b&gt;nn.Module&lt;/b&gt;):&lt;br/&gt;&amp;nbsp;&amp;nbsp;def &lt;b&gt;forward&lt;/b&gt;(self, x):&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return &lt;b&gt;torch.abs&lt;/b&gt;(x)"):::codeBlock
-        SRC_FILE --- SRC_CODE
-    end
+    %% Code Blocks: White with Monospace
+    classDef codeBlock fill:#ffffff,stroke:#20344b,stroke-width:1px,font-family:'Roboto Mono Normal',text-align:left,font-size:12px;
 
-    SRC_CODE --&gt;|" Parse AST "| PARSER
-%% =================================================================================
-%% 2. ENGINE LAYER
-%% =================================================================================
-    subgraph Core [" ml-switcheroo Engine "]
-        direction TB
-        style Core fill: #edf2fa, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans Medium'
-        PARSER(AST Parser):::engine
-        ANALYSIS("&lt;b&gt;🔍 Analysis&lt;/b&gt;&lt;br/&gt;Purity, Lifecycle &amp; Deps"):::engine
-    %% Semantic Lookup
-        KB_HEADER("&lt;b&gt;📚 Knowledge Base&lt;/b&gt;"):::semantics
-        KB_DATA("{&lt;br/&gt;&amp;nbsp;'abs': {'jax': 'jax.numpy.abs'},&lt;br/&gt;&amp;nbsp;'Linear': {'jax': 'flax.nnx.Linear'}&lt;br/&gt;}"):::codeBlock
-    %% Transformation logic
-        REWRITER("&lt;b&gt;🔄 Pivot Rewriter&lt;/b&gt;&lt;br/&gt;Maps 'torch' to Abstract Spec&lt;br/&gt;Lowers to 'jax'"):::engine
-        PLUGIN("&lt;b&gt;🔌 Structural Plugins&lt;/b&gt;&lt;br/&gt;nn.Module → nnx.Module&lt;br/&gt;IO &amp; Device Abstraction"):::plugin
-        FIXER("&lt;b&gt;🧹 Import Fixer&lt;/b&gt;&lt;br/&gt;Prune 'torch'&lt;br/&gt;Inject 'jax.numpy'"):::engine
-    %% Connections
-        PARSER --&gt; ANALYSIS
-        ANALYSIS --&gt; REWRITER
-        KB_HEADER --- KB_DATA
-        KB_DATA -.-&gt;|" Map API "| REWRITER
-        REWRITER --&gt; PLUGIN
-        PLUGIN --&gt; FIXER
-    end
+    %% =================================================================================
+    %% 0. INPUT PHASE
+    %% =================================================================================
+    SRC_HEADER("&lt;b&gt;0. Input Source (PyTorch)&lt;/b&gt;"):::source
+    SRC_CODE("class Model(&lt;b&gt;nn.Module&lt;/b&gt;):&lt;br/&gt;&amp;nbsp;&amp;nbsp;def &lt;b&gt;forward&lt;/b&gt;(self, x):&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return &lt;b&gt;torch.abs&lt;/b&gt;(x)"):::codeBlock
+    
+    SRC_HEADER --- SRC_CODE
+    SRC_CODE --&gt; PARSER
 
-%% =================================================================================
-%% 3. OUTPUT LAYER
-%% =================================================================================
-    FIXER --&gt;|" Emit Code "| TGT_FILE
+    %% =================================================================================
+    %% 1. ANALYSIS PHASE
+    %% =================================================================================
+    PARSER("&lt;b&gt;1. AST Analysis&lt;/b&gt;&lt;br/&gt;Purity &amp; Lifecycle Scanners"):::engine
+    
+    PARSER --&gt; REWRITER
 
-    subgraph Outputs [" Phase 3: Outputs "]
-        direction TB
-        style Outputs fill: #ffffff, stroke: #20344b, stroke-width: 0px
-        TGT_FILE("&lt;b&gt;🚀 Output Target (JAX/Flax)&lt;/b&gt;"):::target
-        TGT_CODE("from flax import nnx&lt;br/&gt;import jax.numpy as jnp&lt;br/&gt;&lt;br/&gt;class Model(&lt;b&gt;nnx.Module&lt;/b&gt;):&lt;br/&gt;&amp;nbsp;&amp;nbsp;def &lt;b&gt;__call__&lt;/b&gt;(self, x):&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return &lt;b&gt;jnp.abs&lt;/b&gt;(x)"):::codeBlock
-        TGT_FILE --- TGT_CODE
-    end
-    </pre><hr class="docutils"/>
-<section id="key-features">
-<h2 id="key-features">⚡ Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
-<section id="the-semantic-pivot-ast-engine">
-<h3 id="the-semantic-pivot-ast-engine">1. The Semantic Pivot (AST Engine)<a class="headerlink" href="#the-semantic-pivot-ast-engine" title="Link to this heading">¶</a></h3>
-<p>The core engine does not map <code class="docutils literal notranslate"><span class="pre">torch</span></code> directly to <code class="docutils literal notranslate"><span class="pre">jax</span></code>. It maps <code class="docutils literal notranslate"><span class="pre">torch</span></code> to an <strong>Abstract Operation</strong> (e.g., “Math.Abs”, “Neural.Conv2d”), then lowers that abstract operation to the target framework.</p>
+    %% =================================================================================
+    %% 2. REWRITE PHASE (The Hub)
+    %% =================================================================================
+    
+    %% Knowledge Base Side-Car
+    KB[("&lt;b&gt;Knowledge Base&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;(Specs + Adapters)")]:::kb
+    
+    REWRITER("&lt;b&gt;2. Pivot Rewriter&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Semantic Translation&lt;/i&gt;"):::engine
+    
+    KB -.-&gt;|" Map IDs "| REWRITER
+    
+    %% Logic Visualization inside Rewriter
+    PIVOT_LOGIC("&lt;b&gt;1. Ingest:&lt;/b&gt; torch.abs(x)&lt;br/&gt;&lt;b&gt;2. Pivot:&lt;/b&gt; Abs(x) [Standard]&lt;br/&gt;&lt;b&gt;3. Project:&lt;/b&gt; jnp.abs(x)"):::codeBlock
+    REWRITER --- PIVOT_LOGIC
+    
+    PIVOT_LOGIC --&gt; FIXER
+
+    %% =================================================================================
+    %% 3. REFINEMENT
+    %% =================================================================================
+    FIXER("&lt;b&gt;3. Import Fixer&lt;/b&gt;&lt;br/&gt;Injects 'jax.numpy'"):::engine
+    
+    FIXER --&gt; TGT_HEADER
+
+    %% =================================================================================
+    %% 4. OUTPUT PHASE
+    %% =================================================================================
+    TGT_HEADER("&lt;b&gt;4. Output Target (JAX)&lt;/b&gt;"):::target
+    TGT_CODE("class Model(&lt;b&gt;nnx.Module&lt;/b&gt;):&lt;br/&gt;&amp;nbsp;&amp;nbsp;def &lt;b&gt;__call__&lt;/b&gt;(self, x):&lt;br/&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return &lt;b&gt;jnp.abs&lt;/b&gt;(x)"):::codeBlock
+    
+    TGT_HEADER --- TGT_CODE
+    TGT_CODE --&gt; VERIFY
+
+    %% =================================================================================
+    %% 5. VERIFICATION LOOP
+    %% =================================================================================
+    VERIFY("&lt;b&gt;5. Verification Engine&lt;/b&gt;&lt;br/&gt;Symbolic Fuzzer &amp; Harness"):::verify
+    
+    RESULT("&lt;b&gt;✅ Equivalence Confirmed&lt;/b&gt;&lt;br/&gt;Input: Array['B', 'C'] (f32)&lt;br/&gt;Diff: 0.000"):::codeBlock
+    
+    VERIFY --- RESULT
+    </pre></section>
+<hr class="docutils"/>
+<section id="core-capabilities">
+<h2 id="core-capabilities">⚡ Core Capabilities<a class="headerlink" href="#core-capabilities" title="Link to this heading">¶</a></h2>
+<section id="the-semantic-pivot">
+<h3 id="the-semantic-pivot">1. The Semantic Pivot<a class="headerlink" href="#the-semantic-pivot" title="Link to this heading">¶</a></h3>
+<p>The engine maps source code to <strong>Abstract Operations</strong> (e.g., <code class="docutils literal notranslate"><span class="pre">Math.Abs</span></code>, <code class="docutils literal notranslate"><span class="pre">Neural.Conv2d</span></code>), then projects them to the
+target framework.</p>
 <ul class="simple">
-<li><p><strong>Renaming:</strong> <code class="docutils literal notranslate"><span class="pre">torch.sum(input,</span> <span class="pre">dim)</span></code> → <code class="docutils literal notranslate"><span class="pre">jax.numpy.sum(a,</span> <span class="pre">axis)</span></code>.</p></li>
-<li><p><strong>Unwrapping:</strong> Converts Functional calls (<code class="docutils literal notranslate"><span class="pre">layer.apply(vars,</span> <span class="pre">x)</span></code>) to OOP styles or vice-versa.</p></li>
-<li><p><strong>Infix/Prefix rewriting:</strong> Transforms function calls like <code class="docutils literal notranslate"><span class="pre">torch.add(a,</span> <span class="pre">b)</span></code> into operators like <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> or <code class="docutils literal notranslate"><span class="pre">torch.neg(x)</span></code> into <code class="docutils literal notranslate"><span class="pre">-x</span></code>.</p></li>
-<li><p><strong>Context Managers:</strong> Rewrites global states like <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> into JAX-compatible shims (<code class="docutils literal notranslate"><span class="pre">nullcontext</span></code>) or functional transformations.</p></li>
+<li><p><strong>Argument Normalization:</strong> Pivots arguments via the spec standard (e.g., <code class="docutils literal notranslate"><span class="pre">torch.sum(input,</span> <span class="pre">dim)</span></code> <span class="math notranslate nohighlight">\(\rightarrow\)</span>
+<code class="docutils literal notranslate"><span class="pre">Standard(x,</span> <span class="pre">axis)</span></code> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">jax.sum(a,</span> <span class="pre">axis)</span></code>).</p></li>
+<li><p><strong>Logic Swaps:</strong> Handles In-place unrolling (<code class="docutils literal notranslate"><span class="pre">x.add_(y)</span></code> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code>), Decomposition (
+<code class="docutils literal notranslate"><span class="pre">torch.add(alpha=2)</span></code> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span> <span class="pre">*</span> <span class="pre">2</span></code>), and Infix/Prefix operators.</p></li>
 </ul>
 </section>
 <section id="structural-state-rewriting">
 <h3 id="structural-state-rewriting">2. Structural &amp; State Rewriting<a class="headerlink" href="#structural-state-rewriting" title="Link to this heading">¶</a></h3>
-<p>Deep learning isn’t just about math operations; it’s about state and type management.</p>
+<p>Deep Learning isn’t just math; it’s state management.</p>
 <ul class="simple">
-<li><p><strong>Class Transpilation:</strong> Converts <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> ↔ <code class="docutils literal notranslate"><span class="pre">flax.nnx.Module</span></code> ↔ <code class="docutils literal notranslate"><span class="pre">keras.Layer</span></code>, handling <code class="docutils literal notranslate"><span class="pre">super().__init__</span></code> injection and method renaming (<code class="docutils literal notranslate"><span class="pre">forward</span></code> ↔ <code class="docutils literal notranslate"><span class="pre">__call__</span></code>).</p></li>
-<li><p><strong>RNG Threading:</strong> Detects stateful Torch randomness (<code class="docutils literal notranslate"><span class="pre">dropout</span></code>) and injects explicit PRNG keys (<code class="docutils literal notranslate"><span class="pre">rng</span></code>) into signatures and function bodies for JAX compliance.</p></li>
-<li><p><strong>Type Hint Rectification:</strong> Parses and rewrites type annotations (e.g., <code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">torch.Tensor</span></code> → <code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">jax.Array</span></code>).</p></li>
-<li><p><strong>IO &amp; Devices:</strong> Plugins automatically map serialization (<code class="docutils literal notranslate"><span class="pre">torch.save</span></code> → <code class="docutils literal notranslate"><span class="pre">orbax.checkpoint</span></code>) and device placement (<code class="docutils literal notranslate"><span class="pre">torch.device('cuda')</span></code> → <code class="docutils literal notranslate"><span class="pre">jax.devices('gpu')[0]</span></code>).</p></li>
+<li><p><strong>Class Transpilation:</strong> Converts <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">flax.nnx.Module</span></code> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span>
+<code class="docutils literal notranslate"><span class="pre">praxis.base_layer.BaseLayer</span></code>. Handles <code class="docutils literal notranslate"><span class="pre">super().__init__</span></code> stripping/injection and method renaming (
+<code class="docutils literal notranslate"><span class="pre">forward</span></code> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">__call__</span></code>).</p></li>
+<li><p><strong>RNG Threading (The “JAX Pointer”):</strong> Detects stochastic operations (<code class="docutils literal notranslate"><span class="pre">dropout</span></code>) and injects explicit PRNG variables (
+<code class="docutils literal notranslate"><span class="pre">rng</span></code>, <code class="docutils literal notranslate"><span class="pre">key</span></code>) into signatures and function bodies.</p></li>
+<li><p><strong>Lifecycle Management:</strong> Strips framework-specific idioms (<code class="docutils literal notranslate"><span class="pre">.to(device)</span></code>, <code class="docutils literal notranslate"><span class="pre">.detach()</span></code>, <code class="docutils literal notranslate"><span class="pre">.cpu()</span></code>) while preserving
+logic. Flags imperative state changes like <code class="docutils literal notranslate"><span class="pre">.eval()</span></code> or <code class="docutils literal notranslate"><span class="pre">.train()</span></code>.</p></li>
 </ul>
 </section>
 <section id="safety-analysis">
 <h3 id="safety-analysis">3. Safety &amp; Analysis<a class="headerlink" href="#safety-analysis" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Purity Scanning:</strong> Static analysis detects side effects unsafe for JAX JIT (I/O, Global mutation, List appends).</p></li>
-<li><p><strong>Lifecycle Analysis:</strong> specifically detects if class attributes are defined dynamically in <code class="docutils literal notranslate"><span class="pre">forward</span></code> rather than <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, ensuring valid static graph compilation.</p></li>
-<li><p><strong>Dependency Scanning:</strong> Flags 3rd-party imports (<code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">cv2</span></code>) not covered by the translation map.</p></li>
-<li><p><strong>Smart Imports:</strong> The <code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code> intelligently injects imports (<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) <em>only</em> if the translated code actually uses them.</p></li>
-<li><p><strong>The Escape Hatch:</strong> Code that cannot be safely translated is passed through verbatim, wrapped in error markers (<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">&lt;SWITCHEROO_FAILED_TO_TRANS&gt;</span></code>) for easy manual review.</p></li>
+<li><p><strong>Purity Scanning:</strong> Static analysis detects side effects (I/O, global mutation, list appends) unsafe for JIT
+compilation.</p></li>
+<li><p><strong>Dependency Scanning:</strong> Flags 3rd-party imports (<code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">cv2</span></code>) not covered by the semantic map to prevent runtime
+crashes.</p></li>
+<li><p><strong>Lifecycle Tracking:</strong> Ensures class members used in <code class="docutils literal notranslate"><span class="pre">forward</span></code> are validly initialized in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>, critical for
+static graph compilation (XLA).</p></li>
+<li><p><strong>Smart Imports:</strong> The <code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code> intelligently injects imports (<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) <em>only</em> if the
+translated code actually uses them.</p></li>
 </ul>
 </section>
-<section id="discovery-verification">
-<h3 id="discovery-verification">4. Discovery &amp; Verification<a class="headerlink" href="#discovery-verification" title="Link to this heading">¶</a></h3>
+<section id="verification-engine">
+<h3 id="verification-engine">4. Verification Engine<a class="headerlink" href="#verification-engine" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Automated Discovery:</strong> The <code class="docutils literal notranslate"><span class="pre">Scaffolder</span></code> utilizes <strong>Griffe</strong> to inspect installed libraries and align them against Standards (ONNX/Array API) using fuzzy matching and signature analysis.</p></li>
-<li><p><strong>Semantic Harvester:</strong> “Human-in-the-Loop” learning. It scans your manually fixed test files to reverse-engineer valid mappings and update the Knowledge Base automatically.</p></li>
-<li><p><strong>Fuzzing Engine:</strong> Includes <code class="docutils literal notranslate"><span class="pre">InputFuzzer</span></code> (with symbolic shape constraints) and <code class="docutils literal notranslate"><span class="pre">HarnessGenerator</span></code>. It validates translations by running random inputs through both Source and Target code in isolated subprocesses.</p></li>
+<li><p><strong>Symbolic Fuzzing:</strong> The <code class="docutils literal notranslate"><span class="pre">InputFuzzer</span></code> generates valid inputs based on Type Hints extracted from specs (support for
+<code class="docutils literal notranslate"><span class="pre">Tensor['B',</span> <span class="pre">'C']</span></code> symbolic shapes).</p></li>
+<li><p><strong>Harness Generator:</strong> Produces standalone verification scripts that run Source vs Target logic side-by-side to prove
+equivalence.</p></li>
 </ul>
 </section>
 </section>
@@ -910,28 +951,28 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <h2 id="cli-usage">🛠 CLI Usage<a class="headerlink" href="#cli-usage" title="Link to this heading">¶</a></h2>
 <section id="transpilation">
 <h3 id="transpilation">Transpilation<a class="headerlink" href="#transpilation" title="Link to this heading">¶</a></h3>
-<p>Convert a file or directory.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic conversion (PyTorch -&gt; JAX)</span>
-ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./models/resnet.py<span class="w"> </span>--out<span class="w"> </span>./models_jax/<span class="w"> </span>--source<span class="w"> </span>torch<span class="w"> </span>--target<span class="w"> </span>jax
+<p>Convert files or entire directories. Defaults to <strong>PyTorch <span class="math notranslate nohighlight">\(\rightarrow\)</span> JAX</strong>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Basic conversion</span>
+ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./models/resnet.py<span class="w"> </span>--out<span class="w"> </span>./models_jax/
+
+<span class="c1"># Specify Frameworks manually</span>
+ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./src<span class="w"> </span>--source<span class="w"> </span>torch<span class="w"> </span>--target<span class="w"> </span>tensorflow<span class="w"> </span>--out<span class="w"> </span>./dst
 
 <span class="c1"># Strict Mode: Fails/Marks unknown APIs instead of passing them through</span>
-ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./src<span class="w"> </span>--strict<span class="w"> </span>--out<span class="w"> </span>./out
-
-<span class="c1"># Verify immediately after converting (generates a harness)</span>
-ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./math_lib.py<span class="w"> </span>--out<span class="w"> </span>./out_lib.py<span class="w"> </span>--verify
+ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./src<span class="w"> </span>--strict<span class="w"> </span>--out<span class="w"> </span>./out<span class="w"> </span>--json-trace<span class="w"> </span>trace.json
 </pre></div>
 </div>
 </section>
-<section id="knowledge-base-management">
-<h3 id="knowledge-base-management">Knowledge Base Management<a class="headerlink" href="#knowledge-base-management" title="Link to this heading">¶</a></h3>
-<p>Build mappings without writing JSON manually.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. View current support matrix</span>
-ml_switcheroo<span class="w"> </span>matrix
+<section id="discovery-learning">
+<h3 id="discovery-learning">Discovery &amp; Learning<a class="headerlink" href="#discovery-learning" title="Link to this heading">¶</a></h3>
+<p>Populate the Knowledge Base automatically.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Scaffold: Scan installed libs (e.g. torch, jax) and align against Standards</span>
+ml_switcheroo<span class="w"> </span>scaffold<span class="w"> </span>--frameworks<span class="w"> </span>torch<span class="w"> </span>jax
 
-<span class="c1"># 2. Interactive Wizard: Categorize missing APIs in a package</span>
+<span class="c1"># 2. Wizard: Interactive tool to categorize unmapped APIs and assign plugins</span>
 ml_switcheroo<span class="w"> </span>wizard<span class="w"> </span>torch
 
-<span class="c1"># 3. Harvest rules from a manual test file (Learn from humans)</span>
+<span class="c1"># 3. Harvest: Learn mappings from your manually written test cases</span>
 ml_switcheroo<span class="w"> </span>harvest<span class="w"> </span>tests/examples/test_custom_layer.py<span class="w"> </span>--target<span class="w"> </span>jax
 </pre></div>
 </div>
@@ -941,73 +982,64 @@ ml_switcheroo<span class="w"> </span>harvest<span class="w"> </span>tests/exampl
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run validation suite on all known mappings</span>
 ml_switcheroo<span class="w"> </span>ci
 
-<span class="c1"># Generate a standalone lockfile of valid operations</span>
+<span class="c1"># Generate a standalone lockfile of verified operations</span>
 ml_switcheroo<span class="w"> </span>ci<span class="w"> </span>--json-report<span class="w"> </span>verified_ops.json
 </pre></div>
 </div>
 </section>
 </section>
 <hr class="docutils"/>
-<section id="architecture">
-<h2 id="architecture">🏗 Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
-<p>The system is split into <strong>Core Logic</strong> (the engine) and <strong>Semantics</strong> (the data).</p>
-<ol class="arabic simple">
-<li><p><strong>Semantics (<code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics</span></code>):</strong> JSON files defining standards.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">k_array_api.json</span></code>: Math operations (abs, sum, matmul).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">k_neural_net.json</span></code>: Stateful layers (Linear, Conv2d).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">k_framework_extras.json</span></code>: Utilities (DataLoader, seeds, devices).</p></li>
-</ul>
-</li>
-<li><p><strong>Importers:</strong> Ingests upstream specs (ONNX Markdown, Array API Stubs).</p></li>
-<li><p><strong>Core:</strong> <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> visits the AST, looks up the Semantics, applies <code class="docutils literal notranslate"><span class="pre">Plugins</span></code> (Hook system), and emits code.</p></li>
-</ol>
-<p>See <a class="reference internal" href="ARCHITECTURE.html"><span class="std std-doc">ARCHITECTURE.md</span></a> for detailed data flow.</p>
-</section>
-<hr class="docutils"/>
 <section id="compatibility-matrix">
 <h2 id="compatibility-matrix">✅ Compatibility Matrix<a class="headerlink" href="#compatibility-matrix" title="Link to this heading">¶</a></h2>
-<p>Supported Frameworks via Adapters &amp; Scanners:</p>
+<p>Supported Frameworks via <strong>Zero-Edit Adapters</strong>:</p>
 <table>
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Framework</p></th>
-<th class="head text-left"><p>Status</p></th>
-<th class="head text-left"><p>Role</p></th>
+<th class="head text-center"><p>Adapter Status</p></th>
+<th class="head text-left"><p>Features Supported</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td class="text-left"><p><strong>PyTorch</strong></p></td>
-<td class="text-left"><p>🟢 Primary</p></td>
-<td class="text-left"><p>Source / Target</p></td>
+<td class="text-center"><p>🟢 Primary</p></td>
+<td class="text-left"><p>Source / Target, NN Modules, Lifecycle</p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>JAX / Flax</strong></p></td>
-<td class="text-left"><p>🟢 Primary</p></td>
-<td class="text-left"><p>Source / Target (NNX)</p></td>
+<td class="text-center"><p>🟢 Primary</p></td>
+<td class="text-left"><p>Source / Target (NNX), RNG Threading</p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>NumPy</strong></p></td>
-<td class="text-left"><p>🟡 Supported</p></td>
-<td class="text-left"><p>Fallback / Inputs</p></td>
+<td class="text-center"><p>🟡 Supported</p></td>
+<td class="text-left"><p>Fallback Target, Verification Backend</p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>TensorFlow</strong></p></td>
-<td class="text-left"><p>🔵 Experimental</p></td>
-<td class="text-left"><p>Adapter / Spec Sync</p></td>
+<td class="text-center"><p>🔵 Beta</p></td>
+<td class="text-left"><p>Keras Layers, IO, Device Placements</p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><strong>Apple MLX</strong></p></td>
-<td class="text-left"><p>🔵 Experimental</p></td>
-<td class="text-left"><p>Adapter / Spec Sync</p></td>
+<td class="text-center"><p>🔵 Experimental</p></td>
+<td class="text-left"><p>Basic Array Ops, Device Abstraction</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>PaxML / Praxis</strong></p></td>
+<td class="text-center"><p>🔵 Experimental</p></td>
+<td class="text-left"><p>Layer Setup Migration, Context Patterns</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <hr class="docutils"/>
-<section id="contributing">
-<h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Link to this heading">¶</a></h2>
+<section id="extensibility">
+<h2 id="extensibility">🔌 Extensibility<a class="headerlink" href="#extensibility" title="Link to this heading">¶</a></h2>
+<p>ml-switcheroo is designed to be extended without modifying the core engine.</p>
 <ol class="arabic simple">
-<li><p>Check definitions in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/*.json</span></code>.</p></li>
-<li><p>Missing an OP? Run <code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">wizard</span> <span class="pre">torch</span></code> to add it interactively.</p></li>
-<li><p>Need complex logic? Add a hook in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>.</p></li>
+<li><p><strong>New Frameworks:</strong> Add a file to <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code> implementing the <code class="docutils literal notranslate"><span class="pre">FrameworkAdapter</span></code> protocol.</p></li>
+<li><p><strong>New Logic:</strong> Add a hook to <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">register_hook("my_custom_pattern")</span></code>) and link it in
+the semantics JSON.</p></li>
+<li><p><strong>New Mappings:</strong> Use <code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">wizard</span></code> or edit <code class="docutils literal notranslate"><span class="pre">semantics/*.json</span></code> directly.</p></li>
 </ol>
+<p>See <a class="reference internal" href="EXTENDING.html"><span class="std std-doc">EXTENDING.md</span></a> for a detailed guide.</p>
 </section>
+<hr class="docutils"/>
 <section id="license">
 <h2 id="license">License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="#LICENSE"><span class="xref myst">Apache-2.0 License</span></a></p>

@@ -1,0 +1,69 @@
+ml_switcheroo.core.rewriter.structure_types
+===========================================
+
+.. py:module:: ml_switcheroo.core.rewriter.structure_types
+
+.. autoapi-nested-parse::
+
+   Type Hint Rewriting Logic.
+
+   Handles transformation of:
+   1. Function Parameter Annotations.
+   2. Return Type Annotations.
+   3. Annotated Assignments (Variable Declarations).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: TypeStructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming Type Annotations.
+
+   .. attribute:: _in_annotation
+
+      Tracks if the visitor is currently inside a type annotation.
+
+      :type: bool
+
+
+   .. py:method:: visit_Annotation(node: libcst.Annotation) -> Optional[bool]
+
+      Enters a type annotation node (e.g., `: torch.Tensor` or `-> int`).
+      Sets a flag to allow `leave_Name` to rewrite type names.
+
+
+
+   .. py:method:: leave_Annotation(original_node: libcst.Annotation, updated_node: libcst.Annotation) -> libcst.Annotation
+
+      Leaves a type annotation node. Resets the annotation flag.
+
+
+
+   .. py:method:: leave_Name(original_node: libcst.Name, updated_node: libcst.Name) -> libcst.BaseExpression
+
+      Rewrites Names found within Type Annotations.
+
+      If we are inside an annotation context (e.g., `x: Tensor`), we resolve
+      this name via aliases (e.g., `Tensor` -> `torch.Tensor`), look it up
+      in the semantics, and rewrite it if a mapping exists (e.g., -> `jax.Array`).
+
+      Note: Calls and Attributes (e.g. `torch.Tensor`) are handled by other mixins
+      or `leave_Attribute` regardless of context, but bare `Name` nodes in code
+      are usually variables we don't want to touch. This method is scoped strictly
+      to annotations to be safe.
+
+
+

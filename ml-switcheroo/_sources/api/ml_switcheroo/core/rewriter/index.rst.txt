@@ -29,6 +29,9 @@ Submodules
    /api/ml_switcheroo/core/rewriter/decorators/index
    /api/ml_switcheroo/core/rewriter/normalization/index
    /api/ml_switcheroo/core/rewriter/structure/index
+   /api/ml_switcheroo/core/rewriter/structure_class/index
+   /api/ml_switcheroo/core/rewriter/structure_func/index
+   /api/ml_switcheroo/core/rewriter/structure_types/index
    /api/ml_switcheroo/core/rewriter/types/index
 
 
@@ -106,120 +109,11 @@ Package Contents
 
 .. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_func.FuncStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin`
 
 
-   Mixin for transforming structural elements (Classes, Functions) and Type Hints.
-
-   .. attribute:: _in_module_class
-
-      Inherited from BaseRewriter. True if currently
-      traversing a Neural Network Module class.
-
-      :type: bool
-
-   .. attribute:: _signature_stack
-
-      Inherited from BaseRewriter.
-      Tracks current function signature state.
-
-      :type: List[SignatureContext]
-
-   .. attribute:: _in_annotation
-
-      Tracks if the visitor is currently inside a type annotation.
-
-      :type: bool
-
-
-   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
-
-      Visits a class definition to detect Neural Module context.
-
-      It inspects base classes to determine if the class is a framework-specific
-      Neural Module (Torch, Flax NNX, or Keras). This sets the `_in_module_class` flag,
-      enabling method renaming and signature fixups nested within.
-
-      :param node: The libCST ClassDef node.
-
-      :returns: True to traverse children.
-
-
-
-   .. py:method:: leave_ClassDef(_original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
-
-      Rewrites class inheritance for the target framework.
-
-      If the class was identified as a Neural Module, this method swaps the
-      base class:
-      - Target JAX: `...` → `flax.nnx.Module`
-      - Target Torch: `...` → `torch.nn.Module`
-      - Target Keras/TF: `...` → `keras.Layer`
-
-      :param original_node: The original CST node (unused).
-      :param updated_node: The CST node with transformed children.
-
-      :returns: The transformed ClassDef node.
-
-
-
-   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
-
-      Visits function definitions to track signature context.
-
-      Captures existing arguments to allow smart injection/stripping later.
-      Pushes a new `SignatureContext` onto the stack.
-
-      :param node: The CST FunctionDef node.
-
-      :returns: True to traverse children.
-
-
-
-   .. py:method:: leave_FunctionDef(_original_node: libcst.FunctionDef, updated_node: libcst.FunctionDef) -> libcst.CSTNode
-
-      Finalizes function transformations.
-
-      Applies:
-      1.  **Method Renaming**: `forward` ↔ `__call__` ↔ `call`.
-      2.  **Signature Modification**: Injecting/Stripping `rngs` for Flax NNX support.
-      3.  **Plugin Injection**: Applying args requested by plugins.
-      4.  **Preamble Injection**: Inserting setup code (like `super().__init__()` or RNG split).
-      5.  **Docstring Updates**: Appends injected arguments to docstrings.
-
-      :param original_node: The original CST node.
-      :param updated_node: The CST node with transformed children.
-
-      :returns: The transformed FunctionDef node.
-
-
-
-   .. py:method:: visit_Annotation(node: libcst.Annotation) -> Optional[bool]
-
-      Enters a type annotation node (e.g., `: torch.Tensor` or `-> int`).
-      Sets a flag to allow `leave_Name` to rewrite type names.
-
-
-
-   .. py:method:: leave_Annotation(original_node: libcst.Annotation, updated_node: libcst.Annotation) -> libcst.Annotation
-
-      Leaves a type annotation node. Resets the annotation flag.
-
-
-
-   .. py:method:: leave_Name(original_node: libcst.Name, updated_node: libcst.Name) -> libcst.BaseExpression
-
-      Rewrites Names found within Type Annotations.
-
-      If we are inside an annotation context (e.g., `x: Tensor`), we resolve
-      this name via aliases (e.g., `Tensor` -> `torch.Tensor`), look it up
-      in the semantics, and rewrite it if a mapping exists (e.g., -> `jax.Array`).
-
-      Note: Calls and Attributes (e.g. `torch.Tensor`) are handled by other mixins
-      or `leave_Attribute` regardless of context, but bare `Name` nodes in code
-      are usually variables we don't want to touch. This method is scoped strictly
-      to annotations to be safe.
-
+   Composite mixin for all structural rewriting tasks.
+   Inherits from granular mixins to assemble the full feature set.
 
 
 .. py:class:: DecoratorMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
@@ -249,10 +143,6 @@ Package Contents
 
    The base class for AST transformation traversal.
 
-   It maintains the state required to navigate Python's scoping rules and
-   import systems, providing helper methods for the specific Mixins (Calls,
-   Structure, Attributes) to resolve names and report issues.
-
    .. attribute:: semantics
 
       The loaded knowledge base of API mappings.
@@ -261,7 +151,7 @@ Package Contents
 
    .. attribute:: config
 
-      Configuration for the current run (strict mode, etc).
+      Configuration for the current run.
 
       :type: RuntimeConfig
 
@@ -315,6 +205,16 @@ Package Contents
 
 
    .. py:attribute:: config
+
+
+   .. py:attribute:: source_fw
+      :value: ''
+
+
+
+   .. py:attribute:: target_fw
+      :value: ''
+
 
 
    .. py:attribute:: strict_mode

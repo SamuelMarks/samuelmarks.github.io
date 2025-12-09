@@ -9,17 +9,12 @@ ml_switcheroo.discovery.syncer
 
    This module scans installed libraries (e.g., Torch, JAX, TensorFlow, MLX) for
    functions that match the names defined in the Semantic Knowledge Base.
-   It performs signature verification to ensure the found function is compatible
-   with the abstract specification.
 
+   Refactor Note:
+       Hardcoded search paths have been removed. This module now queries the
+       `ml_switcheroo.frameworks` registry to determine which submodules to scan
+       for a given framework. This enables "Zero-Edit" support for new frameworks.
 
-
-Attributes
-----------
-
-.. autoapisummary::
-
-   ml_switcheroo.discovery.syncer.SEARCH_PATHS
 
 
 Classes
@@ -33,13 +28,11 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: SEARCH_PATHS
-
 .. py:class:: FrameworkSyncer
 
    Links abstract operations to concrete framework implementations.
 
-   This class iterates through known modules of a target framework, looking for
+   This class iterates through registered modules of a target framework, looking for
    callables that match the operation names defined in the Semantic Knowledge Base.
    It verifies that potential matches have compatible signatures before linking them.
 
@@ -55,7 +48,9 @@ Module Contents
 
       Updates the 'variants' dict in tier_data by hunting for ops in the target framework.
 
-      It attempts to import modules defined in `SEARCH_PATHS` for the given framework.
+      It resolves the `FrameworkAdapter` for the requested framework to determine
+      the list of python submodules to scan (e.g. `['jax.numpy', 'jax.numpy.fft']`).
+
       If a function with a matching name and compatible signature is found, it is
       recorded in the `tier_data` dictionary under the `variants` key.
 

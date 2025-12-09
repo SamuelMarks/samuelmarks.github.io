@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=35f6526a"></script>
+    <script src="_static/switcheroo_demo.js?v=5217a1e4"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
@@ -432,7 +432,7 @@ window.addEventListener("load", load);
 </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Extending" href="EXTENDING.html" />
+    <link rel="next" title="Extending ml-switcheroo" href="EXTENDING.html" />
     <link rel="prev" title="ml-switcheroo 🔄🦘" href="README.html" />
   
    
@@ -591,17 +591,29 @@ window.addEventListener("load", load);
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#architecture--page-root" class="md-nav__link">Architecture</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#system-data-flow" class="md-nav__link">🏗️ System Data Flow</a>
+        <li class="md-nav__item"><a href="#the-semantic-pivot-strategy" class="md-nav__link">🏗️ The Semantic Pivot Strategy</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-ecosystem-ingestion-storage" class="md-nav__link">🧩 1. The Ecosystem (Ingestion & Storage)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#components" class="md-nav__link">Components</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#the-transpilation-engine-conversion" class="md-nav__link">⚡ 2. The Transpilation Engine (Conversion)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#pipeline-steps" class="md-nav__link">Pipeline Steps</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-hook-system" class="md-nav__link">🔌 Plugin & Hook System</a>
         </li>
         <li class="md-nav__item"><a href="#operational-workflows" class="md-nav__link">🔁 Operational Workflows</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#workflow-a-automated-specification-scaffolding-robot" class="md-nav__link">Workflow A: Automated Specification Scaffolding (Robot)</a>
+        <li class="md-nav__item"><a href="#workflow-a-automated-scaffolding-robot" class="md-nav__link">Workflow A: Automated Scaffolding (Robot)</a>
         </li>
-        <li class="md-nav__item"><a href="#workflow-b-the-hybrid-verification-loop-human-in-the-loop" class="md-nav__link">Workflow B: The Hybrid Verification Loop (Human-in-the-Loop)</a>
+        <li class="md-nav__item"><a href="#workflow-b-the-hybrid-verification-loop" class="md-nav__link">Workflow B: The Hybrid Verification Loop</a>
         </li>
-        <li class="md-nav__item"><a href="#workflow-c-production-transpilation-pipeline" class="md-nav__link">Workflow C: Production Transpilation Pipeline</a>
-        </li>
-        <li class="md-nav__item"><a href="#workflow-e-semantic-harvesting" class="md-nav__link">Workflow E: Semantic Harvesting</a>
+        <li class="md-nav__item"><a href="#workflow-c-production-transpilation" class="md-nav__link">Workflow C: Production Transpilation</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -616,7 +628,28 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="#system-data-flow" class="md-nav__link">🏗️ System Data Flow</a>
+      <a href="#the-semantic-pivot-strategy" class="md-nav__link">🏗️ The Semantic Pivot Strategy</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-ecosystem-ingestion-storage" class="md-nav__link">🧩 1. The Ecosystem (Ingestion & Storage)</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-transpilation-engine-conversion" class="md-nav__link">⚡ 2. The Transpilation Engine (Conversion)</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#plugin-hook-system" class="md-nav__link">🔌 Plugin & Hook System</a>
       
     
     </li>
@@ -632,14 +665,14 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="EXTENDING.html" class="md-nav__link">Extending</a>
+      <a href="EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
       
     
     </li>
@@ -678,17 +711,29 @@ window.addEventListener("load", load);
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#architecture--page-root" class="md-nav__link">Architecture</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#system-data-flow" class="md-nav__link">🏗️ System Data Flow</a>
+        <li class="md-nav__item"><a href="#the-semantic-pivot-strategy" class="md-nav__link">🏗️ The Semantic Pivot Strategy</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-ecosystem-ingestion-storage" class="md-nav__link">🧩 1. The Ecosystem (Ingestion & Storage)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#components" class="md-nav__link">Components</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#the-transpilation-engine-conversion" class="md-nav__link">⚡ 2. The Transpilation Engine (Conversion)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#pipeline-steps" class="md-nav__link">Pipeline Steps</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-hook-system" class="md-nav__link">🔌 Plugin & Hook System</a>
         </li>
         <li class="md-nav__item"><a href="#operational-workflows" class="md-nav__link">🔁 Operational Workflows</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#workflow-a-automated-specification-scaffolding-robot" class="md-nav__link">Workflow A: Automated Specification Scaffolding (Robot)</a>
+        <li class="md-nav__item"><a href="#workflow-a-automated-scaffolding-robot" class="md-nav__link">Workflow A: Automated Scaffolding (Robot)</a>
         </li>
-        <li class="md-nav__item"><a href="#workflow-b-the-hybrid-verification-loop-human-in-the-loop" class="md-nav__link">Workflow B: The Hybrid Verification Loop (Human-in-the-Loop)</a>
+        <li class="md-nav__item"><a href="#workflow-b-the-hybrid-verification-loop" class="md-nav__link">Workflow B: The Hybrid Verification Loop</a>
         </li>
-        <li class="md-nav__item"><a href="#workflow-c-production-transpilation-pipeline" class="md-nav__link">Workflow C: Production Transpilation Pipeline</a>
-        </li>
-        <li class="md-nav__item"><a href="#workflow-e-semantic-harvesting" class="md-nav__link">Workflow E: Semantic Harvesting</a>
+        <li class="md-nav__item"><a href="#workflow-c-production-transpilation" class="md-nav__link">Workflow C: Production Transpilation</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -710,128 +755,194 @@ window.addEventListener("load", load);
             
   <section class="tex2jax_ignore mathjax_ignore" id="architecture">
 <h1 id="architecture--page-root">Architecture<a class="headerlink" href="#architecture--page-root" title="Link to this heading">¶</a></h1>
-<p>ml-switcheroo is a deterministic, specification-driven transpiler. It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> framework translation problem by
-decoupling <strong>specification</strong> (the API standard) from <strong>implementation</strong> (the framework mapping).</p>
-<p>The system relies on a central Knowledge Base consisting of Semantic Specifications (derived from the Python Array API
-and ONNX).</p>
-<section id="system-data-flow">
-<h2 id="system-data-flow">🏗️ System Data Flow<a class="headerlink" href="#system-data-flow" title="Link to this heading">¶</a></h2>
+<p>ml-switcheroo is a deterministic, specification-driven transpiler designed to convert Deep Learning code between frameworks (e.g., PyTorch to JAX/Flax).</p>
+<p>Unlike LLM-based assistants that statistically predict code, ml-switcheroo performs <strong>Semantic Translation</strong> based on a rigorous Knowledge Base. It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem (mapping every framework to every other) by decoupling <strong>Specification</strong> (the Abstract Operation) from <strong>Implementation</strong> (the Framework API).</p>
+<hr class="docutils"/>
+<section id="the-semantic-pivot-strategy">
+<h2 id="the-semantic-pivot-strategy">🏗️ The Semantic Pivot Strategy<a class="headerlink" href="#the-semantic-pivot-strategy" title="Link to this heading">¶</a></h2>
+<p>The core architectural principle is the <strong>Hub-and-Spoke</strong> model.</p>
+<ol class="arabic simple">
+<li><p><strong>Ingest (Source → Abstract):</strong> The system identifies a framework call (e.g., <code class="docutils literal notranslate"><span class="pre">torch.sum(input,</span> <span class="pre">dim)</span></code>) and maps it to an <strong>Abstract Operation Standard</strong> (e.g., <code class="docutils literal notranslate"><span class="pre">Sum(x,</span> <span class="pre">axis)</span></code>).</p></li>
+<li><p><strong>Pivot (Normalization):</strong> Arguments are reordered and renamed to match the Abstract Standard.</p></li>
+<li><p><strong>Project (Abstract → Target):</strong> The system looks up the equivalent implementation for the target framework (e.g., <code class="docutils literal notranslate"><span class="pre">jax.numpy.sum(a,</span> <span class="pre">axis)</span></code>) and generates the corresponding AST.</p></li>
+</ol>
+</section>
+<hr class="docutils"/>
+<section id="the-ecosystem-ingestion-storage">
+<h2 id="the-ecosystem-ingestion-storage">🧩 1. The Ecosystem (Ingestion &amp; Storage)<a class="headerlink" href="#the-ecosystem-ingestion-storage" title="Link to this heading">¶</a></h2>
+<p>Before translation can occur, the system must learn how frameworks map to standards. This is the <strong>Discovery Ecosystem</strong>.</p>
 <pre class="mermaid">
         graph TD
     %% --- STYLE DEFINITIONS ---
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
     classDef input fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
     classDef build fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
-    classDef store fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef store fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:0px;
     classDef verify fill:#20344b,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
-    classDef convert fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
-    classDef artifact fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono Normal',rx:5px;
 
-    %% --- 1. INGESTION ---
-    subgraph S1 [Phase 1: Ingestion &amp; Discovery]
+    %% --- PHASE 1: DISCOVERY ---
+    subgraph P1 [1. Ingestion Phase]
         direction TB
-        Standards(External Specs):::input
-        Libs(Installed Frameworks):::input
-        Builder(Inspector &amp; Scaffolder):::build
-        Harvester(Semantic Harvester):::build
+        STANDARDS("External Specs&lt;br/&gt;(ONNX / Array API)"):::input
+        LIBS("Installed Libs&lt;br/&gt;(Torch / JAX)"):::input
         
-        Standards --&gt; Builder
-        Libs --&gt; Builder
-        Libs --&gt; Harvester
+        INSPECTOR("Inspector &amp;&lt;br/&gt;Scaffolder"):::build
+        
+        STANDARDS --&gt; INSPECTOR
+        LIBS --&gt; INSPECTOR
     end
 
-    %% --- 2. STORAGE ---
-    subgraph S2 [Phase 2: Knowledge Base]
+    %% --- PHASE 2: STORAGE ---
+    subgraph P2 [2. Storage Phase]
         direction TB
-        JSON[("semantics/*.json&lt;br/&gt;(The Pivot)")] 
+        JSON[("Knowledge Base&lt;br/&gt;semantics/*.json")]:::store
     end
-    class JSON store
     
-    Builder --&gt; |Populate| JSON
-    Harvester --&gt; |Update| JSON
+    INSPECTOR --&gt;|"Populate"| JSON
 
-    %% --- 3. VERIFICATION ---
-    subgraph S3 [Phase 3: Verification]
+    %% --- PHASE 3: VERIFICATION ---
+    subgraph P3 [3. Verification Phase]
         direction TB
-        TestGen(Test Generator):::verify
-        Suite(Physical Test Suite):::artifact
-        Fuzzer(Input Fuzzer + Adapters):::verify
+        TESTER("TestGen &amp; Fuzzer"):::verify
+        HARVEST("Semantic Harvester"):::verify
         
-        JSON --&gt; |Read Spec| TestGen
-        TestGen --&gt; |Create| Suite
-        Suite --&gt; |Execute| Fuzzer
-        Fuzzer --&gt; |Backend Adapters| Libs
+        JSON -.-&gt;|"Read Spec"| TESTER
+        TESTER --"Manual Fixes"--&gt; HARVEST
+        HARVEST --&gt;|"Update"| JSON
     end
+    </pre><section id="components">
+<h3 id="components">Components<a class="headerlink" href="#components" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>The Knowledge Base (Semantics Layer):</strong>
+Managed by the <code class="docutils literal notranslate"><span class="pre">SemanticsManager</span></code>, this layer aggregates API definitions into “Tiers”:</p>
+<ul>
+<li><p><strong>Tier A (Math):</strong> Pure functional operations (e.g., <code class="docutils literal notranslate"><span class="pre">abs</span></code>, <code class="docutils literal notranslate"><span class="pre">matmul</span></code>). Defined in <code class="docutils literal notranslate"><span class="pre">k_array_api.json</span></code>.</p></li>
+<li><p><strong>Tier B (Neural):</strong> Stateful layers (e.g., <code class="docutils literal notranslate"><span class="pre">Linear</span></code>). Defined in <code class="docutils literal notranslate"><span class="pre">k_neural_net.json</span></code>.</p></li>
+<li><p><strong>Tier C (Extras):</strong> Utilities and IO. Defined in <code class="docutils literal notranslate"><span class="pre">k_framework_extras.json</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Discovery Tools:</strong></p>
+<ul>
+<li><p><strong>ApiInspector:</strong> Uses <code class="docutils literal notranslate"><span class="pre">griffe</span></code> for static analysis of installed libraries.</p></li>
+<li><p><strong>Scaffolder:</strong> Use heuristics to align discovered APIs against upstream Specs.</p></li>
+<li><p><strong>Semantic Harvester:</strong> A “Human-in-the-Loop” tool that learns from manually written tests to update the Knowledge Base.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="the-transpilation-engine-conversion">
+<h2 id="the-transpilation-engine-conversion">⚡ 2. The Transpilation Engine (Conversion)<a class="headerlink" href="#the-transpilation-engine-conversion" title="Link to this heading">¶</a></h2>
+<p>Once the Knowledge Base is populated, the <code class="docutils literal notranslate"><span class="pre">ASTEngine</span></code> orchestrates the conversion of user code using <code class="docutils literal notranslate"><span class="pre">LibCST</span></code>.</p>
+<pre class="mermaid">
+        graph TD
+    %% --- STYLE DEFINITIONS ---
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef artifact fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono Normal',stroke-dasharray: 0;
+    classDef process fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef store fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:0px;
+    classDef plugin fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef output fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
 
-    %% --- 4. CONVERSION ---
-    subgraph S4 [Phase 4: Conversion Pipeline]
+    %% --- NODES ---
+    SRC("Source Code"):::artifact
+    
+    subgraph ENGINE [AST Engine]
         direction TB
-        UserCode(User Source Code):::artifact
-        Analyzer(Purity &amp; Deps Analysis):::convert
-        Rewriter(Pivot Rewriter &amp; Hooks):::convert
-        Fixer(Import Fixer):::convert
-        Output(Target Code):::artifact
+        ANALYSIS("1. Safety Analysis&lt;br/&gt;(Purity/Deps Check)"):::process
         
-        UserCode --&gt; Analyzer
-        Analyzer --&gt; |AST| Rewriter
-        Rewriter --&gt; |AST| Fixer
-        Fixer --&gt; Output
+        JSON[("Knowledge&lt;br/&gt;Base")]:::store
+        
+        REWRITER("2. Pivot Rewriter"):::process
+        PLUGINS{{Plugin System}}:::plugin
+        
+        FIXER("3. Refinement&lt;br/&gt;(Import Fixer)"):::process
     end
+    
+    TGT("Target Code"):::output
 
-    %% Cross-Phase Links
-    JSON --&gt; |Lookup verified API| Rewriter
-    Fuzzer -.-&gt; |Validates| Rewriter
-    </pre></section>
+    %% --- EDGES ---
+    SRC --&gt; ANALYSIS
+    ANALYSIS --&gt; REWRITER
+    
+    JSON -.-&gt;|"Lookup API"| REWRITER
+    REWRITER &lt;--&gt;|"Complex Logic"| PLUGINS
+    
+    REWRITER --&gt; FIXER
+    FIXER --&gt; TGT
+    </pre><section id="pipeline-steps">
+<h3 id="pipeline-steps">Pipeline Steps<a class="headerlink" href="#pipeline-steps" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Analysis Phase:</strong></p>
+<ul class="simple">
+<li><p><strong>PurityScanner:</strong> Detects side effects unsafe for functional frameworks (global mutations, IO).</p></li>
+<li><p><strong>InitializationTracker:</strong> Ensures class attributes used in <code class="docutils literal notranslate"><span class="pre">forward</span></code> are properly defined in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p></li>
+<li><p><strong>DependencyScanner:</strong> Flags 3rd-party imports (e.g., <code class="docutils literal notranslate"><span class="pre">cv2</span></code>) not covered by the semantic map.</p></li>
+</ul>
+</li>
+<li><p><strong>Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>):</strong></p>
+<ul class="simple">
+<li><p><strong>StructureMixin:</strong> Handles Class inheritance warping (<code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">nnx.Module</span></code>), method renaming (<code class="docutils literal notranslate"><span class="pre">forward</span></code> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <code class="docutils literal notranslate"><span class="pre">__call__</span></code>), and state injection (<code class="docutils literal notranslate"><span class="pre">rngs</span></code>).</p></li>
+<li><p><strong>CallMixin:</strong> Handles function calls, argument pivoting, and lifecycle stripping (removing <code class="docutils literal notranslate"><span class="pre">.cpu()</span></code>, <code class="docutils literal notranslate"><span class="pre">.detach()</span></code>).</p></li>
+<li><p><strong>Plugin System:</strong> Hooks into specific abstract operations to perform complicated transforms (e.g., <code class="docutils literal notranslate"><span class="pre">context_to_function_wrap</span></code> for <code class="docutils literal notranslate"><span class="pre">no_grad</span></code>).</p></li>
+</ul>
+</li>
+<li><p><strong>Refinement Phase:</strong></p>
+<ul class="simple">
+<li><p><strong>ImportFixer:</strong> Prunes unused source imports and intelligently injects target imports and standard aliases (e.g., <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) only if referenced.</p></li>
+<li><p><strong>Escape Hatch:</strong> Wraps untranslatable code segments in comments (<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">&lt;SWITCHEROO_FAILED_TO_TRANS&gt;</span></code>) preserving validity.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="plugin-hook-system">
+<h2 id="plugin-hook-system">🔌 Plugin &amp; Hook System<a class="headerlink" href="#plugin-hook-system" title="Link to this heading">¶</a></h2>
+<p>The engine is extensible via <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins</span></code>. Plugins register hooks targeting specific semantic operations.</p>
+<ul class="simple">
+<li><p><strong>Hook Context:</strong> Provides plugins with access to global configuration, target framework traits, and code injection facilities (Preamble/Signature injection).</p></li>
+<li><p><strong>Common Use Cases:</strong></p>
+<ul>
+<li><p><strong>Decomposition:</strong> Turning <code class="docutils literal notranslate"><span class="pre">torch.add(x,</span> <span class="pre">y,</span> <span class="pre">alpha=2)</span></code> into <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span> <span class="pre">*</span> <span class="pre">2</span></code>.</p></li>
+<li><p><strong>State Injection:</strong> Threading <code class="docutils literal notranslate"><span class="pre">rng</span></code> keys for JAX stochasticity.</p></li>
+<li><p><strong>IO Handling:</strong> Delegating serialization (<code class="docutils literal notranslate"><span class="pre">torch.save</span></code>) to framework-specific adapters (<code class="docutils literal notranslate"><span class="pre">orbax.checkpoint</span></code>).</p></li>
+</ul>
+</li>
+</ul>
+</section>
 <hr class="docutils"/>
 <section id="operational-workflows">
 <h2 id="operational-workflows">🔁 Operational Workflows<a class="headerlink" href="#operational-workflows" title="Link to this heading">¶</a></h2>
-<section id="workflow-a-automated-specification-scaffolding-robot">
-<h3 id="workflow-a-automated-specification-scaffolding-robot">Workflow A: Automated Specification Scaffolding (Robot)<a class="headerlink" href="#workflow-a-automated-specification-scaffolding-robot" title="Link to this heading">¶</a></h3>
+<section id="workflow-a-automated-scaffolding-robot">
+<h3 id="workflow-a-automated-scaffolding-robot">Workflow A: Automated Scaffolding (Robot)<a class="headerlink" href="#workflow-a-automated-scaffolding-robot" title="Link to this heading">¶</a></h3>
 <p><strong>Goal:</strong> Auto-discover mappings between frameworks and the standard.</p>
 <ol class="arabic simple">
-<li><p><strong>Ingest:</strong> <code class="docutils literal notranslate"><span class="pre">ApiInspector</span></code> consumes Array API / ONNX specs.</p></li>
-<li><p><strong>Align:</strong> <code class="docutils literal notranslate"><span class="pre">Scaffolder</span></code> introspects installed libraries (Torch/JAX) using heuristic matching (fuzzy name + signature
-arity check).</p></li>
-<li><p><strong>Result:</strong> Populated JSONs in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ApiInspector</span></code> catalogues installed libraries.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Scaffolder</span></code> fuzzy-matches signatures against the Spec Store.</p></li>
+<li><p>Result: Populated <code class="docutils literal notranslate"><span class="pre">semantics/*.json</span></code> files.</p></li>
 </ol>
 </section>
-<section id="workflow-b-the-hybrid-verification-loop-human-in-the-loop">
-<h3 id="workflow-b-the-hybrid-verification-loop-human-in-the-loop">Workflow B: The Hybrid Verification Loop (Human-in-the-Loop)<a class="headerlink" href="#workflow-b-the-hybrid-verification-loop-human-in-the-loop" title="Link to this heading">¶</a></h3>
-<p><strong>Goal:</strong> Verify framework equivalence via generated tests.</p>
+<section id="workflow-b-the-hybrid-verification-loop">
+<h3 id="workflow-b-the-hybrid-verification-loop">Workflow B: The Hybrid Verification Loop<a class="headerlink" href="#workflow-b-the-hybrid-verification-loop" title="Link to this heading">¶</a></h3>
+<p><strong>Goal:</strong> Verify framework equivalence.</p>
 <ol class="arabic simple">
-<li><p><strong>Generate:</strong> <code class="docutils literal notranslate"><span class="pre">TestGenerator</span></code> creates <code class="docutils literal notranslate"><span class="pre">tests/generated/test_math.py</span></code>.</p></li>
-<li><p><strong>Execute:</strong> <code class="docutils literal notranslate"><span class="pre">pytest</span></code> runs the suite. The <code class="docutils literal notranslate"><span class="pre">InputFuzzer</span></code> generates random inputs using type hints found in the specs.</p></li>
-<li><p><strong>Failures:</strong> If a generated test fails, a human engineer writes a manual override function in the same file. The
-system respects manual tests over generated ones.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TestGenerator</span></code> creates a physical test suite from templates (<code class="docutils literal notranslate"><span class="pre">k_test_templates.json</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pytest</span></code> executes the suite. The <code class="docutils literal notranslate"><span class="pre">InputFuzzer</span></code> generates data based on <code class="docutils literal notranslate"><span class="pre">std_args</span></code> types found in the specs.</p></li>
+<li><p>Failures are fixed manually by humans.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SemanticHarvester</span></code> scans the manual fixes to update the Knowledge Base.</p></li>
 </ol>
 </section>
-<section id="workflow-c-production-transpilation-pipeline">
-<h3 id="workflow-c-production-transpilation-pipeline">Workflow C: Production Transpilation Pipeline<a class="headerlink" href="#workflow-c-production-transpilation-pipeline" title="Link to this heading">¶</a></h3>
-<p><strong>Goal:</strong> Convert source code to target framework.</p>
+<section id="workflow-c-production-transpilation">
+<h3 id="workflow-c-production-transpilation">Workflow C: Production Transpilation<a class="headerlink" href="#workflow-c-production-transpilation" title="Link to this heading">¶</a></h3>
+<p><strong>Goal:</strong> Convert user source code.</p>
 <ol class="arabic simple">
-<li><p><strong>Analysis:</strong> The <code class="docutils literal notranslate"><span class="pre">ASTEngine</span></code> runs:</p>
-<ul class="simple">
-<li><p><strong>PurityScanner:</strong> Flags JAX-unsafe side effects (print, global, mutation).</p></li>
-<li><p><strong>DependencyScanner:</strong> Flags unknown 3rd-party libs.</p></li>
-</ul>
-</li>
-<li><p><strong>Rewrite:</strong> <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> walks the AST.</p>
-<ul class="simple">
-<li><p>Transforms classes (Structure rewriting for NNX).</p></li>
-<li><p>Injects required state arguments (e.g. <code class="docutils literal notranslate"><span class="pre">rngs</span></code>, <code class="docutils literal notranslate"><span class="pre">variables</span></code>).</p></li>
-<li><p>Applies Plugins (Decompositions, Context Managers).</p></li>
-</ul>
-</li>
-<li><p><strong>Refine:</strong> <code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code> prunes old imports and intelligently injects new ones only if used.</p></li>
-</ol>
-</section>
-<section id="workflow-e-semantic-harvesting">
-<h3 id="workflow-e-semantic-harvesting">Workflow E: Semantic Harvesting<a class="headerlink" href="#workflow-e-semantic-harvesting" title="Link to this heading">¶</a></h3>
-<p><strong>Goal:</strong> Learn from human-written tests.</p>
-<ol class="arabic simple">
-<li><p><strong>Scan:</strong> The <code class="docutils literal notranslate"><span class="pre">SemanticHarvester</span></code> reads manual test files (e.g., <code class="docutils literal notranslate"><span class="pre">tests/examples/</span></code>).</p></li>
-<li><p><strong>Extract:</strong> It finds passing calls to target APIs (e.g. <code class="docutils literal notranslate"><span class="pre">jax.numpy.sum(a=x,</span> <span class="pre">axis=y)</span></code>).</p></li>
-<li><p><strong>Learn:</strong> It reverse-engineers the mapping (<code class="docutils literal notranslate"><span class="pre">x-&gt;a</span></code>, <code class="docutils literal notranslate"><span class="pre">axis-&gt;axis</span></code>) and updates the Knowledge Base JSONs
-automatically.</p></li>
+<li><p>User invokes CLI (<code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">convert</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ASTEngine</span></code> parses code and runs Analysis passes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> transforms AST based on semantic JSONs and active traits.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code> reconciles dependencies.</p></li>
+<li><p>Code is emitted (optionally verified via <code class="docutils literal notranslate"><span class="pre">HarnessGenerator</span></code>).</p></li>
 </ol>
 </section>
 </section>
@@ -861,12 +972,12 @@ automatically.</p></li>
             </a>
           
           
-            <a href="EXTENDING.html" title="Extending"
+            <a href="EXTENDING.html" title="Extending ml-switcheroo"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> Extending </span>
+                class="md-footer-nav__direction"> "Next" </span> Extending ml-switcheroo </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

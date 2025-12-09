@@ -1,0 +1,194 @@
+ml_switcheroo.frameworks
+========================
+
+.. py:module:: ml_switcheroo.frameworks
+
+.. autoapi-nested-parse::
+
+   Framework Adapters Package.
+
+   Automatically discovers and registers framework adapters defined in this directory.
+   To add support for a new framework, simply add a .py file here with a class
+   decorated via @register_framework("name").
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/frameworks/base/index
+   /api/ml_switcheroo/frameworks/jax/index
+   /api/ml_switcheroo/frameworks/mlx/index
+   /api/ml_switcheroo/frameworks/numpy/index
+   /api/ml_switcheroo/frameworks/paxml/index
+   /api/ml_switcheroo/frameworks/tensorflow/index
+   /api/ml_switcheroo/frameworks/torch/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.FrameworkAdapter
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.register_framework
+   ml_switcheroo.frameworks.get_adapter
+   ml_switcheroo.frameworks.available_frameworks
+
+
+Package Contents
+----------------
+
+.. py:class:: FrameworkAdapter
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol definition for a Framework Adapter.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts input data (usually array-like) to this framework's tensor type.
+
+
+
+   .. py:method:: get_import_stmts() -> str
+      :classmethod:
+
+
+      Returns import statements needed for generated test harness.
+
+
+
+   .. py:method:: get_creation_syntax(var_name: str) -> str
+      :classmethod:
+
+
+      Returns python code to create a tensor from a numpy variable.
+
+
+
+   .. py:method:: get_numpy_conversion_syntax(var_name: str) -> str
+      :classmethod:
+
+
+      Returns python code to convert a tensor back to a numpy array.
+
+
+
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+      List of python modules to scan when running `ml_switcheroo sync`.
+      e.g. ["torch", "torch.nn"]
+
+
+   .. py:property:: display_name
+      :type: str
+
+
+      Friendly name for UI/CLI (e.g. 'PyTorch').
+
+
+   .. py:property:: ui_priority
+      :type: int
+
+
+      Integer defining the sort order in UI tables and Dropdowns.
+      Lower numbers appear first (0 = Highest Priority).
+
+
+   .. py:property:: discovery_heuristics
+      :type: Dict[str, List[str]]
+
+
+      Regex patterns used to categorize discovered APIs into Semantic Tiers.
+      Returns: Dict mapping tier identifiers to lists of regex pattern strings.
+
+
+   .. py:property:: import_alias
+      :type: Tuple[str, str]
+
+
+      Default module import path and alias.
+      Returns: (module_path, local_alias) -> e.g. ("jax.numpy", "jnp")
+
+
+   .. py:property:: inherits_from
+      :type: Optional[str]
+
+
+      Key of a parent framework to inherit mappings from.
+      e.g. 'paxml' inherits from 'jax'. Returns None if no parent.
+
+
+   .. py:property:: structural_traits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
+
+
+      Defines how classes and functions should be transformed to match this framework.
+      Returns: A Pydantic model containing AST rewriting rules.
+
+
+   .. py:property:: rng_seed_methods
+      :type: List[str]
+
+
+      Returns a list of method names that modify global random state.
+      Used by PurityScanner to detect side effects.
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Returns Python source code to instantiate a device on this backend.
+
+
+
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+      Returns Python source code to perform IO operations.
+
+
+
+   .. py:method:: get_serialization_imports() -> List[str]
+
+      Returns a list of import statements required for serialization to work.
+
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+      Returns a Python code snippet demonstrating a typical operation in this
+      framework. Used by the Web Frontend to populate the demo editor.
+
+
+
+.. py:function:: register_framework(name: str)
+
+   Decorator to register a framework adapter class.
+
+
+.. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
+
+   Factory to instantiate an adapter.
+
+
+.. py:function:: available_frameworks() -> List[str]
+
+   Returns a list of all registered framework keys.
+
+

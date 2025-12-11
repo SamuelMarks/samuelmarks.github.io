@@ -3,6 +3,24 @@ ml_switcheroo.frameworks.torch
 
 .. py:module:: ml_switcheroo.frameworks.torch
 
+.. autoapi-nested-parse::
+
+   Torch Adapter with Ghost Protocol Introspection.
+
+   This adapter implements `collect_api` to dynamically discover PyTorch components
+   (Losses, Optimizers, Activations) by introspecting the `torch` namespace at runtime.
+   It supports **Ghost Mode**: if PyTorch is not installed (e.g. within a lightweight
+   CI or WASM environment), it hydrates definitions from a pre-captured JSON snapshot.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.torch.torch
+
 
 Classes
 -------
@@ -14,6 +32,10 @@ Classes
 
 Module Contents
 ---------------
+
+.. py:data:: torch
+   :value: None
+
 
 .. py:class:: TorchAdapter
 
@@ -27,7 +49,7 @@ Module Contents
 
 
    .. py:attribute:: inherits_from
-      :type:  Optional[str]
+      :type:  None
       :value: None
 
 
@@ -58,18 +80,34 @@ Module Contents
 
 
 
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Static definitions for core ops.
+
+
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
 
-   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
+
+      Collects API signatures for the requested category.
+
+      In LIVE mode: Introspects installed `torch` modules.
+      In GHOST mode: Hydrates from loaded JSON snapshot.
+
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: None | str = None) -> str
 
 
    .. py:method:: get_serialization_imports() -> List[str]
 
 
-   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: None | str = None) -> str
 
 
    .. py:method:: convert(data)

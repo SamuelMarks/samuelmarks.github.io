@@ -14,38 +14,17 @@ ml_switcheroo.core.hooks
    ## How to write a Plugin
 
    A plugin is a simple Python function decorated with `@register_hook`. It receives
-   the current AST node (usually a `Call`) and a context object.
+   the current AST node (typically `cst.Call`, but can be others like `cst.For`)
+   and a context object.
 
-   ### 1. Define the Hook
+   ### Usage
 
    ```python
-   import libcst as cst
-   from ml_switcheroo.core.hooks import register_hook, HookContext
-
    @register_hook("my_custom_trigger")
-   def transform_node(node: cst.Call, ctx: HookContext) -> cst.CSTNode:
-       # Example: Rewrite 'foo(x)' to 'bar(x, extra=True)'
-
-       # 1. Modify arguments
-       new_args = list(node.args)
-       new_args.append(cst.Arg(keyword=cst.Name("extra"), value=cst.Name("True")))
-
-       # 2. Modify function name (if needed, though Semantics usually handles this)
-       # Note: Generally, let the semantics JSON handle renaming unless logical
-       # restructuring is required.
-
-       return node.with_changes(args=new_args)
+   def transform_node(node: cst.CSTNode, ctx: HookContext) -> cst.CSTNode:
+       # Logic
+       return node
    ```
-
-   ### 2. Register in Semantics
-
-   Link your hook to an operation in `semantics/*.json`.
-
-   ### 3. Usage
-
-   When the transpiler encounters the API associated with `my_custom_trigger`, it invokes
-   your function. The `ctx` object allows you to read configuration or inject code
-   into the surrounding scope (like adding imports or signature arguments).
 
 
 
@@ -95,7 +74,7 @@ Module Contents
 
    Context object passed to every plugin hook during transcoding.
 
-   This object provides read-only access to the global state and write access
+   Provides read-only access to global state and write access
    to specific injection points (signature args, function body preambles).
 
    .. attribute:: semantics
@@ -119,7 +98,6 @@ Module Contents
    .. attribute:: metadata
 
       A shared dictionary for plugins to store state.
-      Use namespaced keys to avoid collisions (e.g. `ctx.metadata['my_plugin']`).
 
       :type: Dict[str, Any]
 
@@ -145,44 +123,19 @@ Module Contents
 
    .. py:method:: inject_signature_arg(name: str, annotation: Optional[str] = None) -> None
 
-      Requests the injection of an argument into the current function signature.
-
-      This is useful for threading state arguments (like PRNG keys or variables)
-      into functions that didn't previously require them.
-
-      :param name: The argument name (e.g., "rng").
-      :param annotation: Optional type hint (e.g., "jax.random.PRNGKeyArray").
-
-      .. rubric:: Example
-
-      >>> ctx.inject_signature_arg("rng", annotation="jax.Array")
-      # Result: def forward(self, x) -> def forward(self, rng: jax.Array, x)
+      Requests injection of an argument into the current function signature.
 
 
 
    .. py:method:: inject_preamble(code_str: str) -> None
 
-      Requests the injection of a statement at the beginning of the function body.
-
-      Useful for logic that must run before the main operation, such as input
-      conversion, RNG splitting, or context management shims.
-
-      :param code_str: The Python statement string. Code must be syntactically valid.
-
-      .. rubric:: Example
-
-      >>> ctx.inject_preamble("rng, key = jax.random.split(rng)")
+      Requests injection of a statement at the beginning of the function body.
 
 
 
    .. py:method:: raw_config(key: str, default: Any = None) -> Any
 
       Retrieve a raw value from the unstructured plugin settings dict.
-
-      :param key: Config key (e.g. "epsilon").
-      :param default: Fallback value if key is not present.
-
-      :returns: The configuration value or default.
 
 
 
@@ -194,37 +147,19 @@ Module Contents
 
    .. py:method:: validate_settings(model: Type[T]) -> T
 
-      Validates the global config against a Plugin-specific Pydantic schema.
-
-      This allows plugins to enforcing strict typing on their required configuration.
-
-      :param model: Pydantic BaseModel class definition defining the expected settings.
-
-      :returns: Instance of the model populated with valid data from user config.
-
-      :raises pydantic.ValidationError: If user settings do not match the schema.
+      Validates global config against a Plugin-specific Pydantic schema.
 
 
 
    .. py:method:: lookup_api(op_name: str) -> Optional[str]
 
-      Resolves the target framework's API string for a given standard operation name.
-
-      :param op_name: The standard operation name (e.g., "add", "conv2d").
-
-      :returns: The fully qualified API string (e.g. "jax.numpy.add") if found in the
-                Semantic Knowledge Base for the current target framework.
+      Resolves target framework's API string for a given standard operation.
 
 
 
    .. py:method:: lookup_signature(op_name: str) -> List[str]
 
-      Retrieves the standard argument list for a given operation.
-
-      :param op_name: The standard operation name (e.g., "add", "sum").
-
-      :returns: List of argument names (e.g., ['x', 'axis']). Returns empty list if not found.
-                NOTE: This list contains names only, stripping any type information from the spec.
+      Retrieves standard argument list for a given operation.
 
 
 
@@ -234,38 +169,22 @@ Module Contents
 
    Decorator to register a function as a plugin hook.
 
-   :param trigger: The unique identifier string found in `semantics/*.json`
-                   under the `requires_plugin` field.
-
-   :returns: The decorated function (unmodified).
+   :param trigger: The unique identifier. Can be an operation ID or a
+                   reserved system event like "transform_for_loop".
 
 
 .. py:function:: get_hook(trigger: str) -> Optional[HookFunction]
 
    Retrieves a registered hook function by its trigger name.
-   Automatically loads plugins if they haven't been loaded yet.
-
-   :param trigger: The plugin identifier string.
-
-   :returns: The callable hook function or None if not found.
 
 
 .. py:function:: clear_hooks() -> None
 
    Resets the internal hook registry.
-   Useful for testing isolation to ensure clean state between tests.
 
 
 .. py:function:: load_plugins(plugins_dir: Optional[pathlib.Path] = None, extra_dirs: Optional[List[pathlib.Path]] = None) -> int
 
-   Dynamically imports all modules in the plugins directory and any extra directories.
-   This executes the module body, triggering any @register_hook decorators.
-
-   :param plugins_dir: Path object pointing to the specific default plugins folder.
-                       If None, defaults to `src/ml_switcheroo/plugins`.
-   :param extra_dirs: List of additional directories to scan for user modules.
-
-   :returns: Count of modules successfully loaded.
-   :rtype: int
+   Dynamically imports all modules in the plugins directory.
 
 

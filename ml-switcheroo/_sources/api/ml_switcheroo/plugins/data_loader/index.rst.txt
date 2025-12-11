@@ -1,0 +1,42 @@
+ml_switcheroo.plugins.data_loader
+=================================
+
+.. py:module:: ml_switcheroo.plugins.data_loader
+
+.. autoapi-nested-parse::
+
+   Plugin for transforming Data Loaders.
+
+   Handles the mapping of `torch.utils.data.DataLoader` to:
+   1. `GenericDataLoader` shim (for JAX/NumPy).
+   2. Native `torch.utils.data.DataLoader` (Pass-through for Torch).
+   3. `tf.data.Dataset` (Future implementation for TF).
+
+   It leverages `frameworks.common.data` to fetch the shim implementation when needed.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.data_loader.transform_dataloader
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_dataloader(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
+
+   Middleware to rewrite DataLoader instantiation.
+
+   Triggers:
+       Operations marked with `requires_plugin: "convert_dataloader"`
+       (e.g., `DataLoader` in `k_framework_extras.json`).
+
+   Strategy:
+       - If Target == Torch: Keep as is.
+       - If Target != Torch: Inject Shim logic and rewrite to `GenericDataLoader`.
+
+

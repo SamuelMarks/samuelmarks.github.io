@@ -20,9 +20,13 @@ Submodules
    :maxdepth: 1
 
    /api/ml_switcheroo/frameworks/base/index
+   /api/ml_switcheroo/frameworks/common/index
+   /api/ml_switcheroo/frameworks/flax_shim/index
    /api/ml_switcheroo/frameworks/jax/index
+   /api/ml_switcheroo/frameworks/keras/index
    /api/ml_switcheroo/frameworks/mlx/index
    /api/ml_switcheroo/frameworks/numpy/index
+   /api/ml_switcheroo/frameworks/optax_shim/index
    /api/ml_switcheroo/frameworks/paxml/index
    /api/ml_switcheroo/frameworks/tensorflow/index
    /api/ml_switcheroo/frameworks/torch/index
@@ -55,6 +59,9 @@ Package Contents
 
 
    Protocol definition for a Framework Adapter.
+   Includes Hybrid Loading Logic via Mixin-like default behavior requires careful subclassing.
+   Since Protocol cannot have implementation easily without a base class,
+   we define the Interface here and provide a helper method for loading snapshots.
 
 
    .. py:method:: convert(data: Any) -> Any
@@ -92,7 +99,6 @@ Package Contents
 
 
       List of python modules to scan when running `ml_switcheroo sync`.
-      e.g. ["torch", "torch.nn"]
 
 
    .. py:property:: display_name
@@ -107,15 +113,13 @@ Package Contents
 
 
       Integer defining the sort order in UI tables and Dropdowns.
-      Lower numbers appear first (0 = Highest Priority).
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      Regex patterns used to categorize discovered APIs into Semantic Tiers.
-      Returns: Dict mapping tier identifiers to lists of regex pattern strings.
+      Regex patterns used to categorize API surfaces.
 
 
    .. py:property:: import_alias
@@ -123,7 +127,6 @@ Package Contents
 
 
       Default module import path and alias.
-      Returns: (module_path, local_alias) -> e.g. ("jax.numpy", "jnp")
 
 
    .. py:property:: inherits_from
@@ -131,15 +134,13 @@ Package Contents
 
 
       Key of a parent framework to inherit mappings from.
-      e.g. 'paxml' inherits from 'jax'. Returns None if no parent.
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
 
-      Defines how classes and functions should be transformed to match this framework.
-      Returns: A Pydantic model containing AST rewriting rules.
+      Defines how Classes and Functions should be transformed.
 
 
    .. py:property:: rng_seed_methods
@@ -147,7 +148,6 @@ Package Contents
 
 
       Returns a list of method names that modify global random state.
-      Used by PurityScanner to detect side effects.
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
@@ -172,8 +172,24 @@ Package Contents
       :classmethod:
 
 
-      Returns a Python code snippet demonstrating a typical operation in this
-      framework. Used by the Web Frontend to populate the demo editor.
+      Returns a Python code snippet demonstrating a typical operation.
+
+
+
+   .. py:property:: definitions
+      :type: Dict[str, StandardMap]
+
+
+      Returns the framework's implementation of Middle Layer Operations.
+
+
+   .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+      Scans the installed framework (LIVE) or reads from snapshot (GHOST).
+
+      :param category: The semantic category to scan for.
+
+      :returns: A list of GhostRef objects representing the discovered API surface.
 
 
 

@@ -10,10 +10,13 @@ ml_switcheroo.discovery.syncer
    This module scans installed libraries (e.g., Torch, JAX, TensorFlow, MLX) for
    functions that match the names defined in the Semantic Knowledge Base.
 
-   Refactor Note:
-       Hardcoded search paths have been removed. This module now queries the
-       `ml_switcheroo.frameworks` registry to determine which submodules to scan
-       for a given framework. This enables "Zero-Edit" support for new frameworks.
+   It handles:
+   1. Module Discovery via FrameworkAdapters.
+   2. Name Matching (`torch.abs` matches `Abs`).
+   3. Signature Compatibility Verification.
+      - Supports Functions.
+      - **Fix**: Supports Classes (Layers) by checking `__call__`/`forward` signatures
+        and relaxing argument count requirements (assuming extras are in `__init__`/`setup`).
 
 
 

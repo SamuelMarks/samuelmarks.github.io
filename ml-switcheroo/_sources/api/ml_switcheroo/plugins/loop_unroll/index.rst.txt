@@ -1,0 +1,42 @@
+ml_switcheroo.plugins.loop_unroll
+=================================
+
+.. py:module:: ml_switcheroo.plugins.loop_unroll
+
+.. autoapi-nested-parse::
+
+   Plugin for Unrolling Loops (JAX Scan/Fori_loop).
+
+   Detects Python `for` loops and attempts to map them to JAX control flow primitives
+   when the target framework is JAX.
+
+   Supported Patterns:
+   1. `for i in range(args)` -> `jax.lax.fori_loop(start, stop, body_fun, init_val)`
+      *Limitations*: Requires heuristic detection of 'carry' variable (state).
+      If heuristics fail, applies an Escape Hatch warning suggesting manual fix.
+
+   2. Pass-through for non-JAX targets.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.loop_unroll.transform_loops
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_loops(node: libcst.For, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
+
+   Plugin Hook: Transforms `for` loops into JAX primitives if applicable.
+
+   :param node: The CST For loop node.
+   :param ctx: Hook context.
+
+   :returns: Transformed node or original wrapped in EscapeHatch if unsafe to convert.
+
+

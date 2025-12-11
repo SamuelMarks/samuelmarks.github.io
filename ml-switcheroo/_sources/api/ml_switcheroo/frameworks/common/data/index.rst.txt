@@ -1,0 +1,53 @@
+ml_switcheroo.frameworks.common.data
+====================================
+
+.. py:module:: ml_switcheroo.frameworks.common.data
+
+.. autoapi-nested-parse::
+
+   Data Loader Standard & Runtime Shim.
+
+   This module defines the **Generic Data Loader Shim** used when transpiling
+   PyTorch `DataLoader` code to frameworks that lack a direct equivalent (like JAX or NumPy).
+   It also provides the Semantic Configuration injection to ensure the engine detects
+   the DataLoader API and applies the conversion plugin.
+
+   Capabilities handled by the Shim:
+   1. Batching (`batch_size`).
+   2. Shuffling (`shuffle`).
+   3. Dropping last batch (`drop_last`).
+   4. Dataset Protocol (supports any object implementing `__len__` and `__getitem__`).
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.common.data.get_dataloader_semantics
+   ml_switcheroo.frameworks.common.data.get_shim_code
+
+
+Module Contents
+---------------
+
+.. py:function:: get_dataloader_semantics() -> Dict[str, Any]
+
+   Returns the Semantic Definition for the DataLoader and its namespace
+   to be injected into the Knowledge Base (Static Injection).
+
+   This ensures that Scaffolding operations automatically generate the correct
+   wiring for the Data Loader plugin, connecting the 'DataLoader' abstract operation
+   to the 'convert_dataloader' plugin hook for JAX.
+
+   It also includes definitions for `torch.utils` and `torch.utils.data` to prevent
+   Strict Mode attribute traversal checks from failing on the intermediate namespace nodes.
+
+
+.. py:function:: get_shim_code() -> str
+
+   Returns the source code for the `GenericDataLoader` class.
+   This code is injected into generated files by the `convert_dataloader` plugin.
+
+

@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=5217a1e4"></script>
+    <script src="_static/switcheroo_demo.js?v=7feb530a"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ml-switcheroo 🔄🦘" href="README.html" />
@@ -294,7 +294,7 @@
 <div class="switcheroo-material-card" data-wheel="ml_switcheroo-0.0.1-py3-none-any.whl" id="switcheroo-wasm-root">
 <!-- Inject Protocol-Driven Examples -->
 <script>
-                window.SWITCHEROO_PRELOADED_EXAMPLES = {"torch": {"label": "Standard PyTorch Example", "srcFw": "torch", "tgtFw": "jax", "code": "import torch.nn as nn\n\nclass Simple(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.l = nn.Linear(10, 10)\n\n    def forward(self, x):\n        return self.l(x)"}, "jax": {"label": "Standard JAX / Flax Example", "srcFw": "jax", "tgtFw": "torch", "code": "from flax import nnx\n\nclass Simple(nnx.Module):\n    def __init__(self, rngs: nnx.Rngs):\n        self.l = nnx.Linear(10, 10, rngs=rngs)\n\n    def __call__(self, x):\n        return self.l(x)"}, "mlx": {"label": "Standard Apple MLX Example", "srcFw": "mlx", "tgtFw": "jax", "code": "import mlx.core as mx\n\nval = mx.abs(mx.array([-1, 2]))"}, "numpy": {"label": "Standard NumPy Example", "srcFw": "numpy", "tgtFw": "jax", "code": "import numpy as np\n\nval = np.abs([-1, 2])"}, "paxml": {"label": "Standard PaxML / Praxis Example", "srcFw": "paxml", "tgtFw": "jax", "code": "import praxis.layers as pl\nfrom praxis import base_layer\n\nclass Simple(base_layer.BaseLayer):\n    def setup(self):\n        self.l = pl.Linear(10, 10)\n\n    def __call__(self, x):\n        return self.l(x)"}, "tensorflow": {"label": "Standard TensorFlow Example", "srcFw": "tensorflow", "tgtFw": "jax", "code": "import tensorflow as tf\n\nval = tf.abs(tf.constant([-1.0, 2.0]))"}}; 
+                window.SWITCHEROO_PRELOADED_EXAMPLES = {"torch": {"label": "Standard PyTorch Example", "srcFw": "torch", "tgtFw": "jax", "code": "import torch.nn as nn\n\nclass Simple(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.l = nn.Linear(10, 10)\n\n    def forward(self, x):\n        return self.l(x)"}, "jax": {"label": "Standard JAX / Flax Example", "srcFw": "jax", "tgtFw": "torch", "code": "from flax import nnx\n\nclass Simple(nnx.Module):\n    def __init__(self, rngs: nnx.Rngs):\n        self.l = nnx.Linear(10, 10, rngs=rngs)\n\n    def __call__(self, x):\n        return self.l(x)"}, "keras": {"label": "Standard Keras Example", "srcFw": "keras", "tgtFw": "jax", "code": "import keras\nfrom keras import ops\n\nclass M(keras.Layer):\n    def __init__(self):\n        super().__init__()\n        self.d = keras.layers.Dense(10)\n\n    def call(self, x):\n        return self.d(x)"}, "mlx": {"label": "Standard Apple MLX Example", "srcFw": "mlx", "tgtFw": "jax", "code": "import mlx.core as mx\n\nval = mx.abs(mx.array([-1, 2]))"}, "numpy": {"label": "Standard NumPy Example", "srcFw": "numpy", "tgtFw": "jax", "code": "import numpy as np\n\nval = np.abs([-1, 2])"}, "paxml": {"label": "Standard PaxML / Praxis Example", "srcFw": "paxml", "tgtFw": "jax", "code": "import praxis.layers as pl\nfrom praxis import base_layer\n\nclass Simple(base_layer.BaseLayer):\n    def setup(self):\n        self.l = pl.Linear(10, 10)\n\n    def __call__(self, x):\n        return self.l(x)"}, "tensorflow": {"label": "Standard TensorFlow Example", "srcFw": "tensorflow", "tgtFw": "jax", "code": "import tensorflow as tf\n\nval = tf.abs(tf.constant([-1.0, 2.0]))"}}; 
             </script>
 <div class="demo-header">
 <div>
@@ -315,6 +315,7 @@
 <select class="material-select" id="select-src">
 <option selected="" value="torch">PyTorch</option>
 <option value="jax">JAX / Flax</option>
+<option value="keras">Keras</option>
 <option value="mlx">Apple MLX</option>
 <option value="numpy">NumPy</option>
 <option value="paxml">PaxML / Praxis</option>
@@ -326,6 +327,7 @@
 <select class="material-select" id="select-tgt">
 <option value="torch">PyTorch</option>
 <option selected="" value="jax">JAX / Flax</option>
+<option value="keras">Keras</option>
 <option value="mlx">Apple MLX</option>
 <option value="numpy">NumPy</option>
 <option value="paxml">PaxML / Praxis</option>
@@ -400,9 +402,10 @@ class Model(nn.Module):
 </li>
 <li class="toctree-l1"><a class="reference internal" href="MAINTENANCE.html">Maintenance Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#ingestion-upstream-standards">1. Ingestion (Upstream Standards)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#discovery-mapping-frameworks">2. Discovery (Mapping Frameworks)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#verification-ci-loop">3. Verification (CI Loop)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#documentation-web-demo">4. Documentation &amp; Web Demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#operation-connect-mapping-ml-array-math-apis">3. Operation-connect (Mapping ML array &amp; math APIs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#discovery-mapping-frameworks">4. Discovery (Mapping Frameworks)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#verification-ci-loop">5. Verification (CI Loop)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#documentation-web-demo">6. Documentation &amp; Web Demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#glossary-of-artifacts">Glossary of Artifacts</a></li>
 </ul>
 </li>
@@ -421,14 +424,14 @@ class Model(nn.Module):
 <li class="toctree-l3"><a class="reference internal" href="api/purity/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/runner/index.html">runner</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/runner/index.html#classes">Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/runner/index.html#module-contents">Module Contents</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="api/fuzzer/index.html">fuzzer</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/fuzzer/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/fuzzer/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/runner/index.html">runner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/runner/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/runner/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/console/index.html">console</a><ul>
@@ -447,14 +450,14 @@ class Model(nn.Module):
 <li class="toctree-l3"><a class="reference internal" href="api/adapters/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/lifecycle/index.html">lifecycle</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/lifecycle/index.html#classes">Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/lifecycle/index.html#module-contents">Module Contents</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="api/node_diff/index.html">node_diff</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/node_diff/index.html#functions">Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/node_diff/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lifecycle/index.html">lifecycle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/lifecycle/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/lifecycle/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/generator/index.html">generator</a><ul>
@@ -465,11 +468,6 @@ class Model(nn.Module):
 <li class="toctree-l2"><a class="reference internal" href="api/onnx_reader/index.html">onnx_reader</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/onnx_reader/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/onnx_reader/index.html#module-contents">Module Contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/spec_reader/index.html">spec_reader</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/spec_reader/index.html#classes">Classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/spec_reader/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/dependencies/index.html">dependencies</a><ul>
@@ -501,6 +499,11 @@ class Model(nn.Module):
 <li class="toctree-l2"><a class="reference internal" href="api/code_extractor/index.html">code_extractor</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/code_extractor/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/code_extractor/index.html#module-contents">Module Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/array_api_reader/index.html">array_api_reader</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/array_api_reader/index.html#classes">Classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/array_api_reader/index.html#module-contents">Module Contents</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/harness_generator/index.html">harness_generator</a><ul>

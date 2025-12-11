@@ -1,0 +1,48 @@
+ml_switcheroo.core.rewriter.control_flow
+========================================
+
+.. py:module:: ml_switcheroo.core.rewriter.control_flow
+
+.. autoapi-nested-parse::
+
+   Control Flow Rewriting Logic.
+
+   Handles structural control flow transformations, specifically `for` loops.
+   Unlike API calls which map via Semantics JSON, control flow hooks are
+   dispatched via reserved system triggers (e.g. `transform_for_loop`).
+
+   This allows plugins to implement complex logic like:
+   - `for i in range(N)` -> `jax.lax.fori_loop(...)`
+   - `for x in iter`     -> `jax.lax.scan(...)`
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: ControlFlowMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for visiting Control Flow nodes (For, While, If).
+
+
+   .. py:method:: leave_For(original_node: libcst.For, updated_node: libcst.For) -> Union[libcst.For, libcst.CSTNode]
+
+      Invokes the 'transform_for_loop' hook if registered.
+
+      If no plugin is registered or the plugin returns the node unmodified,
+      the loop preserves its Python semantics (appropriate for Torch/NumPy).
+      If JAX/TF is the target, a plugin is expected to intercept this.
+
+
+

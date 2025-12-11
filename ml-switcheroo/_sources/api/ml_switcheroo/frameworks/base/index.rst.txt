@@ -9,6 +9,19 @@ ml_switcheroo.frameworks.base
 
    This module defines the interface that all Framework Adapters must implement.
 
+   Key Updates (Hybrid Loading):
+   - Adapters now possess an `init_mode` (LIVE or GHOST).
+   - Added logic to finding and loading cached snapshots if live imports fail.
+   - Expanded `collect_api` to branch between scanning live objects vs reading cached lists.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.base.SNAPSHOT_DIR
 
 
 Classes
@@ -16,6 +29,9 @@ Classes
 
 .. autoapisummary::
 
+   ml_switcheroo.frameworks.base.StandardCategory
+   ml_switcheroo.frameworks.base.InitMode
+   ml_switcheroo.frameworks.base.StandardMap
    ml_switcheroo.frameworks.base.FrameworkAdapter
 
 
@@ -24,6 +40,7 @@ Functions
 
 .. autoapisummary::
 
+   ml_switcheroo.frameworks.base.load_snapshot_for_adapter
    ml_switcheroo.frameworks.base.register_framework
    ml_switcheroo.frameworks.base.get_adapter
 
@@ -31,12 +48,89 @@ Functions
 Module Contents
 ---------------
 
+.. py:data:: SNAPSHOT_DIR
+
+.. py:class:: StandardCategory
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Categorization of Framework APIs for automated scanning.
+
+
+   .. py:attribute:: LOSS
+      :value: 'loss'
+
+
+
+   .. py:attribute:: OPTIMIZER
+      :value: 'optimizer'
+
+
+
+   .. py:attribute:: LAYER
+      :value: 'layer'
+
+
+
+   .. py:attribute:: ACTIVATION
+      :value: 'activation'
+
+
+
+.. py:class:: InitMode
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Operational mode of an adapter.
+
+
+   .. py:attribute:: LIVE
+      :value: 'live'
+
+
+
+   .. py:attribute:: GHOST
+      :value: 'ghost'
+
+
+
+.. py:class:: StandardMap(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Defines how a Framework implements a Middle Layer standard.
+
+
+   .. py:attribute:: api
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: args
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: requires_plugin
+      :type:  Optional[str]
+      :value: None
+
+
+
 .. py:class:: FrameworkAdapter
 
    Bases: :py:obj:`Protocol`
 
 
    Protocol definition for a Framework Adapter.
+   Includes Hybrid Loading Logic via Mixin-like default behavior requires careful subclassing.
+   Since Protocol cannot have implementation easily without a base class,
+   we define the Interface here and provide a helper method for loading snapshots.
 
 
    .. py:method:: convert(data: Any) -> Any
@@ -74,7 +168,6 @@ Module Contents
 
 
       List of python modules to scan when running `ml_switcheroo sync`.
-      e.g. ["torch", "torch.nn"]
 
 
    .. py:property:: display_name
@@ -89,15 +182,13 @@ Module Contents
 
 
       Integer defining the sort order in UI tables and Dropdowns.
-      Lower numbers appear first (0 = Highest Priority).
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      Regex patterns used to categorize discovered APIs into Semantic Tiers.
-      Returns: Dict mapping tier identifiers to lists of regex pattern strings.
+      Regex patterns used to categorize API surfaces.
 
 
    .. py:property:: import_alias
@@ -105,7 +196,6 @@ Module Contents
 
 
       Default module import path and alias.
-      Returns: (module_path, local_alias) -> e.g. ("jax.numpy", "jnp")
 
 
    .. py:property:: inherits_from
@@ -113,15 +203,13 @@ Module Contents
 
 
       Key of a parent framework to inherit mappings from.
-      e.g. 'paxml' inherits from 'jax'. Returns None if no parent.
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
 
-      Defines how classes and functions should be transformed to match this framework.
-      Returns: A Pydantic model containing AST rewriting rules.
+      Defines how Classes and Functions should be transformed.
 
 
    .. py:property:: rng_seed_methods
@@ -129,7 +217,6 @@ Module Contents
 
 
       Returns a list of method names that modify global random state.
-      Used by PurityScanner to detect side effects.
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
@@ -154,9 +241,34 @@ Module Contents
       :classmethod:
 
 
-      Returns a Python code snippet demonstrating a typical operation in this
-      framework. Used by the Web Frontend to populate the demo editor.
+      Returns a Python code snippet demonstrating a typical operation.
 
+
+
+   .. py:property:: definitions
+      :type: Dict[str, StandardMap]
+
+
+      Returns the framework's implementation of Middle Layer Operations.
+
+
+   .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+      Scans the installed framework (LIVE) or reads from snapshot (GHOST).
+
+      :param category: The semantic category to scan for.
+
+      :returns: A list of GhostRef objects representing the discovered API surface.
+
+
+
+.. py:function:: load_snapshot_for_adapter(fw_key: str) -> Dict[str, Any]
+
+   Locates the most recent snapshot for a given framework key (e.g. 'torch').
+   Used by Adapter __init__ methods when entering Ghost Mode.
+
+   :returns: The snapshot data dictionary (containing 'categories', 'version', etc).
+             Returns empty dict if no snapshot found.
 
 
 .. py:function:: register_framework(name: str)

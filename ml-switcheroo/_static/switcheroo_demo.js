@@ -1,4 +1,4 @@
-let pyodide = null; 
+let pyodide = null;
 let srcEditor = null;
 let tgtEditor = null;
 

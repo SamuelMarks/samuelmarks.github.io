@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=5217a1e4"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=7feb530a"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.calls" href="../calls/index.html" />
@@ -268,14 +268,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -303,14 +303,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
+      <a href="../../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../node_diff/index.html" class="md-nav__link">node_diff</a>
+      <a href="../../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
       
     
     </li>
@@ -325,13 +325,6 @@
     
     
       <a href="../../../../onnx_reader/index.html" class="md-nav__link">onnx_reader</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../spec_reader/index.html" class="md-nav__link">spec_reader</a>
       
     
     </li>
@@ -374,6 +367,13 @@
     
     
       <a href="../../../../code_extractor/index.html" class="md-nav__link">code_extractor</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../array_api_reader/index.html" class="md-nav__link">array_api_reader</a>
       
     
     </li>
@@ -433,6 +433,8 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.base.BaseRewriter._alias_map" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter._alias_map</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.base.BaseRewriter._module_preamble" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter._module_preamble</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.semantics</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#id1" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.config</span></code></a>
@@ -444,6 +446,8 @@
         <li class="md-nav__item"><a href="#id4" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.strict_mode</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#id5" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.ctx</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.base.BaseRewriter.leave_Module" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.leave_Module()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BaseRewriter.visit_Import()</span></code></a>
         </li>
@@ -488,6 +492,7 @@ to <cite>torch.abs</cite> or <cite>np.sum</cite> to <cite>numpy.sum</cite>.</p><
 <li><p><strong>Error Reporting</strong>: Collecting failures during the AST walk to be bubbled
 up to the <cite>ASTEngine</cite>.</p></li>
 <li><p><strong>Hook Infrastructure</strong>: initializing the <cite>HookContext</cite> used by plugins.</p></li>
+<li><p><strong>Global Injection</strong>: Handling file-level preamble injection (<cite>leave_Module</cite>).</p></li>
 </ol>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
@@ -600,6 +605,16 @@ to support argument injection (like <cite>rng</cite>).</p>
 </dl>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter._module_preamble">
+<span class="sig-name descname"><span class="pre">_module_preamble</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter._module_preamble" title="Link to this definition">¶</a></dt>
+<dd><p>Code statements to inject at the top of the file (module level).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
 <span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -623,6 +638,11 @@ to support argument injection (like <cite>rng</cite>).</p>
 <dt class="sig sig-object py" id="id5">
 <span class="sig-name descname"><span class="pre">ctx</span></span><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.leave_Module">
+<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.leave_Module" title="Link to this definition">¶</a></dt>
+<dd><p>Injects module-level preambles (e.g. Shim classes) requested by plugins.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import">
 <span class="sig-name descname"><span class="pre">visit_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.base.BaseRewriter.visit_Import" title="Link to this definition">¶</a></dt>

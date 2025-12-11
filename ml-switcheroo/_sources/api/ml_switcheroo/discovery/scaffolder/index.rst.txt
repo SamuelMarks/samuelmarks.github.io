@@ -14,6 +14,11 @@ ml_switcheroo.discovery.scaffolder
    It prioritizes matching discovered APIs against ingested Specs (ONNX, Array API)
    before falling back to structural heuristics provided by Framework Adapters.
 
+   Updates:
+   - Now injects static semantic defaults (like DataLoader shim configuration)
+     from `ml_switcheroo.frameworks.common.data` to ensuring canonical features
+     are present in the generated JSON.
+
 
 
 Classes
@@ -108,6 +113,8 @@ Module Contents
          Abstract Operator already defined in the Knowledge Base (e.g., from ONNX).
       2. **Heuristic Fallback**: If no spec match, checks Framework Adapters
          for regex conventions (e.g. `.nn` -> Neural).
+      3. **Static Injection**: Merges hardcoded complex definitions (like DataLoader)
+         that cannot be easily autodiscovered but are critical for the engine.
 
       :param frameworks: List of package names (e.g. ['torch', 'jax']).
       :param output_dir: Directory to save generated JSON files.

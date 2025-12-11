@@ -1,0 +1,176 @@
+ml_switcheroo.core.ghost
+========================
+
+.. py:module:: ml_switcheroo.core.ghost
+
+.. autoapi-nested-parse::
+
+   Ghost Core: Introspection Abstraction Layer.
+
+   This module provides the data structures and inspection logic required to
+   decouple framework analysis from the live environment. It enables the system
+   to operate in "Ghost Mode" (WASM/CI) by working against cached snapshots
+   instead of requiring heavy libraries (Torch/TensorFlow) to be installed.
+
+   Classes:
+       GhostParam: Represents a single function/method parameter.
+       GhostRef: A serializable snapshot of an API component (Class or Function).
+       GhostInspector: Facade to extract GhostRefs from live objects or JSON.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.ghost.GhostParam
+   ml_switcheroo.core.ghost.GhostRef
+   ml_switcheroo.core.ghost.GhostInspector
+
+
+Module Contents
+---------------
+
+.. py:class:: GhostParam(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Serializable representation of a function parameter.
+
+   .. attribute:: name
+
+      Parameter name (e.g., 'kernel_size').
+
+   .. attribute:: kind
+
+      Kind of parameter (e.g., 'POSITIONAL_OR_KEYWORD', 'VAR_KEYWORD').
+
+   .. attribute:: default
+
+      Stringified representation of default value, or None if required.
+
+   .. attribute:: annotation
+
+      Stringified type hint, or None.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: kind
+      :type:  str
+
+
+   .. py:attribute:: default
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: annotation
+      :type:  Optional[str]
+      :value: None
+
+
+
+.. py:class:: GhostRef(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Serializable snapshot of a Framework API component.
+
+   Used by the Consensus Engine to align concepts (e.g. 'HuberLoss' vs 'Huber')
+   without needing the framework installed at runtime.
+
+   .. attribute:: name
+
+      The object name (e.g., 'Conv2d').
+
+   .. attribute:: api_path
+
+      Fully qualified import path (e.g., 'torch.nn.Conv2d').
+
+   .. attribute:: kind
+
+      'class' or 'function'.
+
+   .. attribute:: params
+
+      List of parameters for __init__ or the function itself.
+
+   .. attribute:: docstring
+
+      Summary of the docstring for semantic context.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: api_path
+      :type:  str
+
+
+   .. py:attribute:: kind
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: params
+      :type:  List[GhostParam]
+      :value: None
+
+
+
+   .. py:attribute:: docstring
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:method:: has_arg(arg_name: str) -> bool
+
+      Checks if a specific argument exists in the signature.
+
+
+
+.. py:class:: GhostInspector
+
+   Facade for API Inspection.
+
+   Handles the complexity of:
+   1.  Live Introspection: Using `inspect.signature` on installed libraries.
+   2.  Ghost Hydration: wrapper for Pydantic loading (used for future caching interactions).
+   3.  Normalization: Converting classes (inspecting `__init__`) transparently.
+
+
+   .. py:method:: inspect(obj: Union[Any, Callable], api_path: str) -> GhostRef
+      :staticmethod:
+
+
+      Creates a GhostRef from a live Python object.
+
+      :param obj: The live class or function to inspect.
+      :param api_path: The canonical string path (e.g. 'torch.nn.ReLU').
+
+      :returns: A populated GhostRef object.
+
+
+
+   .. py:method:: hydrate(data: dict) -> GhostRef
+      :staticmethod:
+
+
+      Creates a GhostRef from a dictionary (JSON snapshot).
+
+      :param data: Dictionary matching the GhostRef schema.
+
+      :returns: A valid GhostRef object.
+
+
+

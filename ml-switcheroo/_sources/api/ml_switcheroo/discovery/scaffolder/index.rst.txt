@@ -14,10 +14,9 @@ ml_switcheroo.discovery.scaffolder
    It prioritizes matching discovered APIs against ingested Specs (ONNX, Array API)
    before falling back to structural heuristics provided by Framework Adapters.
 
-   Updates:
-   - Now injects static semantic defaults (like DataLoader shim configuration)
-     from `ml_switcheroo.frameworks.common.data` to ensuring canonical features
-     are present in the generated JSON.
+   Updates for Distributed Semantics:
+   - Writes Abstract Operation Definitions (Specs) to `semantics/*.json`.
+   - Writes Implementation Details (Variants) to `snapshots/{framework}_mappings.json`.
 
 
 
@@ -92,32 +91,21 @@ Module Contents
 
 
 
-   .. py:attribute:: tier_a_math
-      :type:  Dict[str, Any]
+   .. py:attribute:: staged_specs
+      :type:  Dict[str, Dict[str, Any]]
 
 
-   .. py:attribute:: tier_b_neural
-      :type:  Dict[str, Any]
+   .. py:attribute:: staged_mappings
+      :type:  Dict[str, Dict[str, Any]]
 
 
-   .. py:attribute:: tier_c_extras
-      :type:  Dict[str, Any]
-
-
-   .. py:method:: scaffold(frameworks: List[str], output_dir: pathlib.Path)
+   .. py:method:: scaffold(frameworks: List[str], output_dir: pathlib.Path = None)
 
       Main entry point. Scans frameworks and builds/updates JSON mappings.
 
-      Discovery Strategy:
-      1. **Spec Validation**: Checks if discovered API matches a specific
-         Abstract Operator already defined in the Knowledge Base (e.g., from ONNX).
-      2. **Heuristic Fallback**: If no spec match, checks Framework Adapters
-         for regex conventions (e.g. `.nn` -> Neural).
-      3. **Static Injection**: Merges hardcoded complex definitions (like DataLoader)
-         that cannot be easily autodiscovered but are critical for the engine.
-
       :param frameworks: List of package names (e.g. ['torch', 'jax']).
-      :param output_dir: Directory to save generated JSON files.
+      :param output_dir: Directory for semantics (Specs).
+                         The snapshots dir is resolved as the sibling 'snapshots' directory.
 
 
 

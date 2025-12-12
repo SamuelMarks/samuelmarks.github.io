@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=9140b820" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=b25da7e2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=7feb530a"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.discovery.syncer" href="../syncer/index.html" />
@@ -229,21 +229,21 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
+      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
+      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../IDEAS.html" class="md-nav__link">ml-switcheroo ideas</a>
+      <a href="../../../../IDEAS.html" class="md-nav__link">Ideas</a>
       
     
     </li>
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
@@ -302,14 +302,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
+      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -436,11 +436,9 @@
         </li>
         <li class="md-nav__item"><a href="#id4" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.arity_penalty</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.discovery.scaffolder.Scaffolder.tier_a_math" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.tier_a_math</span></code></a>
+        <li class="md-nav__item"><a href="#ml_switcheroo.discovery.scaffolder.Scaffolder.staged_specs" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.staged_specs</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.discovery.scaffolder.Scaffolder.tier_b_neural" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.tier_b_neural</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.discovery.scaffolder.Scaffolder.tier_c_extras" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.tier_c_extras</span></code></a>
+        <li class="md-nav__item"><a href="#ml_switcheroo.discovery.scaffolder.Scaffolder.staged_mappings" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.staged_mappings</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.discovery.scaffolder.Scaffolder.scaffold" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Scaffolder.scaffold()</span></code></a>
         </li></ul>
@@ -472,12 +470,9 @@ libraries (Torch, JAX, etc.) and aligns them against the Specification-Guided
 Knowledge Base.</p>
 <p>It prioritizes matching discovered APIs against ingested Specs (ONNX, Array API)
 before falling back to structural heuristics provided by Framework Adapters.</p>
-<p>Updates:
-- Now injects static semantic defaults (like DataLoader shim configuration)</p>
-<blockquote>
-<div><p>from <cite>ml_switcheroo.frameworks.common.data</cite> to ensuring canonical features
-are present in the generated JSON.</p>
-</div></blockquote>
+<p>Updates for Distributed Semantics:
+- Writes Abstract Operation Definitions (Specs) to <cite>semantics/*.json</cite>.
+- Writes Implementation Details (Variants) to <cite>snapshots/{framework}_mappings.json</cite>.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -575,37 +570,23 @@ are present in the generated JSON.</p>
 <span class="sig-name descname"><span class="pre">arity_penalty</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.3</span></em><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.discovery.scaffolder.Scaffolder.tier_a_math">
-<span class="sig-name descname"><span class="pre">tier_a_math</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.tier_a_math" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ml_switcheroo.discovery.scaffolder.Scaffolder.staged_specs">
+<span class="sig-name descname"><span class="pre">staged_specs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.staged_specs" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.discovery.scaffolder.Scaffolder.tier_b_neural">
-<span class="sig-name descname"><span class="pre">tier_b_neural</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.tier_b_neural" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.discovery.scaffolder.Scaffolder.tier_c_extras">
-<span class="sig-name descname"><span class="pre">tier_c_extras</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.tier_c_extras" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="ml_switcheroo.discovery.scaffolder.Scaffolder.staged_mappings">
+<span class="sig-name descname"><span class="pre">staged_mappings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.staged_mappings" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.scaffolder.Scaffolder.scaffold">
-<span class="sig-name descname"><span class="pre">scaffold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frameworks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.scaffold" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">scaffold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frameworks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.discovery.scaffolder.Scaffolder.scaffold" title="Link to this definition">¶</a></dt>
 <dd><p>Main entry point. Scans frameworks and builds/updates JSON mappings.</p>
-<p>Discovery Strategy:
-1. <strong>Spec Validation</strong>: Checks if discovered API matches a specific</p>
-<blockquote>
-<div><p>Abstract Operator already defined in the Knowledge Base (e.g., from ONNX).</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p><strong>Heuristic Fallback</strong>: If no spec match, checks Framework Adapters
-for regex conventions (e.g. <cite>.nn</cite> -&gt; Neural).</p></li>
-<li><p><strong>Static Injection</strong>: Merges hardcoded complex definitions (like DataLoader)
-that cannot be easily autodiscovered but are critical for the engine.</p></li>
-</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>frameworks</strong> – List of package names (e.g. [‘torch’, ‘jax’]).</p></li>
-<li><p><strong>output_dir</strong> – Directory to save generated JSON files.</p></li>
+<li><p><strong>output_dir</strong> – Directory for semantics (Specs).
+The snapshots dir is resolved as the sibling ‘snapshots’ directory.</p></li>
 </ul>
 </dd>
 </dl>

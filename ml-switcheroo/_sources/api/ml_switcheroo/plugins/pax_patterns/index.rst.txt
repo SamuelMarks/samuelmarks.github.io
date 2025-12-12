@@ -5,14 +5,11 @@ ml_switcheroo.plugins.pax_patterns
 
 .. autoapi-nested-parse::
 
-   Plugin for handling PaxML / Praxis specific state patterns.
+   Plugin hooks for PaxML patterns.
 
-   PaxML uses HParam-based configuration and a `setup()` method for layer
-   initialization, differing from PyTorch's `__init__` constructor pattern.
-
-   This plugin aims to:
-   1.  Map standard PyTorch constructor logic to `setup()`.
-   2.  Provide functional pass-through for layer calls, aligning with JAX/Flax semantics.
+   Handles:
+   1. Renaming `__init__` to `setup`.
+   2. Stripping `super().__init__()` calls (which are invalid in Praxis setup).
 
 
 
@@ -29,19 +26,11 @@ Module Contents
 
 .. py:function:: migrate_init_to_setup(node: libcst.FunctionDef, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.FunctionDef
 
-   Plugin Hook: Rename `__init__` to `setup` for Praxis Layer definitions.
+   Hook to transform __init__ methods for PaxML targets.
 
-   Triggers:
-       Operations marked with `requires_plugin: "pax_setup_migration"`.
-       Currently intended for `torch.nn.Module` -> `praxis.base_layer.BaseLayer` transformations.
+   :param node: The FunctionDef node.
+   :param ctx: Hook execution context.
 
-   Action:
-       - Renames `__init__` to `setup`.
-       - Strips `super().__init__()` calls (Praxis BaseLayer handles this implicitly or differently).
-
-   :param node: The function definition node (expected to be `__init__`).
-   :param ctx: The hook context.
-
-   :returns: The transformed FunctionDef node.
+   :returns: Transformed FunctionDef (renamed to setup, super init removed).
 
 

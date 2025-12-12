@@ -10,7 +10,7 @@ ml_switcheroo.frameworks.common.data
    This module defines the **Generic Data Loader Shim** used when transpiling
    PyTorch `DataLoader` code to frameworks that lack a direct equivalent (like JAX or NumPy).
    It also provides the Semantic Configuration injection to ensure the engine detects
-   the DataLoader API and applies the conversion plugin.
+   the DataLoader API.
 
    Capabilities handled by the Shim:
    1. Batching (`batch_size`).
@@ -34,15 +34,12 @@ Module Contents
 
 .. py:function:: get_dataloader_semantics() -> Dict[str, Any]
 
-   Returns the Semantic Definition for the DataLoader and its namespace
-   to be injected into the Knowledge Base (Static Injection).
+   Returns the Semantic Definition for the DataLoader to be injected into the Knowledge Base.
 
-   This ensures that Scaffolding operations automatically generate the correct
-   wiring for the Data Loader plugin, connecting the 'DataLoader' abstract operation
-   to the 'convert_dataloader' plugin hook for JAX.
-
-   It also includes definitions for `torch.utils` and `torch.utils.data` to prevent
-   Strict Mode attribute traversal checks from failing on the intermediate namespace nodes.
+   Updated Architecture compliance:
+   - Contains strictly **Abstract Standard** definitions (description, std_args).
+   - Implementation variants (API paths, plugins) are removed and must be
+     provided by the JSON snapshots (hub-and-spoke model).
 
 
 .. py:function:: get_shim_code() -> str

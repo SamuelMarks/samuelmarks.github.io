@@ -10,9 +10,14 @@ ml_switcheroo.semantics.manager
    This module is responsible for locating, loading, and merging semantic
    specification files (JSONs) into a unified Knowledge Graph.
 
-   It supports **Distributed Semantics**, allowing definitions to be split across
-   multiple files and directories (e.g., `semantics/extensions/*.json`).
-   Files are loaded recursively and merged with a tier-based priority system.
+   It implements a "Hub-and-Spoke" loading strategy:
+   1.  **Hub (Specs)**: Loads Abstract Operation definitions from `semantics/*.json`
+       (e.g., `k_array_api.json`). These define the "Standard" (args, description).
+   2.  **Spokes (Overlays)**: Scans `snapshots/*_mappings.json` to inject
+       framework-specific implementation details (variants) into the abstract definitions.
+
+   This separation allows the Specs to remain stable while Framework implementations
+   evolve rapidly in the snapshots directory.
 
 
 
@@ -38,6 +43,7 @@ Functions
 .. autoapisummary::
 
    ml_switcheroo.semantics.manager.resolve_semantics_dir
+   ml_switcheroo.semantics.manager.resolve_snapshots_dir
 
 
 Module Contents
@@ -56,17 +62,20 @@ Module Contents
    Falls back to package resources for installed distributions.
 
 
+.. py:function:: resolve_snapshots_dir() -> pathlib.Path
+
+   Locates the directory containing framework snapshots and mapping overlays.
+   Defaults to the sibling 'snapshots' directory relative to 'semantics'.
+
+
 .. py:class:: SemanticsManager
 
    Central database for semantic mappings and configuration.
 
    Data Source Priority:
    1. Registry Defaults (Code-defined in FrameworkAdapters).
-   2. JSON Files (User/System defined in `semantics/**/*.json`).
-      Files are loaded in the following order of precedence (Lowest to Highest):
-      - Array API (Math)
-      - Neural Net (Layers)
-      - Extensions/Extras (Patches & New Frameworks)
+   2. Spec Files (`semantics/*.json`): Defines the Abstract Standards.
+   3. Overlay Files (`snapshots/*_mappings.json`): Injects Framework Variants.
 
 
    .. py:attribute:: data

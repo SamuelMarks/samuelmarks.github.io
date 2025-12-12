@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=9140b820" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=b25da7e2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=7feb530a"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.rng_threading" href="../rng_threading/index.html" />
@@ -229,21 +229,21 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
+      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
+      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../IDEAS.html" class="md-nav__link">ml-switcheroo ideas</a>
+      <a href="../../../../IDEAS.html" class="md-nav__link">Ideas</a>
       
     
     </li>
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
@@ -302,14 +302,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
+      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -434,18 +434,16 @@
             
   <section id="module-ml_switcheroo.plugins.pax_patterns">
 <span id="ml-switcheroo-plugins-pax-patterns"></span><h1 id="api-ml-switcheroo-plugins-pax-patterns-index--page-root">ml_switcheroo.plugins.pax_patterns<a class="headerlink" href="#api-ml-switcheroo-plugins-pax-patterns-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Plugin for handling PaxML / Praxis specific state patterns.</p>
-<p>PaxML uses HParam-based configuration and a <cite>setup()</cite> method for layer
-initialization, differing from PyTorch’s <cite>__init__</cite> constructor pattern.</p>
-<p>This plugin aims to:
-1.  Map standard PyTorch constructor logic to <cite>setup()</cite>.
-2.  Provide functional pass-through for layer calls, aligning with JAX/Flax semantics.</p>
+<p>Plugin hooks for PaxML patterns.</p>
+<p>Handles:
+1. Renaming <cite>__init__</cite> to <cite>setup</cite>.
+2. Stripping <cite>super().__init__()</cite> calls (which are invalid in Praxis setup).</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.pax_patterns.migrate_init_to_setup" title="ml_switcheroo.plugins.pax_patterns.migrate_init_to_setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">migrate_init_to_setup</span></code></a>(→ libcst.FunctionDef)</p></td>
-<td><p>Plugin Hook: Rename <cite>__init__</cite> to <cite>setup</cite> for Praxis Layer definitions.</p></td>
+<td><p>Hook to transform __init__ methods for PaxML targets.</p></td>
 </tr>
 </tbody>
 </table>
@@ -455,26 +453,16 @@ initialization, differing from PyTorch’s <cite>__init__</cite> constructor pat
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.pax_patterns.migrate_init_to_setup">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.pax_patterns.</span></span><span class="sig-name descname"><span class="pre">migrate_init_to_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.FunctionDef</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.pax_patterns.migrate_init_to_setup" title="Link to this definition">¶</a></dt>
-<dd><p>Plugin Hook: Rename <cite>__init__</cite> to <cite>setup</cite> for Praxis Layer definitions.</p>
-<dl class="simple">
-<dt>Triggers:</dt><dd><p>Operations marked with <cite>requires_plugin: “pax_setup_migration”</cite>.
-Currently intended for <cite>torch.nn.Module</cite> -&gt; <cite>praxis.base_layer.BaseLayer</cite> transformations.</p>
-</dd>
-<dt>Action:</dt><dd><ul class="simple">
-<li><p>Renames <cite>__init__</cite> to <cite>setup</cite>.</p></li>
-<li><p>Strips <cite>super().__init__()</cite> calls (Praxis BaseLayer handles this implicitly or differently).</p></li>
-</ul>
-</dd>
-</dl>
+<dd><p>Hook to transform __init__ methods for PaxML targets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – The function definition node (expected to be <cite>__init__</cite>).</p></li>
-<li><p><strong>ctx</strong> – The hook context.</p></li>
+<li><p><strong>node</strong> – The FunctionDef node.</p></li>
+<li><p><strong>ctx</strong> – Hook execution context.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The transformed FunctionDef node.</p>
+<dd class="field-even"><p>Transformed FunctionDef (renamed to setup, super init removed).</p>
 </dd>
 </dl>
 </dd></dl>

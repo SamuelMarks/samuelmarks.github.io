@@ -36,15 +36,15 @@ Module Contents
 
    Triggers:
        Operations marked with `requires_plugin: "pack_varargs"`.
-       Designed for `permute_dims` (torch.permute -> jax.numpy.transpose).
+       Designed for abstract operations like `permute_dims`.
 
    Transformation:
        Input:  `torch.permute(x, 0, 2, 1)`
-       Output: `jax.numpy.transpose(x, axes=(0, 2, 1))`
+       Output: `jax.numpy.transpose(x, axes=(0, 2, 1))` (if mapped)
 
    :param node: The original CST Call node.
-   :param ctx: HookContext for API lookup.
+   :param ctx: HookContext for API lookup directly from Semantics.
 
-   :returns: The transformed CST Call node.
+   :returns: The transformed CST Call node, or original if target mapping is missing.
 
 

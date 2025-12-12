@@ -29,11 +29,11 @@ Module Contents
 
    Transforms an `add` call with an `alpha` parameter into a multiplication.
 
-   Used for converting Torch `add` to JAX/Numpy `add`.
+   For example, converting `torch.add(x, y, alpha=a)` to `jax.numpy.add(x, y * a)`.
 
    Transformation:
        Input:  add(x, y, alpha=a)
-       Output: jax.numpy.add(x, y * a)
+       Output: target_api(x, y * a)
 
    :param node: The CST Call node to transform.
    :param ctx: The plugin execution context.
@@ -45,11 +45,9 @@ Module Contents
 
    Transforms a multiplication-nested `add` call into an `add` with `alpha`.
 
-   Used for converting JAX/Numpy `add` to Torch `add`.
-
    Transformation:
-       Input:  add(x, y * a)
-       Output: torch.add(x, y, alpha=a)
+       Input:  target_api(x, y * a)
+       Output: torch.add(x, y, alpha=a) [via mapping]
 
    :param node: The CST Call node to transform.
    :param ctx: The plugin execution context.

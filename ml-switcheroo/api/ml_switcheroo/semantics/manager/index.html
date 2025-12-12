@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=9140b820" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=b25da7e2" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=7feb530a"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.semantics.schema" href="../schema/index.html" />
@@ -229,21 +229,21 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending ml-switcheroo</a>
+      <a href="../../../../EXTENDING.html" class="md-nav__link">Extending</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance Guide</a>
+      <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../IDEAS.html" class="md-nav__link">ml-switcheroo ideas</a>
+      <a href="../../../../IDEAS.html" class="md-nav__link">Ideas</a>
       
     
     </li>
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
@@ -302,14 +302,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
+      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -420,6 +420,8 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.manager.resolve_semantics_dir" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">resolve_semantics_dir()</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.manager.resolve_snapshots_dir" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">resolve_snapshots_dir()</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.manager.SemanticsManager" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">SemanticsManager</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.manager.SemanticsManager.data" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">SemanticsManager.data</span></code></a>
@@ -479,9 +481,17 @@
 <p>SemanticsManager for Knowledge Base Loading and Updating.</p>
 <p>This module is responsible for locating, loading, and merging semantic
 specification files (JSONs) into a unified Knowledge Graph.</p>
-<p>It supports <strong>Distributed Semantics</strong>, allowing definitions to be split across
-multiple files and directories (e.g., <cite>semantics/extensions/*.json</cite>).
-Files are loaded recursively and merged with a tier-based priority system.</p>
+<p>It implements a “Hub-and-Spoke” loading strategy:
+1.  <strong>Hub (Specs)</strong>: Loads Abstract Operation definitions from <cite>semantics/*.json</cite></p>
+<blockquote>
+<div><p>(e.g., <cite>k_array_api.json</cite>). These define the “Standard” (args, description).</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Spokes (Overlays)</strong>: Scans <cite>snapshots/*_mappings.json</cite> to inject
+framework-specific implementation details (variants) into the abstract definitions.</p></li>
+</ol>
+<p>This separation allows the Specs to remain stable while Framework implementations
+evolve rapidly in the snapshots directory.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -509,6 +519,9 @@ Files are loaded recursively and merged with a tier-based priority system.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.manager.resolve_semantics_dir" title="ml_switcheroo.semantics.manager.resolve_semantics_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_semantics_dir</span></code></a>(→ pathlib.Path)</p></td>
 <td><p>Locates the directory containing semantic JSON definitions.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.manager.resolve_snapshots_dir" title="ml_switcheroo.semantics.manager.resolve_snapshots_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_snapshots_dir</span></code></a>(→ pathlib.Path)</p></td>
+<td><p>Locates the directory containing framework snapshots and mapping overlays.</p></td>
+</tr>
 </tbody>
 </table>
 </section>
@@ -526,19 +539,20 @@ Files are loaded recursively and merged with a tier-based priority system.</p>
 tests and editable installs find the source of truth correctly.
 Falls back to package resources for installed distributions.</p>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.manager.resolve_snapshots_dir">
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.manager.</span></span><span class="sig-name descname"><span class="pre">resolve_snapshots_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pathlib.Path</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.manager.resolve_snapshots_dir" title="Link to this definition">¶</a></dt>
+<dd><p>Locates the directory containing framework snapshots and mapping overlays.
+Defaults to the sibling ‘snapshots’ directory relative to ‘semantics’.</p>
+</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.manager.SemanticsManager">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.manager.</span></span><span class="sig-name descname"><span class="pre">SemanticsManager</span></span><a class="headerlink" href="#ml_switcheroo.semantics.manager.SemanticsManager" title="Link to this definition">¶</a></dt>
 <dd><p>Central database for semantic mappings and configuration.</p>
 <p>Data Source Priority:
 1. Registry Defaults (Code-defined in FrameworkAdapters).
-2. JSON Files (User/System defined in <cite>semantics/**/*.json</cite>).</p>
-<blockquote>
-<div><p>Files are loaded in the following order of precedence (Lowest to Highest):
-- Array API (Math)
-- Neural Net (Layers)
-- Extensions/Extras (Patches &amp; New Frameworks)</p>
-</div></blockquote>
+2. Spec Files (<cite>semantics/*.json</cite>): Defines the Abstract Standards.
+3. Overlay Files (<cite>snapshots/*_mappings.json</cite>): Injects Framework Variants.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.manager.SemanticsManager.data">
 <span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.semantics.manager.SemanticsManager.data" title="Link to this definition">¶</a></dt>

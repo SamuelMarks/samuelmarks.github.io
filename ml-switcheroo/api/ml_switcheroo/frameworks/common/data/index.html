@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=e840530c"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=ee4d8b22"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.frameworks.flax_shim" href="../../flax_shim/index.html" />
@@ -268,14 +268,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -296,7 +296,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../adapters/index.html" class="md-nav__link">adapters</a>
+      <a href="../../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -304,13 +304,6 @@
     
     
       <a href="../../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -353,13 +346,6 @@
     
     
       <a href="../../../../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../registry_sync/index.html" class="md-nav__link">registry_sync</a>
       
     
     </li>
@@ -443,16 +429,21 @@ PyTorch <cite>DataLoader</cite> code to frameworks that lack a direct equivalent
 It also provides the Semantic Configuration injection to ensure the engine detects
 the DataLoader API.</p>
 <p>Capabilities handled by the Shim:
-1. Batching (<cite>batch_size</cite>).
-2. Shuffling (<cite>shuffle</cite>).
-3. Dropping last batch (<cite>drop_last</cite>).
-4. Dataset Protocol (supports any object implementing <cite>__len__</cite> and <cite>__getitem__</cite>).</p>
+1.  <strong>Batching</strong>: <cite>batch_size</cite>.
+2.  <strong>Shuffling</strong>: <cite>shuffle</cite>.
+3.  <strong>Dropping Last</strong>: <cite>drop_last</cite>.
+4.  <strong>Dataset Protocol</strong>: Supports <cite>__len__</cite> and <cite>__getitem__</cite>.
+5.  <strong>Multi-Processing Stubs</strong>: <cite>num_workers</cite>, <cite>pin_memory</cite>, <cite>persistent_workers</cite></p>
+<blockquote>
+<div><p>are accepted as no-ops to ensure compatibility with performance-tuned Torch code.</p>
+</div></blockquote>
+<p>The Shim is designed to be a lightweight iterator yielding collated batches.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.common.data.get_dataloader_semantics" title="ml_switcheroo.frameworks.common.data.get_dataloader_semantics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dataloader_semantics</span></code></a>(→ Dict[str, Any])</p></td>
-<td><p>Returns the Semantic Definition for the DataLoader to be injected into the Knowledge Base.</p></td>
+<td><p>Returns the Semantic Definition for the DataLoader.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.common.data.get_shim_code" title="ml_switcheroo.frameworks.common.data.get_shim_code"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_shim_code</span></code></a>(→ str)</p></td>
 <td><p>Returns the source code for the <cite>GenericDataLoader</cite> class.</p></td>
@@ -465,19 +456,18 @@ the DataLoader API.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.common.data.get_dataloader_semantics">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.common.data.</span></span><span class="sig-name descname"><span class="pre">get_dataloader_semantics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.common.data.get_dataloader_semantics" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the Semantic Definition for the DataLoader to be injected into the Knowledge Base.</p>
-<p>Updated Architecture compliance:
-- Contains strictly <strong>Abstract Standard</strong> definitions (description, std_args).
-- Implementation variants (API paths, plugins) are removed and must be</p>
-<blockquote>
-<div><p>provided by the JSON snapshots (hub-and-spoke model).</p>
-</div></blockquote>
+<dd><p>Returns the Semantic Definition for the DataLoader.</p>
+<p>Now includes performance arguments found in standard Torch examples.
+These are mapped to the Shim, which handles them gracefully (usually ignoring them).</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.common.data.get_shim_code">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.common.data.</span></span><span class="sig-name descname"><span class="pre">get_shim_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.common.data.get_shim_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the source code for the <cite>GenericDataLoader</cite> class.
 This code is injected into generated files by the <cite>convert_dataloader</cite> plugin.</p>
+<p>Updates:
+- Added <cite>num_workers</cite>, <cite>pin_memory</cite>, <cite>persistent_workers</cite> to __init__.
+- Included <cite>collate_fn</cite> stub support.</p>
 </dd></dl>
 </section>
 </section>

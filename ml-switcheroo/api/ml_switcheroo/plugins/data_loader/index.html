@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=ee4d8b22"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.decompositions" href="../decompositions/index.html" />
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -295,7 +295,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../adapters/index.html" class="md-nav__link">adapters</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -303,13 +303,6 @@
     
     
       <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -352,13 +345,6 @@
     
     
       <a href="../../../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../registry_sync/index.html" class="md-nav__link">registry_sync</a>
       
     
     </li>
@@ -437,9 +423,16 @@
 <p>Plugin for transforming Data Loaders.</p>
 <p>Handles the mapping of <cite>torch.utils.data.DataLoader</cite> to:
 1. <cite>GenericDataLoader</cite> shim (for JAX/NumPy).
-2. Native <cite>torch.utils.data.DataLoader</cite> (Pass-through for Torch).
-3. <cite>tf.data.Dataset</cite> (Future implementation for TF).</p>
-<p>It leverages <cite>frameworks.common.data</cite> to fetch the shim implementation when needed.</p>
+2. Native <cite>torch.utils.data.DataLoader</cite> (Pass-through for Torch).</p>
+<p>Implementation Details:
+- Filters arguments to ensure compatibility with the Generic Shim.
+- Explicitly handles <cite>num_workers</cite>, <cite>pin_memory</cite>, and <cite>drop_last</cite> by mapping</p>
+<blockquote>
+<div><p>names and passing them (since the Shim now accepts them as optional kwargs).</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Injects the Shim class definition at the top of the file on first use.</p></li>
+</ul>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -463,6 +456,8 @@
 <dt>Strategy:</dt><dd><ul class="simple">
 <li><p>If Target == Torch: Keep as is.</p></li>
 <li><p>If Target != Torch: Inject Shim logic and rewrite to <cite>GenericDataLoader</cite>.</p></li>
+<li><p>Maps performance args (<cite>num_workers</cite>, <cite>pin_memory</cite>) to the shim signatures
+where they are safely ignored.</p></li>
 </ul>
 </dd>
 </dl>

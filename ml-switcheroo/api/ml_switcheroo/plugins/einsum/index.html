@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=ee4d8b22"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.inplace_unroll" href="../inplace_unroll/index.html" />
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -295,7 +295,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../adapters/index.html" class="md-nav__link">adapters</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -303,13 +303,6 @@
     
     
       <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -352,13 +345,6 @@
     
     
       <a href="../../../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../registry_sync/index.html" class="md-nav__link">registry_sync</a>
       
     
     </li>
@@ -436,9 +422,14 @@
 <span id="ml-switcheroo-plugins-einsum"></span><h1 id="api-ml-switcheroo-plugins-einsum-index--page-root">ml_switcheroo.plugins.einsum<a class="headerlink" href="#api-ml-switcheroo-plugins-einsum-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for normalizing Einsum calls.</p>
 <p>Standardizes <cite>einsum</cite> arguments so the equation string is always the first argument.
-This is required because JAX enforces <cite>einsum(equation, *operands)</cite>, whereas
-PyTorch historically allowed <cite>einsum(operand, operand, equation)</cite>.</p>
-<p>This plugin handles both the argument shuffling AND the API renaming.</p>
+JAX strictly enforces <cite>einsum(equation, *operands)</cite>, whereas other frameworks (like older
+PyTorch versions or specific utility wrappers) might allow flexible ordering like
+<cite>einsum(operand, operand, equation)</cite>.</p>
+<p>This plugin handles:
+1.  <strong>Equation Identification</strong>: Scans arguments to find the string literal (the equation).
+2.  <strong>Reordering</strong>: Moves the equation to the 0th position if it isn’t already there.
+3.  <strong>API Renaming</strong>: Updates the function call to the target framework’s API (e.g., <cite>jax.numpy.einsum</cite>).
+4.  <strong>Syntax Cleaning</strong>: Essential comma management when shuffling argument order in the AST.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -456,14 +447,17 @@ PyTorch historically allowed <cite>einsum(operand, operand, equation)</cite>.</p
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.einsum.</span></span><span class="sig-name descname"><span class="pre">normalize_einsum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.einsum.normalize_einsum" title="Link to this definition">¶</a></dt>
 <dd><p>Plugin Hook: Rotates arguments to place the equation string first and renames function.</p>
 <dl class="simple">
-<dt>Triggers:</dt><dd><p>Operations mapping to <cite>einsum</cite> with <cite>requires_plugin: “einsum_normalizer”</cite>.</p>
+<dt>Triggers:</dt><dd><p>Operations mapping to <cite>Einsum</cite> with <cite>requires_plugin: “einsum_normalizer”</cite>.</p>
+</dd>
+<dt>Transformation:</dt><dd><p>Input:  <cite>torch.einsum(x, y, “ij,jk-&gt;ik”)</cite>
+Output: <cite>jax.numpy.einsum(“ij,jk-&gt;ik”, x, y)</cite></p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node</strong> – The original CST Call node.</p></li>
-<li><p><strong>ctx</strong> – HookContext.</p></li>
+<li><p><strong>ctx</strong> – HookContext for looking up the target API.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

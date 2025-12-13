@@ -62,11 +62,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../_static/switcheroo_demo.js?v=e840530c"></script>
+    <script src="../../_static/switcheroo_demo.js?v=ee4d8b22"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="doc_gen" href="../doc_gen/index.html" />
-    <link rel="prev" title="fuzzer" href="../fuzzer/index.html" />
+    <link rel="prev" title="runner" href="../runner/index.html" />
   
    
 
@@ -265,14 +265,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -290,13 +290,17 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-console-index--page-root" class="md-nav__link">console</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#console.console" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">console</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#attributes" class="md-nav__link">Attributes</a>
         </li>
         <li class="md-nav__item"><a href="#functions" class="md-nav__link">Functions</a>
         </li>
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#console.console" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">console</span></code></a>
+        <li class="md-nav__item"><a href="#console.SUCCESS_LEVEL_NUM" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">SUCCESS_LEVEL_NUM</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">console</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#console.set_console" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">set_console()</span></code></a>
         </li>
@@ -334,7 +338,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../adapters/index.html" class="md-nav__link">adapters</a>
+      <a href="../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -342,13 +346,6 @@
     
     
       <a href="../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -391,13 +388,6 @@
     
     
       <a href="../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../registry_sync/index.html" class="md-nav__link">registry_sync</a>
       
     
     </li>
@@ -447,13 +437,17 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-console-index--page-root" class="md-nav__link">console</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#console.console" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">console</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#attributes" class="md-nav__link">Attributes</a>
         </li>
         <li class="md-nav__item"><a href="#functions" class="md-nav__link">Functions</a>
         </li>
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#console.console" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">console</span></code></a>
+        <li class="md-nav__item"><a href="#console.SUCCESS_LEVEL_NUM" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">SUCCESS_LEVEL_NUM</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">console</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#console.set_console" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">set_console()</span></code></a>
         </li>
@@ -490,18 +484,37 @@
   <section id="module-console">
 <span id="console"></span><h1 id="api-console-index--page-root">console<a class="headerlink" href="#api-console-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Central Logging and Console Utilities.</p>
-<p>This module provides a singleton interface to <cite>rich.console.Console</cite> configured
-for the ml-switcheroo theme. It replaces standard print statements across
-the application to ensure consistent, colored output.</p>
-<p>It implements a Proxy pattern to allow the underlying Console instance to be
-swapped (injected) at runtime. This “Injectable Console” architecture is crucial
-for Web and WASM integration, allowing the application to redirect logs to
-HTTP strings or browser capture buffers without modifying business logic.</p>
+<p>This module unifies the application’s output mechanism using the Python standard
+<cite>logging</cite> library, backed by <cite>rich</cite> for formatting.</p>
+<p>It serves two primary purposes:
+1.  <strong>Standard Logging Integration</strong>: Provides a configured <cite>logging.Logger</cite> and</p>
+<blockquote>
+<div><p>adapter functions (<cite>log_success</cite>, <cite>log_warning</cite>) that route to standard logging channels.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Environment Injection</strong>: Implements a Proxy pattern for the Rich Console.
+This allows the output destination (stdout, file, or in-memory buffer) to be
+swapped at runtime via <cite>set_console</cite>. This is critical for WebAssembly (WASM)
+integration, where logs must be captured and returned to the browser context.</p></li>
+</ol>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="console.console">
+<span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">console</span></span><a class="headerlink" href="#console.console" title="Link to this definition">¶</a></dt>
+<dd><p>A global, stable reference to the active Rich Console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_ConsoleProxy</p>
+</dd>
+</dl>
+</dd></dl>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#console.console" title="console.console"><code class="xref py py-obj docutils literal notranslate"><span class="pre">console</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#console.SUCCESS_LEVEL_NUM" title="console.SUCCESS_LEVEL_NUM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SUCCESS_LEVEL_NUM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id0" title="console.console"><code class="xref py py-obj docutils literal notranslate"><span class="pre">console</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -515,22 +528,22 @@ HTTP strings or browser capture buffers without modifying business logic.</p>
 <td><p>Global helper to inject a specific console instance.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#console.reset_console" title="console.reset_console"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset_console</span></code></a>(→ None)</p></td>
-<td><p>Global helper to reset logging to standard output.</p></td>
+<td><p>Global helper to reset logging and console to standard output.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#console.get_console" title="console.get_console"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_console</span></code></a>(→ rich.console.Console)</p></td>
 <td><p>Retrieves the currently active console backend.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#console.log_info" title="console.log_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_info</span></code></a>(→ None)</p></td>
-<td><p>Prints an informational message (prefixed with ℹ️).</p></td>
+<td><p>Logs an informational message via standard logging.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#console.log_success" title="console.log_success"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_success</span></code></a>(→ None)</p></td>
-<td><p>Prints a success message (prefixed with ✅).</p></td>
+<td><p>Logs a success message via standard logging.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#console.log_warning" title="console.log_warning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_warning</span></code></a>(→ None)</p></td>
-<td><p>Prints a warning message (prefixed with ⚠️).</p></td>
+<td><p>Logs a warning message via standard logging.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#console.log_error" title="console.log_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_error</span></code></a>(→ None)</p></td>
-<td><p>Prints an error message (prefixed with ❌).</p></td>
+<td><p>Logs an error message via standard logging.</p></td>
 </tr>
 </tbody>
 </table>
@@ -538,14 +551,20 @@ HTTP strings or browser capture buffers without modifying business logic.</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py data">
-<dt class="sig sig-object py" id="console.console">
-<span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">console</span></span><a class="headerlink" href="#console.console" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="console.SUCCESS_LEVEL_NUM">
+<span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">SUCCESS_LEVEL_NUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">25</span></em><a class="headerlink" href="#console.SUCCESS_LEVEL_NUM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">console</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.set_console">
 <span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">set_console</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_console</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rich.console.Console</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#console.set_console" title="Link to this definition">¶</a></dt>
 <dd><p>Global helper to inject a specific console instance.</p>
-<p>Use this in Web/WASM contexts to redirect output to a capturing console.</p>
+<p>This updates both the <cite>console</cite> proxy object and the standard <cite>logging</cite>
+handlers to write to the new instance. Use this in Web/WASM contexts to
+redirect output to a capture buffer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>new_console</strong> (<em>Console</em>) – The configured Rich console to use globally.</p>
@@ -555,7 +574,7 @@ HTTP strings or browser capture buffers without modifying business logic.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.reset_console">
 <span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">reset_console</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#console.reset_console" title="Link to this definition">¶</a></dt>
-<dd><p>Global helper to reset logging to standard output.</p>
+<dd><p>Global helper to reset logging and console to standard output.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.get_console">
@@ -573,40 +592,40 @@ HTTP strings or browser capture buffers without modifying business logic.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.log_info">
 <span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">log_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#console.log_info" title="Link to this definition">¶</a></dt>
-<dd><p>Prints an informational message (prefixed with ℹ️).</p>
+<dd><p>Logs an informational message via standard logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The text content will be formatted with [info] style.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The message content. Can include rich markup like [bold].</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.log_success">
 <span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">log_success</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#console.log_success" title="Link to this definition">¶</a></dt>
-<dd><p>Prints a success message (prefixed with ✅).</p>
+<dd><p>Logs a success message via standard logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The text content will be formatted with [success] style.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The message content.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.log_warning">
 <span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">log_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#console.log_warning" title="Link to this definition">¶</a></dt>
-<dd><p>Prints a warning message (prefixed with ⚠️).</p>
+<dd><p>Logs a warning message via standard logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The text content will be formatted with [warning] style.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The message content.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="console.log_error">
 <span class="sig-prename descclassname"><span class="pre">console.</span></span><span class="sig-name descname"><span class="pre">log_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#console.log_error" title="Link to this definition">¶</a></dt>
-<dd><p>Prints an error message (prefixed with ❌).</p>
+<dd><p>Logs an error message via standard logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The text content will be formatted with [error] style.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<em>str</em>) – The message content.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -623,7 +642,7 @@ HTTP strings or browser capture buffers without modifying business logic.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../fuzzer/index.html" title="fuzzer"
+            <a href="../runner/index.html" title="runner"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -632,7 +651,7 @@ HTTP strings or browser capture buffers without modifying business logic.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> fuzzer </span>
+                      class="md-footer-nav__direction"> "Previous" </span> runner </span>
               </div>
             </a>
           

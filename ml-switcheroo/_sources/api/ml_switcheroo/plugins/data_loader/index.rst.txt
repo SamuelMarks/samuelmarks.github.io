@@ -10,9 +10,12 @@ ml_switcheroo.plugins.data_loader
    Handles the mapping of `torch.utils.data.DataLoader` to:
    1. `GenericDataLoader` shim (for JAX/NumPy).
    2. Native `torch.utils.data.DataLoader` (Pass-through for Torch).
-   3. `tf.data.Dataset` (Future implementation for TF).
 
-   It leverages `frameworks.common.data` to fetch the shim implementation when needed.
+   Implementation Details:
+   - Filters arguments to ensure compatibility with the Generic Shim.
+   - Explicitly handles `num_workers`, `pin_memory`, and `drop_last` by mapping
+     names and passing them (since the Shim now accepts them as optional kwargs).
+   - Injects the Shim class definition at the top of the file on first use.
 
 
 
@@ -38,5 +41,7 @@ Module Contents
    Strategy:
        - If Target == Torch: Keep as is.
        - If Target != Torch: Inject Shim logic and rewrite to `GenericDataLoader`.
+       - Maps performance args (`num_workers`, `pin_memory`) to the shim signatures
+         where they are safely ignored.
 
 

@@ -401,8 +401,6 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassStructureMixin</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin._known_module_bases" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassStructureMixin._known_module_bases</span></code></a>
-        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin.visit_ClassDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassStructureMixin.visit_ClassDef()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin.leave_ClassDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassStructureMixin.leave_ClassDef()</span></code></a>
@@ -430,20 +428,14 @@
   <section id="module-ml_switcheroo.core.rewriter.structure_class">
 <span id="ml-switcheroo-core-rewriter-structure-class"></span><h1 id="api-ml-switcheroo-core-rewriter-structure-class-index--page-root">ml_switcheroo.core.rewriter.structure_class<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-structure-class-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Class Structure Rewriting Logic.</p>
-<p>Handles transformations relative to class definitions, specifically:
-1.  Inheritance Warping: Swapping base classes (e.g. <cite>torch.nn.Module</cite> -&gt; <cite>flax.nnx.Module</cite>).
-2.  Context Tracking: Setting flags for nested methods (neural vs generic).</p>
-<dl class="simple">
-<dt>Refactor Note:</dt><dd><p>Logic is now fully dynamic. It queries the SemanticsManager for registered
-framework traits to identify module bases, rather than using hardcoded literals.</p>
-</dd>
-</dl>
+<p>Handles transformation of Class Definitions.
+Logic 1: Swaps Module Base (e.g. <cite>torch.nn.Module</cite> -&gt; <cite>flax.nnx.Module</cite>).</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin" title="ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClassStructureMixin</span></code></a></p></td>
-<td><p>Mixin for transforming ClassDef nodes.</p></td>
+<td><p>Mixin for transforming ClassDef nodes (Logic 1).</p></td>
 </tr>
 </tbody>
 </table>
@@ -454,27 +446,17 @@ framework traits to identify module bases, rather than using hardcoded literals.
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.structure_class.</span></span><span class="sig-name descname"><span class="pre">ClassStructureMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
-<p>Mixin for transforming ClassDef nodes.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin._known_module_bases">
-<span class="sig-name descname"><span class="pre">_known_module_bases</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin._known_module_bases" title="Link to this definition">¶</a></dt>
-<dd><p>A cached set of fully qualified
-class names that act as Neural Module bases (e.g., ‘torch.nn.Module’).
-Populated based on registered adapters and JSON config.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[Set[str]]</p>
-</dd>
-</dl>
-</dd></dl>
+<p>Mixin for transforming ClassDef nodes (Logic 1).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin.visit_ClassDef">
 <span class="sig-name descname"><span class="pre">visit_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin.visit_ClassDef" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Detects if we are entering a generic ML Module class.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin.leave_ClassDef">
 <span class="sig-name descname"><span class="pre">leave_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.ClassDef</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin.leave_ClassDef" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Performs the Base Class Swap logic.</p>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

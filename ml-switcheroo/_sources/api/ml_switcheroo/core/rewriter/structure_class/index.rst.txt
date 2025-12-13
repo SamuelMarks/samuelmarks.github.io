@@ -7,13 +7,8 @@ ml_switcheroo.core.rewriter.structure_class
 
    Class Structure Rewriting Logic.
 
-   Handles transformations relative to class definitions, specifically:
-   1.  Inheritance Warping: Swapping base classes (e.g. `torch.nn.Module` -> `flax.nnx.Module`).
-   2.  Context Tracking: Setting flags for nested methods (neural vs generic).
-
-   Refactor Note:
-       Logic is now fully dynamic. It queries the SemanticsManager for registered
-       framework traits to identify module bases, rather than using hardcoded literals.
+   Handles transformation of Class Definitions.
+   Logic 1: Swaps Module Base (e.g. `torch.nn.Module` -> `flax.nnx.Module`).
 
 
 
@@ -33,20 +28,18 @@ Module Contents
    Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
 
-   Mixin for transforming ClassDef nodes.
-
-   .. attribute:: _known_module_bases
-
-      A cached set of fully qualified
-      class names that act as Neural Module bases (e.g., 'torch.nn.Module').
-      Populated based on registered adapters and JSON config.
-
-      :type: Optional[Set[str]]
+   Mixin for transforming ClassDef nodes (Logic 1).
 
 
    .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
 
+      Detects if we are entering a generic ML Module class.
+
+
 
    .. py:method:: leave_ClassDef(_original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
+
+      Performs the Base Class Swap logic.
+
 
 

@@ -13,10 +13,14 @@ ml_switcheroo.frameworks.common.data
    the DataLoader API.
 
    Capabilities handled by the Shim:
-   1. Batching (`batch_size`).
-   2. Shuffling (`shuffle`).
-   3. Dropping last batch (`drop_last`).
-   4. Dataset Protocol (supports any object implementing `__len__` and `__getitem__`).
+   1.  **Batching**: `batch_size`.
+   2.  **Shuffling**: `shuffle`.
+   3.  **Dropping Last**: `drop_last`.
+   4.  **Dataset Protocol**: Supports `__len__` and `__getitem__`.
+   5.  **Multi-Processing Stubs**: `num_workers`, `pin_memory`, `persistent_workers`
+       are accepted as no-ops to ensure compatibility with performance-tuned Torch code.
+
+   The Shim is designed to be a lightweight iterator yielding collated batches.
 
 
 
@@ -34,17 +38,19 @@ Module Contents
 
 .. py:function:: get_dataloader_semantics() -> Dict[str, Any]
 
-   Returns the Semantic Definition for the DataLoader to be injected into the Knowledge Base.
+   Returns the Semantic Definition for the DataLoader.
 
-   Updated Architecture compliance:
-   - Contains strictly **Abstract Standard** definitions (description, std_args).
-   - Implementation variants (API paths, plugins) are removed and must be
-     provided by the JSON snapshots (hub-and-spoke model).
+   Now includes performance arguments found in standard Torch examples.
+   These are mapped to the Shim, which handles them gracefully (usually ignoring them).
 
 
 .. py:function:: get_shim_code() -> str
 
    Returns the source code for the `GenericDataLoader` class.
    This code is injected into generated files by the `convert_dataloader` plugin.
+
+   Updates:
+   - Added `num_workers`, `pin_memory`, `persistent_workers` to __init__.
+   - Included `collate_fn` stub support.
 
 

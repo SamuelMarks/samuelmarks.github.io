@@ -1,0 +1,79 @@
+ml_switcheroo.semantics.merging
+===============================
+
+.. py:module:: ml_switcheroo.semantics.merging
+
+.. autoapi-nested-parse::
+
+   Merging Logic for Semantic Knowledge Base.
+
+   Handles:
+   - Merging Specification Tiers (Math, Neural, Extras).
+   - Merging Snapshot Overlays (Framework mappings).
+   - Conflict resolution and prioritization.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.semantics.merging.infer_tier_from_priority
+   ml_switcheroo.semantics.merging.merge_imports
+   ml_switcheroo.semantics.merging.merge_frameworks
+   ml_switcheroo.semantics.merging.merge_tier_data
+   ml_switcheroo.semantics.merging.merge_overlay_data
+
+
+Module Contents
+---------------
+
+.. py:function:: infer_tier_from_priority(priority: int) -> ml_switcheroo.enums.SemanticTier
+
+   Maps a loading priority integer to a Semantic Tier.
+
+   :param priority: Loading order (10=Math, 20=Neural, etc).
+   :type priority: int
+
+   :returns: The inferred tier enum.
+   :rtype: SemanticTier
+
+
+.. py:function:: merge_imports(master_import_data: Dict[str, Dict], new_imports: Dict[str, Any]) -> None
+
+   Merges new import definitions (from __imports__ block) into the master dictionary.
+   Updates in-place.
+
+
+.. py:function:: merge_frameworks(master_configs: Dict[str, Dict], new_configs: Dict[str, Any]) -> None
+
+   Merges new framework configurations (from __frameworks__ block) into the master.
+   Updates in-place.
+
+
+.. py:function:: merge_tier_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], new_content: Dict[str, Any], tier: ml_switcheroo.enums.SemanticTier) -> None
+
+   Merges content from a Specification file (hub) into the manager state.
+
+   :param data: Master dictionary of operations.
+   :param key_origins: Dict tracking where an op was defined (Math vs Neural).
+   :param import_data: Master dictionary of import mappings.
+   :param framework_configs: Master dictionary of framework traits.
+   :param new_content: The JSON content being loaded.
+   :param tier: The Semantic Tier of the file being loaded.
+
+
+.. py:function:: merge_overlay_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], test_templates: Dict[str, Dict], content: Dict[str, Any], filename: str) -> None
+
+   Merges a mapping overlay file (snapshot) into the main data.
+
+   :param data: Master dictionary of operations.
+   :param key_origins: Dict tracking tier origins.
+   :param import_data: Master dictionary of import mappings.
+   :param framework_configs: Master dictionary of framework traits.
+   :param test_templates: Master dictionary of testing templates.
+   :param content: The JSON content of the snapshot file.
+   :param filename: Filename for metadata inference if needed.
+
+

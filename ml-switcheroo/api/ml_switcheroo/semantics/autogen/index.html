@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=ee4d8b22"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.semantics.manager" href="../manager/index.html" />
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -295,7 +295,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../adapters/index.html" class="md-nav__link">adapters</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -303,13 +303,6 @@
     
     
       <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -352,13 +345,6 @@
     
     
       <a href="../../../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../registry_sync/index.html" class="md-nav__link">registry_sync</a>
       
     
     </li>
@@ -438,24 +424,33 @@
             
   <section id="module-ml_switcheroo.semantics.autogen">
 <span id="ml-switcheroo-semantics-autogen"></span><h1 id="api-ml-switcheroo-semantics-autogen-index--page-root">ml_switcheroo.semantics.autogen<a class="headerlink" href="#api-ml-switcheroo-semantics-autogen-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Semantic Autogen: The Persistence Layer.</p>
+<p>Semantic Autogen: The Distributed Persistence Layer.</p>
 <p>This module is responsible for finalizing “Candidate Standards” proposed by the
-Consensus Engine into the JSON Semantic Knowledge Base.</p>
-<p>It implements a “Do Not Harm” policy:
-- If a standard already exists in the file (implying manual curation or previous sync),</p>
+Consensus Engine into the Distributed Knowledge Base.</p>
+<p>It implements the <strong>Hub-and-Spoke</strong> write strategy:
+1.  <strong>Hub (Specs)</strong>: Writes Abstract Definitions (<cite>std_args</cite>, <cite>description</cite>)</p>
 <blockquote>
-<div><p>it is skipped to prevent overwriting high-quality manual edits with automated guesses.</p>
+<div><p>to the target spec file in <cite>semantics/</cite>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Spokes (Snapshots)</strong>: Writes Implementation Details (<cite>api</cite>, <cite>args</cite>)
+to <cite>snapshots/{framework}_vlatest_map.json</cite>.</p></li>
+</ol>
+<p>Policy:
+- <strong>Do Not Harm</strong>: Existing keys in Specs or Snapshots (implying manual curation)</p>
+<blockquote>
+<div><p>are skipped to prevent overwriting high-quality manual edits.</p>
 </div></blockquote>
 <ul class="simple">
-<li><p>New discoveries are strictly additive.</p></li>
-<li><p>Supports atomic rewrites of the JSON database.</p></li>
+<li><p><strong>Additive</strong>: New discoveries are added.</p></li>
+<li><p><strong>Atomic</strong>: Writes are performed per-file using standard JSON serialization.</p></li>
 </ul>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.autogen.SemanticPersister" title="ml_switcheroo.semantics.autogen.SemanticPersister"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SemanticPersister</span></code></a></p></td>
-<td><p>Handles serialization of Discovered Standards to disk.</p></td>
+<td><p>Handles serialization of Discovered Standards to disk using Hub-and-Spoke architecture.</p></td>
 </tr>
 </tbody>
 </table>
@@ -465,18 +460,17 @@ Consensus Engine into the JSON Semantic Knowledge Base.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.autogen.SemanticPersister">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.autogen.</span></span><span class="sig-name descname"><span class="pre">SemanticPersister</span></span><a class="headerlink" href="#ml_switcheroo.semantics.autogen.SemanticPersister" title="Link to this definition">¶</a></dt>
-<dd><p>Handles serialization of Discovered Standards to disk.</p>
-<p>Transforms internal CandidateStandard objects into the Switcheroo Semantic Schema
-and merges them safely into existing definition files.</p>
+<dd><p>Handles serialization of Discovered Standards to disk using Hub-and-Spoke architecture.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.autogen.SemanticPersister.persist">
-<span class="sig-name descname"><span class="pre">persist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../discovery/consensus/index.html#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard"><span class="pre">ml_switcheroo.discovery.consensus.CandidateStandard</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.autogen.SemanticPersister.persist" title="Link to this definition">¶</a></dt>
-<dd><p>Merges discovered candidates into the target JSON file and saves it.</p>
+<span class="sig-name descname"><span class="pre">persist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../discovery/consensus/index.html#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard"><span class="pre">ml_switcheroo.discovery.consensus.CandidateStandard</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_spec_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.autogen.SemanticPersister.persist" title="Link to this definition">¶</a></dt>
+<dd><p>Splits and persists candidates into Specifications (Hub) and Snapshots (Spokes).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>candidates</strong> – List of aligned CandidateStandard objects.</p></li>
-<li><p><strong>target_file</strong> – Path to the JSON semantic file (e.g. k_framework_extras.json).</p></li>
+<li><p><strong>target_spec_file</strong> – Path to the JSON semantic spec file (Hub) to update/create.
+(e.g., <cite>semantics/k_framework_extras.json</cite>)</p></li>
 </ul>
 </dd>
 </dl>

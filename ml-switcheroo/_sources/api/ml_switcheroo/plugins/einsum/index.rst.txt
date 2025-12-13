@@ -8,10 +8,15 @@ ml_switcheroo.plugins.einsum
    Plugin for normalizing Einsum calls.
 
    Standardizes `einsum` arguments so the equation string is always the first argument.
-   This is required because JAX enforces `einsum(equation, *operands)`, whereas
-   PyTorch historically allowed `einsum(operand, operand, equation)`.
+   JAX strictly enforces `einsum(equation, *operands)`, whereas other frameworks (like older
+   PyTorch versions or specific utility wrappers) might allow flexible ordering like
+   `einsum(operand, operand, equation)`.
 
-   This plugin handles both the argument shuffling AND the API renaming.
+   This plugin handles:
+   1.  **Equation Identification**: Scans arguments to find the string literal (the equation).
+   2.  **Reordering**: Moves the equation to the 0th position if it isn't already there.
+   3.  **API Renaming**: Updates the function call to the target framework's API (e.g., `jax.numpy.einsum`).
+   4.  **Syntax Cleaning**: Essential comma management when shuffling argument order in the AST.
 
 
 
@@ -31,10 +36,14 @@ Module Contents
    Plugin Hook: Rotates arguments to place the equation string first and renames function.
 
    Triggers:
-       Operations mapping to `einsum` with `requires_plugin: "einsum_normalizer"`.
+       Operations mapping to `Einsum` with `requires_plugin: "einsum_normalizer"`.
+
+   Transformation:
+       Input:  `torch.einsum(x, y, "ij,jk->ik")`
+       Output: `jax.numpy.einsum("ij,jk->ik", x, y)`
 
    :param node: The original CST Call node.
-   :param ctx: HookContext.
+   :param ctx: HookContext for looking up the target API.
 
    :returns: The transformed CST Call node.
 

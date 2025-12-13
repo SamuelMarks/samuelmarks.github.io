@@ -62,11 +62,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=e840530c"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=ee4d8b22"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.method_property" href="../method_property/index.html" />
-    <link rel="prev" title="ml_switcheroo.plugins.io_handler" href="../io_handler/index.html" />
+    <link rel="prev" title="ml_switcheroo.plugins.lifecycle_flags" href="../lifecycle_flags/index.html" />
   
    
 
@@ -267,14 +267,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
+      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
+      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
       
     
     </li>
@@ -295,7 +295,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../adapters/index.html" class="md-nav__link">adapters</a>
+      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -303,13 +303,6 @@
     
     
       <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
       
     
     </li>
@@ -352,13 +345,6 @@
     
     
       <a href="../../../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../registry_sync/index.html" class="md-nav__link">registry_sync</a>
       
     
     </li>
@@ -435,23 +421,29 @@
   <section id="module-ml_switcheroo.plugins.loop_unroll">
 <span id="ml-switcheroo-plugins-loop-unroll"></span><h1 id="api-ml-switcheroo-plugins-loop-unroll-index--page-root">ml_switcheroo.plugins.loop_unroll<a class="headerlink" href="#api-ml-switcheroo-plugins-loop-unroll-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for Unrolling Loops (JAX Scan/Fori_loop).</p>
-<p>Detects Python <cite>for</cite> loops and attempts to map them to JAX control flow primitives
-when the target framework is JAX.</p>
-<p>Supported Patterns:
-1. <cite>for i in range(args)</cite> -&gt; <cite>jax.lax.fori_loop(start, stop, body_fun, init_val)</cite></p>
+<p>This module handles the structural transformation of Python control flow into
+JAX-compatible primitives. Unlike PyTorch, which supports imperative Python loops,
+JAX requires loops to be expressed as functional operators (<cite>jax.lax.scan</cite> or <cite>jax.lax.fori_loop</cite>)
+to enable XLA compilation (JIT).</p>
+<p>Logic:
+1.  <strong>Analysis</strong>: Inspects <cite>for</cite> loops to determine if they iterate over a <cite>range</cite> (candidates for <cite>fori_loop</cite>)</p>
 <blockquote>
-<div><p><em>Limitations</em>: Requires heuristic detection of ‘carry’ variable (state).
-If heuristics fail, applies an Escape Hatch warning suggesting manual fix.</p>
+<div><p>or an iterable (candidates for <cite>scan</cite>).</p>
 </div></blockquote>
 <ol class="arabic simple" start="2">
-<li><p>Pass-through for non-JAX targets.</p></li>
+<li><p><strong>Safety Check</strong>: Because automated loop conversion requires solving the “Carry State” problem
+(identifying which variables are mutated across iterations), this plugin currently defaults to a
+<strong>Safety-First</strong> strategy.</p></li>
+<li><p><strong>Transformation</strong>: Instead of hallucinating broken JAX code, it wraps the loop in an <cite>EscapeHatch</cite>.
+This preserves the original logic while explicitly flagging it as a blocker for JIT compliance,
+guiding the user to manually refactor it into a functional pattern.</p></li>
 </ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="ml_switcheroo.plugins.loop_unroll.transform_loops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_loops</span></code></a>(→ libcst.CSTNode)</p></td>
-<td><p>Plugin Hook: Transforms <cite>for</cite> loops into JAX primitives if applicable.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="ml_switcheroo.plugins.loop_unroll.transform_loops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_loops</span></code></a>(→ Union[libcst.For, ...)</p></td>
+<td><p>Plugin Hook: Transforms <cite>for</cite> loops for JAX compliance.</p></td>
 </tr>
 </tbody>
 </table>
@@ -460,17 +452,34 @@ If heuristics fail, applies an Escape Hatch warning suggesting manual fix.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.loop_unroll.transform_loops">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loop_unroll.</span></span><span class="sig-name descname"><span class="pre">transform_loops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="Link to this definition">¶</a></dt>
-<dd><p>Plugin Hook: Transforms <cite>for</cite> loops into JAX primitives if applicable.</p>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loop_unroll.</span></span><span class="sig-name descname"><span class="pre">transform_loops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="Link to this definition">¶</a></dt>
+<dd><p>Plugin Hook: Transforms <cite>for</cite> loops for JAX compliance.</p>
+<p>Triggered by the <cite>ControlFlowMixin</cite> when visiting <cite>For</cite> nodes.</p>
+<dl class="simple">
+<dt>Strategy:</dt><dd><ul class="simple">
+<li><p>If Target != JAX: Pass through (Python loops are valid in Torch/TF Eager).</p></li>
+<li><dl class="simple">
+<dt>If Target == JAX:</dt><dd><ul>
+<li><p>Analyze the iterator.</p></li>
+<li><p>If <cite>range()</cite>: Flag as candidates for <cite>jax.lax.fori_loop</cite>.</p></li>
+<li><p>Else: Flag as candidates for <cite>jax.lax.scan</cite>.</p></li>
+<li><p>Wrap in <cite>EscapeHatch</cite> to prevent compilation errors in JAX/XLA.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – The CST For loop node.</p></li>
-<li><p><strong>ctx</strong> – Hook context.</p></li>
+<li><p><strong>node</strong> – The original CST For loop node.</p></li>
+<li><p><strong>ctx</strong> – Hook context containing framework targets.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Transformed node or original wrapped in EscapeHatch if unsafe to convert.</p>
+<dd class="field-even"><p>The transformed node or an EscapeHatch sentinel.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -487,7 +496,7 @@ If heuristics fail, applies an Escape Hatch warning suggesting manual fix.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../io_handler/index.html" title="ml_switcheroo.plugins.io_handler"
+            <a href="../lifecycle_flags/index.html" title="ml_switcheroo.plugins.lifecycle_flags"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -496,7 +505,7 @@ If heuristics fail, applies an Escape Hatch warning suggesting manual fix.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.plugins.io_handler </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.plugins.lifecycle_flags </span>
               </div>
             </a>
           

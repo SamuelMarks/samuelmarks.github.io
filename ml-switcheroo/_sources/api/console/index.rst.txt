@@ -7,14 +7,22 @@ console
 
    Central Logging and Console Utilities.
 
-   This module provides a singleton interface to `rich.console.Console` configured
-   for the ml-switcheroo theme. It replaces standard print statements across
-   the application to ensure consistent, colored output.
+   This module unifies the application's output mechanism using the Python standard
+   `logging` library, backed by `rich` for formatting.
 
-   It implements a Proxy pattern to allow the underlying Console instance to be
-   swapped (injected) at runtime. This "Injectable Console" architecture is crucial
-   for Web and WASM integration, allowing the application to redirect logs to
-   HTTP strings or browser capture buffers without modifying business logic.
+   It serves two primary purposes:
+   1.  **Standard Logging Integration**: Provides a configured `logging.Logger` and
+       adapter functions (`log_success`, `log_warning`) that route to standard logging channels.
+   2.  **Environment Injection**: Implements a Proxy pattern for the Rich Console.
+       This allows the output destination (stdout, file, or in-memory buffer) to be
+       swapped at runtime via `set_console`. This is critical for WebAssembly (WASM)
+       integration, where logs must be captured and returned to the browser context.
+
+   .. attribute:: console
+
+      A global, stable reference to the active Rich Console.
+
+      :type: _ConsoleProxy
 
 
 
@@ -23,6 +31,7 @@ Attributes
 
 .. autoapisummary::
 
+   console.SUCCESS_LEVEL_NUM
    console.console
 
 
@@ -43,13 +52,19 @@ Functions
 Module Contents
 ---------------
 
+.. py:data:: SUCCESS_LEVEL_NUM
+   :value: 25
+
+
 .. py:data:: console
 
 .. py:function:: set_console(new_console: rich.console.Console) -> None
 
    Global helper to inject a specific console instance.
 
-   Use this in Web/WASM contexts to redirect output to a capturing console.
+   This updates both the `console` proxy object and the standard `logging`
+   handlers to write to the new instance. Use this in Web/WASM contexts to
+   redirect output to a capture buffer.
 
    :param new_console: The configured Rich console to use globally.
    :type new_console: Console
@@ -57,7 +72,7 @@ Module Contents
 
 .. py:function:: reset_console() -> None
 
-   Global helper to reset logging to standard output.
+   Global helper to reset logging and console to standard output.
 
 
 .. py:function:: get_console() -> rich.console.Console
@@ -70,33 +85,33 @@ Module Contents
 
 .. py:function:: log_info(msg: str) -> None
 
-   Prints an informational message (prefixed with ℹ️).
+   Logs an informational message via standard logging.
 
-   :param msg: The text content will be formatted with [info] style.
+   :param msg: The message content. Can include rich markup like [bold].
    :type msg: str
 
 
 .. py:function:: log_success(msg: str) -> None
 
-   Prints a success message (prefixed with ✅).
+   Logs a success message via standard logging.
 
-   :param msg: The text content will be formatted with [success] style.
+   :param msg: The message content.
    :type msg: str
 
 
 .. py:function:: log_warning(msg: str) -> None
 
-   Prints a warning message (prefixed with ⚠️).
+   Logs a warning message via standard logging.
 
-   :param msg: The text content will be formatted with [warning] style.
+   :param msg: The message content.
    :type msg: str
 
 
 .. py:function:: log_error(msg: str) -> None
 
-   Prints an error message (prefixed with ❌).
+   Logs an error message via standard logging.
 
-   :param msg: The text content will be formatted with [error] style.
+   :param msg: The message content.
    :type msg: str
 
 

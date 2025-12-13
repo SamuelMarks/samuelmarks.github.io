@@ -5,16 +5,22 @@ ml_switcheroo.semantics.autogen
 
 .. autoapi-nested-parse::
 
-   Semantic Autogen: The Persistence Layer.
+   Semantic Autogen: The Distributed Persistence Layer.
 
    This module is responsible for finalizing "Candidate Standards" proposed by the
-   Consensus Engine into the JSON Semantic Knowledge Base.
+   Consensus Engine into the Distributed Knowledge Base.
 
-   It implements a "Do Not Harm" policy:
-   - If a standard already exists in the file (implying manual curation or previous sync),
-     it is skipped to prevent overwriting high-quality manual edits with automated guesses.
-   - New discoveries are strictly additive.
-   - Supports atomic rewrites of the JSON database.
+   It implements the **Hub-and-Spoke** write strategy:
+   1.  **Hub (Specs)**: Writes Abstract Definitions (`std_args`, `description`)
+       to the target spec file in `semantics/`.
+   2.  **Spokes (Snapshots)**: Writes Implementation Details (`api`, `args`)
+       to `snapshots/{framework}_vlatest_map.json`.
+
+   Policy:
+   - **Do Not Harm**: Existing keys in Specs or Snapshots (implying manual curation)
+     are skipped to prevent overwriting high-quality manual edits.
+   - **Additive**: New discoveries are added.
+   - **Atomic**: Writes are performed per-file using standard JSON serialization.
 
 
 
@@ -31,18 +37,16 @@ Module Contents
 
 .. py:class:: SemanticPersister
 
-   Handles serialization of Discovered Standards to disk.
-
-   Transforms internal CandidateStandard objects into the Switcheroo Semantic Schema
-   and merges them safely into existing definition files.
+   Handles serialization of Discovered Standards to disk using Hub-and-Spoke architecture.
 
 
-   .. py:method:: persist(candidates: List[ml_switcheroo.discovery.consensus.CandidateStandard], target_file: pathlib.Path) -> None
+   .. py:method:: persist(candidates: List[ml_switcheroo.discovery.consensus.CandidateStandard], target_spec_file: pathlib.Path) -> None
 
-      Merges discovered candidates into the target JSON file and saves it.
+      Splits and persists candidates into Specifications (Hub) and Snapshots (Spokes).
 
       :param candidates: List of aligned CandidateStandard objects.
-      :param target_file: Path to the JSON semantic file (e.g. k_framework_extras.json).
+      :param target_spec_file: Path to the JSON semantic spec file (Hub) to update/create.
+                               (e.g., `semantics/k_framework_extras.json`)
 
 
 

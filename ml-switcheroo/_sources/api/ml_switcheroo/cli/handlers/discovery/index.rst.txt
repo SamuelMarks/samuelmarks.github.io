@@ -1,0 +1,135 @@
+ml_switcheroo.cli.handlers.discovery
+====================================
+
+.. py:module:: ml_switcheroo.cli.handlers.discovery
+
+.. autoapi-nested-parse::
+
+   Discovery Command Handlers.
+
+   This module implements the CLI logic for populating the Semantic Knowledge Base.
+   It handles:
+   1.  **Ingestion**: Importing external standards (ONNX, Array API) and Internal Golden Sets.
+   2.  **Syncing**: Linking abstract operations to installed framework implementations.
+   3.  **Discovery**: Scaffolding new frameworks and harvesting manual overrides.
+   4.  **Wiring**: Applying hardcoded adapter logic (plugins, templates) during sync.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.cli.handlers.discovery.handle_wizard
+   ml_switcheroo.cli.handlers.discovery.handle_harvest
+   ml_switcheroo.cli.handlers.discovery.handle_snapshot
+   ml_switcheroo.cli.handlers.discovery.handle_scaffold
+   ml_switcheroo.cli.handlers.discovery.handle_import_spec
+   ml_switcheroo.cli.handlers.discovery.handle_sync
+   ml_switcheroo.cli.handlers.discovery.handle_sync_standards
+
+
+Module Contents
+---------------
+
+.. py:function:: handle_wizard(package: str) -> int
+
+   Handles the 'wizard' command for interactive mapping discovery.
+
+   :param package: The name of the python package to inspect (e.g., 'torch').
+
+   :returns: Exit code (0 for success).
+   :rtype: int
+
+
+.. py:function:: handle_harvest(path: pathlib.Path, target: str, dry_run: bool) -> int
+
+   Handles the 'harvest' command to learn mappings from manual tests.
+
+   :param path: File or directory containing python test files.
+   :param target: The framework target used in the tests (e.g., 'jax').
+   :param dry_run: If True, prints changes without writing to disk.
+
+   :returns: Exit code (0 for success, 1 for path errors).
+   :rtype: int
+
+
+.. py:function:: handle_snapshot(out_dir: Optional[pathlib.Path]) -> int
+
+   Handles the 'snapshot' command.
+
+   Scans installed frameworks and dumps their API signatures to JSON files.
+   These snapshots allow the engine to operate in "Ghost Mode" (e.g., in WebAssembly)
+   without requiring the heavy frameworks to be installed.
+
+   :param out_dir: Optional custom output directory. Defaults to package/snapshots.
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_scaffold(frameworks: list[str], out_dir: pathlib.Path) -> int
+
+   Handles the 'scaffold' command.
+
+   Automatically generates mapping skeletons based on fuzzy matching between
+   framework APIs and the semantic spec rules.
+
+   :param frameworks: List of framework names to scaffold.
+   :param out_dir: The root directory for generating the knowledge base.
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_import_spec(target: pathlib.Path) -> int
+
+   Handles the 'import-spec' command.
+
+   Parses upstream standards documentation or stubs and merges the definitions
+   into the local semantics Hub.
+
+   Supported Targets:
+   1. 'internal': Loads the Internal Golden Sets for Optimizers/Vision/State.
+   2. '*.md': Parses ONNX Markdown specifications.
+   3. Directory: Parses Python Array API stub files.
+
+   :param target: The file, directory, or keyword to import.
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_sync(framework: str) -> int
+
+   Handles the 'sync' command.
+
+   Links the Abstract Standards (Hub) to the concrete implementation in a
+   specific framework. This process involves:
+   1.  Reading the Specs from `semantics/`.
+   2.  Introspecting the installed framework to find matching APIs.
+   3.  Applying Adapter-specific manual wiring (plugins, templates).
+   4.  Writing the results to the Snapshot Overlay (`snapshots/{fw}_mappings.json`).
+
+   :param framework: The framework key to sync (e.g. 'torch', 'jax').
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_sync_standards(categories: List[str], frameworks: Optional[List[str]], dry_run: bool) -> int
+
+   Handles 'sync-standards' command.
+
+   Invokes the Consensus Engine to automatically discover new Abstract Operations
+   by finding commonalities across multiple framework API surfaces.
+
+   :param categories: List of API categories to scan (e.g. 'loss', 'layer').
+   :param frameworks: List of frameworks to use for consensus (default: all).
+   :param dry_run: If True, prints candidates without saving.
+
+   :returns: Exit code.
+   :rtype: int
+
+

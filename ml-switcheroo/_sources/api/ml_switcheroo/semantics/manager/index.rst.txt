@@ -11,22 +11,10 @@ ml_switcheroo.semantics.manager
    specification files (JSONs) into a unified Knowledge Graph.
 
    It implements a "Hub-and-Spoke" loading strategy:
-   1.  **Hub (Specs)**: Loads Abstract Operation definitions from `semantics/*.json`
-       (e.g., `k_array_api.json`). These define the "Standard" (args, description).
+   1.  **Hub (Specs)**: Loads Abstract Operation definitions from `semantics/*.json`.
    2.  **Spokes (Overlays)**: Scans `snapshots/*_mappings.json` to inject
-       framework-specific implementation details (variants) into the abstract definitions.
+       framework-specific implementation details (variants).
 
-   This separation allows the Specs to remain stable while Framework implementations
-   evolve rapidly in the snapshots directory.
-
-
-
-Attributes
-----------
-
-.. autoapisummary::
-
-   ml_switcheroo.semantics.manager.files
 
 
 Classes
@@ -37,36 +25,8 @@ Classes
    ml_switcheroo.semantics.manager.SemanticsManager
 
 
-Functions
----------
-
-.. autoapisummary::
-
-   ml_switcheroo.semantics.manager.resolve_semantics_dir
-   ml_switcheroo.semantics.manager.resolve_snapshots_dir
-
-
 Module Contents
 ---------------
-
-.. py:data:: files
-   :value: None
-
-
-.. py:function:: resolve_semantics_dir() -> pathlib.Path
-
-   Locates the directory containing semantic JSON definitions.
-
-   Prioritizes the local file system (relative to this file) to ensure
-   tests and editable installs find the source of truth correctly.
-   Falls back to package resources for installed distributions.
-
-
-.. py:function:: resolve_snapshots_dir() -> pathlib.Path
-
-   Locates the directory containing framework snapshots and mapping overlays.
-   Defaults to the sibling 'snapshots' directory relative to 'semantics'.
-
 
 .. py:class:: SemanticsManager
 
@@ -103,9 +63,6 @@ Module Contents
    .. py:method:: resolve_variant(abstract_id: str, target_fw: str) -> Optional[Dict[str, Any]]
 
       Resolves the variant definition for a given target framework, traversing inheritance.
-      Priority:
-      1. JSON-Defined Inheritance (`__frameworks__` config).
-      2. Code-Defined Inheritance (`FrameworkAdapter.inherits_from`).
 
 
 

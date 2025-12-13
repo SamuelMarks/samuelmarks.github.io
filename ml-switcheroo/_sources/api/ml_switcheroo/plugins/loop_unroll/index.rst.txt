@@ -7,15 +7,20 @@ ml_switcheroo.plugins.loop_unroll
 
    Plugin for Unrolling Loops (JAX Scan/Fori_loop).
 
-   Detects Python `for` loops and attempts to map them to JAX control flow primitives
-   when the target framework is JAX.
+   This module handles the structural transformation of Python control flow into
+   JAX-compatible primitives. Unlike PyTorch, which supports imperative Python loops,
+   JAX requires loops to be expressed as functional operators (`jax.lax.scan` or `jax.lax.fori_loop`)
+   to enable XLA compilation (JIT).
 
-   Supported Patterns:
-   1. `for i in range(args)` -> `jax.lax.fori_loop(start, stop, body_fun, init_val)`
-      *Limitations*: Requires heuristic detection of 'carry' variable (state).
-      If heuristics fail, applies an Escape Hatch warning suggesting manual fix.
-
-   2. Pass-through for non-JAX targets.
+   Logic:
+   1.  **Analysis**: Inspects `for` loops to determine if they iterate over a `range` (candidates for `fori_loop`)
+       or an iterable (candidates for `scan`).
+   2.  **Safety Check**: Because automated loop conversion requires solving the "Carry State" problem
+       (identifying which variables are mutated across iterations), this plugin currently defaults to a
+       **Safety-First** strategy.
+   3.  **Transformation**: Instead of hallucinating broken JAX code, it wraps the loop in an `EscapeHatch`.
+       This preserves the original logic while explicitly flagging it as a blocker for JIT compliance,
+       guiding the user to manually refactor it into a functional pattern.
 
 
 
@@ -30,13 +35,23 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: transform_loops(node: libcst.For, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
+.. py:function:: transform_loops(node: libcst.For, ctx: ml_switcheroo.core.hooks.HookContext) -> Union[libcst.For, libcst.FlattenSentinel]
 
-   Plugin Hook: Transforms `for` loops into JAX primitives if applicable.
+   Plugin Hook: Transforms `for` loops for JAX compliance.
 
-   :param node: The CST For loop node.
-   :param ctx: Hook context.
+   Triggered by the `ControlFlowMixin` when visiting `For` nodes.
 
-   :returns: Transformed node or original wrapped in EscapeHatch if unsafe to convert.
+   Strategy:
+       - If Target != JAX: Pass through (Python loops are valid in Torch/TF Eager).
+       - If Target == JAX:
+           - Analyze the iterator.
+           - If `range()`: Flag as candidates for `jax.lax.fori_loop`.
+           - Else: Flag as candidates for `jax.lax.scan`.
+           - Wrap in `EscapeHatch` to prevent compilation errors in JAX/XLA.
+
+   :param node: The original CST For loop node.
+   :param ctx: Hook context containing framework targets.
+
+   :returns: The transformed node or an EscapeHatch sentinel.
 
 

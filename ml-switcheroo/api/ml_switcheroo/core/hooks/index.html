@@ -260,119 +260,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../purity/index.html" class="md-nav__link">purity</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../fuzzer/index.html" class="md-nav__link">fuzzer</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../runner/index.html" class="md-nav__link">runner</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../console/index.html" class="md-nav__link">console</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../doc_gen/index.html" class="md-nav__link">doc_gen</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../node_diff/index.html" class="md-nav__link">node_diff</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../lifecycle/index.html" class="md-nav__link">lifecycle</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../generator/index.html" class="md-nav__link">generator</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../onnx_reader/index.html" class="md-nav__link">onnx_reader</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../dependencies/index.html" class="md-nav__link">dependencies</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../batch_runner/index.html" class="md-nav__link">batch_runner</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
       <a href="../../index.html" class="md-nav__link">ml_switcheroo</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../readme_editor/index.html" class="md-nav__link">readme_editor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../code_extractor/index.html" class="md-nav__link">code_extractor</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../array_api_reader/index.html" class="md-nav__link">array_api_reader</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../harness_generator/index.html" class="md-nav__link">harness_generator</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../harness_generator_template/index.html" class="md-nav__link">harness_generator_template</a>
       
     
     </li></ul>
@@ -394,6 +282,10 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-ml-switcheroo-core-hooks-index--page-root" class="md-nav__link">ml_switcheroo.core.hooks</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#how-to-write-a-plugin" class="md-nav__link">How to write a Plugin</a>
+        </li>
+        <li class="md-nav__item"><a href="#usage" class="md-nav__link">Usage</a>
+        </li>
         <li class="md-nav__item"><a href="#attributes" class="md-nav__link">Attributes</a>
         </li>
         <li class="md-nav__item"><a href="#classes" class="md-nav__link">Classes</a>
@@ -419,16 +311,6 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.target_fw" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.target_fw</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.metadata" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.metadata</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext._runtime_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext._runtime_config</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.semantics</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#id9" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.source_fw</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#id10" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.target_fw</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#id11" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.metadata</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.inject_signature_arg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.inject_signature_arg()</span></code></a>
         </li>
@@ -480,19 +362,21 @@
 <p>This module provides the infrastructure for extending ml-switcheroo via plugins.
 It enables developers to intercept and modify the Abstract Syntax Tree (AST)
 during the conversion process using a hook-based system.</p>
-<p>## How to write a Plugin</p>
-<p>A plugin is a simple Python function decorated with <cite>@register_hook</cite>. It receives
-the current AST node (typically <cite>cst.Call</cite>, but can be others like <cite>cst.For</cite>)
+<section id="how-to-write-a-plugin">
+<h2 id="how-to-write-a-plugin">How to write a Plugin<a class="headerlink" href="#how-to-write-a-plugin" title="Link to this heading">¶</a></h2>
+<p>A plugin is a simple Python function decorated with <code class="docutils literal notranslate"><span class="pre">@register_hook</span></code>. It receives
+the current AST node (typically <code class="docutils literal notranslate"><span class="pre">cst.Call</span></code>, but can be others like <code class="docutils literal notranslate"><span class="pre">cst.For</span></code>)
 and a context object.</p>
-<p>### Usage</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
-@register_hook(“my_custom_trigger”)
-def transform_node(node: cst.CSTNode, ctx: HookContext) -&gt; cst.CSTNode:</p>
-<blockquote>
-<div><p># Logic
-return node</p>
-</div></blockquote>
-<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</section>
+<section id="usage">
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_hook</span><span class="p">(</span><span class="s2">"my_custom_trigger"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_node</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">:</span>
+    <span class="c1"># Logic</span>
+    <span class="k">return</span> <span class="n">node</span>
+</pre></div>
+</div>
+</section>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -571,68 +455,18 @@ to specific injection points (signature args, function body preambles).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.semantics">
 <span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.semantics" title="Link to this definition">¶</a></dt>
-<dd><p>The active knowledge base manager.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager">SemanticsManager</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.source_fw">
 <span class="sig-name descname"><span class="pre">source_fw</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.source_fw" title="Link to this definition">¶</a></dt>
-<dd><p>The import name of the source framework (e.g., ‘torch’).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.target_fw">
 <span class="sig-name descname"><span class="pre">target_fw</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.target_fw" title="Link to this definition">¶</a></dt>
-<dd><p>The import name of the target framework (e.g., ‘jax’).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.metadata" title="Link to this definition">¶</a></dt>
-<dd><p>A shared dictionary for plugins to store state.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[str, Any]</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext._runtime_config">
-<span class="sig-name descname"><span class="pre">_runtime_config</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext._runtime_config" title="Link to this definition">¶</a></dt>
-<dd><p>The full Pydantic configuration object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig">RuntimeConfig</a></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">source_fw</span></span><a class="headerlink" href="#id9" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">target_fw</span></span><a class="headerlink" href="#id10" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.metadata" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.inject_signature_arg">

@@ -11,13 +11,11 @@ ml_switcheroo.core.import_fixer
    based on the data provided by SemanticsManager (Feature 024).
 
    It performs:
-   1.  **Pruning**: Removes source framework imports (e.g. `import torch`) unless preserved.
-   2.  **Remapping**: Maps submodules (e.g. `from torch import nn` -> `from flax import linen as nn`).
-   3.  **Smart Injection**: Dynamically injects target framework imports and standard aliases
-       (e.g., `import tensorflow as tf`, `import mlx.core as mx`) only when used in the code body.
 
-   Dependencies:
-       Uses `ml_switcheroo.core.scanners` to detect name usage in the code body.
+   1.  **Pruning**: Removes source framework imports (e.g. ``import torch``) unless preserved.
+   2.  **Remapping**: Maps submodules (e.g. ``from torch import nn`` -> ``from flax import linen as nn``).
+   3.  **Smart Injection**: Dynamically injects target framework imports and standard aliases
+       (e.g., ``import tensorflow as tf``, ``import mlx.core as mx``) only when used in the code body.
 
 
 
@@ -39,48 +37,6 @@ Module Contents
 
    LibCST Transformer that manages top-level imports.
 
-   .. attribute:: source_fw
-
-      The root package name to remove (e.g., "torch").
-
-      :type: str
-
-   .. attribute:: target_fw
-
-      The root package name to ensure exists (e.g., "jax").
-
-      :type: str
-
-   .. attribute:: submodule_map
-
-      Map of "source.mod" -> (target_root, target_sub, alias).
-
-      :type: Dict
-
-   .. attribute:: alias_map
-
-      Map of "fw_name" -> (module_to_import, local_alias).
-
-      :type: Dict
-
-   .. attribute:: preserve_source
-
-      If True, prevents automatic removal of source_fw imports.
-
-      :type: bool
-
-   .. attribute:: _target_found
-
-      Result tracker for idempotency.
-
-      :type: bool
-
-   .. attribute:: _defined_names
-
-      Tracks names explicitly defined by imports to prevent re-injection.
-
-      :type: Set[str]
-
 
    .. py:attribute:: source_fw
 
@@ -101,7 +57,7 @@ Module Contents
 
    .. py:method:: leave_Import(original_node: libcst.Import, updated_node: libcst.Import) -> Union[libcst.Import, libcst.RemovalSentinel]
 
-      Inspects 'import ...' statements.
+      Inspects ``import ...`` statements.
       Checks aliases against submodule_map or prunes matches to source_fw.
 
       :param original_node: The original CST node.
@@ -113,7 +69,7 @@ Module Contents
 
    .. py:method:: leave_ImportFrom(original_node: libcst.ImportFrom, updated_node: libcst.ImportFrom) -> Union[libcst.ImportFrom, libcst.RemovalSentinel]
 
-      Inspects 'from ... import ...' statements.
+      Inspects ``from ... import ...`` statements.
       Checks module+name against submodule_map.
 
       :param original_node: The original CST node.
@@ -130,7 +86,7 @@ Module Contents
       Logic:
       1. Identifies insertion point (after __future__ and docstrings).
       2. Injects 'import target' only if needed (not found AND used).
-      3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage via `alias_map`.
+      3. Injects aliases (e.g. 'jnp', 'tf', 'mx') if detected in usage via ``alias_map``.
       4. Injects submodule mappings (e.g., from flax import linen) if usage requires it.
 
       :param original_node: The original CST module.

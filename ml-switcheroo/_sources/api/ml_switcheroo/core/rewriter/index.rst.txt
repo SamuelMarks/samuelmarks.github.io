@@ -165,69 +165,6 @@ Package Contents
 
    The base class for AST transformation traversal.
 
-   .. attribute:: semantics
-
-      The loaded knowledge base of API mappings.
-
-      :type: SemanticsManager
-
-   .. attribute:: config
-
-      Configuration for the current run.
-
-      :type: RuntimeConfig
-
-   .. attribute:: source_fw
-
-      The string identifier of the source framework (e.g., 'torch').
-
-      :type: str
-
-   .. attribute:: target_fw
-
-      The string identifier of the target framework (e.g., 'jax').
-
-      :type: str
-
-   .. attribute:: strict_mode
-
-      If True, unknown APIs trigger failure markers instead of pass-through.
-
-      :type: bool
-
-   .. attribute:: ctx
-
-      The context object passed to plugins.
-
-      :type: HookContext
-
-   .. attribute:: _scope_stack
-
-      A stack of scopes, tracking variables identified
-      as stateful (e.g., neural network layers assigned to `self`).
-
-      :type: List[Set[str]]
-
-   .. attribute:: _signature_stack
-
-      Stack tracking function signature details
-      to support argument injection (like `rng`).
-
-      :type: List[SignatureContext]
-
-   .. attribute:: _alias_map
-
-      Map of local names to fully qualified paths
-      (e.g., `{'nn': 'torch.nn', 'F': 'torch.nn.functional'}`).
-
-      :type: Dict[str, str]
-
-   .. attribute:: _module_preamble
-
-      Code statements to inject at the top of the file (module level).
-
-      :type: List[str]
-
 
    .. py:attribute:: semantics
 
@@ -259,15 +196,15 @@ Package Contents
 
    .. py:method:: visit_Import(node: libcst.Import) -> Optional[bool]
 
-      Scans `import ...` statements to populate the alias map.
-      Example: `import torch.nn as nn` -> `_alias_map['nn'] = 'torch.nn'`.
+      Scans ``import ...`` statements to populate the alias map.
+      Example: ``import torch.nn as nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
 
 
 
    .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> Optional[bool]
 
-      Scans `from ... import ...` statements to populate the alias map.
-      Example: `from torch import nn` -> `_alias_map['nn'] = 'torch.nn'`.
+      Scans ``from ... import ...`` statements to populate the alias map.
+      Example: ``from torch import nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
 
 
 
@@ -281,7 +218,7 @@ Package Contents
    .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
 
       If errors occurred during processing of this line's children (e.g. failing
-      to rewrite a function call), wrap the line in an `EscapeHatch`.
+      to rewrite a function call), wrap the line in an ``EscapeHatch``.
 
       Prioritizes errors (reverting to original code) over warnings (using updated code).
 

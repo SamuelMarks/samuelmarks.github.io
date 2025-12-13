@@ -7,15 +7,15 @@ ml_switcheroo.discovery.harvester
 
    Semantic Harvester for extracting knowledge from manual tests.
 
-   This module provides the `SemanticHarvester`, which inspects Python test files
+   This module provides the ``SemanticHarvester``, which inspects Python test files
    written by developers (Human Override Workflow). It analyzes successful test
    calls to reverse-engineer valid argument mappings for the Knowledge Base.
 
    Logic:
        1. Parse a test file's AST.
-       2. Scan for imports to resolve aliases (e.g. `import jax.numpy as jnp`).
-       3. Identify test functions (e.g., `test_matmul`).
-       4. Find calls to the target framework (e.g., `jax.numpy.matmul`).
+       2. Scan for imports to resolve aliases (e.g. ``import jax.numpy as jnp``).
+       3. Identify test functions (e.g., ``test_matmul``).
+       4. Find calls to the target framework (e.g., ``jax.numpy.matmul``).
        5. Correlate input arguments to target parameters using:
           - **Naming Convention**: `np_x` matches standard arg `x`.
           - **Explicit Keywords**: `kwargs` match standard arg names directly.
@@ -45,18 +45,6 @@ Module Contents
 
    Scans AST for imports relevant to the target framework to build an alias map.
 
-   .. attribute:: root_fw
-
-      Framework root to track (e.g. 'jax').
-
-      :type: str
-
-   .. attribute:: aliases
-
-      Map of alias -> full_path (e.g. 'jnp' -> 'jax.numpy').
-
-      :type: Dict[str, str]
-
 
    .. py:attribute:: root_fw
 
@@ -73,18 +61,6 @@ Module Contents
 .. py:class:: SemanticHarvester(semantics: ml_switcheroo.semantics.manager.SemanticsManager, target_fw: str = 'jax')
 
    Analyzes Python source code to extract valid API signatures from usage.
-
-   .. attribute:: semantics
-
-      The manager to retrieve and update definitions.
-
-      :type: SemanticsManager
-
-   .. attribute:: target_fw
-
-      The framework being targeted in tests (e.g., 'jax').
-
-      :type: str
 
 
    .. py:attribute:: semantics
@@ -115,32 +91,8 @@ Module Contents
    Helper AST walker to find specific API calls and extract arguments.
 
    Implements **Value-Based Inference**:
-   - Matches naming conventions (`np_x`).
-   - Matches literal types (e.g. `1` is `int`) to Semantic Types (`axis: int`).
-
-   .. attribute:: target_api
-
-      The fully qualified API to look for (e.g. 'jax.numpy.sum').
-
-      :type: str
-
-   .. attribute:: aliases
-
-      Map of alias -> full_path (e.g. 'jnp' -> 'jax.numpy').
-
-      :type: Dict[str, str]
-
-   .. attribute:: std_args_info
-
-      List of (name, type) from Semantics.
-
-      :type: List[Tuple[str, str]]
-
-   .. attribute:: mappings
-
-      The result dictionary if a call is found.
-
-      :type: Optional[Dict]
+   - Matches naming conventions (``np_x``).
+   - Matches literal types (e.g. ``1`` is ``int``) to Semantic Types (``axis: int``).
 
 
    .. py:attribute:: target_api

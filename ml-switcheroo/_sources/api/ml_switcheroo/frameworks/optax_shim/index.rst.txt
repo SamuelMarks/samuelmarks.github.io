@@ -7,9 +7,14 @@ ml_switcheroo.frameworks.optax_shim
 
    Optax Scanner Logic.
 
-   Optax provides optimization and loss functions for the JAX ecosystem.
-   Unlike PyTorch (Classes), Optax uses functional interfaces (factory functions
-   that return GradientTransformations or loss value calculators).
+   This module provides introspection for the Optax library to power the "Ghost Protocol"
+   discovery. Optax uses a functional API where optimizers and losses are functions
+   returning named tuples or callables, rather than Classes.
+
+   Capabilities:
+   1.  Scans `optax.losses` for loss functions.
+   2.  Scans root `optax` for optimizer factory functions.
+   3.  Filters internal utilities to provide clean Abstract Standard candidates.
 
 
 
@@ -38,11 +43,14 @@ Module Contents
 
 .. py:class:: OptaxScanner
 
-   Helper to inspect Optax APIs.
+   Helper to inspect Optax APIs for the discovery system.
 
 
    .. py:method:: is_available() -> bool
       :staticmethod:
+
+
+      Checks if Optax is installed in the current environment.
 
 
 
@@ -50,8 +58,10 @@ Module Contents
       :staticmethod:
 
 
-      Scans internal Optax registry or public API for optimizers.
-      Optax optimizers are functions returning GradientTransformation.
+      Scans the Optax public API for optimizer functions.
+
+      Optax optimizers are typically factory functions (e.g., `adam`, `sgd`)
+      that return a `GradientTransformation`.
 
 
 
@@ -59,7 +69,7 @@ Module Contents
       :staticmethod:
 
 
-      Scans optax.losses submodule.
+      Scans `optax.losses` for loss functions.
 
 
 

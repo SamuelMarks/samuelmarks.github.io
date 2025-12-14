@@ -3,6 +3,29 @@ ml_switcheroo.frameworks.paxml
 
 .. py:module:: ml_switcheroo.frameworks.paxml
 
+.. autoapi-nested-parse::
+
+   PaxML (Praxis) Framework Adapter (Level 2).
+
+   This adapter specializes the core JAX stack for Google's PaxML framework.
+   It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
+   `JAXStackMixin` but implements the unique structural traits of the Praxis Layer library.
+
+   Key Features:
+   - **Inheritance**: Uses `JAXStackMixin` for shared math/device/optimization logic.
+   - **Structural Traits**: Defines `setup` instead of `__init__`, and `__call__` for inference.
+   - **Layer API**: Maps `praxis.layers` to standard Neural Ops via manual wiring defaults
+     to ensure robust bootstrapping even if the environment lacks full Praxis installations.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.paxml.praxis
+
 
 Classes
 -------
@@ -15,9 +38,20 @@ Classes
 Module Contents
 ---------------
 
+.. py:data:: praxis
+   :value: None
+
+
 .. py:class:: PaxmlAdapter
 
-   Adapter for Google PaxML (Praxis).
+   Bases: :py:obj:`ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin`
+
+
+   Adapter for PaxML (Praxis Layers) running on JAX.
+
+   This Level 2 adapter leverages the Level 0/1 stack provided by `JAXStackMixin`
+   for array operations and optimization, while providing the specific layer
+   definitions for the Praxis library.
 
 
    .. py:attribute:: display_name
@@ -35,6 +69,13 @@ Module Contents
    .. py:attribute:: ui_priority
       :type:  int
       :value: 60
+
+
+
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
+
+      Scans API surface.
+      Delegates Math/Opt to Jax Core, handles Layers specifically for Praxis.
 
 
 
@@ -57,24 +98,36 @@ Module Contents
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
+      Defines PaxML specific structural traits.
+      Reflects that Praxis uses a `setup()` method for initialization rather than `__init__`.
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Static definitions to ensure core functionality even if discovery fails.
+
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
 
-   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+   .. py:method:: convert(data)
 
 
-   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies JAX Stack wiring + PaxML specific logic.
 
 
-   .. py:method:: get_serialization_imports() -> List[str]
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
 
 
-   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-
-   .. py:method:: convert(data: Any) -> Any
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
 
 

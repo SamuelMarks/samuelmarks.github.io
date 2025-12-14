@@ -3,6 +3,12 @@ ml_switcheroo.config
 
 .. py:module:: ml_switcheroo.config
 
+.. autoapi-nested-parse::
+
+   Runtime Configuration Store.
+   Updated to support Framework Flavours (Hierarchical Selection).
+
+
 
 Attributes
 ----------
@@ -47,7 +53,8 @@ Module Contents
    1. Retrieve registered frameworks.
    2. Instantiate adapter to read 'ui_priority'.
    3. Sort by priority (asc), then by name (asc) for stability.
-   4. Frameworks without adapters sort to the end (priority 999).
+   4. Filter out 'Child' frameworks (flavours) if they declare inheritance,
+      keeping the UI list clean (root frameworks only).
 
 
 .. py:class:: RuntimeConfig(/, **data: Any)
@@ -67,6 +74,18 @@ Module Contents
    .. py:attribute:: target_framework
       :type:  str
       :value: 'jax'
+
+
+
+   .. py:attribute:: source_flavour
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: target_flavour
+      :type:  Optional[str]
+      :value: None
 
 
 
@@ -102,11 +121,29 @@ Module Contents
 
 
 
+   .. py:property:: effective_source
+      :type: str
+
+
+      Resolves the specific framework key to use for source logic.
+      If a flavour (e.g. 'flax_nnx') is provided, it overrides the general framework ('jax').
+
+
+   .. py:property:: effective_target
+      :type: str
+
+
+      Resolves the specific framework key to use for target logic.
+
+
    .. py:method:: parse_plugin_settings(schema: Type[T]) -> T
 
 
-   .. py:method:: load(source: Optional[str] = None, target: Optional[str] = None, strict_mode: Optional[bool] = None, plugin_settings: Optional[Dict[str, Any]] = None, validation_report: Optional[pathlib.Path] = None, search_path: Optional[pathlib.Path] = None) -> RuntimeConfig
+   .. py:method:: load(source: Optional[str] = None, target: Optional[str] = None, source_flavour: Optional[str] = None, target_flavour: Optional[str] = None, strict_mode: Optional[bool] = None, plugin_settings: Optional[Dict[str, Any]] = None, validation_report: Optional[pathlib.Path] = None, search_path: Optional[pathlib.Path] = None) -> RuntimeConfig
       :classmethod:
+
+
+      Loads configuration from pyproject.toml and overrides with CLI arguments.
 
 
 

@@ -5,11 +5,15 @@ ml_switcheroo.frameworks.jax
 
 .. autoapi-nested-parse::
 
-   JAX Framework Adapter.
+   JAX Core Framework Adapter (Level 0 & Level 1).
 
-   Integrates:
-   - JAX/Flax/Optax Ecosystem.
-   - Hybrid Discovery (Live + Ghost).
+   This adapter provides support for the functional JAX ecosystem *without* binding
+   to a high-level neural network library like Flax or Haiku. It is intended for:
+   1.  **Pure Math/Array Conversions** (NumPy <-> JAX Array).
+   2.  **Functional Optimization** (via Optax mapping).
+   3.  **Low-Level Checkpointing** (via Orbax).
+
+   It implements the `JAXStackMixin` to standardized these common libraries.
 
 
 
@@ -19,6 +23,7 @@ Attributes
 .. autoapisummary::
 
    ml_switcheroo.frameworks.jax.jax
+   ml_switcheroo.frameworks.jax.JaxAdapter
 
 
 Classes
@@ -26,7 +31,7 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.frameworks.jax.JaxAdapter
+   ml_switcheroo.frameworks.jax.JaxCoreAdapter
 
 
 Module Contents
@@ -36,14 +41,18 @@ Module Contents
    :value: None
 
 
-.. py:class:: JaxAdapter
+.. py:class:: JaxCoreAdapter
 
-   Adapter for JAX / Flax / Optax.
+   Bases: :py:obj:`ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin`
+
+
+   Adapter for Core JAX (jax + optax + orbax) without a Neural Framework.
+   Used for converting math libraries, or as a base for specific frameworks.
 
 
    .. py:attribute:: display_name
       :type:  str
-      :value: 'JAX / Flax'
+      :value: 'JAX (Core)'
 
 
 
@@ -59,12 +68,12 @@ Module Contents
 
 
 
-   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
-
-
    .. py:property:: search_modules
       :type: List[str]
 
+
+      Scans only core math and optimization libraries.
+      Does NOT scan flax/haiku modules.
 
 
    .. py:property:: import_alias
@@ -76,10 +85,15 @@ Module Contents
       :type: Dict[str, List[str]]
 
 
+      Core JAX API surface patterns.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
+
+      Defines traits for pure JAX code.
+      Since pure JAX doesn't use classes for layers, module_base is None.
 
 
    .. py:property:: definitions
@@ -92,13 +106,7 @@ Module Contents
 
 
 
-   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
-
-
-   .. py:method:: get_serialization_imports() -> List[str]
-
-
-   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
 
 
    .. py:method:: convert(data)
@@ -106,7 +114,14 @@ Module Contents
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
-      Injects JAX/Flax specific plugin hooks and templates.
+      Applies Level 0/1 Stack wiring.
 
 
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+
+.. py:data:: JaxAdapter
 

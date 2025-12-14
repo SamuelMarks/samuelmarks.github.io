@@ -7,11 +7,9 @@ ml_switcheroo.core.engine
 
    Orchestration Engine for AST Transformations.
 
-   This module provides the ``ASTEngine`` class which parses source code,
-   applies the sequence of Transformer passes (Purity Analysis, Dependency Scan,
-   Rewriting, Import Fixing), and emits the final source code.
-
-   It returns structured ``ConversionResult`` objects to enable rich reporting.
+   This module uses the configured `effective_target` to drive the compilation process.
+   By resolving 'Flavours' (e.g. `flax_nnx`), it ensures specific structural traits
+   are loaded by the `PivotRewriter` and `Analysis` passes.
 
 
 
@@ -98,14 +96,6 @@ Module Contents
    .. py:method:: run(code: str) -> ConversionResult
 
       Executes the full transpilation pipeline.
-
-      Steps:
-      0a. Purity Analysis (if targeting JAX): Flag unsafe side-effects.
-      0b. Lifecycle Analysis: Detect dynamic attribute definition.
-      0c. Dependency Analysis: Flag unmapped 3rd party libraries.
-      1. Rewrite Call usages (Semantic Pivot).
-      2. Scan for lingering source references.
-      3. Feature-driven Import Fixing.
 
       :param code: The input source string.
 

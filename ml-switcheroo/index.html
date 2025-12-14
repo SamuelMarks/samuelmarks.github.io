@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=bc1bd102"></script>
+    <script src="_static/switcheroo_demo.js?v=4a327545"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ml-switcheroo 🔄🦘" href="README.html" />
@@ -292,9 +292,8 @@
 <h2 id="interactive-demo">Interactive Demo<a class="headerlink" href="#interactive-demo" title="Link to this heading">¶</a></h2>
 <p>Try it right in your browser! The engine runs entirely client-side using WebAssembly.</p>
 <div class="switcheroo-material-card" data-wheel="ml_switcheroo-0.0.1-py3-none-any.whl" id="switcheroo-wasm-root">
-<!-- Inject Data-Driven Examples -->
 <script>
-                window.SWITCHEROO_PRELOADED_EXAMPLES = {"torch_t1": {"label": "PyTorch - Math (Tier 1)", "srcFw": "torch", "tgtFw": "jax", "code": "import torch\n\ndef math_ops(x, y):\n  # Tier 1: Array API Standard\n  # Examples: abs, add, mean\n  a = torch.abs(x)\n  b = torch.add(a, y)\n  return torch.mean(b)"}, "torch_t2": {"label": "PyTorch - Neural (Tier 2)", "srcFw": "torch", "tgtFw": "jax", "code": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Net(nn.Module):\n  # Tier 2: Neural State & Layers\n  def __init__(self):\n    super().__init__()\n    self.conv1 = nn.Conv2d(1, 32, 3, 1)\n    self.fc1 = nn.Linear(5408, 10)\n\n  def forward(self, x):\n    x = self.conv1(x)\n    x = F.relu(x)\n    x = torch.flatten(x, 1)\n    return self.fc1(x)"}, "torch_t3": {"label": "PyTorch - Extras (Tier 3)", "srcFw": "torch", "tgtFw": "jax", "code": "import torch\nfrom torch.utils.data import DataLoader\n\ndef process_data(ds):\n  # Tier 3: Framework Extras\n  # DataLoaders and Device placement\n  dl = DataLoader(ds, batch_size=32, shuffle=True)\n  device = torch.device('cuda')\n  return dl"}}; 
+                window.SWITCHEROO_PRELOADED_EXAMPLES = {}; 
             </script>
 <div class="demo-header">
 <div>
@@ -311,31 +310,40 @@
 </div>
 <div id="demo-interface" style="display:none;">
 <div class="translate-toolbar">
+<!-- Source Column -->
 <div class="select-wrapper">
 <select class="material-select" id="select-src">
 <option selected="" value="torch">PyTorch</option>
-<option value="jax">JAX / Flax</option>
+<option value="jax">JAX (Core)</option>
+<option value="tensorflow">TensorFlow</option>
+<option value="numpy">NumPy</option>
 <option value="keras">Keras</option>
 <option value="mlx">Apple MLX</option>
-<option value="numpy">NumPy</option>
-<option value="paxml">PaxML / Praxis</option>
-<option value="tensorflow">TensorFlow</option>
+</select>
+<div id="src-flavour-region" style="display:none; margin-left:10px;">
+<select class="material-select-sm" id="src-flavour" style="background:#f0f4c3;">
+<option selected="" value="flax_nnx">Flax NNX</option><option value="paxml">PaxML / Praxis</option>
 </select>
 </div>
+</div>
 <button class="swap-icon-btn" id="btn-swap" title="Swap Languages">⇄</button>
+<!-- Target Column -->
 <div class="select-wrapper">
 <select class="material-select" id="select-tgt">
 <option value="torch">PyTorch</option>
-<option selected="" value="jax">JAX / Flax</option>
+<option selected="" value="jax">JAX (Core)</option>
+<option value="tensorflow">TensorFlow</option>
+<option value="numpy">NumPy</option>
 <option value="keras">Keras</option>
 <option value="mlx">Apple MLX</option>
-<option value="numpy">NumPy</option>
-<option value="paxml">PaxML / Praxis</option>
-<option value="tensorflow">TensorFlow</option>
+</select>
+<div id="tgt-flavour-region" style="display:none; margin-left:10px;">
+<select class="material-select-sm" id="tgt-flavour" style="background:#f0f4c3;">
+<option selected="" value="flax_nnx">Flax NNX</option><option value="paxml">PaxML / Praxis</option>
 </select>
 </div>
 </div>
-<!-- Example Selector Toolbar -->
+</div>
 <div class="example-toolbar">
 <span class="label">Load Example:</span>
 <select class="material-select-sm" id="select-example">
@@ -344,7 +352,7 @@
 </div>
 <div class="editor-grid">
 <div class="editor-group source-group">
-<textarea class="material-input" id="code-source" placeholder="Paste source code here..." spellcheck="false">import torch
+<textarea class="material-input" id="code-source" placeholder="Source code..." spellcheck="false">import torch
 import torch.nn as nn
 
 class Model(nn.Module): 
@@ -352,28 +360,18 @@ class Model(nn.Module):
         return torch.abs(x)</textarea>
 </div>
 <div class="editor-group target-group">
-<textarea class="material-input output-bg" id="code-target" placeholder="Translation will appear here..." readonly=""></textarea>
+<textarea class="material-input output-bg" id="code-target" placeholder="Translation..." readonly=""></textarea>
 </div>
 </div>
 <div class="controls-bar">
-<!-- Strict Mode Toggle -->
-<label class="md-switch" title="Strict Mode: Fail if an API cannot be mapped instead of passing it through.">
+<label class="md-switch" title="Strict Mode: Fail on unknown APIs.">
 <input id="chk-strict-mode" type="checkbox"/>
-<span class="md-switch-track">
-<span class="md-switch-thumb"></span>
-</span>
+<span class="md-switch-track"><span class="md-switch-thumb"></span></span>
 <span class="md-switch-text">Strict Mode</span>
 </label>
 <button class="md-btn md-btn-accent" disabled="" id="btn-convert">Run Translation</button>
 </div>
-<!-- Trace Visualization Container -->
-<div class="trace-container" id="trace-visualizer" style="display:none;">
-<div class="trace-row placeholder">
-<div class="trace-content" style="text-align:center;color:#999;padding:20px;">
-                            Trace events will appear here after conversion... 
-                        </div>
-</div>
-</div>
+<div class="trace-container" id="trace-visualizer" style="display:none;"></div>
 </div>
 <div class="console-group">
 <div class="editor-label">Engine Logs</div>

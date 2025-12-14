@@ -1,0 +1,104 @@
+ml_switcheroo.analysis.purity
+=============================
+
+.. py:module:: ml_switcheroo.analysis.purity
+
+.. autoapi-nested-parse::
+
+   Static Purity Analysis for JAX Compliance.
+
+   This module provides the `PurityScanner`, a LibCST transformer that detects
+   operations unsafe for functional frameworks (like JAX). JAX transformation
+   (JIT, VMap, Grad) requires pure functions with no side effects.
+
+   Operations flagged:
+   1.  **I/O**: `print`, `input`, `open`, `write` (Standard Python).
+   2.  **Global State**: `global` keyword usage.
+   3.  **Closure State**: `nonlocal` keyword usage (Feature 05).
+   4.  **Structure Mutation**: List methods `append`, `extend`, etc.
+   5.  **Global RNG**: Seeding operations (dynamically loaded from semantic config).
+   6.  **Framework Impurities**: Methods like `add_`, `copy_` loaded from source framework config.
+
+   Violations are marked via the `EscapeHatch` mechanism.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.analysis.purity.PurityScanner
+
+
+Module Contents
+---------------
+
+.. py:class:: PurityScanner(semantics: Any = None, source_fw: str = 'torch')
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   Scans CST for impurities and wraps violations in EscapeHatch markers.
+
+   .. attribute:: _current_violations
+
+      Accumulator of errors for the current statement.
+
+      :type: List[str]
+
+   .. attribute:: _IO_FUNCTIONS
+
+      Standard Python I/O function names.
+
+      :type: Set[str]
+
+   .. attribute:: _MUTATION_METHODS
+
+      Standard Python container mutation methods.
+
+      :type: Set[str]
+
+   .. attribute:: _dynamic_impurity_methods
+
+      Methods loaded from framework configs (e.g. `add_`).
+
+      :type: Set[str]
+
+   .. attribute:: _global_rng_methods
+
+      Methods loaded from framework configs (e.g. `manual_seed`).
+
+      :type: Set[str]
+
+
+   .. py:attribute:: source_fw
+      :value: 'torch'
+
+
+
+   .. py:method:: visit_SimpleStatementLine(node: libcst.SimpleStatementLine) -> Optional[bool]
+
+      Enters a statement line. Resets violation tracking.
+
+
+
+   .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      Exits a statement line.
+      If violations were found within this statement, wraps it in the EscapeHatch.
+
+
+
+   .. py:method:: visit_Global(node: libcst.Global) -> Optional[bool]
+
+
+   .. py:method:: visit_Nonlocal(node: libcst.Nonlocal) -> Optional[bool]
+
+
+   .. py:method:: visit_Call(node: libcst.Call) -> Optional[bool]
+
+      Inspects calls for I/O functions, list mutations, or global RNG seeding.
+
+
+

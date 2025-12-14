@@ -1,0 +1,71 @@
+ml_switcheroo.generated_tests.generator
+=======================================
+
+.. py:module:: ml_switcheroo.generated_tests.generator
+
+.. autoapi-nested-parse::
+
+   Dynamic Test Code Generator.
+
+   This module is responsible for creating physical Python test files based on the
+   Semantic Knowledge Base.
+
+   It operates using a **Template-Driven** approach. For each framework (Torch, JAX, etc.),
+   it looks up a configuration dictionary that defines how to:
+   1.  Import the library.
+   2.  Convert a NumPy array to the library's tensor format.
+   3.  Convert the library's tensor format back to a NumPy array.
+   4.  Optionally wrap execution in JIT compilation (for JAX correctness).
+
+   It emits:
+   1.  **Imports**: Only for frameworks actually used in the generated batch.
+   2.  **Input Generation**: NumPy seeded random data, using Type Hints from the Spec.
+   3.  **Execution Blocks**: Try/Except blocks for each backend found.
+   4.  **Comparison Logic**: A generic loop to compare all successful outputs.
+
+   **Update for Distributed Semantics**:
+   Templates are now retrieved from the unified SemanticsManager, which aggregates
+   templates from Registry (Code) and Overlays (Snapshots).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.generated_tests.generator.TestGenerator
+
+
+Module Contents
+---------------
+
+.. py:class:: TestGenerator(semantics_mgr: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None)
+
+   Generates Pytest-compatible test files from Semantic Operations.
+
+   .. attribute:: semantics_mgr
+
+      Source for op definitions and backend templates.
+
+      :type: SemanticsManager
+
+   .. attribute:: _processed_fws
+
+      Tracks which frameworks were seen to optimize imports.
+
+      :type: Set[str]
+
+
+   .. py:attribute:: semantics_mgr
+
+
+   .. py:method:: generate(semantics: Dict[str, Any], output_path: pathlib.Path) -> None
+
+      Generates a test file containing functions for each operation in semantics.
+
+      :param semantics: Dictionary of operations (result of mgr.get_known_apis()).
+      :param output_path: Destination path for the .py file.
+
+
+

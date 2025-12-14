@@ -1,0 +1,99 @@
+ml_switcheroo.analysis.lifecycle
+================================
+
+.. py:module:: ml_switcheroo.analysis.lifecycle
+
+.. autoapi-nested-parse::
+
+   Lifecycle Analysis for Class Member Initialization.
+
+   This module provides the `InitializationTracker`, a static analysis tool that
+   verifies that class members used in the forward pass (inference) are properly
+   defined in the initialization phase (`__init__`).
+
+   This check helps detect:
+   1.  Dynamic attribute definition (valid in Python, often invalid in static graph compilation like JAX/XLA).
+   2.  Typoes in member names between init and forward.
+   3.  Implicit state that might be lost during transpilation if not explicitly declared.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.analysis.lifecycle.InitializationTracker
+
+
+Module Contents
+---------------
+
+.. py:class:: InitializationTracker
+
+   Bases: :py:obj:`libcst.CSTVisitor`
+
+
+   Scans classes to ensure members used in forward are initialized in __init__.
+
+   .. attribute:: warnings
+
+      List of discovered issues (e.g. "Member 'conv1' used but not initialized").
+
+      :type: List[str]
+
+   .. attribute:: _scope_stack
+
+      Stack tracking nested class contexts.
+
+      :type: List[_ClassContext]
+
+
+   .. py:attribute:: warnings
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> None
+
+      Enters a class definition.
+
+
+
+   .. py:method:: leave_ClassDef(node: libcst.ClassDef) -> None
+
+      Exits a class definition and computes diff.
+
+
+
+   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> None
+
+      Tracks entry into __init__ or forward/call methods.
+
+
+
+   .. py:method:: leave_FunctionDef(node: libcst.FunctionDef) -> None
+
+      Exits function scope.
+
+
+
+   .. py:method:: visit_Assign(node: libcst.Assign) -> None
+
+      Tracks assignments to self.x in __init__.
+
+
+
+   .. py:method:: visit_AnnAssign(node: libcst.AnnAssign) -> None
+
+      Tracks annotated assignments (self.x: int = ...) in __init__.
+
+
+
+   .. py:method:: visit_Attribute(node: libcst.Attribute) -> None
+
+      Tracks attribute access (self.x) in forward.
+
+
+

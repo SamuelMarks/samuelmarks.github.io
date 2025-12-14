@@ -8,7 +8,34 @@ ml_switcheroo
    ml-switcheroo Package.
 
    A deterministic AST transpiler for converting Deep Learning models between
-   frameworks (PyTorch -> JAX).
+   frameworks (e.g., PyTorch -> JAX/Flax).
+
+   This package exposes the core compilation engine and configuration utilities
+   for programmatic usage.
+
+   Usage
+   -----
+
+   ### Simple String Conversion
+
+   >>> import ml_switcheroo as mls
+   >>> code = "y = torch.abs(x)"
+   >>> result = mls.convert(code, source="torch", target="jax")
+   >>> print(result)
+   y = jax.numpy.abs(x)
+
+   ### Advanced Usage (AST Engine)
+
+   >>> from ml_switcheroo import ASTEngine, RuntimeConfig
+   >>>
+   >>> config = RuntimeConfig(source_framework="torch", target_framework="jax", strict_mode=True)
+   >>> engine = ASTEngine(config=config)
+   >>> res = engine.run("y = torch.abs(x)")
+   >>>
+   >>> if res.success:
+   ...     print(res.code)
+   ... else:
+   ...     print(f"Errors: {res.errors}")
 
 
 
@@ -42,10 +69,275 @@ Attributes
    ml_switcheroo.__version__
 
 
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.RuntimeConfig
+   ml_switcheroo.ASTEngine
+   ml_switcheroo.ConversionResult
+   ml_switcheroo.SemanticsManager
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.convert
+
+
 Package Contents
 ----------------
 
+.. py:class:: RuntimeConfig(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Global configuration container for the translation engine.
+
+
+   .. py:attribute:: source_framework
+      :type:  str
+      :value: 'torch'
+
+
+
+   .. py:attribute:: target_framework
+      :type:  str
+      :value: 'jax'
+
+
+
+   .. py:attribute:: strict_mode
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: plugin_settings
+      :type:  Dict[str, Any]
+      :value: None
+
+
+
+   .. py:attribute:: plugin_paths
+      :type:  List[pathlib.Path]
+      :value: None
+
+
+
+   .. py:attribute:: validation_report
+      :type:  Optional[pathlib.Path]
+      :value: None
+
+
+
+   .. py:method:: validate_framework(v: str) -> str
+      :classmethod:
+
+
+      Ensures the framework is registered in the system.
+
+
+
+   .. py:method:: parse_plugin_settings(schema: Type[T]) -> T
+
+
+   .. py:method:: load(source: Optional[str] = None, target: Optional[str] = None, strict_mode: Optional[bool] = None, plugin_settings: Optional[Dict[str, Any]] = None, validation_report: Optional[pathlib.Path] = None, search_path: Optional[pathlib.Path] = None) -> RuntimeConfig
+      :classmethod:
+
+
+
+.. py:class:: ASTEngine(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: str = 'torch', target: str = 'jax', strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None)
+
+   The main compilation unit.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: source
+
+
+   .. py:attribute:: target
+
+
+   .. py:attribute:: strict_mode
+
+
+   .. py:method:: parse(code: str) -> libcst.Module
+
+      Parses source string into a LibCST Module.
+
+
+
+   .. py:method:: to_source(tree: libcst.Module) -> str
+
+      Converts CST back to source string.
+
+
+
+   .. py:method:: run(code: str) -> ConversionResult
+
+      Executes the full transpilation pipeline.
+
+      Steps:
+      0a. Purity Analysis (if targeting JAX): Flag unsafe side-effects.
+      0b. Lifecycle Analysis: Detect dynamic attribute definition.
+      0c. Dependency Analysis: Flag unmapped 3rd party libraries.
+      1. Rewrite Call usages (Semantic Pivot).
+      2. Scan for lingering source references.
+      3. Feature-driven Import Fixing.
+
+      :param code: The input source string.
+
+      :returns: Object containing transformed code and error logs.
+      :rtype: ConversionResult
+
+
+
+.. py:class:: ConversionResult(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Structured result of a single file conversion.
+
+
+   .. py:attribute:: code
+      :type:  str
+      :value: ''
+
+
+
+   .. py:attribute:: errors
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: success
+      :type:  bool
+      :value: True
+
+
+
+   .. py:attribute:: trace_events
+      :type:  List[Dict[str, Any]]
+      :value: None
+
+
+
+   .. py:property:: has_errors
+      :type: bool
+
+
+      Returns True if any errors were recorded.
+
+
+.. py:class:: SemanticsManager
+
+   Central database for semantic mappings and configuration.
+
+   Data Source Priority:
+   1. Registry Defaults (Code-defined in FrameworkAdapters).
+   2. Spec Files (`semantics/*.json`): Defines the Abstract Standards.
+   3. Overlay Files (`snapshots/*_mappings.json`): Injects Framework Variants.
+
+
+   .. py:attribute:: data
+      :type:  Dict[str, Dict]
+
+
+   .. py:attribute:: import_data
+      :type:  Dict[str, Dict]
+
+
+   .. py:attribute:: framework_configs
+      :type:  Dict[str, Dict]
+
+
+   .. py:attribute:: test_templates
+      :type:  Dict[str, Dict]
+
+
+   .. py:method:: get_all_rng_methods() -> Set[str]
+
+      Returns the consolidated set of RNG methods from all frameworks.
+
+
+
+   .. py:method:: resolve_variant(abstract_id: str, target_fw: str) -> Optional[Dict[str, Any]]
+
+      Resolves the variant definition for a given target framework, traversing inheritance.
+
+
+
+   .. py:method:: load_validation_report(report_path: pathlib.Path) -> None
+
+
+   .. py:method:: is_verified(abstract_id: str) -> bool
+
+
+   .. py:method:: get_definition_by_id(abstract_id: str) -> Optional[Dict[str, Any]]
+
+
+   .. py:method:: get_definition(api_name: str) -> Optional[Tuple[str, Dict]]
+
+
+   .. py:method:: get_known_apis() -> Dict[str, Dict]
+
+
+   .. py:method:: get_import_map(target_fw: str) -> Dict[str, Tuple[str, Optional[str], Optional[str]]]
+
+
+   .. py:method:: get_framework_config(framework: str) -> Dict[str, Any]
+
+
+   .. py:method:: get_test_template(framework: str) -> Optional[Dict[str, str]]
+
+
+   .. py:method:: get_framework_aliases() -> Dict[str, Tuple[str, str]]
+
+
+   .. py:method:: update_definition(abstract_id: str, new_data: Dict[str, Any]) -> None
+
+
 .. py:data:: __version__
    :value: '0.0.1'
+
+
+.. py:function:: convert(code: str, source: str = 'torch', target: str = 'jax', strict: bool = False, plugin_settings: Optional[Dict[str, Any]] = None, semantics: Optional[semantics.manager.SemanticsManager] = None) -> str
+
+   Transpiles a string of Python code from one framework to another.
+
+   This is a high-level convenience wrapper around the `ASTEngine`. For file-based
+   conversions or batch processing, consider using `ml_switcheroo.cli` or using
+   `ASTEngine` directly.
+
+   :param code: The source code to convert.
+   :type code: str
+   :param source: The source framework key (e.g., "torch", "jax").
+   :type source: str
+   :param target: The target framework key (e.g., "jax", "tensorflow").
+   :type target: str
+   :param strict: If True, the engine will return an error if an API
+                  cannot be mapped. If False (default), the original code
+                  is preserved wrapped in escape hatch comments.
+   :type strict: bool
+   :param plugin_settings: Specific configuration flags passed to
+                           plugin hooks (e.g., `{"rng_arg_name": "seed"}`).
+   :type plugin_settings: dict, optional
+   :param semantics: An existing Knowledge Base instance.
+                     If None, a new one is initialized from disk.
+   :type semantics: SemanticsManager, optional
+
+   :returns: The transpiled source code.
+   :rtype: str
+
+   :raises ValueError: If the conversion fails (e.g. syntax errors or strict mode violations).
 
 

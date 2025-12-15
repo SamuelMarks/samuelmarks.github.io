@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=4a327545"></script>
+    <script src="_static/switcheroo_demo.js?v=446c668a"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ml-switcheroo 🔄🦘" href="README.html" />
@@ -293,7 +293,7 @@
 <p>Try it right in your browser! The engine runs entirely client-side using WebAssembly.</p>
 <div class="switcheroo-material-card" data-wheel="ml_switcheroo-0.0.1-py3-none-any.whl" id="switcheroo-wasm-root">
 <script>
-                window.SWITCHEROO_PRELOADED_EXAMPLES = {}; 
+                window.SWITCHEROO_PRELOADED_EXAMPLES = {"torch_tier1_math": {"label": "PyTorch: Math", "srcFw": "torch", "srcFlavour": null, "tgtFw": "jax", "tgtFlavour": null, "code": "import torch\n\ndef math_ops(x, y):\n  # Tier 1: Array API Standard\n  # Examples: abs, add, mean\n  a = torch.abs(x)\n  b = torch.add(a, y)\n  return torch.mean(b)"}, "torch_tier2_neural": {"label": "PyTorch: Neural", "srcFw": "torch", "srcFlavour": null, "tgtFw": "jax", "tgtFlavour": null, "code": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass Net(nn.Module):\n  # Tier 2: Neural State & Layers\n  def __init__(self):\n    super().__init__()\n    self.conv1 = nn.Conv2d(1, 32, 3, 1)\n    self.fc1 = nn.Linear(5408, 10)\n\n  def forward(self, x):\n    x = self.conv1(x)\n    x = F.relu(x)\n    x = torch.flatten(x, 1)\n    return self.fc1(x)"}, "torch_tier3_extras": {"label": "PyTorch: Extras", "srcFw": "torch", "srcFlavour": null, "tgtFw": "jax", "tgtFlavour": null, "code": "import torch\nfrom torch.utils.data import DataLoader\n\ndef process_data(ds):\n  # Tier 3: Framework Extras\n  # DataLoaders and Device placement\n  dl = DataLoader(ds, batch_size=32, shuffle=True)\n  device = torch.device('cuda')\n  return dl"}, "flax_nnx_tier2_neural": {"label": "Flax NNX: Neural", "srcFw": "jax", "srcFlavour": "flax_nnx", "tgtFw": "torch", "tgtFlavour": null, "code": "from flax import nnx\nimport jax.numpy as jnp\n\nclass Net(nnx.Module):\n    def __init__(self, rngs: nnx.Rngs):\n        self.linear = nnx.Linear(10, 10, rngs=rngs)\n\n    def __call__(self, x):\n        x = self.linear(x)\n        return nnx.relu(x)\n"}, "flax_nnx_tier3_extras": {"label": "Flax NNX: Extras", "srcFw": "jax", "srcFlavour": "flax_nnx", "tgtFw": "torch", "tgtFlavour": null, "code": "# Flax NNX State Management\n# See repo for details on nnx.Variable interactions."}, "paxml_tier2_neural": {"label": "PaxML / Praxis: Neural", "srcFw": "jax", "srcFlavour": "paxml", "tgtFw": "torch", "tgtFlavour": null, "code": "import praxis.layers as pl\nfrom praxis import base_layer\n\nclass SimpleMLP(base_layer.BaseLayer):\n  def setup(self):\n    # PaxML uses setup() instead of __init__\n    self.fc1 = pl.Linear(output_dims=128)\n    self.fc2 = pl.Linear(output_dims=10)\n\n  def __call__(self, x):\n    x = self.fc1(x)\n    x = pl.relu(x)\n    return self.fc2(x)\n"}, "paxml_tier1_math": {"label": "PaxML / Praxis: Math", "srcFw": "jax", "srcFlavour": "paxml", "tgtFw": "torch", "tgtFlavour": null, "code": "import jax.numpy as jnp\nfrom jax import grad, jit\n\ndef predict(params, x): \n  # Pure JAX function\n  return jnp.dot(x, params['w']) + params['b'] \n\ndef loss_fn(params, x, y): \n  preds = predict(params, x) \n  return jnp.mean((preds - y) ** 2) \n"}};
             </script>
 <div class="demo-header">
 <div>
@@ -355,8 +355,8 @@
 <textarea class="material-input" id="code-source" placeholder="Source code..." spellcheck="false">import torch
 import torch.nn as nn
 
-class Model(nn.Module): 
-    def forward(self, x): 
+class Model(nn.Module):
+    def forward(self, x):
         return torch.abs(x)</textarea>
 </div>
 <div class="editor-group target-group">

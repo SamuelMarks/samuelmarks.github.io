@@ -507,7 +507,7 @@ async function runTranspilation() {
         consoleEl.innerText = `❌ Runtime Error:\n${err}`;
     } finally {
         btn.disabled = false;
-        btn.innerText = "Running Translation";
+        btn.innerText = "🔄🦘 Run Translation";
     }
 }
 

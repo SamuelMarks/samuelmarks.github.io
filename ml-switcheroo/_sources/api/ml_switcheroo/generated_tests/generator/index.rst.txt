@@ -5,27 +5,24 @@ ml_switcheroo.generated_tests.generator
 
 .. autoapi-nested-parse::
 
-   Dynamic Test Code Generator.
+   Dynamic Test Code Generator (Physical Synthesizer).
 
    This module is responsible for creating physical Python test files based on the
    Semantic Knowledge Base.
 
-   It operates using a **Template-Driven** approach. For each framework (Torch, JAX, etc.),
-   it looks up a configuration dictionary that defines how to:
-   1.  Import the library.
-   2.  Convert a NumPy array to the library's tensor format.
-   3.  Convert the library's tensor format back to a NumPy array.
-   4.  Optionally wrap execution in JIT compilation (for JAX correctness).
+   It operations in two stages:
+   1.  **Template Resolution**: It aggregates execution templates (`import`, `convert_input`, `to_numpy`)
+       from the SemanticsManager, prioritizing overlays (snapshots) over registry defaults.
+   2.  **Code Emission**: It iterates over Operations in the Spec, generating `def test_gen_<opname>()`
+       functions that:
+       - Generate random inputs using type hints.
+       - Execute the operation across all available backends (Torch, JAX, etc.).
+       - Compare outputs using `np.allclose`.
 
-   It emits:
-   1.  **Imports**: Only for frameworks actually used in the generated batch.
-   2.  **Input Generation**: NumPy seeded random data, using Type Hints from the Spec.
-   3.  **Execution Blocks**: Try/Except blocks for each backend found.
-   4.  **Comparison Logic**: A generic loop to compare all successful outputs.
-
-   **Update for Distributed Semantics**:
-   Templates are now retrieved from the unified SemanticsManager, which aggregates
-   templates from Registry (Code) and Overlays (Snapshots).
+   JIT Logic:
+       If a template specifies `jit_wrap: True` (e.g., JAX), the generator inspects the
+       framework traits to identify `static_argnums` (arguments like `axis` or `keepdims`)
+       and generates valid `jax.jit(fn, static_argnums=(...))` wrappers.
 
 
 

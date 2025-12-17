@@ -8,14 +8,13 @@ ml_switcheroo.frameworks.flax_nnx
    Flax NNX Framework Adapter (Level 2).
 
    This adapter builds upon the core JAX stack to support the **Flax NNX**
-   neural network library. It inherits math/optimizer logic from `JAXStackMixin`
-   but implements unique structural traits for NNX Modules.
+   neural network library. It inherits math/optimizer logic from ``JAXStackMixin``
+   but implements dynamic discovery for NNX Modules.
 
-   Key Features:
-   - Inheritance from `jax` core via Mixin reuse.
-   - Rewriting `torch.nn.Module` -> `flax.nnx.Module`.
-   - Handling `rngs` state threading for stochastic layers.
-   - Maps core Neural Ops to ensure successful transpilation if not pre-seeded.
+   Capabilities:
+   1.  **Inheritance**: Extends ``jax`` core adapter.
+   2.  **Structural Traits**: Handles ``rngs`` injection and ``__call__`` inference.
+   3.  **Dynamic Discovery**: Scans ``flax.nnx`` to automatically find all available Layers.
 
 
 
@@ -47,7 +46,9 @@ Module Contents
    Bases: :py:obj:`ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin`
 
 
-   Adapter for the Flax NNX Framework.
+   Adapter for the Flax NNX Framework (The Object-Oriented JAX API).
+
+   Links standard Neural Layer definitions to ``flax.nnx.*``.
 
 
    .. py:attribute:: display_name
@@ -71,14 +72,18 @@ Module Contents
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
 
       Collects API definitions.
-      Leverages JaxCore logic for shared categories (Loss/Activations) via composition
-      if living in the same environment, or scans Flax-specific layers.
+
+      Delegates Loss/Optimizer/Activation scanning to the Core JAX adapter
+      (which scans Optax/JAX.nn), and implements specific logic for scanning
+      Flax NNX Layers.
 
 
 
    .. py:property:: search_modules
       :type: List[str]
 
+
+      Modules to scan during Scaffolding.
 
 
    .. py:property:: import_alias
@@ -91,11 +96,17 @@ Module Contents
 
 
 
+   .. py:property:: supported_tiers
+      :type: List[Any]
+
+
+
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
       Defines Flax NNX specific structural transformations (Level 2).
+      Requires injection of `rngs` argument for stochastic layers.
 
 
    .. py:property:: definitions

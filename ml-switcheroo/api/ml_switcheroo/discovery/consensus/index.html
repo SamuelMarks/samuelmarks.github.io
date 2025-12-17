@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.discovery.harvester" href="../harvester/index.html" />
@@ -351,12 +351,10 @@
   <section id="module-ml_switcheroo.discovery.consensus">
 <span id="ml-switcheroo-discovery-consensus"></span><h1 id="api-ml-switcheroo-discovery-consensus-index--page-root">ml_switcheroo.discovery.consensus<a class="headerlink" href="#api-ml-switcheroo-discovery-consensus-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Consensus Engine: The Dynamic Standardization Brain.</p>
-<p>This module implements the logic to automatically discover Abstract Standards
-by analyzing API lists from multiple frameworks. It identifies common concepts
-(e.g., “HuberLoss” in Torch vs “huber” in JAX) via fuzzy clustering and naming
-normalization, proposing them as “Candidate Standards” for the Middle Layer.</p>
-<p>It also performs “Signature Alignment” to determine the standard arguments
-(e.g. deciding that ‘lr’ is the standard argument for learning rate across frameworks).</p>
+<p>This module provides the logic to identify common operations across disjoint frameworks.
+It aligns variable naming conventions (e.g., ‘dim’ vs ‘axis’) and clusters API endpoints
+(e.g., ‘torch.sin’ and ‘jax.numpy.sin’) into unified Abstract Standards suitable for
+the Semantic Knowledge Base.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -377,32 +375,30 @@ normalization, proposing them as “Candidate Standards” for the Middle Layer.
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.discovery.consensus.</span></span><span class="sig-name descname"><span class="pre">CandidateStandard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>A proposed Abstract Standard discovered via consensus.</p>
-<p>Represents a single concept (e.g., ‘Huber’) found in one or more frameworks.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.CandidateStandard.name">
 <span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard.name" title="Link to this definition">¶</a></dt>
-<dd><p>The proposed Abstract Name (e.g. ‘Huber’).</p>
+<dd><p>The abstract name (e.g., ‘Conv2d’).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.CandidateStandard.variants">
 <span class="sig-name descname"><span class="pre">variants</span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard.variants" title="Link to this definition">¶</a></dt>
-<dd><p>Map of {framework_name: GhostRef} for the implementations found.</p>
+<dd><p>A map of framework names to their specific implementations (GhostRefs).</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.CandidateStandard.score">
 <span class="sig-name descname"><span class="pre">score</span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard.score" title="Link to this definition">¶</a></dt>
-<dd><p>A confidence score (0.0-1.0) based on how many frameworks agree.</p>
+<dd><p>A confidence score derived from the number of concurring frameworks.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.CandidateStandard.std_args">
 <span class="sig-name descname"><span class="pre">std_args</span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard.std_args" title="Link to this definition">¶</a></dt>
-<dd><p>List of abstract argument names agreed upon by consensus.</p>
+<dd><p>The list of argument names deemed ‘standard’ via voting.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.CandidateStandard.arg_mappings">
 <span class="sig-name descname"><span class="pre">arg_mappings</span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard.arg_mappings" title="Link to this definition">¶</a></dt>
-<dd><p>Nested dictionary {framework_name: {std_arg: fw_arg}}.
-Used to generate the keys in the final StandardMap.</p>
+<dd><p>Nested dictionary mapping {framework: {std_arg: fw_specific_arg}}.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
@@ -427,20 +423,21 @@ Used to generate the keys in the final StandardMap.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.CandidateStandard.add_variant">
 <span class="sig-name descname"><span class="pre">add_variant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.CandidateStandard.add_variant" title="Link to this definition">¶</a></dt>
-<dd><p>Registers a framework’s implementation of this standard.</p>
+<dd><p>Registers a framework’s implementation of this concept.
+Updates the consensus score.</p>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.discovery.consensus.</span></span><span class="sig-name descname"><span class="pre">ConsensusEngine</span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine" title="Link to this definition">¶</a></dt>
 <dd><p>Algorithms for aligning divergent API naming conventions.</p>
-<p>Responsibility:
-1. Normalize API names (Clustering).
-2. Normalize Argument names (Signature Alignment).
-3. Compute intersection of arguments to define the Standard.</p>
+<p>Capabilities:
+1.  <strong>Clustering</strong>: Groups APIs like <cite>HuberLoss</cite>, <cite>huber_loss</cite>, and <cite>Huber</cite> together.
+2.  <strong>Normalization</strong>: Strips common noise (prefixes/suffixes) to find the semantic root.
+3.  <strong>Signature Alignment</strong>: Builds a translation map for arguments (e.g., <cite>keepdims</cite> &lt;-&gt; <cite>keep_dims</cite>).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.IGNORED_SUFFIXES">
-<span class="sig-name descname"><span class="pre">IGNORED_SUFFIXES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['loss',</span> <span class="pre">'error',</span> <span class="pre">'layer',</span> <span class="pre">'block',</span> <span class="pre">'2d',</span> <span class="pre">'1d',</span> <span class="pre">'3d',</span> <span class="pre">'v1',</span> <span class="pre">'v2',</span> <span class="pre">'object']</span></em><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.IGNORED_SUFFIXES" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">IGNORED_SUFFIXES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['loss',</span> <span class="pre">'error',</span> <span class="pre">'layer',</span> <span class="pre">'block',</span> <span class="pre">'2d',</span> <span class="pre">'1d',</span> <span class="pre">'3d',</span> <span class="pre">'v1',</span> <span class="pre">'v2',</span> <span class="pre">'object',</span> <span class="pre">'op',</span> <span class="pre">'func']</span></em><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.IGNORED_SUFFIXES" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.ARG_ALIASES">
@@ -450,34 +447,75 @@ Used to generate the keys in the final StandardMap.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.normalize_name">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalize_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.normalize_name" title="Link to this definition">¶</a></dt>
 <dd><p>Reduces an API Name to its semantic core for comparison.</p>
+<p class="rubric">Examples</p>
+<ul class="simple">
+<li><p>‘HuberLoss’ -&gt; ‘huber’</p></li>
+<li><p>‘reduce_mean’ -&gt; ‘mean’</p></li>
+<li><p>‘conv2d’ -&gt; ‘conv’</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The raw API name (e.g. ‘CrossEntropyLoss’).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalized key (e.g. ‘crossentropy’).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.normalize_arg">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalize_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.normalize_arg" title="Link to this definition">¶</a></dt>
-<dd><p>Canonicalizes an argument name.
+<dd><p>Canonicalizes an argument name using the alias map.
 e.g., ‘learning_rate’ -&gt; ‘lr’.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.cluster">
 <span class="sig-name descname"><span class="pre">cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard"><span class="pre">CandidateStandard</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.cluster" title="Link to this definition">¶</a></dt>
-<dd><p>Groups API definitions from multiple frameworks into Candidates.</p>
+<dd><p>Groups API definitions from multiple frameworks into Candidates based on name similarity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>framework_inputs</strong> – Dictionary mapping ‘framework_name’ -&gt; List of discovered GhostRefs.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of potential standards, sorted by score.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard">CandidateStandard</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.filter_common">
 <span class="sig-name descname"><span class="pre">filter_common</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard"><span class="pre">CandidateStandard</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_support</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard"><span class="pre">CandidateStandard</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.filter_common" title="Link to this definition">¶</a></dt>
-<dd><p>Returns only standards derived from agreement between multiple frameworks.</p>
+<dd><p>Filters candidates to keep only those present in a minimum number of frameworks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>candidates</strong> – List of candidates from clustering.</p></li>
+<li><p><strong>min_support</strong> – Minimum number of frameworks that must implement the op.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered list of CandidateStandard.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.consensus.ConsensusEngine.align_signatures">
 <span class="sig-name descname"><span class="pre">align_signatures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.discovery.consensus.CandidateStandard" title="ml_switcheroo.discovery.consensus.CandidateStandard"><span class="pre">CandidateStandard</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consensus_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.discovery.consensus.ConsensusEngine.align_signatures" title="Link to this definition">¶</a></dt>
-<dd><p>Analyses the signatures of all variants in a candidate.
-Populates ‘std_args’ and ‘arg_mappings’ based on consensus.</p>
+<dd><p>Analyses the arguments of all variants in a candidate to determine Standard Arguments.</p>
+<p>It populates <cite>std_args</cite> on the candidate by voting: if an argument (normalized)
+appears in &gt;50% of the implementations, it becomes part of the standard signature.</p>
+<p>It also populates <cite>arg_mappings</cite> to translate between the Standard name and
+the specific framework name (e.g. Standard ‘dim’ -&gt; Torch ‘dim’, Jax ‘axis’).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>candidates</strong> – List of CandidateStandards to process (in-place modification).</p></li>
-<li><p><strong>consensus_threshold</strong> – Fraction of variants that must share an arg for it to be standard.
-(0.5 means &gt; 50% must have it).</p></li>
+<li><p><strong>consensus_threshold</strong> – Fraction of variants that must share an arg (0.0 - 1.0).</p></li>
 </ul>
 </dd>
 </dl>

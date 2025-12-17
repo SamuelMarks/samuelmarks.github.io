@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.importers" href="../../importers/index.html" />
@@ -318,23 +318,27 @@
             
   <section id="module-ml_switcheroo.generated_tests.generator">
 <span id="ml-switcheroo-generated-tests-generator"></span><h1 id="api-ml-switcheroo-generated-tests-generator-index--page-root">ml_switcheroo.generated_tests.generator<a class="headerlink" href="#api-ml-switcheroo-generated-tests-generator-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Dynamic Test Code Generator.</p>
+<p>Dynamic Test Code Generator (Physical Synthesizer).</p>
 <p>This module is responsible for creating physical Python test files based on the
 Semantic Knowledge Base.</p>
-<p>It operates using a <strong>Template-Driven</strong> approach. For each framework (Torch, JAX, etc.),
-it looks up a configuration dictionary that defines how to:
-1.  Import the library.
-2.  Convert a NumPy array to the library’s tensor format.
-3.  Convert the library’s tensor format back to a NumPy array.
-4.  Optionally wrap execution in JIT compilation (for JAX correctness).</p>
-<p>It emits:
-1.  <strong>Imports</strong>: Only for frameworks actually used in the generated batch.
-2.  <strong>Input Generation</strong>: NumPy seeded random data, using Type Hints from the Spec.
-3.  <strong>Execution Blocks</strong>: Try/Except blocks for each backend found.
-4.  <strong>Comparison Logic</strong>: A generic loop to compare all successful outputs.</p>
-<p><strong>Update for Distributed Semantics</strong>:
-Templates are now retrieved from the unified SemanticsManager, which aggregates
-templates from Registry (Code) and Overlays (Snapshots).</p>
+<p>It operations in two stages:
+1.  <strong>Template Resolution</strong>: It aggregates execution templates (<cite>import</cite>, <cite>convert_input</cite>, <cite>to_numpy</cite>)</p>
+<blockquote>
+<div><p>from the SemanticsManager, prioritizing overlays (snapshots) over registry defaults.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Code Emission</strong>: It iterates over Operations in the Spec, generating <cite>def test_gen_&lt;opname&gt;()</cite>
+functions that:
+- Generate random inputs using type hints.
+- Execute the operation across all available backends (Torch, JAX, etc.).
+- Compare outputs using <cite>np.allclose</cite>.</p></li>
+</ol>
+<dl class="simple">
+<dt>JIT Logic:</dt><dd><p>If a template specifies <cite>jit_wrap: True</cite> (e.g., JAX), the generator inspects the
+framework traits to identify <cite>static_argnums</cite> (arguments like <cite>axis</cite> or <cite>keepdims</cite>)
+and generates valid <cite>jax.jit(fn, static_argnums=(…))</cite> wrappers.</p>
+</dd>
+</dl>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">

@@ -8,12 +8,11 @@ ml_switcheroo.frameworks.jax
    JAX Core Framework Adapter (Level 0 & Level 1).
 
    This adapter provides support for the functional JAX ecosystem *without* binding
-   to a high-level neural network library like Flax or Haiku. It is intended for:
-   1.  **Pure Math/Array Conversions** (NumPy <-> JAX Array).
-   2.  **Functional Optimization** (via Optax mapping).
-   3.  **Low-Level Checkpointing** (via Orbax).
+   to a high-level neural network library like Flax or Haiku.
 
-   It implements the `JAXStackMixin` to standardized these common libraries.
+   Updates:
+   - Dynamic scanning of ``jax.nn`` for activations.
+   - Dynamic scanning of ``optax`` for optimizers/losses via `OptaxScanner`.
 
 
 
@@ -47,7 +46,6 @@ Module Contents
 
 
    Adapter for Core JAX (jax + optax + orbax) without a Neural Framework.
-   Used for converting math libraries, or as a base for specific frameworks.
 
 
    .. py:attribute:: display_name
@@ -73,7 +71,6 @@ Module Contents
 
 
       Scans only core math and optimization libraries.
-      Does NOT scan flax/haiku modules.
 
 
    .. py:property:: import_alias
@@ -85,15 +82,10 @@ Module Contents
       :type: Dict[str, List[str]]
 
 
-      Core JAX API surface patterns.
-
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
-
-      Defines traits for pure JAX code.
-      Since pure JAX doesn't use classes for layers, module_base is None.
 
 
    .. py:property:: definitions

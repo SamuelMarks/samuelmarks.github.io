@@ -10,13 +10,14 @@ ml_switcheroo.discovery.syncer
    This module scans installed libraries (e.g., Torch, JAX, TensorFlow, MLX) for
    functions that match the names defined in the Semantic Knowledge Base.
 
-   It handles:
+   Links:
+   - Hub (Spec): "Abs(x)"
+   - Spoke (Lib): "torch.abs"
+
+   Logic:
    1. Module Discovery via FrameworkAdapters.
    2. Name Matching (`torch.abs` matches `Abs`).
-   3. Signature Compatibility Verification.
-      - Supports Functions.
-      - **Fix**: Supports Classes (Layers) by checking `__call__`/`forward` signatures
-        and relaxing argument count requirements (assuming extras are in `__init__`/`setup`).
+   3. Signature Compatibility Verification. (Robust against C-Exts).
 
 
 
@@ -35,10 +36,6 @@ Module Contents
 
    Links abstract operations to concrete framework implementations.
 
-   This class iterates through registered modules of a target framework, looking for
-   callables that match the operation names defined in the Semantic Knowledge Base.
-   It verifies that potential matches have compatible signatures before linking them.
-
    .. attribute:: console
 
       A configured Rich console for logging output.
@@ -50,16 +47,6 @@ Module Contents
    .. py:method:: sync(tier_data: Dict[str, Any], framework: str) -> None
 
       Updates the 'variants' dict in tier_data by hunting for ops in the target framework.
-
-      It resolves the `FrameworkAdapter` for the requested framework to determine
-      the list of python submodules to scan (e.g. `['jax.numpy', 'jax.numpy.fft']`).
-
-      If a function with a matching name and compatible signature is found, it is
-      recorded in the `tier_data` dictionary under the `variants` key.
-
-      :param tier_data: The Semantic Knowledge Base (dictionary of operations).
-                        This dictionary is modified in-place.
-      :param framework: The target framework name (e.g., 'torch', 'tensorflow', 'mlx').
 
 
 

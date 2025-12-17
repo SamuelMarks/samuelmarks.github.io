@@ -62,10 +62,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="ml_switcheroo.discovery.scaffolder" href="../scaffolder/index.html" />
+    <link rel="next" title="ml_switcheroo.discovery.layers" href="../layers/index.html" />
     <link rel="prev" title="ml_switcheroo.discovery.harvester" href="../harvester/index.html" />
   
    
@@ -288,6 +288,8 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.discovery.inspector.ApiInspector" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ApiInspector</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.discovery.inspector.ApiInspector._package_cache" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ApiInspector._package_cache</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.discovery.inspector.ApiInspector.inspect" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ApiInspector.inspect()</span></code></a>
         </li></ul>
             </nav>
@@ -313,15 +315,22 @@
   <section id="module-ml_switcheroo.discovery.inspector">
 <span id="ml-switcheroo-discovery-inspector"></span><h1 id="api-ml-switcheroo-discovery-inspector-index--page-root">ml_switcheroo.discovery.inspector<a class="headerlink" href="#api-ml-switcheroo-discovery-inspector-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Inspection Engine for Python Packages.</p>
-<p>This module uses <code class="docutils literal notranslate"><span class="pre">griffe</span></code> to perform static analysis on installed packages,
-extracting function signatures, docstrings, and identifying attributes (constants/types).
-It provides robust detection of variable arguments (<code class="docutils literal notranslate"><span class="pre">*args</span></code>) to aid fuzzy matching.</p>
+<p>This module provides the <a class="reference internal" href="#ml_switcheroo.discovery.inspector.ApiInspector" title="ml_switcheroo.discovery.inspector.ApiInspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiInspector</span></code></a>, a hybrid static-dynamic analysis tool
+designed to extract API signatures (functions, classes, and attributes) from Python packages.</p>
+<p>It employs a two-stage strategy:</p>
+<ol class="arabic simple">
+<li><p><strong>Static Analysis (Griffe)</strong>: Attempts to parse the source code first. This is safer
+and preserves comments/docstrings better, but fails on compiled modules (C-Extensions).</p></li>
+<li><p><strong>Runtime Introspection (Inspect)</strong>: Falls back to importing the module and inspecting
+live objects. This is required for frameworks like PyTorch, TensorFlow, and MLX which
+rely heavily on compiled bindings.</p></li>
+</ol>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.discovery.inspector.ApiInspector" title="ml_switcheroo.discovery.inspector.ApiInspector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApiInspector</span></code></a></p></td>
-<td><p>Static Analysis tool for Python packages.</p></td>
+<td><p>A robust inspector for discovering API surfaces of installed libraries.</p></td>
 </tr>
 </tbody>
 </table>
@@ -331,23 +340,21 @@ It provides robust detection of variable arguments (<code class="docutils litera
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.inspector.ApiInspector">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.discovery.inspector.</span></span><span class="sig-name descname"><span class="pre">ApiInspector</span></span><a class="headerlink" href="#ml_switcheroo.discovery.inspector.ApiInspector" title="Link to this definition">¶</a></dt>
-<dd><p>Static Analysis tool for Python packages.</p>
+<dd><p>A robust inspector for discovering API surfaces of installed libraries.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.discovery.inspector.ApiInspector._package_cache">
+<span class="sig-name descname"><span class="pre">_package_cache</span></span><a class="headerlink" href="#ml_switcheroo.discovery.inspector.ApiInspector._package_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Cache of statically parsed Griffe trees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, griffe.Object]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.inspector.ApiInspector.inspect">
 <span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.inspector.ApiInspector.inspect" title="Link to this definition">¶</a></dt>
 <dd><p>Scans a package and returns a flat catalog of its public API.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>package_name</strong> – The importable name of the package (e.g. ‘torch’, ‘math’).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Catalog of API members.
-Format: <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">"pkg.sub.func":</span> <span class="pre">{</span> <span class="pre">"name":</span> <span class="pre">"func",</span> <span class="pre">"has_varargs":</span> <span class="pre">True,</span> <span class="pre">...</span> <span class="pre">}</span> <span class="pre">}</span></code></p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[str, Any]</p>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 </section>
@@ -377,12 +384,12 @@ Format: <code class="docutils literal notranslate"><span class="pre">{</span> <s
             </a>
           
           
-            <a href="../scaffolder/index.html" title="ml_switcheroo.discovery.scaffolder"
+            <a href="../layers/index.html" title="ml_switcheroo.discovery.layers"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.discovery.scaffolder </span>
+                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.discovery.layers </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

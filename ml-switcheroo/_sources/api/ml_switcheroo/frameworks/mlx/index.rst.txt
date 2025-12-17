@@ -3,6 +3,17 @@ ml_switcheroo.frameworks.mlx
 
 .. py:module:: ml_switcheroo.frameworks.mlx
 
+.. autoapi-nested-parse::
+
+   Apple MLX Framework Adapter.
+
+   This module provides the adapter for Apple's MLX array framework.
+   It supports:
+   1.  **Unified Memory math**: Mapping `mlx.core` operations.
+   2.  **Neural Networks**: Mapping `mlx.nn` layers and containers.
+   3.  **Discovery**: Runtime introspection of the MLX API surface.
+
+
 
 Classes
 -------
@@ -17,7 +28,7 @@ Module Contents
 
 .. py:class:: MLXAdapter
 
-   Adapter for Apple MLX.
+   Adapter for Apple MLX (Silicon-optimized tensor framework).
 
 
    .. py:attribute:: display_name
@@ -47,14 +58,26 @@ Module Contents
       :type: Tuple[str, str]
 
 
+      Default alias for core array operations.
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
 
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
+
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
 
@@ -66,6 +89,20 @@ Module Contents
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
 
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns MLX idiomatic examples used for validity testing.
+
+
+
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
 
@@ -75,6 +112,10 @@ Module Contents
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
 
-   .. py:method:: convert(data)
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies manual wiring for MLX.
+      Ideally, we inject import mappings here.
+
 
 

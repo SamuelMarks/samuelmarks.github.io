@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.frameworks.numpy" href="../numpy/index.html" />
@@ -300,11 +300,21 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.discovery_heuristics" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.discovery_heuristics</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.supported_tiers" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.supported_tiers</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.structural_traits" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.structural_traits</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.definitions" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.definitions</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.rng_seed_methods" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.rng_seed_methods</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.collect_api" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.collect_api()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.convert" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.convert()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_example_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.get_example_code()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_tiered_examples" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.get_tiered_examples()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_device_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.get_device_syntax()</span></code></a>
         </li>
@@ -312,7 +322,7 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_serialization_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.get_serialization_syntax()</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.convert" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.convert()</span></code></a>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.mlx.MLXAdapter.apply_wiring" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MLXAdapter.apply_wiring()</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -336,12 +346,18 @@
             
   <section id="module-ml_switcheroo.frameworks.mlx">
 <span id="ml-switcheroo-frameworks-mlx"></span><h1 id="api-ml-switcheroo-frameworks-mlx-index--page-root">ml_switcheroo.frameworks.mlx<a class="headerlink" href="#api-ml-switcheroo-frameworks-mlx-index--page-root" title="Link to this heading">¶</a></h1>
+<p>Apple MLX Framework Adapter.</p>
+<p>This module provides the adapter for Apple’s MLX array framework.
+It supports:
+1.  <strong>Unified Memory math</strong>: Mapping <cite>mlx.core</cite> operations.
+2.  <strong>Neural Networks</strong>: Mapping <cite>mlx.nn</cite> layers and containers.
+3.  <strong>Discovery</strong>: Runtime introspection of the MLX API surface.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.mlx.MLXAdapter" title="ml_switcheroo.frameworks.mlx.MLXAdapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLXAdapter</span></code></a></p></td>
-<td><p>Adapter for Apple MLX.</p></td>
+<td><p>Adapter for Apple MLX (Silicon-optimized tensor framework).</p></td>
 </tr>
 </tbody>
 </table>
@@ -351,7 +367,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.mlx.</span></span><span class="sig-name descname"><span class="pre">MLXAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter" title="Link to this definition">¶</a></dt>
-<dd><p>Adapter for Apple MLX.</p>
+<dd><p>Adapter for Apple MLX (Silicon-optimized tensor framework).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Apple</span> <span class="pre">MLX'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -371,14 +387,23 @@
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.import_alias" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Default alias for core array operations.</p>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.supported_tiers">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.structural_traits" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.definitions">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.definitions" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.rng_seed_methods">
@@ -388,6 +413,19 @@
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.collect_api">
 <span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.collect_api" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.convert">
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.convert" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.get_example_code">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_example_code" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.get_tiered_examples">
+<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
+<dd><p>Returns MLX idiomatic examples used for validity testing.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.get_device_syntax">
 <span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
@@ -401,9 +439,11 @@
 <span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.convert" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.mlx.MLXAdapter.apply_wiring">
+<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.mlx.MLXAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
+<dd><p>Applies manual wiring for MLX.
+Ideally, we inject import mappings here.</p>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

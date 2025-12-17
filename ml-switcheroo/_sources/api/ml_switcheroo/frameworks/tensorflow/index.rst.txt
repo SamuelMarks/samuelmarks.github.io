@@ -3,6 +3,19 @@ ml_switcheroo.frameworks.tensorflow
 
 .. py:module:: ml_switcheroo.frameworks.tensorflow
 
+.. autoapi-nested-parse::
+
+   TensorFlow Framework Adapter.
+
+   This module provides the adapter for TensorFlow, supporting both core TF operations
+   and legacy Keras integration if present within the TF namespace.
+
+   Capabilities:
+   1.  **Core Math**: Maps `Mean`, `Abs` to `tf.math`.
+   2.  **Plugin Wiring**: Handles `transpose` (permute) via the `pack_varargs` plugin.
+   3.  **Discovery**: Scans `tensorflow.nn` for activations and layers.
+
+
 
 Classes
 -------
@@ -17,7 +30,9 @@ Module Contents
 
 .. py:class:: TensorFlowAdapter
 
-   Adapter for TensorFlow.
+   Adapter for TensorFlow (Core & Keras).
+
+   Supports translation of Low-level TF modules and math operations.
 
 
    .. py:attribute:: display_name
@@ -42,20 +57,46 @@ Module Contents
       :type: List[str]
 
 
+      Modules to scan during Scaffolding.
+      Broadens search to include signal, linalg, and embedded keras layers.
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
+
+      import tensorflow as tf.
+
+      :type: Default import alias
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
+      Regex patterns for categorizing discovered APIs.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
+
+      Defines structural rewriting rules for TF Classes.
+      Often overlaps with Keras traits (call vs forward).
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Static definitions for core operations.
+
+      Ensures 'Mean' uses 'reduce_mean' and 'permute_dims' uses the plugin.
 
 
    .. py:property:: rng_seed_methods
@@ -65,8 +106,35 @@ Module Contents
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
+      Implements runtime introspection for the Consensus Engine.
+      Scans `tf.nn` for activations/math and `tf.keras` for layers.
+
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+      Returns snippet for the web demo.
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns TensorFlow Core idiomatic examples.
+
+      Tiers:
+      1. Math: Uses `tf.math` operations.
+      2. Neural: Uses `tf.Module` (distinct from Keras Layers) to show low-level state.
+      3. Extras: Uses `tf.data` pipelines.
+
+
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Generates `tf.device` string.
+      Resolves 'cuda'/'gpu' to 'GPU', 'cpu' to 'CPU'.
+
 
 
    .. py:method:: get_serialization_imports() -> List[str]
@@ -76,5 +144,8 @@ Module Contents
 
 
    .. py:method:: convert(data)
+
+      Converts inputs to TF Tensors.
+
 
 

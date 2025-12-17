@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.frameworks.keras" href="../keras/index.html" />
@@ -344,11 +344,10 @@
 <span id="ml-switcheroo-frameworks-jax"></span><h1 id="api-ml-switcheroo-frameworks-jax-index--page-root">ml_switcheroo.frameworks.jax<a class="headerlink" href="#api-ml-switcheroo-frameworks-jax-index--page-root" title="Link to this heading">¶</a></h1>
 <p>JAX Core Framework Adapter (Level 0 &amp; Level 1).</p>
 <p>This adapter provides support for the functional JAX ecosystem <em>without</em> binding
-to a high-level neural network library like Flax or Haiku. It is intended for:
-1.  <strong>Pure Math/Array Conversions</strong> (NumPy &lt;-&gt; JAX Array).
-2.  <strong>Functional Optimization</strong> (via Optax mapping).
-3.  <strong>Low-Level Checkpointing</strong> (via Orbax).</p>
-<p>It implements the <cite>JAXStackMixin</cite> to standardized these common libraries.</p>
+to a high-level neural network library like Flax or Haiku.</p>
+<p>Updates:
+- Dynamic scanning of <code class="docutils literal notranslate"><span class="pre">jax.nn</span></code> for activations.
+- Dynamic scanning of <code class="docutils literal notranslate"><span class="pre">optax</span></code> for optimizers/losses via <cite>OptaxScanner</cite>.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -382,8 +381,7 @@ to a high-level neural network library like Flax or Haiku. It is intended for:
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.jax.</span></span><span class="sig-name descname"><span class="pre">JaxCoreAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../common/jax_stack/index.html#ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin" title="ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin</span></code></a></p>
-<p>Adapter for Core JAX (jax + optax + orbax) without a Neural Framework.
-Used for converting math libraries, or as a base for specific frameworks.</p>
+<p>Adapter for Core JAX (jax + optax + orbax) without a Neural Framework.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'JAX</span> <span class="pre">(Core)'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -399,8 +397,7 @@ Used for converting math libraries, or as a base for specific frameworks.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.search_modules" title="Link to this definition">¶</a></dt>
-<dd><p>Scans only core math and optimization libraries.
-Does NOT scan flax/haiku modules.</p>
+<dd><p>Scans only core math and optimization libraries.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.import_alias">
@@ -409,14 +406,11 @@ Does NOT scan flax/haiku modules.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
-<dd><p>Core JAX API surface patterns.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.structural_traits" title="Link to this definition">¶</a></dt>
-<dd><p>Defines traits for pure JAX code.
-Since pure JAX doesn’t use classes for layers, module_base is None.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.definitions" title="Link to this definition">¶</a></dt>

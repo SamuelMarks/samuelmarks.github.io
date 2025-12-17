@@ -9,13 +9,10 @@ ml_switcheroo.frameworks.paxml
 
    This adapter specializes the core JAX stack for Google's PaxML framework.
    It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
-   `JAXStackMixin` but implements the unique structural traits of the Praxis Layer library.
+   ``JAXStackMixin`` but implements the unique structural traits of the Praxis library.
 
-   Key Features:
-   - **Inheritance**: Uses `JAXStackMixin` for shared math/device/optimization logic.
-   - **Structural Traits**: Defines `setup` instead of `__init__`, and `__call__` for inference.
-   - **Layer API**: Maps `praxis.layers` to standard Neural Ops via manual wiring defaults
-     to ensure robust bootstrapping even if the environment lacks full Praxis installations.
+   Updates:
+   - Dynamic discovery of ``praxis.layers`` by scanning the module at runtime.
 
 
 
@@ -49,7 +46,7 @@ Module Contents
 
    Adapter for PaxML (Praxis Layers) running on JAX.
 
-   This Level 2 adapter leverages the Level 0/1 stack provided by `JAXStackMixin`
+   This Level 2 adapter leverages the Level 0/1 stack provided by ``JAXStackMixin``
    for array operations and optimization, while providing the specific layer
    definitions for the Praxis library.
 
@@ -75,7 +72,7 @@ Module Contents
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
 
       Scans API surface.
-      Delegates Math/Opt to Jax Core, handles Layers specifically for Praxis.
+      Delegates Math/Opt to Jax Core, handles Layers (Praxis) dynamically.
 
 
 
@@ -91,6 +88,11 @@ Module Contents
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
+
+
+
+   .. py:property:: supported_tiers
+      :type: List[Any]
 
 
 
@@ -129,5 +131,13 @@ Module Contents
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns PaxML (Praxis) idiomatic examples.
+
+      Tiers:
+      1. Math: Uses `jax.numpy` (JAX Core).
+      2. Neural: Uses `praxis.layers` and `setup()` method lifecycle.
+      3. Extras: Uses `HParams` configuration templates.
+
 
 

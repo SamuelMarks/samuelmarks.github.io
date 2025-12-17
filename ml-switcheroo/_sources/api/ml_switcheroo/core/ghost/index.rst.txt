@@ -12,10 +12,9 @@ ml_switcheroo.core.ghost
    to operate in "Ghost Mode" (WASM/CI) by working against cached snapshots
    instead of requiring heavy libraries (Torch/TensorFlow) to be installed.
 
-   Classes:
-       GhostParam: Represents a single function/method parameter.
-       GhostRef: A serializable snapshot of an API component (Class or Function).
-       GhostInspector: Facade to extract GhostRefs from live objects or JSON.
+   Updates:
+   - Robust C-Extension handling (try/except around `inspect.signature`).
+   - Validates parameter kinds to support `*args` (VarPositional).
 
 
 
@@ -97,6 +96,12 @@ Module Contents
 
 
 
+   .. py:attribute:: has_varargs
+      :type:  bool
+      :value: False
+
+
+
    .. py:method:: has_arg(arg_name: str) -> bool
 
       Checks if a specific argument exists in the signature.
@@ -107,10 +112,8 @@ Module Contents
 
    Facade for API Inspection.
 
-   Handles the complexity of:
-   1.  Live Introspection: Using ``inspect.signature`` on installed libraries.
-   2.  Ghost Hydration: wrapper for Pydantic loading (used for future caching interactions).
-   3.  Normalization: Converting classes (inspecting ``__init__``) transparently.
+   Responsibility: Convert Live Objects -> JSON-serializable GhostDefs.
+   Crucial for populating snapshots used by WASM/JS environments.
 
 
    .. py:method:: inspect(obj: Union[Any, Callable], api_path: str) -> GhostRef
@@ -118,6 +121,7 @@ Module Contents
 
 
       Creates a GhostRef from a live Python object.
+      Gracefully handles C-Extensions and builtins that resist introspection.
 
       :param obj: The live class or function to inspect.
       :param api_path: The canonical string path (e.g. 'torch.nn.ReLU').
@@ -131,10 +135,6 @@ Module Contents
 
 
       Creates a GhostRef from a dictionary (JSON snapshot).
-
-      :param data: Dictionary matching the GhostRef schema.
-
-      :returns: A valid GhostRef object.
 
 
 

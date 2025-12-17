@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.hooks" href="../hooks/index.html" />
@@ -310,6 +310,8 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.ghost.GhostRef.docstring" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GhostRef.docstring</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.ghost.GhostRef.has_varargs" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GhostRef.has_varargs</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.ghost.GhostRef.has_arg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GhostRef.has_arg()</span></code></a>
         </li></ul>
             </nav>
@@ -347,12 +349,9 @@
 decouple framework analysis from the live environment. It enables the system
 to operate in “Ghost Mode” (WASM/CI) by working against cached snapshots
 instead of requiring heavy libraries (Torch/TensorFlow) to be installed.</p>
-<dl class="simple">
-<dt>Classes:</dt><dd><p>GhostParam: Represents a single function/method parameter.
-GhostRef: A serializable snapshot of an API component (Class or Function).
-GhostInspector: Facade to extract GhostRefs from live objects or JSON.</p>
-</dd>
-</dl>
+<p>Updates:
+- Robust C-Extension handling (try/except around <cite>inspect.signature</cite>).
+- Validates parameter kinds to support <cite>*args</cite> (VarPositional).</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -420,6 +419,10 @@ without needing the framework installed at runtime.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.core.ghost.GhostRef.docstring">
 <span class="sig-name descname"><span class="pre">docstring</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.ghost.GhostRef.docstring" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.ghost.GhostRef.has_varargs">
+<span class="sig-name descname"><span class="pre">has_varargs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ml_switcheroo.core.ghost.GhostRef.has_varargs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.ghost.GhostRef.has_arg">
 <span class="sig-name descname"><span class="pre">has_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ml_switcheroo.core.ghost.GhostRef.has_arg" title="Link to this definition">¶</a></dt>
@@ -430,14 +433,13 @@ without needing the framework installed at runtime.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.core.ghost.GhostInspector">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.ghost.</span></span><span class="sig-name descname"><span class="pre">GhostInspector</span></span><a class="headerlink" href="#ml_switcheroo.core.ghost.GhostInspector" title="Link to this definition">¶</a></dt>
 <dd><p>Facade for API Inspection.</p>
-<p>Handles the complexity of:
-1.  Live Introspection: Using <code class="docutils literal notranslate"><span class="pre">inspect.signature</span></code> on installed libraries.
-2.  Ghost Hydration: wrapper for Pydantic loading (used for future caching interactions).
-3.  Normalization: Converting classes (inspecting <code class="docutils literal notranslate"><span class="pre">__init__</span></code>) transparently.</p>
+<p>Responsibility: Convert Live Objects -&gt; JSON-serializable GhostDefs.
+Crucial for populating snapshots used by WASM/JS environments.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.ghost.GhostInspector.inspect">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">GhostRef</span></a></span></span><a class="headerlink" href="#ml_switcheroo.core.ghost.GhostInspector.inspect" title="Link to this definition">¶</a></dt>
-<dd><p>Creates a GhostRef from a live Python object.</p>
+<dd><p>Creates a GhostRef from a live Python object.
+Gracefully handles C-Extensions and builtins that resist introspection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -454,14 +456,6 @@ without needing the framework installed at runtime.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.core.ghost.GhostInspector.hydrate">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hydrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">GhostRef</span></a></span></span><a class="headerlink" href="#ml_switcheroo.core.ghost.GhostInspector.hydrate" title="Link to this definition">¶</a></dt>
 <dd><p>Creates a GhostRef from a dictionary (JSON snapshot).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> – Dictionary matching the GhostRef schema.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A valid GhostRef object.</p>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 </section>

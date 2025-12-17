@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.frameworks.flax_shim" href="../flax_shim/index.html" />
@@ -306,6 +306,8 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.discovery_heuristics" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FlaxNNXAdapter.discovery_heuristics</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.supported_tiers" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FlaxNNXAdapter.supported_tiers</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.structural_traits" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FlaxNNXAdapter.structural_traits</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.definitions" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FlaxNNXAdapter.definitions</span></code></a>
@@ -344,13 +346,12 @@
 <span id="ml-switcheroo-frameworks-flax-nnx"></span><h1 id="api-ml-switcheroo-frameworks-flax-nnx-index--page-root">ml_switcheroo.frameworks.flax_nnx<a class="headerlink" href="#api-ml-switcheroo-frameworks-flax-nnx-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Flax NNX Framework Adapter (Level 2).</p>
 <p>This adapter builds upon the core JAX stack to support the <strong>Flax NNX</strong>
-neural network library. It inherits math/optimizer logic from <cite>JAXStackMixin</cite>
-but implements unique structural traits for NNX Modules.</p>
-<p>Key Features:
-- Inheritance from <cite>jax</cite> core via Mixin reuse.
-- Rewriting <cite>torch.nn.Module</cite> -&gt; <cite>flax.nnx.Module</cite>.
-- Handling <cite>rngs</cite> state threading for stochastic layers.
-- Maps core Neural Ops to ensure successful transpilation if not pre-seeded.</p>
+neural network library. It inherits math/optimizer logic from <code class="docutils literal notranslate"><span class="pre">JAXStackMixin</span></code>
+but implements dynamic discovery for NNX Modules.</p>
+<p>Capabilities:
+1.  <strong>Inheritance</strong>: Extends <code class="docutils literal notranslate"><span class="pre">jax</span></code> core adapter.
+2.  <strong>Structural Traits</strong>: Handles <code class="docutils literal notranslate"><span class="pre">rngs</span></code> injection and <code class="docutils literal notranslate"><span class="pre">__call__</span></code> inference.
+3.  <strong>Dynamic Discovery</strong>: Scans <code class="docutils literal notranslate"><span class="pre">flax.nnx</span></code> to automatically find all available Layers.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -366,7 +367,7 @@ but implements unique structural traits for NNX Modules.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter" title="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FlaxNNXAdapter</span></code></a></p></td>
-<td><p>Adapter for the Flax NNX Framework.</p></td>
+<td><p>Adapter for the Flax NNX Framework (The Object-Oriented JAX API).</p></td>
 </tr>
 </tbody>
 </table>
@@ -381,7 +382,8 @@ but implements unique structural traits for NNX Modules.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.flax_nnx.</span></span><span class="sig-name descname"><span class="pre">FlaxNNXAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../common/jax_stack/index.html#ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin" title="ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin</span></code></a></p>
-<p>Adapter for the Flax NNX Framework.</p>
+<p>Adapter for the Flax NNX Framework (The Object-Oriented JAX API).</p>
+<p>Links standard Neural Layer definitions to <code class="docutils literal notranslate"><span class="pre">flax.nnx.*</span></code>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Flax</span> <span class="pre">NNX'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -397,14 +399,16 @@ but implements unique structural traits for NNX Modules.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.collect_api">
 <span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ml_switcheroo.frameworks.base.GhostRef</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.collect_api" title="Link to this definition">¶</a></dt>
-<dd><p>Collects API definitions.
-Leverages JaxCore logic for shared categories (Loss/Activations) via composition
-if living in the same environment, or scans Flax-specific layers.</p>
+<dd><p>Collects API definitions.</p>
+<p>Delegates Loss/Optimizer/Activation scanning to the Core JAX adapter
+(which scans Optax/JAX.nn), and implements specific logic for scanning
+Flax NNX Layers.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.search_modules" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Modules to scan during Scaffolding.</p>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.import_alias" title="Link to this definition">¶</a></dt>
@@ -414,9 +418,14 @@ if living in the same environment, or scans Flax-specific layers.</p>
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.supported_tiers">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.structural_traits" title="Link to this definition">¶</a></dt>
-<dd><p>Defines Flax NNX specific structural transformations (Level 2).</p>
+<dd><p>Defines Flax NNX specific structural transformations (Level 2).
+Requires injection of <cite>rngs</cite> argument for stochastic layers.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.flax_nnx.FlaxNNXAdapter.definitions">

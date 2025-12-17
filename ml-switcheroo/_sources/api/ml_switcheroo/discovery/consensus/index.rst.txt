@@ -7,13 +7,10 @@ ml_switcheroo.discovery.consensus
 
    Consensus Engine: The Dynamic Standardization Brain.
 
-   This module implements the logic to automatically discover Abstract Standards
-   by analyzing API lists from multiple frameworks. It identifies common concepts
-   (e.g., "HuberLoss" in Torch vs "huber" in JAX) via fuzzy clustering and naming
-   normalization, proposing them as "Candidate Standards" for the Middle Layer.
-
-   It also performs "Signature Alignment" to determine the standard arguments
-   (e.g. deciding that 'lr' is the standard argument for learning rate across frameworks).
+   This module provides the logic to identify common operations across disjoint frameworks.
+   It aligns variable naming conventions (e.g., 'dim' vs 'axis') and clusters API endpoints
+   (e.g., 'torch.sin' and 'jax.numpy.sin') into unified Abstract Standards suitable for
+   the Semantic Knowledge Base.
 
 
 
@@ -36,28 +33,25 @@ Module Contents
 
    A proposed Abstract Standard discovered via consensus.
 
-   Represents a single concept (e.g., 'Huber') found in one or more frameworks.
-
    .. attribute:: name
 
-      The proposed Abstract Name (e.g. 'Huber').
+      The abstract name (e.g., 'Conv2d').
 
    .. attribute:: variants
 
-      Map of {framework_name: GhostRef} for the implementations found.
+      A map of framework names to their specific implementations (GhostRefs).
 
    .. attribute:: score
 
-      A confidence score (0.0-1.0) based on how many frameworks agree.
+      A confidence score derived from the number of concurring frameworks.
 
    .. attribute:: std_args
 
-      List of abstract argument names agreed upon by consensus.
+      The list of argument names deemed 'standard' via voting.
 
    .. attribute:: arg_mappings
 
-      Nested dictionary {framework_name: {std_arg: fw_arg}}.
-      Used to generate the keys in the final StandardMap.
+      Nested dictionary mapping {framework: {std_arg: fw_specific_arg}}.
 
 
    .. py:attribute:: name
@@ -90,7 +84,8 @@ Module Contents
 
    .. py:method:: add_variant(framework: str, ref: ml_switcheroo.core.ghost.GhostRef)
 
-      Registers a framework's implementation of this standard.
+      Registers a framework's implementation of this concept.
+      Updates the consensus score.
 
 
 
@@ -98,14 +93,14 @@ Module Contents
 
    Algorithms for aligning divergent API naming conventions.
 
-   Responsibility:
-   1. Normalize API names (Clustering).
-   2. Normalize Argument names (Signature Alignment).
-   3. Compute intersection of arguments to define the Standard.
+   Capabilities:
+   1.  **Clustering**: Groups APIs like `HuberLoss`, `huber_loss`, and `Huber` together.
+   2.  **Normalization**: Strips common noise (prefixes/suffixes) to find the semantic root.
+   3.  **Signature Alignment**: Builds a translation map for arguments (e.g., `keepdims` <-> `keep_dims`).
 
 
    .. py:attribute:: IGNORED_SUFFIXES
-      :value: ['loss', 'error', 'layer', 'block', '2d', '1d', '3d', 'v1', 'v2', 'object']
+      :value: ['loss', 'error', 'layer', 'block', '2d', '1d', '3d', 'v1', 'v2', 'object', 'op', 'func']
 
 
 
@@ -118,37 +113,63 @@ Module Contents
 
       Reduces an API Name to its semantic core for comparison.
 
+      .. rubric:: Examples
+
+      - 'HuberLoss' -> 'huber'
+      - 'reduce_mean' -> 'mean'
+      - 'conv2d' -> 'conv'
+
+      :param name: The raw API name (e.g. 'CrossEntropyLoss').
+      :type name: str
+
+      :returns: The normalized key (e.g. 'crossentropy').
+      :rtype: str
+
 
 
    .. py:method:: normalize_arg(arg_name: str) -> str
       :classmethod:
 
 
-      Canonicalizes an argument name.
+      Canonicalizes an argument name using the alias map.
       e.g., 'learning_rate' -> 'lr'.
 
 
 
    .. py:method:: cluster(framework_inputs: Dict[str, List[ml_switcheroo.core.ghost.GhostRef]]) -> List[CandidateStandard]
 
-      Groups API definitions from multiple frameworks into Candidates.
+      Groups API definitions from multiple frameworks into Candidates based on name similarity.
+
+      :param framework_inputs: Dictionary mapping 'framework_name' -> List of discovered GhostRefs.
+
+      :returns: A list of potential standards, sorted by score.
+      :rtype: List[CandidateStandard]
 
 
 
    .. py:method:: filter_common(candidates: List[CandidateStandard], min_support: int = 2) -> List[CandidateStandard]
 
-      Returns only standards derived from agreement between multiple frameworks.
+      Filters candidates to keep only those present in a minimum number of frameworks.
+
+      :param candidates: List of candidates from clustering.
+      :param min_support: Minimum number of frameworks that must implement the op.
+
+      :returns: Filtered list of CandidateStandard.
 
 
 
    .. py:method:: align_signatures(candidates: List[CandidateStandard], consensus_threshold: float = 0.5)
 
-      Analyses the signatures of all variants in a candidate.
-      Populates 'std_args' and 'arg_mappings' based on consensus.
+      Analyses the arguments of all variants in a candidate to determine Standard Arguments.
+
+      It populates `std_args` on the candidate by voting: if an argument (normalized)
+      appears in >50% of the implementations, it becomes part of the standard signature.
+
+      It also populates `arg_mappings` to translate between the Standard name and
+      the specific framework name (e.g. Standard 'dim' -> Torch 'dim', Jax 'axis').
 
       :param candidates: List of CandidateStandards to process (in-place modification).
-      :param consensus_threshold: Fraction of variants that must share an arg for it to be standard.
-                                  (0.5 means > 50% must have it).
+      :param consensus_threshold: Fraction of variants that must share an arg (0.0 - 1.0).
 
 
 

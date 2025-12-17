@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.enums" href="../../enums/index.html" />
@@ -319,17 +319,13 @@
 <p>Discovery Tool for linking Framework implementations to Standards.</p>
 <p>This module scans installed libraries (e.g., Torch, JAX, TensorFlow, MLX) for
 functions that match the names defined in the Semantic Knowledge Base.</p>
-<p>It handles:
+<p>Links:
+- Hub (Spec): “Abs(x)”
+- Spoke (Lib): “torch.abs”</p>
+<p>Logic:
 1. Module Discovery via FrameworkAdapters.
 2. Name Matching (<cite>torch.abs</cite> matches <cite>Abs</cite>).
-3. Signature Compatibility Verification.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Supports Functions.</p></li>
-<li><p><strong>Fix</strong>: Supports Classes (Layers) by checking <cite>__call__</cite>/<cite>forward</cite> signatures
-and relaxing argument count requirements (assuming extras are in <cite>__init__</cite>/<cite>setup</cite>).</p></li>
-</ul>
-</div></blockquote>
+3. Signature Compatibility Verification. (Robust against C-Exts).</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -346,9 +342,6 @@ and relaxing argument count requirements (assuming extras are in <cite>__init__<
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.syncer.FrameworkSyncer">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.discovery.syncer.</span></span><span class="sig-name descname"><span class="pre">FrameworkSyncer</span></span><a class="headerlink" href="#ml_switcheroo.discovery.syncer.FrameworkSyncer" title="Link to this definition">¶</a></dt>
 <dd><p>Links abstract operations to concrete framework implementations.</p>
-<p>This class iterates through registered modules of a target framework, looking for
-callables that match the operation names defined in the Semantic Knowledge Base.
-It verifies that potential matches have compatible signatures before linking them.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.syncer.FrameworkSyncer.console">
 <span class="sig-name descname"><span class="pre">console</span></span><a class="headerlink" href="#ml_switcheroo.discovery.syncer.FrameworkSyncer.console" title="Link to this definition">¶</a></dt>
@@ -362,19 +355,6 @@ It verifies that potential matches have compatible signatures before linking the
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.syncer.FrameworkSyncer.sync">
 <span class="sig-name descname"><span class="pre">sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tier_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framework</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.syncer.FrameworkSyncer.sync" title="Link to this definition">¶</a></dt>
 <dd><p>Updates the ‘variants’ dict in tier_data by hunting for ops in the target framework.</p>
-<p>It resolves the <cite>FrameworkAdapter</cite> for the requested framework to determine
-the list of python submodules to scan (e.g. <cite>[‘jax.numpy’, ‘jax.numpy.fft’]</cite>).</p>
-<p>If a function with a matching name and compatible signature is found, it is
-recorded in the <cite>tier_data</cite> dictionary under the <cite>variants</cite> key.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tier_data</strong> – The Semantic Knowledge Base (dictionary of operations).
-This dictionary is modified in-place.</p></li>
-<li><p><strong>framework</strong> – The target framework name (e.g., ‘torch’, ‘tensorflow’, ‘mlx’).</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 </section>

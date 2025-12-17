@@ -11,31 +11,28 @@ ml_switcheroo.testing.fuzzer
    NumPy arrays, scalars, and complex container structures to feed into Framework A
    and Framework B during behavioral verification tests.
 
-   ## Generation Strategies
-
    It uses a dual-strategy approach:
 
    1.  **Type Hints (Semantic Validated)**:
-       If `spec_reader` has extracted explicit type information from the spec files,
-       the fuzzer parses these strings using a mini-grammar to generate compliant data.
+       If explicit type information is available (e.g., from Spec files), the fuzzer
+       parses these strings using a mini-grammar to generate compliant data.
 
        **Supported Grammar:**
        - Primitives: `int`, `float`, `bool`, `str`
        - Structural: `List[T]`, `Tuple[T, ...]`, `Dict[K, V]`, `Optional[T]`
        - Unions: `int | float`
        - Domain: `Array`, `Tensor`, `dtype`
-       - **Symbolic Shapes (New)**: `Array['B', 'N']` (Constraint Solving)
+       - **Symbolic Shapes**: `Array['B', 'N']` (Constraint Solving for consistent dimensions)
 
    2.  **Heuristics (Fallback)**:
-       If no hints are available in the spec, it infers data types from argument names.
+       If no hints are available, it infers data types from argument names.
        - `mask`, `condition` -> `bool`
-       - `idx`, `axis`, `dim` -> `int`
+       - `idx`, `axis`, `dim` -> `int` within bounds
        - `x`, `y`, `input` -> `Array (float32)`
 
-   ## Safety
-
-   The fuzzer implements `MAX_RECURSION_DEPTH` to prevent infinite loops when generating
-   recursive or deeply nested types (e.g. `List[List[List[...]]]`).
+   Safety:
+       Implements `MAX_RECURSION_DEPTH` to prevent infinite loops when generating
+       recursive or deeply nested types.
 
 
 
@@ -54,13 +51,10 @@ Module Contents
 
    Generates dummy inputs (Arrays, Scalars, Containers) for equivalence testing.
 
-   Prioritizes explicit Type Hints from the Knowledge Base. Falls back to
-   name-based heuristics if hints are missing or ambiguous (e.g., 'Any').
-
    .. attribute:: _seed_shape
 
       If set, forces generation
-      of arrays with this specific shape.
+      of arrays with this specific shape in fallback mode.
 
       :type: Optional[Tuple[int, ...]]
 
@@ -83,11 +77,14 @@ Module Contents
 
    .. py:method:: generate_inputs(params: List[str], hints: Optional[Dict[str, str]] = None) -> Dict[str, Any]
 
-      Creates a dictionary of {arg_name: value}.
+      Creates a dictionary of `{arg_name: value}`.
 
-      :param params: List of argument names [x, y, axis].
-      :param hints: Dictionary of {arg_name: type_string} derived from Spec.
-                    Example: {"x": "Array['B', 'T']", "axis": "int"}.
+      Resolves symbolic dimensions across the entire parameter set. For example,
+      if hints are `{'x': "Array['N']", 'y': "Array['N']"}`, both arrays will
+      have matching lengths.
+
+      :param params: List of argument names to generate (e.g. `['x', 'axis']`).
+      :param hints: Dictionary of `{arg_name: type_string}` derived from Spec.
 
       :returns: Randomized inputs ready for Framework adaptation.
       :rtype: Dict[str, Any]
@@ -97,10 +94,11 @@ Module Contents
    .. py:method:: adapt_to_framework(kwargs: Dict[str, Any], framework: str) -> Dict[str, Any]
 
       Converts Numpy inputs to framework-specific tensor types.
-      Delegates to registered adapters in `ml_switcheroo.testing.adapters`.
+
+      Delegates to registered adapters (e.g., `TorchAdapter`, `JaxAdapter`).
 
       :param kwargs: Input dictionary with Numpy values.
-      :param framework: "torch", "jax", "tensorflow", etc.
+      :param framework: Key of the framework (e.g., "torch", "jax").
 
       :returns: Dict with framework-specific tensors.
 

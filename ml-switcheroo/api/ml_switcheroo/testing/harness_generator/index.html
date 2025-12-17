@@ -62,7 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=0a5cd657"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.testing.harness_generator_template" href="../harness_generator_template/index.html" />
@@ -317,22 +317,25 @@
   <section id="module-ml_switcheroo.testing.harness_generator">
 <span id="ml-switcheroo-testing-harness-generator"></span><h1 id="api-ml-switcheroo-testing-harness-generator-index--page-root">ml_switcheroo.testing.harness_generator<a class="headerlink" href="#api-ml-switcheroo-testing-harness-generator-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Integration Test Harness Generator.</p>
-<p>This module is responsible for creating temporary verification scripts (harnesses)
-that dynamically import the original Source code and the converted Target code,
-feed them identical inputs, and verify that their outputs match.</p>
-<p>Crucially, the generated harness is <strong>Standalone</strong>: it does not import from
-the <cite>ml_switcheroo</cite> package, allowing verification in isolated environments.</p>
-<p><strong>Update (Split-Brain Fix)</strong>:
-Uses <cite>CodeExtractor</cite> to inject the <em>actual</em> code of <cite>InputFuzzer</cite> into the harness script,
-eliminating the duplicated <cite>StandaloneFuzzer</cite> maintained in string templates.
-This ensures that type hint improvements in the main codebase are automatically
-reflected in the verification harness.</p>
+<p>This module creates self-contained Python scripts for verifying transpilation accuracy.
+It dynamically extracts source code from the live system to ensure that generated
+harnesses support ALL registered frameworks (Torch, JAX, Keras, etc.) without
+hardcoding switch statements.</p>
+<p>Capabilities:
+1. <strong>Dynamic Shim Generation</strong>: Reads <cite>convert()</cite> methods from all registered</p>
+<blockquote>
+<div><p>Framework Adapters and synthesizes a standalone <cite>get_adapter</cite> function.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>Fuzzer Inlining</strong>: Extracts the <cite>InputFuzzer</cite> class source code.</p></li>
+<li><p><strong>Isolation</strong>: Generated scripts run without <cite>ml_switcheroo</cite> installed.</p></li>
+</ol>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator" title="ml_switcheroo.testing.harness_generator.HarnessGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HarnessGenerator</span></code></a></p></td>
-<td><p>Generates a standalone Python script to verify transpilation correctness.</p></td>
+<td><p>Generates standalone verification scripts.</p></td>
 </tr>
 </tbody>
 </table>
@@ -342,12 +345,11 @@ reflected in the verification harness.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.harness_generator.HarnessGenerator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.harness_generator.</span></span><span class="sig-name descname"><span class="pre">HarnessGenerator</span></span><a class="headerlink" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a standalone Python script to verify transpilation correctness.
-Dynamically extracts the <cite>InputFuzzer</cite> logic to embed it within the script.</p>
+<dd><p>Generates standalone verification scripts.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.harness_generator.HarnessGenerator.extractor">
 <span class="sig-name descname"><span class="pre">extractor</span></span><a class="headerlink" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator.extractor" title="Link to this definition">¶</a></dt>
-<dd><p>Utility to source code from runtime objects.</p>
+<dd><p>Tool to read source from live objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="../../utils/code_extractor/index.html#ml_switcheroo.utils.code_extractor.CodeExtractor" title="ml_switcheroo.utils.code_extractor.CodeExtractor">CodeExtractor</a></p>
@@ -362,21 +364,6 @@ Dynamically extracts the <cite>InputFuzzer</cite> logic to embed it within the s
 <dt class="sig sig-object py" id="ml_switcheroo.testing.harness_generator.HarnessGenerator.generate">
 <span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_harness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'torch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jax'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator.generate" title="Link to this definition">¶</a></dt>
 <dd><p>Writes the standalone verification script to disk.</p>
-<p>It reads the source code of <cite>InputFuzzer</cite> and injects it into the template,
-renaming it to <cite>StandaloneFuzzer</cite> to match the template’s expectations if needed,
-or simply using the extracted class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>source_file</strong> – Path to the original source code.</p></li>
-<li><p><strong>target_file</strong> – Path to the converted source code.</p></li>
-<li><p><strong>output_harness</strong> – Where to save the <cite>verify_xyz.py</cite> script.</p></li>
-<li><p><strong>source_fw</strong> – Name of source framework (for fuzzer adaptation).</p></li>
-<li><p><strong>target_fw</strong> – Name of target framework (for fuzzer adaptation).</p></li>
-<li><p><strong>semantics</strong> – Optional semantics dictionary to extract type hints.</p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 </dd></dl>
 </section>

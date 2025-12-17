@@ -1,0 +1,132 @@
+ml_switcheroo.testing.linter
+============================
+
+.. py:module:: ml_switcheroo.testing.linter
+
+.. autoapi-nested-parse::
+
+   Structural Validation Linter (The Anti-Pollution Check).
+
+   This module provides the ``StructuralLinter``, a static analysis tool designed
+   to verify that the output of a transpilation contains no artifacts from the
+   source framework.
+
+   Detection Scope:
+   1.  **Direct Imports**: Flags `import torch` or `from flax import ...`.
+   2.  **Aliased Usage**: Tracks `import torch as t` and flags subsequent calls like `t.abs()`.
+   3.  **Attribute Access**: Flags `torch.nn.Linear` if `torch` is a forbidden root.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.testing.linter.StructuralLinter
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.testing.linter.validate_transpilation
+
+
+Module Contents
+---------------
+
+.. py:class:: StructuralLinter(forbidden_roots: Set[str])
+
+   Bases: :py:obj:`libcst.CSTVisitor`
+
+
+   Scans CST for forbidden framework usage.
+
+   .. attribute:: forbidden_roots
+
+      The set of root package names (e.g., {'torch', 'flax'})
+      that should NOT appear in the generated code.
+
+      :type: Set[str]
+
+   .. attribute:: violations
+
+      usage violations found during the scan.
+
+      :type: List[str]
+
+   .. attribute:: _local_aliases
+
+      Maps local variable names to forbidden roots.
+      e.g., {'t': 'torch', 'nn': 'torch.nn'}.
+
+      :type: Dict[str, str]
+
+
+   .. py:attribute:: forbidden_roots
+
+
+   .. py:attribute:: violations
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:method:: check(code: str) -> List[str]
+
+      Runs the linter on a source string.
+
+      :param code: The Python source code to validate.
+
+      :returns: A list of error messages. Empty if valid.
+      :rtype: List[str]
+
+
+
+   .. py:method:: visit_Import(node: libcst.Import) -> None
+
+      Checks `import x`, `import x as y`.
+
+
+
+   .. py:method:: leave_Import(node: libcst.Import) -> None
+
+
+   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> None
+
+      Checks `from x import y`.
+
+
+
+   .. py:method:: leave_ImportFrom(node: libcst.ImportFrom) -> None
+
+
+   .. py:method:: visit_Name(node: libcst.Name) -> None
+
+      Checks usage of aliased forbidden variables (e.g. `t.abs()` where `t` is torch).
+
+
+
+   .. py:method:: visit_Attribute(node: libcst.Attribute) -> None
+
+      Checks attributes to provide more specific error messages (e.g. `torch.abs`).
+
+
+
+.. py:function:: validate_transpilation(code: str, source_fw: str) -> Tuple[bool, List[str]]
+
+   Facade to lint generated code against a specific source framework.
+
+   It automatically expands the `source_fw` into a set of forbidden roots including:
+   1. The framework itself (e.g. 'torch').
+   2. Known aliases (from adapter).
+   3. Inherited parents (e.g. 'flax_nnx' bans 'jax' too).
+
+   :param code: The generated python code.
+   :param source_fw: The framework that SHOULD have been removed (e.g., "torch").
+
+   :returns: (is_valid, list_of_errors)
+
+

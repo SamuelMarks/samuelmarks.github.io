@@ -44,16 +44,7 @@ Module Contents
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   str(object='') -> str
-   str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-   Create a new string object from the given object. If encoding or
-   errors is specified, then the object must expose a data buffer
-   that will be decoded using the given encoding and error handler.
-   Otherwise, returns the result of object.__str__() (if defined)
-   or repr(object).
-   encoding defaults to sys.getdefaultencoding().
-   errors defaults to 'strict'.
+   Enumeration of supported trace event types.
 
 
    .. py:attribute:: PHASE_START
@@ -93,6 +84,9 @@ Module Contents
 
 .. py:class:: TraceEvent
 
+   A single unit of execution history.
+
+
    .. py:attribute:: id
       :type:  str
 
@@ -124,47 +118,85 @@ Module Contents
    Records transpilation events for visualization.
    Designed to be injected into the Engine and Rewriter.
 
+   This class maintains a stack of active phases to establish parent-child
+   relationships between events (e.g. an AST mutation inside a specific Rewrite pass).
+
 
    .. py:method:: start_phase(name: str, description: str = '') -> str
 
-      Starts a nested phase (e.g., 'Rewriting Function X'). Returns Phase ID.
+      Starts a nested phase (e.g., 'Rewriting Function X').
+
+      :param name: The name of the phase.
+      :type name: str
+      :param description: Additional detail.
+      :type description: str
+
+      :returns: The generated Phase ID.
+      :rtype: str
 
 
 
-   .. py:method:: end_phase()
+   .. py:method:: end_phase() -> None
 
       Ends the current active phase.
+      Pops the phase ID from the stack and logs an end event.
 
 
 
-   .. py:method:: log_match(source_api: str, target_api: str, abstract_op: str)
+   .. py:method:: log_match(source_api: str, target_api: str, abstract_op: str) -> None
 
       Logs a Semantic Match event.
 
-
-
-   .. py:method:: log_mutation(node_type: str, before: str, after: str)
-
-      Logs an AST transformation.
+      :param source_api: The source function name (e.g. `torch.abs`).
+      :param target_api: The target implementation (e.g. `jax.numpy.abs`).
+      :param abstract_op: The abstract standard key (e.g. `Abs`).
 
 
 
-   .. py:method:: log_warning(message: str)
+   .. py:method:: log_mutation(node_type: str, before: str, after: str) -> None
+
+      Logs an AST transformation with code diffs.
+
+      :param node_type: Description of node being changed (e.g. "Call").
+      :param before: Source code snapshot before mutation.
+      :param after: Source code snapshot after mutation.
 
 
-   .. py:method:: log_inspection(node_str: str, outcome: str, detail: str = '')
 
-      Logs a decision point where no change occurred.
+   .. py:method:: log_warning(message: str) -> None
+
+      Logs an analysis warning.
+
+      :param message: The warning text.
+
+
+
+   .. py:method:: log_inspection(node_str: str, outcome: str, detail: str = '') -> None
+
+      Logs a decision point where no change occurred (for debugging).
+
+      :param node_str: The code element being inspected.
+      :param outcome: The result (e.g., "Skipped", "Ignored").
+      :param detail: Reason for the outcome.
 
 
 
    .. py:method:: export() -> List[Dict[str, Any]]
 
-      Returns list of dicts for JSON serialization.
+      Exports the event log as a list of dictionaries.
+
+      :returns: JSON-serializable event stream.
+      :rtype: List[Dict[str, Any]]
 
 
 
 .. py:function:: get_tracer() -> TraceLogger
 
-.. py:function:: reset_tracer()
+   Returns the global singleton TraceLogger instance.
+
+
+.. py:function:: reset_tracer() -> None
+
+   Resets the global tracer state. Useful between runs or tests.
+
 

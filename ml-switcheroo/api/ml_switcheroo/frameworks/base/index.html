@@ -260,7 +260,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -319,12 +340,20 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.StandardMap.args" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardMap.args</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.StandardMap.requires_plugin" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardMap.requires_plugin</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.StandardMap.output_adapter" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardMap.output_adapter</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.StandardMap.transformation_type" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardMap.transformation_type</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.StandardMap.operator" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardMap.operator</span></code></a>
         </li></ul>
             </nav>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.convert" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.convert()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.test_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.test_config</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.search_modules" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.search_modules</span></code></a>
         </li>
@@ -356,7 +385,11 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.definitions" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.definitions</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.import_namespaces" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.import_namespaces</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.collect_api" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.collect_api()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.base.FrameworkAdapter.apply_wiring" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkAdapter.apply_wiring()</span></code></a>
         </li></ul>
             </nav>
         </li>
@@ -387,12 +420,14 @@
   <section id="module-ml_switcheroo.frameworks.base">
 <span id="ml-switcheroo-frameworks-base"></span><h1 id="api-ml-switcheroo-frameworks-base-index--page-root">ml_switcheroo.frameworks.base<a class="headerlink" href="#api-ml-switcheroo-frameworks-base-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Base Protocol and Registry for Framework Adapters.</p>
-<p>This module defines the interface that all Framework Adapters must implement.</p>
-<p>Key Updates (Hybrid Loading):
-- Adapters now possess an <cite>init_mode</cite> (LIVE or GHOST).
-- Added logic to finding and loading cached snapshots if live imports fail.
-- Expanded <cite>collect_api</cite> to branch between scanning live objects vs reading cached lists.
-- <strong>New</strong>: <cite>supported_tiers</cite> property to define capabilities (Math vs Neural).</p>
+<p>This module defines the interface that all Framework Adapters must implement.
+It acts as the primary contact point between the <cite>ASTEngine</cite> and the specific
+ML library implementations (plugins).</p>
+<p>Key Capabilities (Hybrid Loading):
+- Adapters possess an <cite>init_mode</cite> (LIVE or GHOST).
+- In LIVE mode, they introspect installed packages.
+- In GHOST mode, they load cached JSON snapshots.</p>
+<p>Update: Enhanced StandardMap schema and import definitions.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -408,10 +443,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StandardCategory</span></code></a></p></td>
-<td><p>Categorization of Framework APIs for automated scanning.</p></td>
+<td><p>str(object='') -&gt; str</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.base.InitMode" title="ml_switcheroo.frameworks.base.InitMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InitMode</span></code></a></p></td>
-<td><p>Operational mode of an adapter.</p></td>
+<td><p>str(object='') -&gt; str</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StandardMap</span></code></a></p></td>
 <td><p>Defines how a Framework implements a Middle Layer standard.</p></td>
@@ -427,13 +462,13 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.base.load_snapshot_for_adapter" title="ml_switcheroo.frameworks.base.load_snapshot_for_adapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_snapshot_for_adapter</span></code></a>(→ Dict[str, Any])</p></td>
-<td><p>Locates the most recent snapshot for a given framework key (e.g. 'torch').</p></td>
+<td><p>Locates the most recent snapshot for a given framework key.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.base.register_framework" title="ml_switcheroo.frameworks.base.register_framework"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_framework</span></code></a>(name)</p></td>
-<td><p>Decorator to register a framework adapter class.</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.frameworks.base.get_adapter" title="ml_switcheroo.frameworks.base.get_adapter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_adapter</span></code></a>(→ Optional[FrameworkAdapter])</p></td>
-<td><p>Factory to instantiate an adapter.</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -448,7 +483,15 @@
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardCategory">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">StandardCategory</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardCategory" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Categorization of Framework APIs for automated scanning.</p>
+<p>str(object=’’) -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.__str__() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to ‘strict’.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardCategory.LOSS">
 <span class="sig-name descname"><span class="pre">LOSS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'loss'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardCategory.LOSS" title="Link to this definition">¶</a></dt>
@@ -470,7 +513,15 @@
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.InitMode">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">InitMode</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.InitMode" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
-<p>Operational mode of an adapter.</p>
+<p>str(object=’’) -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.__str__() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to ‘strict’.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.InitMode.LIVE">
 <span class="sig-name descname"><span class="pre">LIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'live'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.InitMode.LIVE" title="Link to this definition">¶</a></dt>
@@ -484,7 +535,8 @@
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardMap">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">StandardMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardMap" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
-<p>Defines how a Framework implements a Middle Layer standard.</p>
+<p>Defines how a Framework implements a Middle Layer standard.
+Used for declaring static definitions in adapters.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardMap.api">
 <span class="sig-name descname"><span class="pre">api</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardMap.api" title="Link to this definition">¶</a></dt>
@@ -497,136 +549,121 @@
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardMap.requires_plugin">
 <span class="sig-name descname"><span class="pre">requires_plugin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardMap.requires_plugin" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardMap.output_adapter">
+<span class="sig-name descname"><span class="pre">output_adapter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardMap.output_adapter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardMap.transformation_type">
+<span class="sig-name descname"><span class="pre">transformation_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardMap.transformation_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.StandardMap.operator">
+<span class="sig-name descname"><span class="pre">operator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.StandardMap.operator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">FrameworkAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">Protocol</span></code></p>
-<p>Protocol definition for a Framework Adapter.
-Includes Hybrid Loading Logic via Mixin-like default behavior requires careful subclassing.
-Since Protocol cannot have implementation easily without a base class,
-we define the Interface here and provide a helper method for loading snapshots.</p>
+<p>Protocol definition for a Framework Adapter.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.convert">
 <span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.convert" title="Link to this definition">¶</a></dt>
-<dd><p>Converts input data (usually array-like) to this framework’s tensor type.</p>
-</dd></dl>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.test_config">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.test_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.search_modules" title="Link to this definition">¶</a></dt>
-<dd><p>List of python modules to scan when running <cite>ml_switcheroo sync</cite>.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.display_name">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.display_name" title="Link to this definition">¶</a></dt>
-<dd><p>Friendly name for UI/CLI (e.g. ‘PyTorch’).</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.ui_priority">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ui_priority</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.ui_priority" title="Link to this definition">¶</a></dt>
-<dd><p>Integer defining the sort order in UI tables and Dropdowns.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
-<dd><p>Regex patterns used to categorize API surfaces.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.supported_tiers">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the semantic tiers supported by this framework.
-e.g. [SemanticTier.ARRAY_API] for NumPy,</p>
-<blockquote>
-<div><p>[SemanticTier.ARRAY_API, SemanticTier.NEURAL] for PyTorch.</p>
-</div></blockquote>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.import_alias" title="Link to this definition">¶</a></dt>
-<dd><p>Default module import path and alias.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.inherits_from">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inherits_from</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.inherits_from" title="Link to this definition">¶</a></dt>
-<dd><p>Key of a parent framework to inherit mappings from.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.StructuralTraits" title="ml_switcheroo.semantics.schema.StructuralTraits"><span class="pre">ml_switcheroo.semantics.schema.StructuralTraits</span></a></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.structural_traits" title="Link to this definition">¶</a></dt>
-<dd><p>Defines how Classes and Functions should be transformed.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.rng_seed_methods">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng_seed_methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.rng_seed_methods" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a list of method names that modify global random state.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.get_device_syntax">
 <span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
-<dd><p>Returns Python source code to instantiate a device on this backend.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.get_serialization_syntax">
 <span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
-<dd><p>Returns Python source code to perform IO operations.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.get_serialization_imports">
 <span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a list of import statements required for serialization to work.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.get_example_code">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.get_example_code" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the standard demo example.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.get_tiered_examples">
 <span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a dictionary of categorized examples.
-Expected keys: ‘tier1_math’, ‘tier2_neural’, ‘tier3_extras’.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.definitions" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the framework’s implementation of Middle Layer Operations.</p>
+<dd><p>Returns the framework’s static implementation of Middle Layer Operations.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.import_namespaces">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
+<dd><p>Returns import path remapping rules.
+Format: {“source.mod”: {“root”: “target”, “sub”: “mod”, “alias”: “alias”}}</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.collect_api">
 <span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.collect_api" title="Link to this definition">¶</a></dt>
-<dd><p>Scans the installed framework (LIVE) or reads from snapshot (GHOST).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>category</strong> – The semantic category to scan for.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of GhostRef objects representing the discovered API surface.</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.FrameworkAdapter.apply_wiring">
+<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.FrameworkAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.load_snapshot_for_adapter">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">load_snapshot_for_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fw_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.load_snapshot_for_adapter" title="Link to this definition">¶</a></dt>
-<dd><p>Locates the most recent snapshot for a given framework key (e.g. ‘torch’).
-Used by Adapter __init__ methods when entering Ghost Mode.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The snapshot data dictionary (containing ‘categories’, ‘version’, etc).
-Returns empty dict if no snapshot found.</p>
-</dd>
-</dl>
+<dd><p>Locates the most recent snapshot for a given framework key.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.register_framework">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">register_framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.frameworks.base.register_framework" title="Link to this definition">¶</a></dt>
-<dd><p>Decorator to register a framework adapter class.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.base.get_adapter">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.base.</span></span><span class="sig-name descname"><span class="pre">get_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.frameworks.base.FrameworkAdapter" title="ml_switcheroo.frameworks.base.FrameworkAdapter"><span class="pre">FrameworkAdapter</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.base.get_adapter" title="Link to this definition">¶</a></dt>
-<dd><p>Factory to instantiate an adapter.</p>
-</dd></dl>
+<dd></dd></dl>
 </section>
 </section>
 

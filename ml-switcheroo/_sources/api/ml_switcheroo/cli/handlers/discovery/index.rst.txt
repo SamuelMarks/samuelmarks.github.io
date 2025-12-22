@@ -5,14 +5,15 @@ ml_switcheroo.cli.handlers.discovery
 
 .. autoapi-nested-parse::
 
-   Discovery Command Handlers.
+   Discovery & Standards Command Handlers.
 
-   This module implements the CLI logic for populating the Semantic Knowledge Base.
+   This module implements the logic for populating the Semantic Knowledge Base via
+   Automated Discovery and Specification Imports.
+
    It handles:
-   1.  **Ingestion**: Importing external standards (ONNX, Array API) and Internal Golden Sets.
-   2.  **Syncing**: Linking abstract operations to installed framework implementations.
-   3.  **Discovery**: Scaffolding new frameworks and harvesting manual overrides.
-   4.  **Wiring**: Applying hardcoded adapter logic (plugins, templates) during sync.
+   1.  **Ingestion**: Importing external standards (ONNX, Array API) and Internal Golden Sets (Hub).
+   2.  **Scaffolding**: Generating skeleton mappings.
+   3.  **Discovery**: Identifying Neural Layers via Consensus and linking them to the Semantic Hub.
 
 
 
@@ -21,77 +22,28 @@ Functions
 
 .. autoapisummary::
 
-   ml_switcheroo.cli.handlers.discovery.handle_discover_layers
-   ml_switcheroo.cli.handlers.discovery.handle_wizard
-   ml_switcheroo.cli.handlers.discovery.handle_harvest
-   ml_switcheroo.cli.handlers.discovery.handle_snapshot
    ml_switcheroo.cli.handlers.discovery.handle_scaffold
    ml_switcheroo.cli.handlers.discovery.handle_import_spec
-   ml_switcheroo.cli.handlers.discovery.handle_sync
    ml_switcheroo.cli.handlers.discovery.handle_sync_standards
 
 
 Module Contents
 ---------------
 
-.. py:function:: handle_discover_layers(dry_run: bool) -> int
-
-   Handles 'discover-layers' command.
-
-   Runs the LayerDiscoveryBot to find missing Neural Network Layers (e.g. Linear, Conv)
-   in Torch and Flax environments and populates 'k_discovered.json'.
-
-   :param dry_run: If True, prints findings without writing to disk.
-
-   :returns: Exit code.
-   :rtype: int
-
-
-.. py:function:: handle_wizard(package: str) -> int
-
-   Handles the 'wizard' command for interactive mapping discovery.
-
-   :param package: The name of the python package to inspect (e.g., 'torch').
-
-   :returns: Exit code (0 for success).
-   :rtype: int
-
-
-.. py:function:: handle_harvest(path: pathlib.Path, target: str, dry_run: bool) -> int
-
-   Handles the 'harvest' command to learn mappings from manual tests.
-
-   :param path: File or directory containing python test files.
-   :param target: The framework target used in the tests (e.g., 'jax').
-   :param dry_run: If True, prints changes without writing to disk.
-
-   :returns: Exit code (0 for success, 1 for path errors).
-   :rtype: int
-
-
-.. py:function:: handle_snapshot(out_dir: Optional[pathlib.Path]) -> int
-
-   Handles the 'snapshot' command.
-
-   Scans installed frameworks and dumps their API signatures to JSON files.
-   These snapshots allow the engine to operate in "Ghost Mode" (e.g., in WebAssembly)
-   without requiring the heavy frameworks to be installed.
-
-   :param out_dir: Optional custom output directory. Defaults to package/snapshots.
-
-   :returns: Exit code.
-   :rtype: int
-
-
 .. py:function:: handle_scaffold(frameworks: list[str], out_dir: pathlib.Path) -> int
 
    Handles the 'scaffold' command.
 
-   Automatically generates mapping skeletons based on fuzzy matching between
-   framework APIs and the semantic spec rules.
+   -   Iterates through provided frameworks.
+   -   Uses `FrameworkAdapter.discovery_heuristics` regexes to fuzzy match framework
+       APIs against known specs or structural conventions.
+   -   Populates semantic specs (Hub) and framework mappings (Spokes/Snapshots).
 
-   :param frameworks: List of framework names to scaffold.
+   :param frameworks: List of framework package names to scaffold (e.g., ['torch', 'jax']).
+   :type frameworks: list[str]
    :param out_dir: The root directory for generating the knowledge base.
+                   Defaults to the package source if None.
+   :type out_dir: Path
 
    :returns: Exit code.
    :rtype: int
@@ -104,30 +56,8 @@ Module Contents
    Parses upstream standards documentation or stubs and merges the definitions
    into the local semantics Hub.
 
-   Supported Targets:
-   1. 'internal': Loads the Internal Golden Sets for Optimizers/Vision/State.
-   2. '*.md': Parses ONNX Markdown specifications.
-   3. Directory: Parses Python Array API stub files.
-
-   :param target: The file, directory, or keyword to import.
-
-   :returns: Exit code.
-   :rtype: int
-
-
-.. py:function:: handle_sync(framework: str) -> int
-
-   Handles the 'sync' command.
-
-   Links the Abstract Standards (Hub) to the concrete implementation in a
-   specific framework. This process involves:
-   1.  Reading the Specs from `semantics/`.
-   2.  Introspecting the installed framework to find matching APIs.
-   3.  **Merging Static Definitions** from the Adapter (for Ghost support).
-   4.  Applying Adapter-specific manual wiring (plugins, templates).
-   5.  Writing the results to the Snapshot Overlay (`snapshots/{fw}_mappings.json`).
-
-   :param framework: The framework key to sync (e.g. 'torch', 'jax').
+   :param target: Code resource to import ('internal', .md file, or directory).
+   :type target: Path
 
    :returns: Exit code.
    :rtype: int
@@ -138,11 +68,16 @@ Module Contents
    Handles 'sync-standards' command.
 
    Invokes the Consensus Engine to automatically discover new Abstract Operations
-   by finding commonalities across multiple framework API surfaces.
+   by finding commonalities across multiple framework API surfaces. Writes the
+   results to `k_discovered.json` (The Unofficial/Discovered Standard).
 
-   :param categories: List of API categories to scan (e.g. 'loss', 'layer').
-   :param frameworks: List of frameworks to use for consensus (default: all).
-   :param dry_run: If True, prints candidates without saving.
+   :param categories: List of category strings (layer, loss, etc.) to scan.
+   :type categories: List[str]
+   :param frameworks: List of framework keys to scan.
+                      Defaults to installed/registered frameworks.
+   :type frameworks: Optional[List[str]]
+   :param dry_run: If True, prints results without saving.
+   :type dry_run: bool
 
    :returns: Exit code.
    :rtype: int

@@ -29,6 +29,7 @@ Submodules
    /api/ml_switcheroo/core/rewriter/calls/index
    /api/ml_switcheroo/core/rewriter/control_flow/index
    /api/ml_switcheroo/core/rewriter/decorators/index
+   /api/ml_switcheroo/core/rewriter/initializers/index
    /api/ml_switcheroo/core/rewriter/normalization/index
    /api/ml_switcheroo/core/rewriter/structure/index
    /api/ml_switcheroo/core/rewriter/structure_class/index
@@ -85,9 +86,6 @@ Package Contents
 
 
    Mixin class providing argument normalization and operator transformation logic.
-
-   Designed to be mixed into `PivotRewriter`. It relies on `self.semantics` to
-   retrieve the argument specifications (`std_args`) and mapping rules.
 
 
 .. py:class:: AttributeMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
@@ -150,11 +148,22 @@ Package Contents
 
    .. py:method:: leave_For(original_node: libcst.For, updated_node: libcst.For) -> Union[libcst.For, libcst.CSTNode]
 
-      Invokes the 'transform_for_loop' hook if registered.
+      Invokes loop transformation logic.
 
-      If no plugin is registered or the plugin returns the node unmodified,
-      the loop preserves its Python semantics (appropriate for Torch/NumPy).
-      If JAX/TF is the target, a plugin is expected to intercept this.
+      Implements a priority chain:
+      1.  **Static Unroll**: Checks ``transform_for_loop_static``. If the loop index
+          is constant, unrolls it (Optimization).
+      2.  **General Transform**: Checks ``transform_for_loop``. Handles general
+          case logic or applies safety warnings (e.g., Escape Hatch for JAX).
+
+      :param original_node: The node before transformation.
+      :type original_node: cst.For
+      :param updated_node: The node after child visitors have run.
+      :type updated_node: cst.For
+
+      :returns: The transformed node (potentially a
+                FlattenSentinel of unrolled statements) or the original node if untouched.
+      :rtype: Union[cst.For, cst.CSTNode]
 
 
 
@@ -164,6 +173,9 @@ Package Contents
 
 
    The base class for AST transformation traversal.
+
+   Provides common utilities for scope tracking, alias resolution, and error bubbling,
+   which are utilized by the specific Mixins (CallMixin, StructureMixin, etc.).
 
 
    .. py:attribute:: semantics
@@ -191,6 +203,13 @@ Package Contents
    .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
 
       Injects module-level preambles (e.g. Shim classes) requested by plugins.
+      Ensures injection happens after docstrings to maintain valid Python help text.
+
+      :param original_node: Logic before transformation.
+      :param updated_node: Logic after transformation.
+
+      :returns: The module with injected preambles.
+      :rtype: cst.Module
 
 
 
@@ -199,12 +218,22 @@ Package Contents
       Scans ``import ...`` statements to populate the alias map.
       Example: ``import torch.nn as nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
 
+      :param node: Import statement node.
+
+      :returns: False to stop traversal of children.
+      :rtype: Optional[bool]
+
 
 
    .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> Optional[bool]
 
       Scans ``from ... import ...`` statements to populate the alias map.
       Example: ``from torch import nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
+
+      :param node: ImportFrom statement node.
+
+      :returns: False to stop traversal of children.
+      :rtype: Optional[bool]
 
 
 
@@ -213,14 +242,28 @@ Package Contents
       Resets error tracking at the start of each line.
       Errors bubble up from children (Expressions) to this Statement handler.
 
+      :param node: The statement line node.
+
+      :returns: True to continue traversal.
+      :rtype: Optional[bool]
+
 
 
    .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      Handles error bubbling from expression rewrites.
 
       If errors occurred during processing of this line's children (e.g. failing
       to rewrite a function call), wrap the line in an ``EscapeHatch``.
 
       Prioritizes errors (reverting to original code) over warnings (using updated code).
+
+      :param original_node: The node before children were visited.
+      :param updated_node: The node after children transformation.
+
+      :returns: The resulted node
+                (possibly wrapped with comments).
+      :rtype: Union[cst.SimpleStatementLine, cst.FlattenSentinel]
 
 
 

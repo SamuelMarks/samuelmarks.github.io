@@ -49,12 +49,11 @@ Module Contents
 
    Returns a list of framework keys sorted by UI Priority.
 
-   Logic:
-   1. Retrieve registered frameworks.
-   2. Instantiate adapter to read 'ui_priority'.
-   3. Sort by priority (asc), then by name (asc) for stability.
-   4. Filter out 'Child' frameworks (flavours) if they declare inheritance,
-      keeping the UI list clean (root frameworks only).
+   The sort order is determined by the `ui_priority` attribute of the
+   registered FrameworkAdapter. Lower numbers appear first.
+
+   :returns: Sorted list of framework identifiers (e.g. ['torch', 'jax']).
+   :rtype: List[str]
 
 
 .. py:class:: RuntimeConfig(/, **data: Any)
@@ -67,13 +66,13 @@ Module Contents
 
    .. py:attribute:: source_framework
       :type:  str
-      :value: 'torch'
+      :value: None
 
 
 
    .. py:attribute:: target_framework
       :type:  str
-      :value: 'jax'
+      :value: None
 
 
 
@@ -91,7 +90,7 @@ Module Contents
 
    .. py:attribute:: strict_mode
       :type:  bool
-      :value: False
+      :value: None
 
 
 
@@ -119,6 +118,14 @@ Module Contents
 
       Ensures the framework is registered in the system.
 
+      :param v: The framework key to validate.
+      :type v: str
+
+      :returns: The normalized (lowercase) framework key.
+      :rtype: str
+
+      :raises ValueError: If the framework is not found in the registry.
+
 
 
    .. py:property:: effective_source
@@ -126,7 +133,11 @@ Module Contents
 
 
       Resolves the specific framework key to use for source logic.
+
       If a flavour (e.g. 'flax_nnx') is provided, it overrides the general framework ('jax').
+
+      :returns: The active source framework key.
+      :rtype: str
 
 
    .. py:property:: effective_target
@@ -135,8 +146,20 @@ Module Contents
 
       Resolves the specific framework key to use for target logic.
 
+      :returns: The active target framework key.
+      :rtype: str
+
 
    .. py:method:: parse_plugin_settings(schema: Type[T]) -> T
+
+      Validates the raw plugin settings dictionary against a specific Pydantic model.
+
+      :param schema: The Pydantic model class defining expected settings.
+      :type schema: Type[T]
+
+      :returns: An instance of the schema model populated with runtime values.
+      :rtype: T
+
 
 
    .. py:method:: load(source: Optional[str] = None, target: Optional[str] = None, source_flavour: Optional[str] = None, target_flavour: Optional[str] = None, strict_mode: Optional[bool] = None, plugin_settings: Optional[Dict[str, Any]] = None, validation_report: Optional[pathlib.Path] = None, search_path: Optional[pathlib.Path] = None) -> RuntimeConfig
@@ -145,7 +168,38 @@ Module Contents
 
       Loads configuration from pyproject.toml and overrides with CLI arguments.
 
+      :param source: Override for source framework.
+      :type source: Optional[str]
+      :param target: Override for target framework.
+      :type target: Optional[str]
+      :param source_flavour: Override for source flavour.
+      :type source_flavour: Optional[str]
+      :param target_flavour: Override for target flavour.
+      :type target_flavour: Optional[str]
+      :param strict_mode: Override for strict mode setting.
+      :type strict_mode: Optional[bool]
+      :param plugin_settings: Additional CLI plugin settings.
+      :type plugin_settings: Optional[Dict]
+      :param validation_report: Override for validation report path.
+      :type validation_report: Optional[Path]
+      :param search_path: Directory to start searching for TOML config.
+      :type search_path: Optional[Path]
+
+      :returns: The fully resolved configuration object.
+      :rtype: RuntimeConfig
+
 
 
 .. py:function:: parse_cli_key_values(items: Optional[List[str]]) -> Dict[str, Any]
+
+   Parses a list of 'key=value' strings into a dictionary.
+
+   Types are inferred (int, float, bool, or string).
+
+   :param items: List of raw CLI strings directly from argparse.
+   :type items: Optional[List[str]]
+
+   :returns: Parsed dictionary.
+   :rtype: Dict[str, Any]
+
 

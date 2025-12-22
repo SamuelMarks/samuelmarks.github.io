@@ -10,9 +10,13 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /api/ml_switcheroo/cli/handlers/audit/index
    /api/ml_switcheroo/cli/handlers/convert/index
+   /api/ml_switcheroo/cli/handlers/define/index
    /api/ml_switcheroo/cli/handlers/dev/index
    /api/ml_switcheroo/cli/handlers/discovery/index
+   /api/ml_switcheroo/cli/handlers/learning/index
+   /api/ml_switcheroo/cli/handlers/snapshots/index
    /api/ml_switcheroo/cli/handlers/verify/index
 
 
@@ -21,12 +25,11 @@ Functions
 
 .. autoapisummary::
 
-   ml_switcheroo.cli.handlers.handle_convert
-   ml_switcheroo.cli.handlers.handle_snapshot
    ml_switcheroo.cli.handlers.handle_scaffold
    ml_switcheroo.cli.handlers.handle_import_spec
-   ml_switcheroo.cli.handlers.handle_sync
    ml_switcheroo.cli.handlers.handle_sync_standards
+   ml_switcheroo.cli.handlers.handle_snapshot
+   ml_switcheroo.cli.handlers.handle_sync
    ml_switcheroo.cli.handlers.handle_wizard
    ml_switcheroo.cli.handlers.handle_harvest
    ml_switcheroo.cli.handlers.handle_ci
@@ -38,23 +41,56 @@ Functions
 Package Contents
 ----------------
 
-.. py:function:: handle_convert(input_path: pathlib.Path, output_path: Optional[pathlib.Path], source: Optional[str], target: Optional[str], verify: bool, strict: Optional[bool], plugin_settings: Dict[str, Any], json_trace_path: Optional[pathlib.Path] = None) -> int
+.. py:function:: handle_scaffold(frameworks: list[str], out_dir: pathlib.Path) -> int
 
-   Handles the 'convert' command execution.
+   Handles the 'scaffold' command.
 
-   Orchestrates the loading of configuration, initialization of the semantic
-   knowledge base, and the execution of the transpilation engine on files or directories.
+   -   Iterates through provided frameworks.
+   -   Uses `FrameworkAdapter.discovery_heuristics` regexes to fuzzy match framework
+       APIs against known specs or structural conventions.
+   -   Populates semantic specs (Hub) and framework mappings (Spokes/Snapshots).
 
-   :param input_path: Path to the source file or directory to convert.
-   :param output_path: Path where generated code should be saved.
-   :param source: Override for source framework (e.g. 'torch').
-   :param target: Override for target framework (e.g. 'jax').
-   :param verify: If True, generates and runs a verification harness test immediately.
-   :param strict: If True, enforces strict strict_mode on the Engine.
-   :param plugin_settings: Dictionary of specific plugin configuration flags.
-   :param json_trace_path: Optional path to dump execution trace JSON.
+   :param frameworks: List of framework package names to scaffold (e.g., ['torch', 'jax']).
+   :type frameworks: list[str]
+   :param out_dir: The root directory for generating the knowledge base.
+                   Defaults to the package source if None.
+   :type out_dir: Path
 
-   :returns: Exit code (0 for success, 1 for failure).
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_import_spec(target: pathlib.Path) -> int
+
+   Handles the 'import-spec' command.
+
+   Parses upstream standards documentation or stubs and merges the definitions
+   into the local semantics Hub.
+
+   :param target: Code resource to import ('internal', .md file, or directory).
+   :type target: Path
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_sync_standards(categories: List[str], frameworks: Optional[List[str]], dry_run: bool) -> int
+
+   Handles 'sync-standards' command.
+
+   Invokes the Consensus Engine to automatically discover new Abstract Operations
+   by finding commonalities across multiple framework API surfaces. Writes the
+   results to `k_discovered.json` (The Unofficial/Discovered Standard).
+
+   :param categories: List of category strings (layer, loss, etc.) to scan.
+   :type categories: List[str]
+   :param frameworks: List of framework keys to scan.
+                      Defaults to installed/registered frameworks.
+   :type frameworks: Optional[List[str]]
+   :param dry_run: If True, prints results without saving.
+   :type dry_run: bool
+
+   :returns: Exit code.
    :rtype: int
 
 
@@ -72,38 +108,6 @@ Package Contents
    :rtype: int
 
 
-.. py:function:: handle_scaffold(frameworks: list[str], out_dir: pathlib.Path) -> int
-
-   Handles the 'scaffold' command.
-
-   Automatically generates mapping skeletons based on fuzzy matching between
-   framework APIs and the semantic spec rules.
-
-   :param frameworks: List of framework names to scaffold.
-   :param out_dir: The root directory for generating the knowledge base.
-
-   :returns: Exit code.
-   :rtype: int
-
-
-.. py:function:: handle_import_spec(target: pathlib.Path) -> int
-
-   Handles the 'import-spec' command.
-
-   Parses upstream standards documentation or stubs and merges the definitions
-   into the local semantics Hub.
-
-   Supported Targets:
-   1. 'internal': Loads the Internal Golden Sets for Optimizers/Vision/State.
-   2. '*.md': Parses ONNX Markdown specifications.
-   3. Directory: Parses Python Array API stub files.
-
-   :param target: The file, directory, or keyword to import.
-
-   :returns: Exit code.
-   :rtype: int
-
-
 .. py:function:: handle_sync(framework: str) -> int
 
    Handles the 'sync' command.
@@ -114,24 +118,10 @@ Package Contents
    2.  Introspecting the installed framework to find matching APIs.
    3.  **Merging Static Definitions** from the Adapter (for Ghost support).
    4.  Applying Adapter-specific manual wiring (plugins, templates).
-   5.  Writing the results to the Snapshot Overlay (`snapshots/{fw}_mappings.json`).
+   5.  **Persisting Test Configuration templates**.
+   6.  Writing the results to the Snapshot Overlay (`snapshots/{fw}_mappings.json`).
 
    :param framework: The framework key to sync (e.g. 'torch', 'jax').
-
-   :returns: Exit code.
-   :rtype: int
-
-
-.. py:function:: handle_sync_standards(categories: List[str], frameworks: Optional[List[str]], dry_run: bool) -> int
-
-   Handles 'sync-standards' command.
-
-   Invokes the Consensus Engine to automatically discover new Abstract Operations
-   by finding commonalities across multiple framework API surfaces.
-
-   :param categories: List of API categories to scan (e.g. 'loss', 'layer').
-   :param frameworks: List of frameworks to use for consensus (default: all).
-   :param dry_run: If True, prints candidates without saving.
 
    :returns: Exit code.
    :rtype: int

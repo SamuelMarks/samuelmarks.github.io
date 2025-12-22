@@ -260,7 +260,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -386,6 +407,7 @@ to handle specific aspects of the AST transformation:
 <li class="toctree-l1"><a class="reference internal" href="calls/index.html">ml_switcheroo.core.rewriter.calls</a></li>
 <li class="toctree-l1"><a class="reference internal" href="control_flow/index.html">ml_switcheroo.core.rewriter.control_flow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decorators/index.html">ml_switcheroo.core.rewriter.decorators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initializers/index.html">ml_switcheroo.core.rewriter.initializers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="normalization/index.html">ml_switcheroo.core.rewriter.normalization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure/index.html">ml_switcheroo.core.rewriter.structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="structure_class/index.html">ml_switcheroo.core.rewriter.structure_class</a></li>
@@ -452,8 +474,6 @@ Implements Logic 4: Layer Init State Threading.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.</span></span><span class="sig-name descname"><span class="pre">NormalizationMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.NormalizationMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
 <p>Mixin class providing argument normalization and operator transformation logic.</p>
-<p>Designed to be mixed into <cite>PivotRewriter</cite>. It relies on <cite>self.semantics</cite> to
-retrieve the argument specifications (<cite>std_args</cite>) and mapping rules.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.AttributeMixin">
@@ -503,10 +523,31 @@ Inherits from granular mixins to assemble the full feature set.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.ControlFlowMixin.leave_For">
 <span class="sig-name descname"><span class="pre">leave_For</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.ControlFlowMixin.leave_For" title="Link to this definition">¶</a></dt>
-<dd><p>Invokes the ‘transform_for_loop’ hook if registered.</p>
-<p>If no plugin is registered or the plugin returns the node unmodified,
-the loop preserves its Python semantics (appropriate for Torch/NumPy).
-If JAX/TF is the target, a plugin is expected to intercept this.</p>
+<dd><p>Invokes loop transformation logic.</p>
+<p>Implements a priority chain:
+1.  <strong>Static Unroll</strong>: Checks <code class="docutils literal notranslate"><span class="pre">transform_for_loop_static</span></code>. If the loop index</p>
+<blockquote>
+<div><p>is constant, unrolls it (Optimization).</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>General Transform</strong>: Checks <code class="docutils literal notranslate"><span class="pre">transform_for_loop</span></code>. Handles general
+case logic or applies safety warnings (e.g., Escape Hatch for JAX).</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_node</strong> (<em>cst.For</em>) – The node before transformation.</p></li>
+<li><p><strong>updated_node</strong> (<em>cst.For</em>) – The node after child visitors have run.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed node (potentially a
+FlattenSentinel of unrolled statements) or the original node if untouched.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[cst.For, cst.CSTNode]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -514,6 +555,8 @@ If JAX/TF is the target, a plugin is expected to intercept this.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.</span></span><span class="sig-name descname"><span class="pre">BaseRewriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
 <p>The base class for AST transformation traversal.</p>
+<p>Provides common utilities for scope tracking, alias resolution, and error bubbling,
+which are utilized by the specific Mixins (CallMixin, StructureMixin, etc.).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.BaseRewriter.semantics">
 <span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter.semantics" title="Link to this definition">¶</a></dt>
@@ -541,32 +584,96 @@ If JAX/TF is the target, a plugin is expected to intercept this.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.BaseRewriter.leave_Module">
 <span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter.leave_Module" title="Link to this definition">¶</a></dt>
-<dd><p>Injects module-level preambles (e.g. Shim classes) requested by plugins.</p>
+<dd><p>Injects module-level preambles (e.g. Shim classes) requested by plugins.
+Ensures injection happens after docstrings to maintain valid Python help text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_node</strong> – Logic before transformation.</p></li>
+<li><p><strong>updated_node</strong> – Logic after transformation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The module with injected preambles.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Module</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.BaseRewriter.visit_Import">
 <span class="sig-name descname"><span class="pre">visit_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter.visit_Import" title="Link to this definition">¶</a></dt>
 <dd><p>Scans <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">...</span></code> statements to populate the alias map.
 Example: <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">torch.nn</span> <span class="pre">as</span> <span class="pre">nn</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">_alias_map['nn']</span> <span class="pre">=</span> <span class="pre">'torch.nn'</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – Import statement node.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False to stop traversal of children.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[bool]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.BaseRewriter.visit_ImportFrom">
 <span class="sig-name descname"><span class="pre">visit_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter.visit_ImportFrom" title="Link to this definition">¶</a></dt>
 <dd><p>Scans <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">...</span> <span class="pre">import</span> <span class="pre">...</span></code> statements to populate the alias map.
 Example: <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">torch</span> <span class="pre">import</span> <span class="pre">nn</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">_alias_map['nn']</span> <span class="pre">=</span> <span class="pre">'torch.nn'</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – ImportFrom statement node.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False to stop traversal of children.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[bool]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.BaseRewriter.visit_SimpleStatementLine">
 <span class="sig-name descname"><span class="pre">visit_SimpleStatementLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter.visit_SimpleStatementLine" title="Link to this definition">¶</a></dt>
 <dd><p>Resets error tracking at the start of each line.
 Errors bubble up from children (Expressions) to this Statement handler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – The statement line node.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True to continue traversal.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[bool]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.BaseRewriter.leave_SimpleStatementLine">
 <span class="sig-name descname"><span class="pre">leave_SimpleStatementLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.SimpleStatementLine</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.SimpleStatementLine</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.BaseRewriter.leave_SimpleStatementLine" title="Link to this definition">¶</a></dt>
-<dd><p>If errors occurred during processing of this line’s children (e.g. failing
+<dd><p>Handles error bubbling from expression rewrites.</p>
+<p>If errors occurred during processing of this line’s children (e.g. failing
 to rewrite a function call), wrap the line in an <code class="docutils literal notranslate"><span class="pre">EscapeHatch</span></code>.</p>
 <p>Prioritizes errors (reverting to original code) over warnings (using updated code).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_node</strong> – The node before children were visited.</p></li>
+<li><p><strong>updated_node</strong> – The node after children transformation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulted node
+(possibly wrapped with comments).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[cst.SimpleStatementLine, cst.FlattenSentinel]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">

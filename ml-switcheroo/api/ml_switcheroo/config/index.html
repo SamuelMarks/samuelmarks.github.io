@@ -259,7 +259,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -380,7 +401,7 @@ Updated to support Framework Flavours (Hierarchical Selection).</p>
 <td><p>Returns a list of framework keys sorted by UI Priority.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.config.parse_cli_key_values" title="ml_switcheroo.config.parse_cli_key_values"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_cli_key_values</span></code></a>(→ Dict[str, Any])</p></td>
-<td><p></p></td>
+<td><p>Parses a list of 'key=value' strings into a dictionary.</p></td>
 </tr>
 </tbody>
 </table>
@@ -399,14 +420,16 @@ Updated to support Framework Flavours (Hierarchical Selection).</p>
 <dt class="sig sig-object py" id="ml_switcheroo.config.get_framework_priority_order">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.config.</span></span><span class="sig-name descname"><span class="pre">get_framework_priority_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.config.get_framework_priority_order" title="Link to this definition">¶</a></dt>
 <dd><p>Returns a list of framework keys sorted by UI Priority.</p>
-<p>Logic:
-1. Retrieve registered frameworks.
-2. Instantiate adapter to read ‘ui_priority’.
-3. Sort by priority (asc), then by name (asc) for stability.
-4. Filter out ‘Child’ frameworks (flavours) if they declare inheritance,</p>
-<blockquote>
-<div><p>keeping the UI list clean (root frameworks only).</p>
-</div></blockquote>
+<p>The sort order is determined by the <cite>ui_priority</cite> attribute of the
+registered FrameworkAdapter. Lower numbers appear first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sorted list of framework identifiers (e.g. [‘torch’, ‘jax’]).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig">
@@ -415,11 +438,11 @@ Updated to support Framework Flavours (Hierarchical Selection).</p>
 <p>Global configuration container for the translation engine.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.source_framework">
-<span class="sig-name descname"><span class="pre">source_framework</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'torch'</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.source_framework" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">source_framework</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.source_framework" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.target_framework">
-<span class="sig-name descname"><span class="pre">target_framework</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jax'</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.target_framework" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">target_framework</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.target_framework" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.source_flavour">
@@ -431,7 +454,7 @@ Updated to support Framework Flavours (Hierarchical Selection).</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.strict_mode">
-<span class="sig-name descname"><span class="pre">strict_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.strict_mode" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">strict_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.strict_mode" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.plugin_settings">
@@ -449,32 +472,107 @@ Updated to support Framework Flavours (Hierarchical Selection).</p>
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.validate_framework">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.validate_framework" title="Link to this definition">¶</a></dt>
 <dd><p>Ensures the framework is registered in the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>str</em>) – The framework key to validate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalized (lowercase) framework key.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the framework is not found in the registry.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.effective_source">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">effective_source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.effective_source" title="Link to this definition">¶</a></dt>
-<dd><p>Resolves the specific framework key to use for source logic.
-If a flavour (e.g. ‘flax_nnx’) is provided, it overrides the general framework (‘jax’).</p>
+<dd><p>Resolves the specific framework key to use for source logic.</p>
+<p>If a flavour (e.g. ‘flax_nnx’) is provided, it overrides the general framework (‘jax’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The active source framework key.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.effective_target">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">effective_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.effective_target" title="Link to this definition">¶</a></dt>
 <dd><p>Resolves the specific framework key to use for target logic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The active target framework key.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.parse_plugin_settings">
 <span class="sig-name descname"><span class="pre">parse_plugin_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">T</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.parse_plugin_settings" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Validates the raw plugin settings dictionary against a specific Pydantic model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>schema</strong> (<em>Type</em><em>[</em><em>T</em><em>]</em>) – The Pydantic model class defining expected settings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An instance of the schema model populated with runtime values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>T</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.config.RuntimeConfig.load">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_flavour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_flavour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_report</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">RuntimeConfig</span></a></span></span><a class="headerlink" href="#ml_switcheroo.config.RuntimeConfig.load" title="Link to this definition">¶</a></dt>
 <dd><p>Loads configuration from pyproject.toml and overrides with CLI arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Override for source framework.</p></li>
+<li><p><strong>target</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Override for target framework.</p></li>
+<li><p><strong>source_flavour</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Override for source flavour.</p></li>
+<li><p><strong>target_flavour</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Override for target flavour.</p></li>
+<li><p><strong>strict_mode</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – Override for strict mode setting.</p></li>
+<li><p><strong>plugin_settings</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>]</em>) – Additional CLI plugin settings.</p></li>
+<li><p><strong>validation_report</strong> (<em>Optional</em><em>[</em><em>Path</em><em>]</em>) – Override for validation report path.</p></li>
+<li><p><strong>search_path</strong> (<em>Optional</em><em>[</em><em>Path</em><em>]</em>) – Directory to start searching for TOML config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The fully resolved configuration object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig">RuntimeConfig</a></p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.config.parse_cli_key_values">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.config.</span></span><span class="sig-name descname"><span class="pre">parse_cli_key_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.config.parse_cli_key_values" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Parses a list of ‘key=value’ strings into a dictionary.</p>
+<p>Types are inferred (int, float, bool, or string).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>items</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>) – List of raw CLI strings directly from argparse.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed dictionary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 </section>
 

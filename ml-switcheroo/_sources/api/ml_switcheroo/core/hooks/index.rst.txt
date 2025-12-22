@@ -11,21 +11,10 @@ ml_switcheroo.core.hooks
    It enables developers to intercept and modify the Abstract Syntax Tree (AST)
    during the conversion process using a hook-based system.
 
-   How to write a Plugin
-   ---------------------
-
-   A plugin is a simple Python function decorated with ``@register_hook``. It receives
-   the current AST node (typically ``cst.Call``, but can be others like ``cst.For``)
-   and a context object.
-
-   Usage
-   -----
-   .. code-block:: python
-
-       @register_hook("my_custom_trigger")
-       def transform_node(node: cst.CSTNode, ctx: HookContext) -> cst.CSTNode:
-           # Logic
-           return node
+   Refactor:
+       - Added `auto_wire` support to the `register_hook` decorator.
+       - Plugins can now declare their own Semantic definitions, eliminating
+         the need to edit `standards_internal.py` or JSON files for self-contained features.
 
 
 
@@ -47,6 +36,7 @@ Classes
 .. autoapisummary::
 
    ml_switcheroo.core.hooks.HookContext
+   ml_switcheroo.core.hooks.AutoWireSpec
 
 
 Functions
@@ -56,6 +46,7 @@ Functions
 
    ml_switcheroo.core.hooks.register_hook
    ml_switcheroo.core.hooks.get_hook
+   ml_switcheroo.core.hooks.get_all_hook_metadata
    ml_switcheroo.core.hooks.clear_hooks
    ml_switcheroo.core.hooks.load_plugins
 
@@ -92,9 +83,15 @@ Module Contents
       :type:  Dict[str, Any]
 
 
+   .. py:attribute:: current_op_id
+      :type:  Optional[str]
+      :value: None
+
+
+
    .. py:method:: inject_signature_arg(name: str, annotation: Optional[str] = None) -> None
 
-      Requests injection of an argument into the current function signature.
+      Requests injection of argument into the current function signature.
 
 
 
@@ -134,28 +131,67 @@ Module Contents
 
 
 
+.. py:class:: AutoWireSpec(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Schema for plugin self-registration metadata.
+   Allows a plugin to define the Semantic Operation it satisfies.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: ops
+      :type:  Dict[str, Dict[str, Any]]
+      :value: None
+
+
+
 .. py:data:: HookFunction
 
-.. py:function:: register_hook(trigger: str) -> Callable[[HookFunction], HookFunction]
+.. py:function:: register_hook(trigger: str, auto_wire: Optional[Dict[str, Any]] = None) -> Callable[[HookFunction], HookFunction]
 
    Decorator to register a function as a plugin hook.
 
    :param trigger: The unique identifier. Can be an operation ID or a
                    reserved system event like "transform_for_loop".
+   :param auto_wire: Optional dictionary defining the Semantic Spec for this plugin.
+                     If provided, the SemanticsManager will automatically load
+                     these definitions, eliminating the need for JSON usage.
+                     Format matches `semantics/*.json` schema (e.g. `{"ops": {"MyOp": ...}}`).
 
 
 .. py:function:: get_hook(trigger: str) -> Optional[HookFunction]
 
    Retrieves a registered hook function by its trigger name.
+   Lazily loads plugins from the default directory if registry is empty.
+
+
+.. py:function:: get_all_hook_metadata() -> Dict[str, AutoWireSpec]
+
+   Returns the metadata for all registered hooks.
+   Used by SemanticsManager to hydrate the Knowledge Base.
 
 
 .. py:function:: clear_hooks() -> None
 
-   Resets the internal hook registry.
+   Resets the internal hook registry. Primarily for testing.
 
 
 .. py:function:: load_plugins(plugins_dir: Optional[pathlib.Path] = None, extra_dirs: Optional[List[pathlib.Path]] = None) -> int
 
-   Dynamically imports all modules in the plugins directory.
+   Dynamically imports plugins.
+
+   :param plugins_dir: Overrides default package directory.
+                       If provided, this directory is scanned for .py files.
+                       If NOT provided, the internal `ml_switcheroo.plugins` package is loaded.
+   :param extra_dirs: Additional directories to scan (e.g. user extensions).
+
+   :returns: Number of modules loaded.
+   :rtype: int
 
 

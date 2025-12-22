@@ -1,0 +1,228 @@
+ml_switcheroo.core.dsl
+======================
+
+.. py:module:: ml_switcheroo.core.dsl
+
+.. autoapi-nested-parse::
+
+   Operation Definition Language (ODL) Schema.
+
+   This module defines the Pydantic models used to validate the input (e.g. YAML)
+   for defining new operations. It represents the source of truth for generating
+   new operation definitions in the codebase, enforcing schema validity before
+   AST injection occurs.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.dsl.ParameterDef
+   ml_switcheroo.core.dsl.FrameworkVariant
+   ml_switcheroo.core.dsl.PluginType
+   ml_switcheroo.core.dsl.Rule
+   ml_switcheroo.core.dsl.PluginScaffoldDef
+   ml_switcheroo.core.dsl.OperationDef
+
+
+Module Contents
+---------------
+
+.. py:class:: ParameterDef(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Definition of a single argument in an abstract operation signature.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: type
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: doc
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: default
+      :type:  Optional[str]
+      :value: None
+
+
+
+.. py:class:: FrameworkVariant(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for how a specific framework implements the operation.
+
+
+   .. py:attribute:: api
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: args
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: casts
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: requires_plugin
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: transformation_type
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_adapter
+      :type:  Optional[str]
+      :value: None
+
+
+
+.. py:class:: PluginType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration of supported plugin structures to generate.
+
+
+   .. py:attribute:: CALL
+      :value: 'call_transform'
+
+
+
+   .. py:attribute:: BLOCK
+      :value: 'block_transform'
+
+
+
+.. py:class:: Rule(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Declarative rule for conditional logic within a plugin.
+   Used to generate switch-statements in the scaffolded code.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: if_arg
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: is_val
+      :type:  Union[str, int, float, bool]
+      :value: None
+
+
+
+   .. py:attribute:: use_api
+      :type:  str
+      :value: None
+
+
+
+.. py:class:: PluginScaffoldDef(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Metadata for generating a new Python plugin file.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: type
+      :type:  PluginType
+      :value: None
+
+
+
+   .. py:attribute:: doc
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: rules
+      :type:  List[Rule]
+      :value: None
+
+
+
+.. py:class:: OperationDef(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Top-level definition of a new Abstract Operation.
+
+
+   .. py:attribute:: operation
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: description
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: std_args
+      :type:  List[ParameterDef]
+      :value: None
+
+
+
+   .. py:attribute:: variants
+      :type:  Dict[str, FrameworkVariant]
+      :value: None
+
+
+
+   .. py:attribute:: scaffold_plugins
+      :type:  List[PluginScaffoldDef]
+      :value: None
+
+
+

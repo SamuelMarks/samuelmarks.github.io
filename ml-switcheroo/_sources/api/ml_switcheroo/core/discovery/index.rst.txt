@@ -1,0 +1,71 @@
+ml_switcheroo.core.discovery
+============================
+
+.. py:module:: ml_switcheroo.core.discovery
+
+.. autoapi-nested-parse::
+
+   Core Discovery mechanism for Auto-Inference of APIs.
+
+   This module provides the ``SimulatedReflection`` engine, which enables the
+   system to dynamically locate API endpoints in a target framework based on
+   an abstract operation name. It is used by the ``define`` CLI command to
+   resolve `api: "infer"` placeholders in ODL (Operation Definition Language) files.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.discovery.logger
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.discovery.SimulatedReflection
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: SimulatedReflection(framework: str)
+
+   Scans a target framework to infer the API path for a given operation name.
+
+   It utilizes the ``FrameworkAdapter.search_modules`` to limit the search space
+   and applies both exact normalization matching and fuzzy string matching to
+   find the best candidate.
+
+
+   .. py:attribute:: framework
+
+
+   .. py:attribute:: adapter
+
+
+   .. py:method:: discover(op_name: str) -> Optional[str]
+
+      Attempts to locate the fully qualified API path for an operation.
+
+      Strategy:
+      1.  **Normalization**: Converts input and candidates to lowercase, stripping underscores.
+      2.  **Exact Match**: Iterates through search modules. If a normalized match is found, returns immediately.
+      3.  **Fuzzy Match**: If no exact match is found, collects all candidates and uses `difflib`
+          to find the closest string match.
+
+      :param op_name: The abstract operation name (e.g. "LogSoftmax", "abs").
+      :type op_name: str
+
+      :returns: The fully qualified API path (e.g. "torch.nn.functional.log_softmax")
+                or None if no confident match is found.
+      :rtype: Optional[str]
+
+
+

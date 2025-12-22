@@ -10,10 +10,10 @@ ml_switcheroo.semantics.manager
    This module is responsible for locating, loading, and merging semantic
    specification files (JSONs) into a unified Knowledge Graph.
 
-   It implements a "Hub-and-Spoke" loading strategy:
-   1.  **Hub (Specs)**: Loads Abstract Operation definitions from `semantics/*.json`.
-   2.  **Spokes (Overlays)**: Scans `snapshots/*_mappings.json` to inject
-       framework-specific implementation details (variants).
+   Updates:
+   - Calls `_hydrate_defaults_from_registry` to merge code-defined variants.
+   - Merges `adapter.definitions` as valid overlays.
+   - Merges `adapter.import_namespaces` into import maps.
 
 
 
@@ -22,7 +22,7 @@ Attributes
 
 .. autoapisummary::
 
-   ml_switcheroo.semantics.manager.DISCOVERED_FILENAME
+   ml_switcheroo.semantics.manager.DISCOVERED_FILENAMES
 
 
 Classes
@@ -36,18 +36,11 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: DISCOVERED_FILENAME
-   :value: 'k_discovered.json'
-
+.. py:data:: DISCOVERED_FILENAMES
 
 .. py:class:: SemanticsManager
 
    Central database for semantic mappings and configuration.
-
-   Data Source Priority:
-   1. Registry Defaults (Code-defined in FrameworkAdapters).
-   2. Spec Files (`semantics/*.json`): Defines the Abstract Standards.
-   3. Overlay Files (`snapshots/*_mappings.json`): Injects Framework Variants.
 
 
    .. py:attribute:: data

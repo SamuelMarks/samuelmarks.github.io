@@ -33,29 +33,11 @@ Module Contents
 
    A proposed Abstract Standard discovered via consensus.
 
-   .. attribute:: name
-
-      The abstract name (e.g., 'Conv2d').
-
-   .. attribute:: variants
-
-      A map of framework names to their specific implementations (GhostRefs).
-
-   .. attribute:: score
-
-      A confidence score derived from the number of concurring frameworks.
-
-   .. attribute:: std_args
-
-      The list of argument names deemed 'standard' via voting.
-
-   .. attribute:: arg_mappings
-
-      Nested dictionary mapping {framework: {std_arg: fw_specific_arg}}.
-
 
    .. py:attribute:: name
       :type:  str
+      :value: None
+
 
 
    .. py:attribute:: variants
@@ -66,7 +48,7 @@ Module Contents
 
    .. py:attribute:: score
       :type:  float
-      :value: 0.0
+      :value: None
 
 
 
@@ -82,10 +64,15 @@ Module Contents
 
 
 
-   .. py:method:: add_variant(framework: str, ref: ml_switcheroo.core.ghost.GhostRef)
+   .. py:method:: add_variant(framework: str, ref: ml_switcheroo.core.ghost.GhostRef) -> None
 
       Registers a framework's implementation of this concept.
-      Updates the consensus score.
+      Updates the consensus score based on support count.
+
+      :param framework: The framework identifier (e.g. 'torch').
+      :type framework: str
+      :param ref: The API reference object found in that framework.
+      :type ref: GhostRef
 
 
 
@@ -94,6 +81,7 @@ Module Contents
    Algorithms for aligning divergent API naming conventions.
 
    Capabilities:
+
    1.  **Clustering**: Groups APIs like `HuberLoss`, `huber_loss`, and `Huber` together.
    2.  **Normalization**: Strips common noise (prefixes/suffixes) to find the semantic root.
    3.  **Signature Alignment**: Builds a translation map for arguments (e.g., `keepdims` <-> `keep_dims`).
@@ -113,11 +101,13 @@ Module Contents
 
       Reduces an API Name to its semantic core for comparison.
 
+      This removes casing, underscores, and common prefixes/suffixes.
+
       .. rubric:: Examples
 
-      - 'HuberLoss' -> 'huber'
-      - 'reduce_mean' -> 'mean'
-      - 'conv2d' -> 'conv'
+      * 'HuberLoss' -> 'huber'
+      * 'reduce_mean' -> 'mean'
+      * 'conv2d' -> 'conv'
 
       :param name: The raw API name (e.g. 'CrossEntropyLoss').
       :type name: str
@@ -132,7 +122,16 @@ Module Contents
 
 
       Canonicalizes an argument name using the alias map.
-      e.g., 'learning_rate' -> 'lr'.
+
+      .. rubric:: Example
+
+      'learning_rate' -> 'lr'
+
+      :param arg_name: The raw argument name.
+      :type arg_name: str
+
+      :returns: The canonical standard name.
+      :rtype: str
 
 
 
@@ -142,7 +141,7 @@ Module Contents
 
       :param framework_inputs: Dictionary mapping 'framework_name' -> List of discovered GhostRefs.
 
-      :returns: A list of potential standards, sorted by score.
+      :returns: A list of potential standards, sorted by descending score.
       :rtype: List[CandidateStandard]
 
 
@@ -151,14 +150,20 @@ Module Contents
 
       Filters candidates to keep only those present in a minimum number of frameworks.
 
+      This ensures we only create standards for concepts that are truly shared across
+      ecosystems, avoiding framework-specific noise.
+
       :param candidates: List of candidates from clustering.
-      :param min_support: Minimum number of frameworks that must implement the op.
+      :type candidates: List[CandidateStandard]
+      :param min_support: Minimum number of different frameworks that must implement the op.
+      :type min_support: int
 
-      :returns: Filtered list of CandidateStandard.
+      :returns: Filtered list of robust candidates.
+      :rtype: List[CandidateStandard]
 
 
 
-   .. py:method:: align_signatures(candidates: List[CandidateStandard], consensus_threshold: float = 0.5)
+   .. py:method:: align_signatures(candidates: List[CandidateStandard], consensus_threshold: float = 0.5) -> None
 
       Analyses the arguments of all variants in a candidate to determine Standard Arguments.
 
@@ -169,7 +174,9 @@ Module Contents
       the specific framework name (e.g. Standard 'dim' -> Torch 'dim', Jax 'axis').
 
       :param candidates: List of CandidateStandards to process (in-place modification).
+      :type candidates: List[CandidateStandard]
       :param consensus_threshold: Fraction of variants that must share an arg (0.0 - 1.0).
+      :type consensus_threshold: float
 
 
 

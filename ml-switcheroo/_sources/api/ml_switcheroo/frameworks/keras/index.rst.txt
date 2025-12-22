@@ -10,11 +10,7 @@ ml_switcheroo.frameworks.keras
    This module provides the adapter for Keras 3+, enabling translation between
    Keras and other frameworks (JAX, Torch, TensorFlow).
 
-   Capabilities:
-   1.  **Math Operations**: Maps `keras.ops` functions to Array API standards.
-   2.  **Neural Layers**: Maps `keras.layers` to Neural Standards.
-   3.  **Discovery**: Implements `collect_api` to dynamically find losses,
-       optimizers, and activations by inspecting the installed Keras package.
+   Refactor: Definitions populated for Keras specific Layers, Ops, and Vision.
 
 
 
@@ -45,9 +41,6 @@ Module Contents
 
    Adapter for Keras 3+ (Multi-backend).
 
-   Supports translation of Functional API models, Layer subclasses, and
-   backend-agnostic math operations (`keras.ops`).
-
 
    .. py:attribute:: display_name
       :type:  str
@@ -71,93 +64,61 @@ Module Contents
       :classmethod:
 
 
-      Returns the primary example code used for instant demos.
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns Keras 3.0 idiomatic examples.
-
-      Tiers:
-      1. Math: Uses `keras.ops` for backend-agnostic tensor math.
-      2. Neural: Uses the Functional API (`Input` -> `Model`).
-      3. Extras: Uses `SeedGenerator` for controlled randomness.
-
 
 
    .. py:property:: search_modules
       :type: List[str]
 
 
-      Modules to scan when running bulk scaffolding.
-
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
-      (module, alias).
 
-      :type: Returns default alias tuple
+   .. py:property:: import_namespaces
+      :type: Dict[str, Dict[str, str]]
+
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      Regex patterns to categorize discovered APIs.
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
+
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Keras supports all major tiers including Neural Layers.
-
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
-
-      Defines behavior for class and function rewriting.
-      Keras uses `call` for forward pass and requires `super().__init__()`.
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Static definitions to ensure core ops work without discovery.
-      Includes argument name mapping for Dense layers (units vs out_features).
+      Static definitions for Keras mappings.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      Methods that set global random seed.
-
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
 
-      Collects API signatures (Live or Ghost).
-
-      If Keras is installed, it scans `keras.layers`, `keras.losses`, etc.
-      If not installed, it attempts to load from a cached snapshot.
-
-      :param category: The API category to scan.
-      :type category: StandardCategory
-
-      :returns: Found API signatures.
-      :rtype: List[GhostRef]
-
-
 
    .. py:method:: convert(data: Any) -> Any
-
-      Converts input data to Keras tensor.
-
 
 
    .. py:method:: get_serialization_imports() -> List[str]
@@ -168,13 +129,7 @@ Module Contents
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
-      Keras 3 device scopes.
-
-
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
-
-      Injects Keras specific manual wiring hooks.
-
 
 

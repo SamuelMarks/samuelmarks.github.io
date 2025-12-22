@@ -260,7 +260,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -304,7 +325,11 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_alias" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PaxmlAdapter.import_alias</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_namespaces" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PaxmlAdapter.import_namespaces</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.discovery_heuristics" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PaxmlAdapter.discovery_heuristics</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.test_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PaxmlAdapter.test_config</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.supported_tiers" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PaxmlAdapter.supported_tiers</span></code></a>
         </li>
@@ -348,8 +373,7 @@
 <p>This adapter specializes the core JAX stack for Google’s PaxML framework.
 It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
 <code class="docutils literal notranslate"><span class="pre">JAXStackMixin</span></code> but implements the unique structural traits of the Praxis library.</p>
-<p>Updates:
-- Dynamic discovery of <code class="docutils literal notranslate"><span class="pre">praxis.layers</span></code> by scanning the module at runtime.</p>
+<p>Refactor: Populates definitions for PaxML layers and namespaces.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -381,9 +405,6 @@ It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.paxml.</span></span><span class="sig-name descname"><span class="pre">PaxmlAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../common/jax_stack/index.html#ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin" title="ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin</span></code></a></p>
 <p>Adapter for PaxML (Praxis Layers) running on JAX.</p>
-<p>This Level 2 adapter leverages the Level 0/1 stack provided by <code class="docutils literal notranslate"><span class="pre">JAXStackMixin</span></code>
-for array operations and optimization, while providing the specific layer
-definitions for the Praxis library.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PaxML</span> <span class="pre">/</span> <span class="pre">Praxis'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -411,8 +432,16 @@ Delegates Math/Opt to Jax Core, handles Layers (Praxis) dynamically.</p>
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_alias" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_namespaces">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.test_config">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.test_config" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.supported_tiers">
@@ -450,10 +479,6 @@ Reflects that Praxis uses a <cite>setup()</cite> method for initialization rathe
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_tiered_examples">
 <span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
 <dd><p>Returns PaxML (Praxis) idiomatic examples.</p>
-<p>Tiers:
-1. Math: Uses <cite>jax.numpy</cite> (JAX Core).
-2. Neural: Uses <cite>praxis.layers</cite> and <cite>setup()</cite> method lifecycle.
-3. Extras: Uses <cite>HParams</cite> configuration templates.</p>
 </dd></dl>
 </dd></dl>
 </section>

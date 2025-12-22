@@ -63,6 +63,371 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="_static/trace_render.js?v=690b4e4b"></script>
     <script src="_static/switcheroo_demo.js?v=cd11226c"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";
+
+const defaultStyle = document.createElement('style');
+defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+`;
+document.head.appendChild(defaultStyle);
+
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+document.head.appendChild(fullscreenStyle);
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }
+    return false;
+};
+
+const load = async () => {
+    await mermaid.run();
+
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(load, 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(load, 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(load, 200);
+        return;
+    }
+
+    const darkTheme = isDarkTheme();
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    const modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    const allButtons = [];
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        container.appendChild(fullscreenBtn);
+        allButtons.push(fullscreenBtn);
+    });
+
+    // Update theme classes when theme changes
+    const updateTheme = () => {
+        const dark = isDarkTheme();
+        allButtons.forEach(btn => {
+            if (dark) {
+                btn.classList.add('dark-theme');
+            } else {
+                btn.classList.remove('dark-theme');
+            }
+        });
+        if (dark) {
+            modal.classList.add('dark-theme');
+            modalContent.classList.add('dark-theme');
+            closeBtn.classList.add('dark-theme');
+        } else {
+            modal.classList.remove('dark-theme');
+            modalContent.classList.remove('dark-theme');
+            closeBtn.classList.remove('dark-theme');
+        }
+    };
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+};
+
+window.addEventListener("load", load);
+</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Maintenance" href="MAINTENANCE.html" />
@@ -231,15 +596,27 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#extending--page-root" class="md-nav__link">Extending</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#adding-a-new-framework-adapter" class="md-nav__link">1. Adding a New Framework Adapter</a>
+        <li class="md-nav__item"><a href="#architecture-overview" class="md-nav__link">🏗️ Architecture Overview</a>
         </li>
-        <li class="md-nav__item"><a href="#mapping-apis-the-overlay" class="md-nav__link">2. Mapping APIs (The Overlay)</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#the-operation-definition-language-odl" class="md-nav__link">🚀 1. The Operation Definition Language (ODL)</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#automated-discovery" class="md-nav__link">Automated Discovery</a>
+        <li class="md-nav__item"><a href="#workflow" class="md-nav__link">Workflow</a>
+        </li>
+        <li class="md-nav__item"><a href="#odl-schema-reference" class="md-nav__link">ODL Schema Reference</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-scaffolding-via-odl" class="md-nav__link">Plugin Scaffolding via ODL</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#verification" class="md-nav__link">3. Verification</a>
+        <li class="md-nav__item"><a href="#adding-a-framework-adapter" class="md-nav__link">🔌 2. Adding a Framework Adapter</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-system-custom-code" class="md-nav__link">🧠 3. Plugin System (Custom Code)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#auto-wired-plugins" class="md-nav__link">Auto-Wired Plugins</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-hook-context-ctx" class="md-nav__link">The Hook Context (<code class="docutils literal notranslate"><span class="pre">ctx</span></code>)</a>
+        </li></ul>
+            </nav>
         </li></ul>
             </nav>
         </li>
@@ -252,21 +629,28 @@
     <li class="md-nav__item">
     
     
-      <a href="#adding-a-new-framework-adapter" class="md-nav__link">1. Adding a New Framework Adapter</a>
+      <a href="#architecture-overview" class="md-nav__link">🏗️ Architecture Overview</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="#mapping-apis-the-overlay" class="md-nav__link">2. Mapping APIs (The Overlay)</a>
+      <a href="#the-operation-definition-language-odl" class="md-nav__link">🚀 1. The Operation Definition Language (ODL)</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="#verification" class="md-nav__link">3. Verification</a>
+      <a href="#adding-a-framework-adapter" class="md-nav__link">🔌 2. Adding a Framework Adapter</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#plugin-system-custom-code" class="md-nav__link">🧠 3. Plugin System (Custom Code)</a>
       
     
     </li></ul>
@@ -314,15 +698,27 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#extending--page-root" class="md-nav__link">Extending</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#adding-a-new-framework-adapter" class="md-nav__link">1. Adding a New Framework Adapter</a>
+        <li class="md-nav__item"><a href="#architecture-overview" class="md-nav__link">🏗️ Architecture Overview</a>
         </li>
-        <li class="md-nav__item"><a href="#mapping-apis-the-overlay" class="md-nav__link">2. Mapping APIs (The Overlay)</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#the-operation-definition-language-odl" class="md-nav__link">🚀 1. The Operation Definition Language (ODL)</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#automated-discovery" class="md-nav__link">Automated Discovery</a>
+        <li class="md-nav__item"><a href="#workflow" class="md-nav__link">Workflow</a>
+        </li>
+        <li class="md-nav__item"><a href="#odl-schema-reference" class="md-nav__link">ODL Schema Reference</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-scaffolding-via-odl" class="md-nav__link">Plugin Scaffolding via ODL</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#verification" class="md-nav__link">3. Verification</a>
+        <li class="md-nav__item"><a href="#adding-a-framework-adapter" class="md-nav__link">🔌 2. Adding a Framework Adapter</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-system-custom-code" class="md-nav__link">🧠 3. Plugin System (Custom Code)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#auto-wired-plugins" class="md-nav__link">Auto-Wired Plugins</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-hook-context-ctx" class="md-nav__link">The Hook Context (<code class="docutils literal notranslate"><span class="pre">ctx</span></code>)</a>
+        </li></ul>
+            </nav>
         </li></ul>
             </nav>
         </li>
@@ -342,127 +738,261 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="extending">
 <h1 id="extending--page-root">Extending<a class="headerlink" href="#extending--page-root" title="Link to this heading">¶</a></h1>
-<p>ml-switcheroo is built on a modular “Zero-Edit” architecture. You can add support for new Machine Learning frameworks (like <code class="docutils literal notranslate"><span class="pre">tinygrad</span></code>, <code class="docutils literal notranslate"><span class="pre">keras</span></code>, or <code class="docutils literal notranslate"><span class="pre">mlx</span></code>) without modifying the core engine logic.</p>
-<p><strong>Artifacts required for a new framework:</strong></p>
+<p><strong>ml-switcheroo</strong> is built on a modular, data-driven architecture. Supporting new operations or entirely new frameworks
+involves populating the <strong>Knowledge Base</strong> rather than modifying the core engine logic.</p>
+<p>There are three ways to extend the system, ordered by complexity:</p>
 <ol class="arabic simple">
-<li><p><strong>Adapter</strong>: Python class in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>.</p></li>
-<li><p><strong>Snapshot</strong>: JSON mapping in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code>.</p></li>
+<li><p><strong>ODL (YAML)</strong>: Define operations declaratively using the Operation Definition Language. (Recommended)</p></li>
+<li><p><strong>Adapter API</strong>: Write Python classes for full framework support.</p></li>
+<li><p><strong>Plugin Hooks</strong>: Write AST transformation logic for complex architectural mismatches.</p></li>
 </ol>
 <hr class="docutils"/>
-<section id="adding-a-new-framework-adapter">
-<h2 id="adding-a-new-framework-adapter">1. Adding a New Framework Adapter<a class="headerlink" href="#adding-a-new-framework-adapter" title="Link to this heading">¶</a></h2>
-<p>To support a new library (e.g., <code class="docutils literal notranslate"><span class="pre">my_framework</span></code>), create a file <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/my_framework.py</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.frameworks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_framework</span>
+<section id="architecture-overview">
+<h2 id="architecture-overview">🏗️ Architecture Overview<a class="headerlink" href="#architecture-overview" title="Link to this heading">¶</a></h2>
+<p>The extension system works by injecting definitions into the Knowledge Base (The Hub) and linking them to specific
+framework implementations (The Spokes).</p>
+<pre class="mermaid">
+        graph TD
+%% Styles
+    classDef hub fill: #f9ab00, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans', rx: 5px
+    classDef adapter fill: #4285f4, stroke: #20344b, stroke-width: 2px, stroke-dasharray: 0, color: #ffffff, font-family: 'Google Sans', rx: 5px
+    classDef plugin fill: #34a853, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
+    classDef tool fill: #ea4335, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
+
+    subgraph EXT [Your Extension]
+        direction TB
+        ADAPTER("&lt;b&gt;Framework Adapter&lt;/b&gt;&lt;br/&gt;src/frameworks/*.py&lt;br/&gt;&lt;i&gt;Definitions&lt;/i&gt;"):::adapter
+        PLUGIN("&lt;b&gt;Plugin Hooks&lt;/b&gt;&lt;br/&gt;src/plugins/*.py&lt;br/&gt;&lt;i&gt;Complex Logic&lt;/i&gt;"):::plugin
+    end
+
+    subgraph CORE [Core System]
+        direction TB
+        HUB("&lt;b&gt;Semantic Hub&lt;/b&gt;&lt;br/&gt;standards_internal.py&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;"):::hub
+    end
+
+    subgraph TOOLS [Automation Tools]
+        direction TB
+        DEFINE("&lt;b&gt;CLI Command&lt;/b&gt;&lt;br/&gt;ml_switcheroo define&lt;br/&gt;&lt;i&gt;Code Injection&lt;/i&gt;"):::tool
+        YAML("&lt;b&gt;ODL YAML&lt;/b&gt;&lt;br/&gt;Operation Definition&lt;br/&gt;&lt;i&gt;Declarative Spec&lt;/i&gt;"):::tool
+    end
+
+%% Wiring
+    YAML --&gt; DEFINE
+    DEFINE --&gt;|" 1. Inject Spec "| HUB
+    DEFINE --&gt;|" 2. Inject Mapping "| ADAPTER
+    DEFINE --&gt;|" 3. Scaffold File "| PLUGIN
+    ADAPTER --&gt;|" Registration "| HUB
+    PLUGIN --&gt;|" Transformation "| HUB
+    </pre></section>
+<hr class="docutils"/>
+<section id="the-operation-definition-language-odl">
+<h2 id="the-operation-definition-language-odl">🚀 1. The Operation Definition Language (ODL)<a class="headerlink" href="#the-operation-definition-language-odl" title="Link to this heading">¶</a></h2>
+<p>The quickest way to add support for missing operations is via the <code class="docutils literal notranslate"><span class="pre">define</span></code> command. You write a YAML file describing the
+operation, and the tool injects the necessary Python code into the system.</p>
+<section id="workflow">
+<h3 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Create a file <code class="docutils literal notranslate"><span class="pre">my_op.yaml</span></code>.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">define</span> <span class="pre">my_op.yaml</span></code>.</p></li>
+</ol>
+<p>This command automatically:</p>
+<ol class="arabic simple">
+<li><p>Updates the Abstract Standard (Hub) in <code class="docutils literal notranslate"><span class="pre">standards_internal.py</span></code>.</p></li>
+<li><p>Updates Framework Mappings (Spokes) in <code class="docutils literal notranslate"><span class="pre">frameworks/*.py</span></code>.</p></li>
+<li><p>Scaffolds Plugin files if complex logic is requested.</p></li>
+</ol>
+</section>
+<section id="odl-schema-reference">
+<h3 id="odl-schema-reference">ODL Schema Reference<a class="headerlink" href="#odl-schema-reference" title="Link to this heading">¶</a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Abstract Definition (The Hub)</span>
+<span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"LogSoftmax"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Applies</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">LogSoftmax</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">n-dimensional</span><span class="nv"> </span><span class="s">input</span><span class="nv"> </span><span class="s">Tensor."</span>
+<span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">"-1"</span>
+
+<span class="c1"># 2. Variants (The Spokes)</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Framework keys must match registered adapters (torch, jax, tensorflow, etc.)</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.log_softmax"</span><span class="w"> </span><span class="c1"># Direct mapping</span>
+
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.nn.log_softmax"</span>
+<span class="w">    </span><span class="c1"># Argument renaming: Standard 'dim' -&gt; Framework 'axis'</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span>
+
+<span class="w">  </span><span class="c1"># Advanced Feature: Auto-Inference</span>
+<span class="w">  </span><span class="c1"># If you don't know the exact API path, use "infer" to let the engine search existing libraries.</span>
+<span class="w">  </span><span class="nt">numpy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"infer"</span>
+
+<span class="w">  </span><span class="c1"># Advanced Feature: Output Adaptation</span>
+<span class="w">  </span><span class="c1"># Use Python lambdas to reshape return values (e.g., taking the first element of a tuple)</span>
+<span class="w">  </span><span class="c1"># Useful for APIs that return (val, indices) when you only need val.</span>
+<span class="w">  </span><span class="nt">tensorflow</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"tf.nn.log_softmax"</span>
+<span class="w">    </span><span class="nt">output_adapter</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">x:</span><span class="nv"> </span><span class="s">x[0]"</span>
+
+<span class="w">  </span><span class="c1"># Advanced Feature: Infix Operators</span>
+<span class="w">  </span><span class="c1"># Map a function call to a math operator </span>
+<span class="w">  </span><span class="c1"># Example: add(a, b) -&gt; a + b</span>
+<span class="w">  </span><span class="nt">mlx</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"mx.add"</span>
+<span class="w">    </span><span class="nt">transformation_type</span><span class="p">:</span><span class="w"> </span><span class="s">"infix"</span><span class="w"> </span><span class="c1"># or "inline_lambda"</span>
+<span class="w">    </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="s">"+"</span>
+</pre></div>
+</div>
+</section>
+<section id="plugin-scaffolding-via-odl">
+<h3 id="plugin-scaffolding-via-odl">Plugin Scaffolding via ODL<a class="headerlink" href="#plugin-scaffolding-via-odl" title="Link to this heading">¶</a></h3>
+<p>If an operation requires logic too complex for simple mapping (e.g., conditional dispatch based on argument values), you
+can define <strong>Rules</strong> in the YAML. The CLI will generate a Python plugin with <code class="docutils literal notranslate"><span class="pre">if/else</span></code> logic pre-written.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside your YAML file:</span>
+<span class="nt">scaffold_plugins</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"resize_dispatcher"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"call_transform"</span>
+<span class="w">    </span><span class="nt">doc</span><span class="p">:</span><span class="w"> </span><span class="s">"Dispatches</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">different</span><span class="nv"> </span><span class="s">resize</span><span class="nv"> </span><span class="s">APIs</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">interpolation</span><span class="nv"> </span><span class="s">mode."</span>
+<span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
+<span class="w">        </span><span class="nt">is</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_nearest"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
+<span class="w">        </span><span class="nt">is</span><span class="p">:</span><span class="w"> </span><span class="s">"bilinear"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_bilinear"</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="adding-a-framework-adapter">
+<h2 id="adding-a-framework-adapter">🔌 2. Adding a Framework Adapter<a class="headerlink" href="#adding-a-framework-adapter" title="Link to this heading">¶</a></h2>
+<p>To support a new library (e.g., <code class="docutils literal notranslate"><span class="pre">tinygrad</span></code> or <code class="docutils literal notranslate"><span class="pre">my_lib</span></code>), you create a Python class that acts as the translation
+interface.</p>
+<p><strong>Location:</strong> <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/my_lib.py</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.frameworks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_framework</span><span class="p">,</span> <span class="n">FrameworkAdapter</span><span class="p">,</span> <span class="n">StandardMap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.semantics.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuralTraits</span>
 
-<span class="nd">@register_framework</span><span class="p">(</span><span class="s2">"my_framework"</span><span class="p">)</span>  <span class="c1"># Unique key used in CLI</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">MyFrameworkAdapter</span><span class="p">:</span> 
-    <span class="c1"># --- Metadata --- </span>
-    <span class="n">display_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"My Framework"</span> 
-    <span class="n">ui_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span> 
 
-    <span class="c1"># --- Discovery --- </span>
+<span class="nd">@register_framework</span><span class="p">(</span><span class="s2">"my_lib"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyLibAdapter</span><span class="p">:</span>
+    <span class="n">display_name</span> <span class="o">=</span> <span class="s2">"My Library"</span>
+
+    <span class="c1"># Optional: Inherit behavior (e.g. 'flax_nnx' inherits 'jax' math capabilities)</span>
+    <span class="n">inherits_from</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Discovery configuration</span>
+    <span class="n">ui_priority</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="c1"># --- 1. Import Logic ---</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">search_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span> 
-        <span class="k">return</span> <span class="p">[</span><span class="s2">"my_framework"</span><span class="p">,</span> <span class="s2">"my_framework.nn"</span><span class="p">]</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="c1"># How is the library imported? alias is usually what users type (e.g. 'np', 'tf')</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">"my_lib"</span><span class="p">,</span> <span class="s2">"ml"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">import_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span> 
-        <span class="c1"># Default alias behavior: import my_framework as mf</span>
-        <span class="k">return</span> <span class="p">(</span><span class="s2">"my_framework"</span><span class="p">,</span> <span class="s2">"mf"</span><span class="p">)</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_namespaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="c1"># Remap source namespaces. </span>
+        <span class="c1"># Rules: If input uses 'torch.nn', we inject 'import my_lib.layers as nn'</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"torch.nn"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"root"</span><span class="p">:</span> <span class="s2">"my_lib"</span><span class="p">,</span> <span class="s2">"sub"</span><span class="p">:</span> <span class="s2">"layers"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">:</span> <span class="s2">"nn"</span><span class="p">},</span>
+        <span class="p">}</span>
 
-    <span class="c1"># --- Structural Traits (Zero-Edit Rewriter Config) --- </span>
-    <span class="c1"># Defines how Classes and Functions are transformed. </span>
+    <span class="c1"># --- 2. Static Mappings (The "Definitions") ---</span>
+    <span class="c1"># This property allows Ghost Mode to work without the library installed.</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">structural_traits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructuralTraits</span><span class="p">:</span> 
-        <span class="k">return</span> <span class="n">StructuralTraits</span><span class="p">(</span> 
-            <span class="n">module_base</span><span class="o">=</span><span class="s2">"my_framework.Module"</span><span class="p">,</span>  <span class="c1"># Base class for layers</span>
-            <span class="n">forward_method</span><span class="o">=</span><span class="s2">"call"</span><span class="p">,</span>              <span class="c1"># Method name: forward vs call</span>
-            <span class="n">requires_super_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>           <span class="c1"># Needs super().__init__()?</span>
-            <span class="n">lifecycle_strip_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"gpu"</span><span class="p">],</span>    <span class="c1"># Remove .gpu() calls?</span>
-        <span class="p">)</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StandardMap</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="c1"># Simple 1:1 Mapping</span>
+            <span class="s2">"Abs"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">"ml.abs"</span><span class="p">),</span>
 
-    <span class="c1"># --- Verification &amp; Test Gen Support --- </span>
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_import_stmts</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> 
-        <span class="k">return</span> <span class="s2">"import my_framework as mf"</span> 
+            <span class="c1"># Argument Renaming</span>
+            <span class="s2">"Linear"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.layers.Dense"</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"in_features"</span><span class="p">:</span> <span class="s2">"input_dim"</span><span class="p">,</span> <span class="s2">"out_features"</span><span class="p">:</span> <span class="s2">"units"</span><span class="p">}</span>
+            <span class="p">),</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_creation_syntax</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> 
-        <span class="c1"># Code to turn numpy array 'var_name' into tensor</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">"mf.tensor(</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s2">)"</span> 
+            <span class="c1"># Linking to a Plugin (Logic located in src/plugins/)</span>
+            <span class="s2">"permute_dims"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.transpose"</span><span class="p">,</span>
+                <span class="n">requires_plugin</span><span class="o">=</span><span class="s2">"pack_varargs"</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_numpy_conversion_syntax</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> 
-        <span class="c1"># Code to turn tensor back to numpy</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s2">.numpy()"</span> 
-
-    <span class="c1"># ... See base.py for full protocol including convert()</span>
+    <span class="c1"># --- 3. Structural Traits ---</span>
+    <span class="c1"># Configure how Classes/Functions are rewritten without custom code</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">structural_traits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructuralTraits</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">StructuralTraits</span><span class="p">(</span>
+            <span class="n">module_base</span><span class="o">=</span><span class="s2">"ml.Module"</span><span class="p">,</span>  <span class="c1"># Base class for layers</span>
+            <span class="n">forward_method</span><span class="o">=</span><span class="s2">"call"</span><span class="p">,</span>  <span class="c1"># Inference method name</span>
+            <span class="n">requires_super_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Inject super().__init__()?</span>
+            <span class="n">strip_magic_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"rngs"</span><span class="p">],</span>  <span class="c1"># Remove args not used by this FW</span>
+            <span class="n">lifecycle_strip_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"to"</span><span class="p">,</span> <span class="s2">"cpu"</span><span class="p">],</span>  <span class="c1"># Methods to silently remove</span>
+            <span class="n">impurity_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"add_"</span><span class="p">]</span>  <span class="c1"># Methods flagged as side-effects</span>
+        <span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <hr class="docutils"/>
-<section id="mapping-apis-the-overlay">
-<h2 id="mapping-apis-the-overlay">2. Mapping APIs (The Overlay)<a class="headerlink" href="#mapping-apis-the-overlay" title="Link to this heading">¶</a></h2>
-<p>You typically do <strong>not</strong> edit the core spec files (<code class="docutils literal notranslate"><span class="pre">semantics/*.json</span></code>). Instead, you define how your framework implements those standards in a Snapshot Overlay.</p>
-<p>Create <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/my_framework_mappings.json</span></code>:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">"__framework__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_framework"</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">"mappings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">"Abs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="w">      </span><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_framework.abs"</span><span class="w"> </span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">"Add"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="w">        </span><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_framework.add"</span><span class="w"> </span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">"Linear"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="w">        </span><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_framework.nn.Linear"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"args"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="w">            </span><span class="nt">"in_features"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in_ch"</span><span class="p">,</span><span class="w"> </span>
-<span class="w">            </span><span class="nt">"out_features"</span><span class="p">:</span><span class="w"> </span><span class="s2">"out_ch"</span><span class="w"> </span>
-<span class="w">        </span><span class="p">}</span><span class="w"> </span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">"DataLoader"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span>
-<span class="w">        </span><span class="nt">"api"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_framework.data.Loader"</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">"requires_plugin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"convert_dataloader"</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">"templates"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">"import"</span><span class="p">:</span><span class="w"> </span><span class="s2">"import my_framework as mf"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"convert_input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mf.tensor({np_var})"</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">"to_numpy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{res_var}.numpy()"</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<section id="automated-discovery">
-<h3 id="automated-discovery">Automated Discovery<a class="headerlink" href="#automated-discovery" title="Link to this heading">¶</a></h3>
-<p>Instead of writing JSON manually, you can auto-generate the file by scanning your installed library:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Install your library</span>
-pip<span class="w"> </span>install<span class="w"> </span>my_framework
+<section id="plugin-system-custom-code">
+<h2 id="plugin-system-custom-code">🧠 3. Plugin System (Custom Code)<a class="headerlink" href="#plugin-system-custom-code" title="Link to this heading">¶</a></h2>
+<p>For operations that require manipulating the AST structure (e.g., packing args, unwrapping state, injecting context
+managers), you use the <strong>Hook System</strong>.</p>
+<p>Create a python file in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>. It will be automatically discovered.</p>
+<section id="auto-wired-plugins">
+<h3 id="auto-wired-plugins">Auto-Wired Plugins<a class="headerlink" href="#auto-wired-plugins" title="Link to this heading">¶</a></h3>
+<p>You can register a hook and definition its semantic mapping in one place using the <code class="docutils literal notranslate"><span class="pre">auto_wire</span></code> parameter. This
+architecture maintains locality of behavior and avoids editing huge JSON files manually.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_hook</span><span class="p">,</span> <span class="n">HookContext</span>
 
-<span class="c1"># 2. Run the Scaffolder</span>
-ml_switcheroo<span class="w"> </span>scaffold<span class="w"> </span>--frameworks<span class="w"> </span>my_framework
+
+<span class="c1"># Define the operation spec and logic in one go</span>
+<span class="nd">@register_hook</span><span class="p">(</span>
+    <span class="n">trigger</span><span class="o">=</span><span class="s2">"custom_reshape_logic"</span><span class="p">,</span>
+    <span class="n">auto_wire</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"ops"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"Reshape"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"std_args"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"shape"</span><span class="p">],</span>
+                <span class="s2">"variants"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">"torch"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"api"</span><span class="p">:</span> <span class="s2">"torch.reshape"</span><span class="p">},</span>
+                    <span class="s2">"jax"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"api"</span><span class="p">:</span> <span class="s2">"jnp.reshape"</span><span class="p">,</span> <span class="s2">"requires_plugin"</span><span class="p">:</span> <span class="s2">"custom_reshape_logic"</span><span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_reshape</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">:</span>
+    <span class="c1"># 1. Inspect 'node' (The Call AST)</span>
+    <span class="c1"># 2. Use 'ctx' to look up config or API mappings</span>
+    <span class="n">target_api</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">lookup_api</span><span class="p">(</span><span class="s2">"Reshape"</span><span class="p">)</span>  <span class="c1"># returns "jnp.reshape"</span>
+
+    <span class="c1"># 3. Perform transformation logic (e.g. check args and modify them)</span>
+    <span class="c1"># This example grabs the function name, ignores args logic for brevity</span>
+    <span class="n">new_func</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"reshaped_manually"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">with_changes</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">new_func</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This will find functions that match standard names (e.g. <code class="docutils literal notranslate"><span class="pre">abs</span></code>, <code class="docutils literal notranslate"><span class="pre">sum</span></code>) and populate <code class="docutils literal notranslate"><span class="pre">snapshots/my_framework_mappings.json</span></code>.</p>
 </section>
+<section id="the-hook-context-ctx">
+<h3 id="the-hook-context-ctx">The Hook Context (<code class="docutils literal notranslate"><span class="pre">ctx</span></code>)<a class="headerlink" href="#the-hook-context-ctx" title="Link to this heading">¶</a></h3>
+<p>The context object passed to your function provides helper methods for robust plugin writing:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ctx.target_fw</span></code>: The active target framework key (string).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctx.lookup_api(op_name)</span></code>: Resolve the API string for the current target via the Semantics Manager.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctx.inject_signature_arg(name)</span></code>: Add an argument to the enclosing function definition (e.g., inject <code class="docutils literal notranslate"><span class="pre">rng</span></code> into
+<code class="docutils literal notranslate"><span class="pre">def</span> <span class="pre">forward(...)</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctx.inject_preamble(code)</span></code>: Add code to the start of the function body.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctx.config(key)</span></code>: Read plugin settings from <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> or CLI args.</p></li>
+</ul>
 </section>
-<hr class="docutils"/>
-<section id="verification">
-<h2 id="verification">3. Verification<a class="headerlink" href="#verification" title="Link to this heading">¶</a></h2>
-<p>Once your Adapter and Snapshot are present, verify integration:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Run fuzzer</span>
-ml_switcheroo<span class="w"> </span>ci
-</pre></div>
-</div>
-<p>This command:</p>
-<ol class="arabic simple">
-<li><p>Reads the abstract specs (e.g. <code class="docutils literal notranslate"><span class="pre">Abs</span></code> requires numeric input).</p></li>
-<li><p>Generates a Python script using your Adapter’s templates.</p></li>
-<li><p>Executes <code class="docutils literal notranslate"><span class="pre">my_framework.abs(data)</span></code> and compares the result against NumPy/Torch reference.</p></li>
-</ol>
 </section>
 </section>
 

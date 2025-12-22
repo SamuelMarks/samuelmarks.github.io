@@ -66,7 +66,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.escape_hatch" href="../escape_hatch/index.html" />
-    <link rel="prev" title="ml_switcheroo.core" href="../index.html" />
+    <link rel="prev" title="ml_switcheroo.core.dsl" href="../dsl/index.html" />
   
    
 
@@ -260,7 +260,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -339,9 +360,29 @@
   <section id="module-ml_switcheroo.core.engine">
 <span id="ml-switcheroo-core-engine"></span><h1 id="api-ml-switcheroo-core-engine-index--page-root">ml_switcheroo.core.engine<a class="headerlink" href="#api-ml-switcheroo-core-engine-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Orchestration Engine for AST Transformations.</p>
-<p>This module uses the configured <cite>effective_target</cite> to drive the compilation process.
-By resolving ‘Flavours’ (e.g. <cite>flax_nnx</cite>), it ensures specific structural traits
-are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</p>
+<p>This module provides the <cite>ASTEngine</cite>, the primary driver for the transpilation process.
+It coordinates the various analysis and transformation passes required to convert code
+from a source framework to a target framework.</p>
+<p>The Engine pipeline consists of:</p>
+<ol class="arabic simple">
+<li><p><strong>Preprocessing</strong>: Parsing source code into a LibCST tree.</p></li>
+<li><p><strong>Safety Analysis</strong>:</p>
+<ul class="simple">
+<li><p><strong>Purity</strong>: Checking for side effects if targeting functional frameworks (JAX).</p></li>
+<li><p><strong>Lifecycle</strong>: Verifying variable initialization.</p></li>
+<li><p><strong>Dependencies</strong>: Scanning for unmapped 3rd-party imports.</p></li>
+</ul>
+</li>
+<li><p><strong>Semantic Pivoting</strong>: Executing the <cite>PivotRewriter</cite> to map API calls and structure.</p></li>
+<li><p><strong>Post-processing</strong>:</p>
+<ul class="simple">
+<li><p><strong>Import Fixer</strong>: Injecting necessary imports and removing unused source imports.</p></li>
+<li><p><strong>Structural Linting</strong>: Verifying no artifacts from the source framework remain.</p></li>
+</ul>
+</li>
+</ol>
+<p>The engine relies on <cite>RuntimeConfig</cite> to resolve ‘Flavours’ (e.g., distinguishing
+<cite>flax_nnx</cite> from generic <cite>jax</cite>) to load the correct structural traits.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -364,7 +405,7 @@ are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</
 <p>Structured result of a single file conversion.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ConversionResult.code">
-<span class="sig-name descname"><span class="pre">code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult.code" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult.code" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ConversionResult.errors">
@@ -372,7 +413,7 @@ are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ConversionResult.success">
-<span class="sig-name descname"><span class="pre">success</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult.success" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">success</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult.success" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ConversionResult.trace_events">
@@ -381,13 +422,23 @@ are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ConversionResult.has_errors">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_errors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult.has_errors" title="Link to this definition">¶</a></dt>
-<dd><p>Returns True if any errors were recorded.</p>
+<dd><p>Returns True if any errors or warnings were recorded during conversion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if errors list is non-empty.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.engine.</span></span><span class="sig-name descname"><span class="pre">ASTEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'torch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jax'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine" title="Link to this definition">¶</a></dt>
 <dd><p>The main compilation unit.</p>
+<p>This class encapsulates the state and logic required to transpile a single unit of code.
+It manages the lifecycle of the LibCST tree and the invocation of visitor passes.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.semantics">
 <span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.semantics" title="Link to this definition">¶</a></dt>
@@ -408,19 +459,52 @@ are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.parse">
 <span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.parse" title="Link to this definition">¶</a></dt>
 <dd><p>Parses source string into a LibCST Module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>code</strong> (<em>str</em>) – Python source code.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed Abstract Syntax Tree.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Module</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>libcst.ParserSyntaxError</strong> – If the input code is invalid Python.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.to_source">
 <span class="sig-name descname"><span class="pre">to_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.to_source" title="Link to this definition">¶</a></dt>
 <dd><p>Converts CST back to source string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree</strong> (<em>cst.Module</em>) – The modified syntax tree.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generated Python code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.core.engine.ConversionResult" title="ml_switcheroo.core.engine.ConversionResult"><span class="pre">ConversionResult</span></a></span></span><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.run" title="Link to this definition">¶</a></dt>
 <dd><p>Executes the full transpilation pipeline.</p>
+<p>Passes performed:
+1.  Parse.
+2.  Purity Scan (if targeting JAX-like frameworks).
+3.  Lifecycle Analysis (Init/Forward mismatch).
+4.  Dependency Scan (Checking 3rd party libs).
+5.  Pivot Rewrite (The main transformation).
+6.  Import Fixer (Injecting new imports, pruning old ones).
+7.  Structural Linting (Verifying output cleanliness).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>code</strong> – The input source string.</p>
+<dd class="field-odd"><p><strong>code</strong> (<em>str</em>) – The input source string.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Object containing transformed code and error logs.</p>
@@ -444,7 +528,7 @@ are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../index.html" title="ml_switcheroo.core"
+            <a href="../dsl/index.html" title="ml_switcheroo.core.dsl"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -453,7 +537,7 @@ are loaded by the <cite>PivotRewriter</cite> and <cite>Analysis</cite> passes.</
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.dsl </span>
               </div>
             </a>
           

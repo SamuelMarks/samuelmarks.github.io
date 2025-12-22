@@ -260,7 +260,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -298,7 +319,11 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.import_alias" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.import_alias</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.import_namespaces" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.import_namespaces</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.discovery_heuristics" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.discovery_heuristics</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.test_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.test_config</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.structural_traits" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.structural_traits</span></code></a>
         </li>
@@ -309,6 +334,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.rng_seed_methods" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.rng_seed_methods</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.collect_api" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.collect_api()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.apply_wiring" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.apply_wiring()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_example_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_example_code()</span></code></a>
         </li>
@@ -347,10 +374,7 @@
 <p>TensorFlow Framework Adapter.</p>
 <p>This module provides the adapter for TensorFlow, supporting both core TF operations
 and legacy Keras integration if present within the TF namespace.</p>
-<p>Capabilities:
-1.  <strong>Core Math</strong>: Maps <cite>Mean</cite>, <cite>Abs</cite> to <cite>tf.math</cite>.
-2.  <strong>Plugin Wiring</strong>: Handles <cite>transpose</cite> (permute) via the <cite>pack_varargs</cite> plugin.
-3.  <strong>Discovery</strong>: Scans <cite>tensorflow.nn</cite> for activations and layers.</p>
+<p>Refactor: Distributed definitions populated.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -367,7 +391,6 @@ and legacy Keras integration if present within the TF namespace.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.tensorflow.</span></span><span class="sig-name descname"><span class="pre">TensorFlowAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Adapter for TensorFlow (Core &amp; Keras).</p>
-<p>Supports translation of Low-level TF modules and math operations.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TensorFlow'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -383,30 +406,27 @@ and legacy Keras integration if present within the TF namespace.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.search_modules" title="Link to this definition">¶</a></dt>
-<dd><p>Modules to scan during Scaffolding.
-Broadens search to include signal, linalg, and embedded keras layers.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.import_alias" title="Link to this definition">¶</a></dt>
-<dd><p>import tensorflow as tf.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Default import alias</p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.import_namespaces">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
-<dd><p>Regex patterns for categorizing discovered APIs.</p>
-</dd></dl>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.test_config">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.test_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.structural_traits" title="Link to this definition">¶</a></dt>
-<dd><p>Defines structural rewriting rules for TF Classes.
-Often overlaps with Keras traits (call vs forward).</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.supported_tiers">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
@@ -415,7 +435,6 @@ Often overlaps with Keras traits (call vs forward).</p>
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.definitions" title="Link to this definition">¶</a></dt>
 <dd><p>Static definitions for core operations.</p>
-<p>Ensures ‘Mean’ uses ‘reduce_mean’ and ‘permute_dims’ uses the plugin.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.rng_seed_methods">
@@ -424,29 +443,23 @@ Often overlaps with Keras traits (call vs forward).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.collect_api">
 <span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.collect_api" title="Link to this definition">¶</a></dt>
-<dd><p>Implements runtime introspection for the Consensus Engine.
-Scans <cite>tf.nn</cite> for activations/math and <cite>tf.keras</cite> for layers.</p>
-</dd></dl>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.apply_wiring">
+<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_example_code">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_example_code" title="Link to this definition">¶</a></dt>
-<dd><p>Returns snippet for the web demo.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tiered_examples">
 <span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
-<dd><p>Returns TensorFlow Core idiomatic examples.</p>
-<p>Tiers:
-1. Math: Uses <cite>tf.math</cite> operations.
-2. Neural: Uses <cite>tf.Module</cite> (distinct from Keras Layers) to show low-level state.
-3. Extras: Uses <cite>tf.data</cite> pipelines.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_syntax">
 <span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
-<dd><p>Generates <cite>tf.device</cite> string.
-Resolves ‘cuda’/’gpu’ to ‘GPU’, ‘cpu’ to ‘CPU’.</p>
-</dd></dl>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_imports">
 <span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
@@ -458,8 +471,7 @@ Resolves ‘cuda’/’gpu’ to ‘GPU’, ‘cpu’ to ‘CPU’.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.convert">
 <span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.convert" title="Link to this definition">¶</a></dt>
-<dd><p>Converts inputs to TF Tensors.</p>
-</dd></dl>
+<dd></dd></dl>
 </dd></dl>
 </section>
 </section>

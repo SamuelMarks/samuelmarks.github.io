@@ -11,12 +11,10 @@ ml_switcheroo.discovery.scaffolder
    libraries (Torch, JAX, etc.) and aligns them against the Specification-Guided
    Knowledge Base.
 
-   It prioritizes matching discovered APIs against ingested Specs (ONNX, Array API)
-   before falling back to structural heuristics provided by Framework Adapters.
-
-   Updates for Distributed Semantics:
-   - Writes Abstract Operation Definitions (Specs) to `semantics/*.json` (Hub).
-   - Writes Implementation Details (Variants) to `snapshots/*.json` (Spokes).
+   Optimization Update:
+   - Implements Indexing for Catalog Lookups to prevent O(N^2) complexity
+     when aligning massive frameworks (Torch vs JAX).
+   - Uses pre-computed indices keyed by lowercase API names for fast retrieval.
 
 
 
@@ -35,41 +33,7 @@ Module Contents
 
    Automated discovery tool that aligns framework APIs.
 
-   .. attribute:: inspector
-
-      Tool to extract function signatures.
-
-      :type: ApiInspector
-
-   .. attribute:: console
-
-      Rich console for output.
-
-      :type: Console
-
-   .. attribute:: semantics
-
-      The knowledge base manager.
-
-      :type: SemanticsManager
-
-   .. attribute:: similarity_threshold
-
-      Cutoff for fuzzy matching (0.0 - 1.0).
-
-      :type: float
-
-   .. attribute:: arity_penalty
-
-      Penalty subtracted from similarity score for mismatched arity.
-
-      :type: float
-
-   .. attribute:: _cached_heuristics
-
-      Compiled regexes for categorization.
-
-      :type: Dict[str, List[re.Pattern]]
+   Optimized with catalog indexing to handle large-scale API surfaces efficiently.
 
 
    .. py:attribute:: inspector
@@ -102,11 +66,6 @@ Module Contents
    .. py:method:: scaffold(frameworks: List[str], root_dir: Optional[pathlib.Path] = None)
 
       Main entry point. Scans frameworks and builds/updates JSON mappings.
-
-      :param frameworks: List of package names (e.g. ['torch', 'jax']).
-      :param root_dir: Root directory of the Knowledge Base (Hub & Spokes).
-                       If provided, 'semantics/' and 'snapshots/' subdirs are used relative to this.
-                       If None, defaults to package location.
 
 
 

@@ -1,0 +1,72 @@
+injector_spec
+=============
+
+.. py:module:: injector_spec
+
+.. autoapi-nested-parse::
+
+   LibCST Transformer for Injecting Specifications.
+
+   This tool modifies Python source files (specifically `standards_internal.py`)
+   by locating the `INTERNAL_OPS` dictionary and appending a new operation definition
+   derived from an ODL (Operation Definition Language) model.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   injector_spec.StandardsInjector
+
+
+Module Contents
+---------------
+
+.. py:class:: StandardsInjector(op_def: ml_switcheroo.core.dsl.OperationDef)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   Injects a new operation definition into the INTERNAL_OPS dict.
+
+   It transforms the abstract `OperationDef` into a concrete LibCST Dictionary
+   node structure, including rich parameter metadata, and appends it to the
+   existing dictionary in the source.
+
+   .. attribute:: op_def
+
+      The operation model to inject.
+
+      :type: OperationDef
+
+   .. attribute:: found
+
+      Flag indicating if the injection target (INTERNAL_OPS) was found.
+
+      :type: bool
+
+
+   .. py:attribute:: op_def
+
+
+   .. py:attribute:: found
+      :value: False
+
+
+
+   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
+
+      Visits assignment statements to find `INTERNAL_OPS`.
+
+      If found, modifies the dictionary value to include the new key-value pair.
+
+      :param original_node: The node before transformation.
+      :param updated_node: The node after transformation (containing any recursive changes).
+
+      :returns: The modified assignment node.
+      :rtype: cst.Assign
+
+
+

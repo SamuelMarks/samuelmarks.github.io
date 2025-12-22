@@ -39,6 +39,9 @@ Module Contents
 
    The base class for AST transformation traversal.
 
+   Provides common utilities for scope tracking, alias resolution, and error bubbling,
+   which are utilized by the specific Mixins (CallMixin, StructureMixin, etc.).
+
 
    .. py:attribute:: semantics
 
@@ -65,6 +68,13 @@ Module Contents
    .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
 
       Injects module-level preambles (e.g. Shim classes) requested by plugins.
+      Ensures injection happens after docstrings to maintain valid Python help text.
+
+      :param original_node: Logic before transformation.
+      :param updated_node: Logic after transformation.
+
+      :returns: The module with injected preambles.
+      :rtype: cst.Module
 
 
 
@@ -73,12 +83,22 @@ Module Contents
       Scans ``import ...`` statements to populate the alias map.
       Example: ``import torch.nn as nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
 
+      :param node: Import statement node.
+
+      :returns: False to stop traversal of children.
+      :rtype: Optional[bool]
+
 
 
    .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> Optional[bool]
 
       Scans ``from ... import ...`` statements to populate the alias map.
       Example: ``from torch import nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
+
+      :param node: ImportFrom statement node.
+
+      :returns: False to stop traversal of children.
+      :rtype: Optional[bool]
 
 
 
@@ -87,14 +107,28 @@ Module Contents
       Resets error tracking at the start of each line.
       Errors bubble up from children (Expressions) to this Statement handler.
 
+      :param node: The statement line node.
+
+      :returns: True to continue traversal.
+      :rtype: Optional[bool]
+
 
 
    .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      Handles error bubbling from expression rewrites.
 
       If errors occurred during processing of this line's children (e.g. failing
       to rewrite a function call), wrap the line in an ``EscapeHatch``.
 
       Prioritizes errors (reverting to original code) over warnings (using updated code).
+
+      :param original_node: The node before children were visited.
+      :param updated_node: The node after children transformation.
+
+      :returns: The resulted node
+                (possibly wrapped with comments).
+      :rtype: Union[cst.SimpleStatementLine, cst.FlattenSentinel]
 
 
 

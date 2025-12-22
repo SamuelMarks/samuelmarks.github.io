@@ -8,12 +8,15 @@ ml_switcheroo.frameworks.base
    Base Protocol and Registry for Framework Adapters.
 
    This module defines the interface that all Framework Adapters must implement.
+   It acts as the primary contact point between the `ASTEngine` and the specific
+   ML library implementations (plugins).
 
-   Key Updates (Hybrid Loading):
-   - Adapters now possess an `init_mode` (LIVE or GHOST).
-   - Added logic to finding and loading cached snapshots if live imports fail.
-   - Expanded `collect_api` to branch between scanning live objects vs reading cached lists.
-   - **New**: `supported_tiers` property to define capabilities (Math vs Neural).
+   Key Capabilities (Hybrid Loading):
+   - Adapters possess an `init_mode` (LIVE or GHOST).
+   - In LIVE mode, they introspect installed packages.
+   - In GHOST mode, they load cached JSON snapshots.
+
+   Update: Enhanced StandardMap schema and import definitions.
 
 
 
@@ -56,7 +59,16 @@ Module Contents
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   Categorization of Framework APIs for automated scanning.
+   str(object='') -> str
+   str(bytes_or_buffer[, encoding[, errors]]) -> str
+
+   Create a new string object from the given object. If encoding or
+   errors is specified, then the object must expose a data buffer
+   that will be decoded using the given encoding and error handler.
+   Otherwise, returns the result of object.__str__() (if defined)
+   or repr(object).
+   encoding defaults to sys.getdefaultencoding().
+   errors defaults to 'strict'.
 
 
    .. py:attribute:: LOSS
@@ -84,7 +96,16 @@ Module Contents
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   Operational mode of an adapter.
+   str(object='') -> str
+   str(bytes_or_buffer[, encoding[, errors]]) -> str
+
+   Create a new string object from the given object. If encoding or
+   errors is specified, then the object must expose a data buffer
+   that will be decoded using the given encoding and error handler.
+   Otherwise, returns the result of object.__str__() (if defined)
+   or repr(object).
+   encoding defaults to sys.getdefaultencoding().
+   errors defaults to 'strict'.
 
 
    .. py:attribute:: LIVE
@@ -103,6 +124,7 @@ Module Contents
 
 
    Defines how a Framework implements a Middle Layer standard.
+   Used for declaring static definitions in adapters.
 
 
    .. py:attribute:: api
@@ -123,20 +145,37 @@ Module Contents
 
 
 
+   .. py:attribute:: output_adapter
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: transformation_type
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: operator
+      :type:  Optional[str]
+      :value: None
+
+
+
 .. py:class:: FrameworkAdapter
 
    Bases: :py:obj:`Protocol`
 
 
    Protocol definition for a Framework Adapter.
-   Includes Hybrid Loading Logic via Mixin-like default behavior requires careful subclassing.
-   Since Protocol cannot have implementation easily without a base class,
-   we define the Interface here and provide a helper method for loading snapshots.
 
 
    .. py:method:: convert(data: Any) -> Any
 
-      Converts input data (usually array-like) to this framework's tensor type.
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
 
 
 
@@ -144,133 +183,91 @@ Module Contents
       :type: List[str]
 
 
-      List of python modules to scan when running `ml_switcheroo sync`.
-
 
    .. py:property:: display_name
       :type: str
 
-
-      Friendly name for UI/CLI (e.g. 'PyTorch').
 
 
    .. py:property:: ui_priority
       :type: int
 
 
-      Integer defining the sort order in UI tables and Dropdowns.
-
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
-
-      Regex patterns used to categorize API surfaces.
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Returns the semantic tiers supported by this framework.
-      e.g. [SemanticTier.ARRAY_API] for NumPy,
-           [SemanticTier.ARRAY_API, SemanticTier.NEURAL] for PyTorch.
-
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
-
-      Default module import path and alias.
 
 
    .. py:property:: inherits_from
       :type: Optional[str]
 
 
-      Key of a parent framework to inherit mappings from.
-
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
-
-      Defines how Classes and Functions should be transformed.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      Returns a list of method names that modify global random state.
-
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
-
-      Returns Python source code to instantiate a device on this backend.
-
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      Returns Python source code to perform IO operations.
-
-
 
    .. py:method:: get_serialization_imports() -> List[str]
-
-      Returns a list of import statements required for serialization to work.
-
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
-      Returns the standard demo example.
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns a dictionary of categorized examples.
-      Expected keys: 'tier1_math', 'tier2_neural', 'tier3_extras'.
-
 
 
    .. py:property:: definitions
       :type: Dict[str, StandardMap]
 
 
-      Returns the framework's implementation of Middle Layer Operations.
+      Returns the framework's static implementation of Middle Layer Operations.
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, Dict[str, str]]
+
+
+      Returns import path remapping rules.
+      Format: {"source.mod": {"root": "target", "sub": "mod", "alias": "alias"}}
 
 
    .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
-      Scans the installed framework (LIVE) or reads from snapshot (GHOST).
 
-      :param category: The semantic category to scan for.
-
-      :returns: A list of GhostRef objects representing the discovered API surface.
-
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
 
 .. py:function:: load_snapshot_for_adapter(fw_key: str) -> Dict[str, Any]
 
-   Locates the most recent snapshot for a given framework key (e.g. 'torch').
-   Used by Adapter __init__ methods when entering Ghost Mode.
-
-   :returns: The snapshot data dictionary (containing 'categories', 'version', etc).
-             Returns empty dict if no snapshot found.
+   Locates the most recent snapshot for a given framework key.
 
 
 .. py:function:: register_framework(name: str)
 
-   Decorator to register a framework adapter class.
-
-
 .. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
-
-   Factory to instantiate an adapter.
-
 

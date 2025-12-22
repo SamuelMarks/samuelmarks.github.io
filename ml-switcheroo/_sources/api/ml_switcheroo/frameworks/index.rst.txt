@@ -21,7 +21,6 @@ Submodules
    /api/ml_switcheroo/frameworks/base/index
    /api/ml_switcheroo/frameworks/common/index
    /api/ml_switcheroo/frameworks/flax_nnx/index
-   /api/ml_switcheroo/frameworks/flax_shim/index
    /api/ml_switcheroo/frameworks/jax/index
    /api/ml_switcheroo/frameworks/keras/index
    /api/ml_switcheroo/frameworks/mlx/index
@@ -73,14 +72,13 @@ Package Contents
 
 
    Protocol definition for a Framework Adapter.
-   Includes Hybrid Loading Logic via Mixin-like default behavior requires careful subclassing.
-   Since Protocol cannot have implementation easily without a base class,
-   we define the Interface here and provide a helper method for loading snapshots.
 
 
    .. py:method:: convert(data: Any) -> Any
 
-      Converts input data (usually array-like) to this framework's tensor type.
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
 
 
 
@@ -88,126 +86,88 @@ Package Contents
       :type: List[str]
 
 
-      List of python modules to scan when running `ml_switcheroo sync`.
-
 
    .. py:property:: display_name
       :type: str
 
-
-      Friendly name for UI/CLI (e.g. 'PyTorch').
 
 
    .. py:property:: ui_priority
       :type: int
 
 
-      Integer defining the sort order in UI tables and Dropdowns.
-
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
-
-      Regex patterns used to categorize API surfaces.
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Returns the semantic tiers supported by this framework.
-      e.g. [SemanticTier.ARRAY_API] for NumPy,
-           [SemanticTier.ARRAY_API, SemanticTier.NEURAL] for PyTorch.
-
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
-
-      Default module import path and alias.
 
 
    .. py:property:: inherits_from
       :type: Optional[str]
 
 
-      Key of a parent framework to inherit mappings from.
-
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
-
-      Defines how Classes and Functions should be transformed.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      Returns a list of method names that modify global random state.
-
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
-
-      Returns Python source code to instantiate a device on this backend.
-
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      Returns Python source code to perform IO operations.
-
-
 
    .. py:method:: get_serialization_imports() -> List[str]
-
-      Returns a list of import statements required for serialization to work.
-
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
-      Returns the standard demo example.
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns a dictionary of categorized examples.
-      Expected keys: 'tier1_math', 'tier2_neural', 'tier3_extras'.
-
 
 
    .. py:property:: definitions
       :type: Dict[str, StandardMap]
 
 
-      Returns the framework's implementation of Middle Layer Operations.
+      Returns the framework's static implementation of Middle Layer Operations.
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, Dict[str, str]]
+
+
+      Returns import path remapping rules.
+      Format: {"source.mod": {"root": "target", "sub": "mod", "alias": "alias"}}
 
 
    .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
-      Scans the installed framework (LIVE) or reads from snapshot (GHOST).
 
-      :param category: The semantic category to scan for.
-
-      :returns: A list of GhostRef objects representing the discovered API surface.
-
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
 
 .. py:function:: register_framework(name: str)
 
-   Decorator to register a framework adapter class.
-
-
 .. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
-
-   Factory to instantiate an adapter.
-
 
 .. py:data:: TorchAdapter
    :value: None

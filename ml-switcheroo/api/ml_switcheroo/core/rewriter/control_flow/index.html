@@ -261,7 +261,28 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../index.html" class="md-nav__link">ml_switcheroo</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../injector_spec/index.html" class="md-nav__link">injector_spec</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../injector_plugin/index.html" class="md-nav__link">injector_plugin</a>
       
     
     </li></ul>
@@ -314,12 +335,17 @@
   <section id="module-ml_switcheroo.core.rewriter.control_flow">
 <span id="ml-switcheroo-core-rewriter-control-flow"></span><h1 id="api-ml-switcheroo-core-rewriter-control-flow-index--page-root">ml_switcheroo.core.rewriter.control_flow<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-control-flow-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Control Flow Rewriting Logic.</p>
-<p>Handles structural control flow transformations, specifically <cite>for</cite> loops.
+<p>Handles structural control flow transformations, specifically <code class="docutils literal notranslate"><span class="pre">for</span></code> loops.
 Unlike API calls which map via Semantics JSON, control flow hooks are
-dispatched via reserved system triggers (e.g. <cite>transform_for_loop</cite>).</p>
-<p>This allows plugins to implement complex logic like:
-- <cite>for i in range(N)</cite> -&gt; <cite>jax.lax.fori_loop(…)</cite>
-- <cite>for x in iter</cite>     -&gt; <cite>jax.lax.scan(…)</cite></p>
+dispatched via reserved system triggers (e.g. <code class="docutils literal notranslate"><span class="pre">transform_for_loop</span></code>).</p>
+<p>This logic enables a prioritization chain for loop handling:</p>
+<ol class="arabic simple">
+<li><p><strong>Static Unrolling</strong>: Optimization strategy. If a loop is determined to be
+static (e.g., <code class="docutils literal notranslate"><span class="pre">range(5)</span></code>), it is unrolled into flat code.</p></li>
+<li><p><strong>Safety Transformation</strong>: Compliance strategy. If the loop remains dynamic
+and the target framework (like JAX) enforces functional purity, this ensures
+the loop is flagged or converted to a scan/while construct.</p></li>
+</ol>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -340,10 +366,31 @@ dispatched via reserved system triggers (e.g. <cite>transform_for_loop</cite>).<
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin.leave_For">
 <span class="sig-name descname"><span class="pre">leave_For</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin.leave_For" title="Link to this definition">¶</a></dt>
-<dd><p>Invokes the ‘transform_for_loop’ hook if registered.</p>
-<p>If no plugin is registered or the plugin returns the node unmodified,
-the loop preserves its Python semantics (appropriate for Torch/NumPy).
-If JAX/TF is the target, a plugin is expected to intercept this.</p>
+<dd><p>Invokes loop transformation logic.</p>
+<p>Implements a priority chain:
+1.  <strong>Static Unroll</strong>: Checks <code class="docutils literal notranslate"><span class="pre">transform_for_loop_static</span></code>. If the loop index</p>
+<blockquote>
+<div><p>is constant, unrolls it (Optimization).</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p><strong>General Transform</strong>: Checks <code class="docutils literal notranslate"><span class="pre">transform_for_loop</span></code>. Handles general
+case logic or applies safety warnings (e.g., Escape Hatch for JAX).</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_node</strong> (<em>cst.For</em>) – The node before transformation.</p></li>
+<li><p><strong>updated_node</strong> (<em>cst.For</em>) – The node after child visitors have run.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed node (potentially a
+FlattenSentinel of unrolled statements) or the original node if untouched.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[cst.For, cst.CSTNode]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>

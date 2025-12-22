@@ -36,6 +36,8 @@ Module Contents
 
    Scans classes to ensure members used in forward are initialized in __init__.
 
+   It maintains a stack of Class Contexts to handle nested class definitions correctly.
+
    .. attribute:: warnings
 
       List of discovered issues (e.g. "Member 'conv1' used but not initialized").
@@ -58,42 +60,46 @@ Module Contents
    .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> None
 
       Enters a class definition.
+      Pushes a new Context onto the stack.
 
 
 
    .. py:method:: leave_ClassDef(node: libcst.ClassDef) -> None
 
-      Exits a class definition and computes diff.
+      Exits a class definition and computes the difference between usages and inits.
+      If discrepancies are found, they are recorded in `self.warnings`.
 
 
 
    .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> None
 
       Tracks entry into __init__ or forward/call methods.
+      Sets context flags `in_init` or `in_forward`.
 
 
 
    .. py:method:: leave_FunctionDef(node: libcst.FunctionDef) -> None
 
       Exits function scope.
+      Resets context flags.
 
 
 
    .. py:method:: visit_Assign(node: libcst.Assign) -> None
 
-      Tracks assignments to self.x in __init__.
+      Tracks assignments to `self.x` inside `__init__`.
 
 
 
    .. py:method:: visit_AnnAssign(node: libcst.AnnAssign) -> None
 
-      Tracks annotated assignments (self.x: int = ...) in __init__.
+      Tracks annotated assignments (`self.x: int = ...`) inside `__init__`.
 
 
 
    .. py:method:: visit_Attribute(node: libcst.Attribute) -> None
 
-      Tracks attribute access (self.x) in forward.
+      Tracks attribute access (`self.x`) inside `forward`.
 
 
 

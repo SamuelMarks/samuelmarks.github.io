@@ -1,132 +1,267 @@
 Extending
 =========
 
-ml-switcheroo is built on a modular "Zero-Edit" architecture. You can add support for new Machine Learning frameworks (like `tinygrad`, `keras`, or `mlx`) without modifying the core engine logic. 
+**ml-switcheroo** is built on a modular, data-driven architecture. Supporting new operations or entirely new frameworks
+involves populating the **Knowledge Base** rather than modifying the core engine logic.
 
-**Artifacts required for a new framework:**
-1.  **Adapter**: Python class in `src/ml_switcheroo/frameworks/`.
-2.  **Snapshot**: JSON mapping in `src/ml_switcheroo/snapshots/`.
+There are three ways to extend the system, ordered by complexity:
 
---- 
+1. **ODL (YAML)**: Define operations declaratively using the Operation Definition Language. (Recommended)
+2. **Adapter API**: Write Python classes for full framework support.
+3. **Plugin Hooks**: Write AST transformation logic for complex architectural mismatches.
 
-## 1. Adding a New Framework Adapter
+---
 
-To support a new library (e.g., `my_framework`), create a file `src/ml_switcheroo/frameworks/my_framework.py`.
+## 🏗️ Architecture Overview
+
+The extension system works by injecting definitions into the Knowledge Base (The Hub) and linking them to specific
+framework implementations (The Spokes).
+
+```mermaid
+graph TD
+%% Styles
+    classDef hub fill: #f9ab00, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans', rx: 5px
+    classDef adapter fill: #4285f4, stroke: #20344b, stroke-width: 2px, stroke-dasharray: 0, color: #ffffff, font-family: 'Google Sans', rx: 5px
+    classDef plugin fill: #34a853, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
+    classDef tool fill: #ea4335, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
+
+    subgraph EXT [Your Extension]
+        direction TB
+        ADAPTER("<b>Framework Adapter</b><br/>src/frameworks/*.py<br/><i>Definitions</i>"):::adapter
+        PLUGIN("<b>Plugin Hooks</b><br/>src/plugins/*.py<br/><i>Complex Logic</i>"):::plugin
+    end
+
+    subgraph CORE [Core System]
+        direction TB
+        HUB("<b>Semantic Hub</b><br/>standards_internal.py<br/><i>Abstract Operations</i>"):::hub
+    end
+
+    subgraph TOOLS [Automation Tools]
+        direction TB
+        DEFINE("<b>CLI Command</b><br/>ml_switcheroo define<br/><i>Code Injection</i>"):::tool
+        YAML("<b>ODL YAML</b><br/>Operation Definition<br/><i>Declarative Spec</i>"):::tool
+    end
+
+%% Wiring
+    YAML --> DEFINE
+    DEFINE -->|" 1. Inject Spec "| HUB
+    DEFINE -->|" 2. Inject Mapping "| ADAPTER
+    DEFINE -->|" 3. Scaffold File "| PLUGIN
+    ADAPTER -->|" Registration "| HUB
+    PLUGIN -->|" Transformation "| HUB
+```
+
+---
+
+## 🚀 1. The Operation Definition Language (ODL)
+
+The quickest way to add support for missing operations is via the `define` command. You write a YAML file describing the
+operation, and the tool injects the necessary Python code into the system.
+
+### Workflow
+
+1. Create a file `my_op.yaml`.
+2. Run `ml_switcheroo define my_op.yaml`.
+
+This command automatically:
+
+1. Updates the Abstract Standard (Hub) in `standards_internal.py`.
+2. Updates Framework Mappings (Spokes) in `frameworks/*.py`.
+3. Scaffolds Plugin files if complex logic is requested.
+
+### ODL Schema Reference
+
+```yaml
+# 1. Abstract Definition (The Hub)
+operation: "LogSoftmax"
+description: "Applies the LogSoftmax function to an n-dimensional input Tensor."
+std_args:
+  - name: "input"
+    type: "Tensor"
+  - name: "dim"
+    type: "int"
+    default: "-1"
+
+# 2. Variants (The Spokes)
+variants:
+  # Framework keys must match registered adapters (torch, jax, tensorflow, etc.)
+  torch:
+    api: "torch.nn.functional.log_softmax" # Direct mapping
+
+  jax:
+    api: "jax.nn.log_softmax"
+    # Argument renaming: Standard 'dim' -> Framework 'axis'
+    args:
+      dim: "axis"
+
+  # Advanced Feature: Auto-Inference
+  # If you don't know the exact API path, use "infer" to let the engine search existing libraries.
+  numpy:
+    api: "infer"
+
+  # Advanced Feature: Output Adaptation
+  # Use Python lambdas to reshape return values (e.g., taking the first element of a tuple)
+  # Useful for APIs that return (val, indices) when you only need val.
+  tensorflow:
+    api: "tf.nn.log_softmax"
+    output_adapter: "lambda x: x[0]"
+
+  # Advanced Feature: Infix Operators
+  # Map a function call to a math operator 
+  # Example: add(a, b) -> a + b
+  mlx:
+    api: "mx.add"
+    transformation_type: "infix" # or "inline_lambda"
+    operator: "+"
+```
+
+### Plugin Scaffolding via ODL
+
+If an operation requires logic too complex for simple mapping (e.g., conditional dispatch based on argument values), you
+can define **Rules** in the YAML. The CLI will generate a Python plugin with `if/else` logic pre-written.
+
+```yaml
+# Inside your YAML file:
+scaffold_plugins:
+  - name: "resize_dispatcher"
+    type: "call_transform"
+    doc: "Dispatches to different resize APIs based on interpolation mode."
+    rules:
+      - if_arg: "mode"
+        is: "nearest"
+        use_api: "jax.image.resize_nearest"
+      - if_arg: "mode"
+        is: "bilinear"
+        use_api: "jax.image.resize_bilinear"
+```
+
+---
+
+## 🔌 2. Adding a Framework Adapter
+
+To support a new library (e.g., `tinygrad` or `my_lib`), you create a Python class that acts as the translation
+interface.
+
+**Location:** `src/ml_switcheroo/frameworks/my_lib.py`
 
 ```python
-from typing import List, Tuple, Dict, Any
-from ml_switcheroo.frameworks import register_framework
+from typing import Dict, Tuple
+from ml_switcheroo.frameworks.base import register_framework, FrameworkAdapter, StandardMap
 from ml_switcheroo.semantics.schema import StructuralTraits
 
-@register_framework("my_framework")  # Unique key used in CLI
-class MyFrameworkAdapter: 
-    # --- Metadata --- 
-    display_name: str = "My Framework" 
-    ui_priority: int = 100 
 
-    # --- Discovery --- 
+@register_framework("my_lib")
+class MyLibAdapter:
+    display_name = "My Library"
+
+    # Optional: Inherit behavior (e.g. 'flax_nnx' inherits 'jax' math capabilities)
+    inherits_from = None
+
+    # Discovery configuration
+    ui_priority = 100
+
+    # --- 1. Import Logic ---
     @property
-    def search_modules(self) -> List[str]: 
-        return ["my_framework", "my_framework.nn"] 
+    def import_alias(self) -> Tuple[str, str]:
+        # How is the library imported? alias is usually what users type (e.g. 'np', 'tf')
+        return ("my_lib", "ml")
 
     @property
-    def import_alias(self) -> Tuple[str, str]: 
-        # Default alias behavior: import my_framework as mf
-        return ("my_framework", "mf") 
+    def import_namespaces(self) -> Dict[str, Dict[str, str]]:
+        # Remap source namespaces. 
+        # Rules: If input uses 'torch.nn', we inject 'import my_lib.layers as nn'
+        return {
+            "torch.nn": {"root": "my_lib", "sub": "layers", "alias": "nn"},
+        }
 
-    # --- Structural Traits (Zero-Edit Rewriter Config) --- 
-    # Defines how Classes and Functions are transformed. 
+    # --- 2. Static Mappings (The "Definitions") ---
+    # This property allows Ghost Mode to work without the library installed.
     @property
-    def structural_traits(self) -> StructuralTraits: 
-        return StructuralTraits( 
-            module_base="my_framework.Module",  # Base class for layers
-            forward_method="call",              # Method name: forward vs call
-            requires_super_init=True,           # Needs super().__init__()?
-            lifecycle_strip_methods=["gpu"],    # Remove .gpu() calls?
-        ) 
+    def definitions(self) -> Dict[str, StandardMap]:
+        return {
+            # Simple 1:1 Mapping
+            "Abs": StandardMap(api="ml.abs"),
 
-    # --- Verification & Test Gen Support --- 
-    @classmethod
-    def get_import_stmts(cls) -> str: 
-        return "import my_framework as mf" 
+            # Argument Renaming
+            "Linear": StandardMap(
+                api="ml.layers.Dense",
+                args={"in_features": "input_dim", "out_features": "units"}
+            ),
 
-    @classmethod
-    def get_creation_syntax(cls, var_name: str) -> str: 
-        # Code to turn numpy array 'var_name' into tensor
-        return f"mf.tensor({var_name})" 
+            # Linking to a Plugin (Logic located in src/plugins/)
+            "permute_dims": StandardMap(
+                api="ml.transpose",
+                requires_plugin="pack_varargs"
+            )
+        }
 
-    @classmethod
-    def get_numpy_conversion_syntax(cls, var_name: str) -> str: 
-        # Code to turn tensor back to numpy
-        return f"{var_name}.numpy()" 
-
-    # ... See base.py for full protocol including convert()
+    # --- 3. Structural Traits ---
+    # Configure how Classes/Functions are rewritten without custom code
+    @property
+    def structural_traits(self) -> StructuralTraits:
+        return StructuralTraits(
+            module_base="ml.Module",  # Base class for layers
+            forward_method="call",  # Inference method name
+            requires_super_init=True,  # Inject super().__init__()?
+            strip_magic_args=["rngs"],  # Remove args not used by this FW
+            lifecycle_strip_methods=["to", "cpu"],  # Methods to silently remove
+            impurity_methods=["add_"]  # Methods flagged as side-effects
+        )
 ```
 
---- 
+---
 
-## 2. Mapping APIs (The Overlay)
+## 🧠 3. Plugin System (Custom Code)
 
-You typically do **not** edit the core spec files (`semantics/*.json`). Instead, you define how your framework implements those standards in a Snapshot Overlay.
+For operations that require manipulating the AST structure (e.g., packing args, unwrapping state, injecting context
+managers), you use the **Hook System**.
 
-Create `src/ml_switcheroo/snapshots/my_framework_mappings.json`:
+Create a python file in `src/ml_switcheroo/plugins/`. It will be automatically discovered.
 
-```json
-{
-  "__framework__": "my_framework",
-  "mappings": {
-    "Abs": { 
-      "api": "my_framework.abs" 
-    },
-    "Add": { 
-        "api": "my_framework.add" 
-    },
-    "Linear": { 
-        "api": "my_framework.nn.Linear",
-        "args": { 
-            "in_features": "in_ch", 
-            "out_features": "out_ch" 
-        } 
-    },
-    "DataLoader": { 
-        "api": "my_framework.data.Loader",
-        "requires_plugin": "convert_dataloader"
+### Auto-Wired Plugins
+
+You can register a hook and definition its semantic mapping in one place using the `auto_wire` parameter. This
+architecture maintains locality of behavior and avoids editing huge JSON files manually.
+
+```python
+import libcst as cst
+from ml_switcheroo.core.hooks import register_hook, HookContext
+
+
+# Define the operation spec and logic in one go
+@register_hook(
+    trigger="custom_reshape_logic",
+    auto_wire={
+        "ops": {
+            "Reshape": {
+                "std_args": ["x", "shape"],
+                "variants": {
+                    "torch": {"api": "torch.reshape"},
+                    "jax": {"api": "jnp.reshape", "requires_plugin": "custom_reshape_logic"}
+                }
+            }
+        }
     }
-  },
-  "templates": {
-      "import": "import my_framework as mf",
-      "convert_input": "mf.tensor({np_var})",
-      "to_numpy": "{res_var}.numpy()"
-  }
-}
+)
+def transform_reshape(node: cst.Call, ctx: HookContext) -> cst.Call:
+    # 1. Inspect 'node' (The Call AST)
+    # 2. Use 'ctx' to look up config or API mappings
+    target_api = ctx.lookup_api("Reshape")  # returns "jnp.reshape"
+
+    # 3. Perform transformation logic (e.g. check args and modify them)
+    # This example grabs the function name, ignores args logic for brevity
+    new_func = cst.Name("reshaped_manually")
+
+    return node.with_changes(func=new_func)
 ```
 
-### Automated Discovery
+### The Hook Context (`ctx`)
 
-Instead of writing JSON manually, you can auto-generate the file by scanning your installed library:
+The context object passed to your function provides helper methods for robust plugin writing:
 
-```bash
-# 1. Install your library
-pip install my_framework
-
-# 2. Run the Scaffolder
-ml_switcheroo scaffold --frameworks my_framework
-```
-
-This will find functions that match standard names (e.g. `abs`, `sum`) and populate `snapshots/my_framework_mappings.json`.
-
---- 
-
-## 3. Verification
-
-Once your Adapter and Snapshot are present, verify integration:
-
-```bash
-# 1. Run fuzzer
-ml_switcheroo ci
-```
-
-This command:
-1.  Reads the abstract specs (e.g. `Abs` requires numeric input).
-2.  Generates a Python script using your Adapter's templates.
-3.  Executes `my_framework.abs(data)` and compares the result against NumPy/Torch reference.
+* `ctx.target_fw`: The active target framework key (string).
+* `ctx.lookup_api(op_name)`: Resolve the API string for the current target via the Semantics Manager.
+* `ctx.inject_signature_arg(name)`: Add an argument to the enclosing function definition (e.g., inject `rng` into
+  `def forward(...)`).
+* `ctx.inject_preamble(code)`: Add code to the start of the function body.
+* `ctx.config(key)`: Read plugin settings from `pyproject.toml` or CLI args.

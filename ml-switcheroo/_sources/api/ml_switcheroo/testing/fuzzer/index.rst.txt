@@ -27,10 +27,13 @@ ml_switcheroo.testing.fuzzer
 
    2.  **Heuristics (Fallback)**:
        If no hints are available, it infers data types from argument names.
-
        - `mask`, `condition` -> `bool`
        - `idx`, `axis`, `dim` -> `int` within bounds
        - `x`, `y`, `input` -> `Array (float32)`
+
+   3.  **Semantic Constraints**:
+       Respects `min`, `max`, and `options` constraints applied to parameters,
+       preventing invalid inputs (e.g., negative args for log).
 
    Safety:
        Implements `MAX_RECURSION_DEPTH` to prevent infinite loops when generating
@@ -64,7 +67,7 @@ Module Contents
 
 
 
-   .. py:method:: generate_inputs(params: List[str], hints: Optional[Dict[str, str]] = None) -> Dict[str, Any]
+   .. py:method:: generate_inputs(params: List[str], hints: Optional[Dict[str, str]] = None, constraints: Optional[Dict[str, Dict]] = None) -> Dict[str, Any]
 
       Creates a dictionary of `{arg_name: value}`.
 
@@ -74,6 +77,7 @@ Module Contents
 
       :param params: List of argument names to generate (e.g. `['x', 'axis']`).
       :param hints: Dictionary of `{arg_name: type_string}` derived from Spec.
+      :param constraints: Dictionary of `{arg_name: {min, max, options}}`.
 
       :returns: Randomized inputs ready for Framework adaptation.
       :rtype: Dict[str, Any]

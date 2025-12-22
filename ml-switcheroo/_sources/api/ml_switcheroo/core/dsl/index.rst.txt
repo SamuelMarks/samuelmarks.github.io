@@ -22,6 +22,7 @@ Classes
    ml_switcheroo.core.dsl.ParameterDef
    ml_switcheroo.core.dsl.FrameworkVariant
    ml_switcheroo.core.dsl.PluginType
+   ml_switcheroo.core.dsl.LogicOp
    ml_switcheroo.core.dsl.Rule
    ml_switcheroo.core.dsl.PluginScaffoldDef
    ml_switcheroo.core.dsl.OperationDef
@@ -36,6 +37,9 @@ Module Contents
 
 
    Definition of a single argument in an abstract operation signature.
+
+   Updated to support semantic constraints (min, max, options) to guide
+   fuzzing and validation logic (Bounds Checking).
 
 
    .. py:attribute:: name
@@ -62,6 +66,24 @@ Module Contents
 
 
 
+   .. py:attribute:: min
+      :type:  Optional[float]
+      :value: None
+
+
+
+   .. py:attribute:: max
+      :type:  Optional[float]
+      :value: None
+
+
+
+   .. py:attribute:: options
+      :type:  Optional[List[Union[str, int, float, bool]]]
+      :value: None
+
+
+
 .. py:class:: FrameworkVariant(/, **data: Any)
 
    Bases: :py:obj:`pydantic.BaseModel`
@@ -78,6 +100,12 @@ Module Contents
 
    .. py:attribute:: args
       :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: inject_args
+      :type:  Optional[Dict[str, Union[str, int, float, bool]]]
       :value: None
 
 
@@ -124,6 +152,54 @@ Module Contents
 
 
 
+.. py:class:: LogicOp
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Supported boolean operators for conditional rules.
+
+
+   .. py:attribute:: EQ
+      :value: 'eq'
+
+
+
+   .. py:attribute:: NEQ
+      :value: 'neq'
+
+
+
+   .. py:attribute:: GT
+      :value: 'gt'
+
+
+
+   .. py:attribute:: LT
+      :value: 'lt'
+
+
+
+   .. py:attribute:: GTE
+      :value: 'gte'
+
+
+
+   .. py:attribute:: LTE
+      :value: 'lte'
+
+
+
+   .. py:attribute:: IN
+      :value: 'in'
+
+
+
+   .. py:attribute:: NOT_IN
+      :value: 'not_in'
+
+
+
 .. py:class:: Rule(/, **data: Any)
 
    Bases: :py:obj:`pydantic.BaseModel`
@@ -144,8 +220,14 @@ Module Contents
 
 
 
+   .. py:attribute:: op
+      :type:  LogicOp
+      :value: None
+
+
+
    .. py:attribute:: is_val
-      :type:  Union[str, int, float, bool]
+      :type:  Union[str, int, float, bool, List[Union[str, int, float]]]
       :value: None
 
 

@@ -358,13 +358,13 @@ parses these strings using a mini-grammar to generate compliant data.</p>
 </ul>
 </li>
 <li><p><strong>Heuristics (Fallback)</strong>:
-If no hints are available, it infers data types from argument names.</p>
-<ul class="simple">
-<li><p><cite>mask</cite>, <cite>condition</cite> -&gt; <cite>bool</cite></p></li>
-<li><p><cite>idx</cite>, <cite>axis</cite>, <cite>dim</cite> -&gt; <cite>int</cite> within bounds</p></li>
-<li><p><cite>x</cite>, <cite>y</cite>, <cite>input</cite> -&gt; <cite>Array (float32)</cite></p></li>
-</ul>
-</li>
+If no hints are available, it infers data types from argument names.
+- <cite>mask</cite>, <cite>condition</cite> -&gt; <cite>bool</cite>
+- <cite>idx</cite>, <cite>axis</cite>, <cite>dim</cite> -&gt; <cite>int</cite> within bounds
+- <cite>x</cite>, <cite>y</cite>, <cite>input</cite> -&gt; <cite>Array (float32)</cite></p></li>
+<li><p><strong>Semantic Constraints</strong>:
+Respects <cite>min</cite>, <cite>max</cite>, and <cite>options</cite> constraints applied to parameters,
+preventing invalid inputs (e.g., negative args for log).</p></li>
 </ol>
 <dl class="simple">
 <dt>Safety:</dt><dd><p>Implements <cite>MAX_RECURSION_DEPTH</cite> to prevent infinite loops when generating
@@ -397,7 +397,7 @@ recursive or deeply nested types.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs">
-<span class="sig-name descname"><span class="pre">generate_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs" title="Link to this definition">¶</a></dt>
 <dd><p>Creates a dictionary of <cite>{arg_name: value}</cite>.</p>
 <p>Resolves symbolic dimensions across the entire parameter set. For example,
 if hints are <cite>{‘x’: “Array[‘N’]”, ‘y’: “Array[‘N’]”}</cite>, both arrays will
@@ -407,6 +407,7 @@ have matching lengths.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>params</strong> – List of argument names to generate (e.g. <cite>[‘x’, ‘axis’]</cite>).</p></li>
 <li><p><strong>hints</strong> – Dictionary of <cite>{arg_name: type_string}</cite> derived from Spec.</p></li>
+<li><p><strong>constraints</strong> – Dictionary of <cite>{arg_name: {min, max, options}}</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -481,7 +482,7 @@ have matching lengths.</p>
       <div class="md-footer-meta__inner md-grid">
         <div class="md-footer-copyright">
           <div class="md-footer-copyright__highlight">
-              &#169; Copyright 2025, ml-switcheroo Developers.
+              &#169; Copyright 2025, Samuel Marks.
               
           </div>
             Created using

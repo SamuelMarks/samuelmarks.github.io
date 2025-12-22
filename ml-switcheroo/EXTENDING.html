@@ -602,9 +602,9 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#workflow" class="md-nav__link">Workflow</a>
         </li>
-        <li class="md-nav__item"><a href="#odl-schema-reference" class="md-nav__link">ODL Schema Reference</a>
+        <li class="md-nav__item"><a href="#odl-schema-reference-advanced" class="md-nav__link">ODL Schema Reference (Advanced)</a>
         </li>
-        <li class="md-nav__item"><a href="#plugin-scaffolding-via-odl" class="md-nav__link">Plugin Scaffolding via ODL</a>
+        <li class="md-nav__item"><a href="#declarative-plugin-scaffolding" class="md-nav__link">Declarative Plugin Scaffolding</a>
         </li></ul>
             </nav>
         </li>
@@ -704,9 +704,9 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#workflow" class="md-nav__link">Workflow</a>
         </li>
-        <li class="md-nav__item"><a href="#odl-schema-reference" class="md-nav__link">ODL Schema Reference</a>
+        <li class="md-nav__item"><a href="#odl-schema-reference-advanced" class="md-nav__link">ODL Schema Reference (Advanced)</a>
         </li>
-        <li class="md-nav__item"><a href="#plugin-scaffolding-via-odl" class="md-nav__link">Plugin Scaffolding via ODL</a>
+        <li class="md-nav__item"><a href="#declarative-plugin-scaffolding" class="md-nav__link">Declarative Plugin Scaffolding</a>
         </li></ul>
             </nav>
         </li>
@@ -799,11 +799,12 @@ operation, and the tool injects the necessary Python code into the system.</p>
 <ol class="arabic simple">
 <li><p>Updates the Abstract Standard (Hub) in <code class="docutils literal notranslate"><span class="pre">standards_internal.py</span></code>.</p></li>
 <li><p>Updates Framework Mappings (Spokes) in <code class="docutils literal notranslate"><span class="pre">frameworks/*.py</span></code>.</p></li>
-<li><p>Scaffolds Plugin files if complex logic is requested.</p></li>
+<li><p>Scaffolds Plugin files (if complex logic is requested).</p></li>
 </ol>
 </section>
-<section id="odl-schema-reference">
-<h3 id="odl-schema-reference">ODL Schema Reference<a class="headerlink" href="#odl-schema-reference" title="Link to this heading">¶</a></h3>
+<section id="odl-schema-reference-advanced">
+<h3 id="odl-schema-reference-advanced">ODL Schema Reference (Advanced)<a class="headerlink" href="#odl-schema-reference-advanced" title="Link to this heading">¶</a></h3>
+<p>The ODL has been expanded to support <strong>Semantic Constraints</strong>, <strong>Output Adaptation</strong>, and <strong>Declarative Logic Rules</strong>.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Abstract Definition (The Hub)</span>
 <span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"LogSoftmax"</span>
 <span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Applies</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">LogSoftmax</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">n-dimensional</span><span class="nv"> </span><span class="s">input</span><span class="nv"> </span><span class="s">Tensor."</span>
@@ -813,57 +814,79 @@ operation, and the tool injects the necessary Python code into the system.</p>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span>
 <span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
 <span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">"-1"</span>
+<span class="w">    </span><span class="c1"># Semantics Constraints (Used by the Fuzzer)</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-3</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"reduction"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"str"</span>
+<span class="w">    </span><span class="nt">options</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"mean"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"sum"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"none"</span><span class="w"> </span><span class="p p-Indicator">]</span>
 
 <span class="c1"># 2. Variants (The Spokes)</span>
 <span class="nt">variants</span><span class="p">:</span>
-<span class="w">  </span><span class="c1"># Framework keys must match registered adapters (torch, jax, tensorflow, etc.)</span>
+<span class="w">  </span><span class="c1"># Torch: Direct mapping</span>
 <span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.log_softmax"</span><span class="w"> </span><span class="c1"># Direct mapping</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.log_softmax"</span>
 
+<span class="w">  </span><span class="c1"># JAX: Argument Renaming</span>
 <span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.nn.log_softmax"</span>
-<span class="w">    </span><span class="c1"># Argument renaming: Standard 'dim' -&gt; Framework 'axis'</span>
 <span class="w">    </span><span class="nt">args</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span>
 
-<span class="w">  </span><span class="c1"># Advanced Feature: Auto-Inference</span>
-<span class="w">  </span><span class="c1"># If you don't know the exact API path, use "infer" to let the engine search existing libraries.</span>
-<span class="w">  </span><span class="nt">numpy</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"infer"</span>
-
-<span class="w">  </span><span class="c1"># Advanced Feature: Output Adaptation</span>
-<span class="w">  </span><span class="c1"># Use Python lambdas to reshape return values (e.g., taking the first element of a tuple)</span>
-<span class="w">  </span><span class="c1"># Useful for APIs that return (val, indices) when you only need val.</span>
+<span class="w">  </span><span class="c1"># Mixed: Argument Injection + Casting</span>
+<span class="w">  </span><span class="c1"># Useful when target requires fixed parameters not present in source.</span>
 <span class="w">  </span><span class="nt">tensorflow</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"tf.nn.log_softmax"</span>
+<span class="w">    </span><span class="nt">inject_args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">full_precision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Inject 'full_precision=True'</span>
+<span class="w">    </span><span class="nt">casts</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="s">"float32"</span><span class="w">      </span><span class="c1"># Cast input argument to float32</span>
+
+<span class="w">  </span><span class="c1"># Output Adaptation (Lambda Wrapper)</span>
+<span class="w">  </span><span class="c1"># Useful for APIs that return (val, indices) when you only need val.</span>
+<span class="w">  </span><span class="nt">numpy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"np.some_func"</span>
+<span class="w">    </span><span class="c1"># Wraps call result: (lambda x: x[0])(np.some_func(...))</span>
 <span class="w">    </span><span class="nt">output_adapter</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">x:</span><span class="nv"> </span><span class="s">x[0]"</span>
 
-<span class="w">  </span><span class="c1"># Advanced Feature: Infix Operators</span>
-<span class="w">  </span><span class="c1"># Map a function call to a math operator </span>
-<span class="w">  </span><span class="c1"># Example: add(a, b) -&gt; a + b</span>
+<span class="w">  </span><span class="c1"># Infix Transformation</span>
+<span class="w">  </span><span class="c1"># Maps function call to math operator: add(a, b) -&gt; a + b</span>
 <span class="w">  </span><span class="nt">mlx</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"mx.add"</span>
-<span class="w">    </span><span class="nt">transformation_type</span><span class="p">:</span><span class="w"> </span><span class="s">"infix"</span><span class="w"> </span><span class="c1"># or "inline_lambda"</span>
+<span class="w">    </span><span class="nt">transformation_type</span><span class="p">:</span><span class="w"> </span><span class="s">"infix"</span>
 <span class="w">    </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="s">"+"</span>
 </pre></div>
 </div>
 </section>
-<section id="plugin-scaffolding-via-odl">
-<h3 id="plugin-scaffolding-via-odl">Plugin Scaffolding via ODL<a class="headerlink" href="#plugin-scaffolding-via-odl" title="Link to this heading">¶</a></h3>
-<p>If an operation requires logic too complex for simple mapping (e.g., conditional dispatch based on argument values), you
-can define <strong>Rules</strong> in the YAML. The CLI will generate a Python plugin with <code class="docutils literal notranslate"><span class="pre">if/else</span></code> logic pre-written.</p>
+<section id="declarative-plugin-scaffolding">
+<h3 id="declarative-plugin-scaffolding">Declarative Plugin Scaffolding<a class="headerlink" href="#declarative-plugin-scaffolding" title="Link to this heading">¶</a></h3>
+<p>If an operation requires conditional logic (e.g., dispatching to different APIs based on an argument value), you can
+define <strong>Rules</strong> in the YAML. The CLI will generate a Python plugin with <code class="docutils literal notranslate"><span class="pre">if/else</span></code> logic pre-written, handling all
+necessary boilerplate.</p>
+<p>Supported Operators: <code class="docutils literal notranslate"><span class="pre">eq</span></code>, <code class="docutils literal notranslate"><span class="pre">neq</span></code>, <code class="docutils literal notranslate"><span class="pre">gt</span></code>, <code class="docutils literal notranslate"><span class="pre">lt</span></code>, <code class="docutils literal notranslate"><span class="pre">gte</span></code>, <code class="docutils literal notranslate"><span class="pre">lte</span></code>, <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">not_in</span></code>.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside your YAML file:</span>
 <span class="nt">scaffold_plugins</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"resize_dispatcher"</span>
 <span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"call_transform"</span>
 <span class="w">    </span><span class="nt">doc</span><span class="p">:</span><span class="w"> </span><span class="s">"Dispatches</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">different</span><span class="nv"> </span><span class="s">resize</span><span class="nv"> </span><span class="s">APIs</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">interpolation</span><span class="nv"> </span><span class="s">mode."</span>
 <span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">      </span><span class="c1"># Rule 1: Exact Match</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
-<span class="w">        </span><span class="nt">is</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
 <span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_nearest"</span>
+
+<span class="w">      </span><span class="c1"># Rule 2: List Membership (IN)</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
-<span class="w">        </span><span class="nt">is</span><span class="p">:</span><span class="w"> </span><span class="s">"bilinear"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"in"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"bilinear"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"bicubic"</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_bilinear"</span>
+
+<span class="w">      </span><span class="c1"># Rule 3: Numeric Comparison</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"size"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"gt"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_large"</span>
 </pre></div>
 </div>
 </section>
@@ -883,7 +906,7 @@ interface.</p>
 <span class="k">class</span><span class="w"> </span><span class="nc">MyLibAdapter</span><span class="p">:</span>
     <span class="n">display_name</span> <span class="o">=</span> <span class="s2">"My Library"</span>
 
-    <span class="c1"># Optional: Inherit behavior (e.g. 'flax_nnx' inherits 'jax' math capabilities)</span>
+    <span class="c1"># Optional: Inherit implementation behavior (e.g. 'flax_nnx' inherits 'jax' math capabilities)</span>
     <span class="n">inherits_from</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Discovery configuration</span>
@@ -897,7 +920,7 @@ interface.</p>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">import_namespaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-        <span class="c1"># Remap source namespaces. </span>
+        <span class="c1"># Remap source namespaces.</span>
         <span class="c1"># Rules: If input uses 'torch.nn', we inject 'import my_lib.layers as nn'</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">"torch.nn"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"root"</span><span class="p">:</span> <span class="s2">"my_lib"</span><span class="p">,</span> <span class="s2">"sub"</span><span class="p">:</span> <span class="s2">"layers"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">:</span> <span class="s2">"nn"</span><span class="p">},</span>
@@ -905,6 +928,7 @@ interface.</p>
 
     <span class="c1"># --- 2. Static Mappings (The "Definitions") ---</span>
     <span class="c1"># This property allows Ghost Mode to work without the library installed.</span>
+    <span class="c1"># It populates the Spokes.</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StandardMap</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -921,6 +945,13 @@ interface.</p>
             <span class="s2">"permute_dims"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
                 <span class="n">api</span><span class="o">=</span><span class="s2">"ml.transpose"</span><span class="p">,</span>
                 <span class="n">requires_plugin</span><span class="o">=</span><span class="s2">"pack_varargs"</span>
+            <span class="p">),</span>
+
+            <span class="c1"># Inline Transformation</span>
+            <span class="s2">"Add"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.add"</span><span class="p">,</span>
+                <span class="n">transformation_type</span><span class="o">=</span><span class="s2">"infix"</span><span class="p">,</span>
+                <span class="n">operator</span><span class="o">=</span><span class="s2">"+"</span>
             <span class="p">)</span>
         <span class="p">}</span>
 
@@ -947,8 +978,8 @@ managers), you use the <strong>Hook System</strong>.</p>
 <p>Create a python file in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>. It will be automatically discovered.</p>
 <section id="auto-wired-plugins">
 <h3 id="auto-wired-plugins">Auto-Wired Plugins<a class="headerlink" href="#auto-wired-plugins" title="Link to this heading">¶</a></h3>
-<p>You can register a hook and definition its semantic mapping in one place using the <code class="docutils literal notranslate"><span class="pre">auto_wire</span></code> parameter. This
-architecture maintains locality of behavior and avoids editing huge JSON files manually.</p>
+<p>You can register a hook and define its semantic mapping (“Hub entry”) in one place using the <code class="docutils literal notranslate"><span class="pre">auto_wire</span></code> parameter. This
+architecture maintains locality of behavior and avoids editing large JSON files manually.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_hook</span><span class="p">,</span> <span class="n">HookContext</span>
 
@@ -1039,7 +1070,7 @@ architecture maintains locality of behavior and avoids editing huge JSON files m
       <div class="md-footer-meta__inner md-grid">
         <div class="md-footer-copyright">
           <div class="md-footer-copyright__highlight">
-              &#169; Copyright 2025, ml-switcheroo Developers.
+              &#169; Copyright 2025, Samuel Marks.
               
           </div>
             Created using

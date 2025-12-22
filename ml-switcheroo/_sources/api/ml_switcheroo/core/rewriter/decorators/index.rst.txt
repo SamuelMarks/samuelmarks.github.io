@@ -12,6 +12,12 @@ ml_switcheroo.core.rewriter.decorators
    1.  **Renaming**: Mapping decorators between frameworks (e.g., `@torch.jit.script` -> `@jax.jit`).
    2.  **Removal**: stripping decorators that have no equivalent in the target framework (if mapped to null).
 
+   Logic robustness handles conflict with `CallMixin`. Since `leave_Decorator` runs
+   after child nodes (the decorator expression) are visited, `CallMixin` might have
+   already transformed calls inside the decorator (e.g. `@torch.jit.script(optk=True)`).
+   To perform accurate lookups, we inspect the `original_node` (preserving Source semantics)
+   before applying target logic.
+
 
 
 Classes
@@ -31,6 +37,7 @@ Module Contents
 
 
    Mixin for transforming Decorator nodes.
+   Part of PivotRewriter.
 
 
    .. py:method:: leave_Decorator(original_node: libcst.Decorator, updated_node: libcst.Decorator) -> Union[libcst.Decorator, libcst.RemovalSentinel]
@@ -38,7 +45,8 @@ Module Contents
       Processes decorators attached to functions or classes.
 
       Logic:
-      1. Identifies the decorator name (handling both `@name` and `@call(...)`).
+      1. Identifies the decorator name from `original_node` to ensure we key off the
+         Source Framework API, even if `CallMixin` modified the children in `updated_node`.
       2. Looks up the semantic definition.
       3. If the target variant is explicitly `null` (None), removes the decorator.
       4. If the target variant specifies a new API, rewrites the name.

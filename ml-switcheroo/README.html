@@ -599,6 +599,8 @@ window.addEventListener("load", load);
         <li class="md-nav__item"><a href="#verification-ci" class="md-nav__link">3. Verification (<code class="docutils literal notranslate"><span class="pre">ci</span></code>)</a>
         </li>
         <li class="md-nav__item"><a href="#knowledge-discovery-scaffold-wizard" class="md-nav__link">4. Knowledge Discovery (<code class="docutils literal notranslate"><span class="pre">scaffold</span></code> & <code class="docutils literal notranslate"><span class="pre">wizard</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#operation-definition-define" class="md-nav__link">5. Operation Definition (<code class="docutils literal notranslate"><span class="pre">define</span></code>)</a>
         </li></ul>
             </nav>
         </li>
@@ -755,6 +757,8 @@ window.addEventListener("load", load);
         <li class="md-nav__item"><a href="#verification-ci" class="md-nav__link">3. Verification (<code class="docutils literal notranslate"><span class="pre">ci</span></code>)</a>
         </li>
         <li class="md-nav__item"><a href="#knowledge-discovery-scaffold-wizard" class="md-nav__link">4. Knowledge Discovery (<code class="docutils literal notranslate"><span class="pre">scaffold</span></code> & <code class="docutils literal notranslate"><span class="pre">wizard</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#operation-definition-define" class="md-nav__link">5. Operation Definition (<code class="docutils literal notranslate"><span class="pre">define</span></code>)</a>
         </li></ul>
             </nav>
         </li>
@@ -807,6 +811,8 @@ for “Zero-Edit” support for new frameworks via isolated JSON snapshots (Spok
 <ul class="simple">
 <li><p><strong>🚫 No Hallucinations</strong>: Uses static analysis (AST) and deterministic mapping rules. If it compiles, it’s
 mathematically grounded.</p></li>
+<li><p><strong>📝 ODL (Operation Definition Language)</strong>: Define new mathematical operations using a simple YAML syntax without
+writing Python AST code.</p></li>
 <li><p><strong>🔌 Hub-and-Spoke Architecture</strong>: Decouples the <em>semantic definition</em> of an operation (e.g., <code class="docutils literal notranslate"><span class="pre">Conv2d</span></code>) from its
 <em>implementation</em> (e.g., <code class="docutils literal notranslate"><span class="pre">torch.nn.Conv2d</span></code>).</p></li>
 <li><p><strong>👻 Ghost Mode</strong>: Can analyze and transpile code for frameworks <em>not installed</em> on the local machine using cached API
@@ -825,39 +831,32 @@ reconstructed for the target framework.</p>
 <!-- prettier-ignore -->
 <pre class="mermaid">
         graph TD
-    %% Theme
-    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b,stroke-width:1px;
-    classDef source fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
-    classDef engine fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
-    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
-    classDef spoke fill:#fff4c7,stroke:#f9ab00,stroke-width:2px,stroke-dasharray: 5 5,color:#20344b,font-family:'Google Sans Medium',rx:5px;
-    classDef target fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
-    classDef codeBlock fill:#ffffff,stroke:#20344b,stroke-width:1px,font-family:'Roboto Mono Normal',text-align:left,font-size:12px;
-
+%% Theme
+    classDef default font-family: 'Google Sans Normal', color: #20344b, stroke: #20344b, stroke-width: 1px;
+    classDef source fill: #ea4335, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px;
+    classDef engine fill: #4285f4, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px;
+    classDef hub fill: #f9ab00, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans Medium', rx: 5px;
+    classDef spoke fill: #fff4c7, stroke: #f9ab00, stroke-width: 2px, stroke-dasharray: 5 5, color: #20344b, font-family: 'Google Sans Medium', rx: 5px;
+    classDef target fill: #34a853, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px;
+    classDef codeBlock fill: #ffffff, stroke: #20344b, stroke-width: 1px, font-family: 'Roboto Mono Normal', text-align: left, font-size: 12px;
     SRC_HEADER("&lt;b&gt;0. Source Code&lt;/b&gt;&lt;br/&gt;(e.g., PyTorch)"):::source
     PARSER("&lt;b&gt;1. Analysis Phase&lt;/b&gt;&lt;br/&gt;Parsing, Purity Check,&lt;br/&gt;Lifecycle Scans"):::engine
-    
     SRC_HEADER --&gt; PARSER
-
-    %% The Knowledge Base
+%% The Knowledge Base
     subgraph KB [Distributed Knowledge Base]
         direction TB
         SPECS[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
         MAPS[("&lt;b&gt;The Spokes (Overlays)&lt;/b&gt;&lt;br/&gt;snapshots/*_mappings.json&lt;br/&gt;&lt;i&gt;Framework Variants&lt;/i&gt;")]:::spoke
-        
         MAPS -.-&gt;|" Hydrates "| SPECS
     end
-    
+
     REWRITER("&lt;b&gt;2. Pivot Rewriter&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Semantic Translation&lt;/i&gt;"):::engine
     KB -.-&gt;|" Lookup API "| REWRITER
     PARSER --&gt; REWRITER
-
     PIVOT_LOGIC("&lt;b&gt;1. Ingest:&lt;/b&gt; torch.abs(x)&lt;br/&gt;&lt;b&gt;2. Pivot:&lt;/b&gt; Abs(x) [Standard]&lt;br/&gt;&lt;b&gt;3. Project:&lt;/b&gt; jnp.abs(x)"):::codeBlock
     REWRITER --- PIVOT_LOGIC
-    
     FIXER("&lt;b&gt;3. Refinement&lt;/b&gt;&lt;br/&gt;Import Injection &amp; Pruning"):::engine
     PIVOT_LOGIC --&gt; FIXER
-
     TGT_HEADER("&lt;b&gt;4. Target Code&lt;/b&gt;&lt;br/&gt;(e.g., JAX/Flax)"):::target
     FIXER --&gt; TGT_HEADER
     </pre></section>
@@ -865,10 +864,10 @@ reconstructed for the target framework.</p>
 <section id="installation">
 <h2 id="installation">📦 Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install form source</span>
-pip<span class="w"> </span>install<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="w"> </span>
 
-<span class="c1"># Install with testing dependencies (for running the fuzzer/verification)</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[test]"</span>
+<span class="c1"># Install with testing dependencies (for running the fuzzer/verification) </span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[test]"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -879,14 +878,14 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[te
 <section id="transpilation-convert">
 <h3 id="transpilation-convert">1. Transpilation (<code class="docutils literal notranslate"><span class="pre">convert</span></code>)<a class="headerlink" href="#transpilation-convert" title="Link to this heading">¶</a></h3>
 <p>Convert a file or directory from one framework to another.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert a PyTorch model to JAX (Flax NNX)</span>
-ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./models/resnet.py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--source<span class="w"> </span>torch<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--target<span class="w"> </span>jax<span class="w"> </span><span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert a PyTorch model to JAX (Flax NNX) </span>
+ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./models/resnet.py<span class="w"> </span><span class="se">\ </span>
+<span class="w">    </span>--source<span class="w"> </span>torch<span class="w"> </span><span class="se">\ </span>
+<span class="w">    </span>--target<span class="w"> </span>jax<span class="w"> </span><span class="se">\ </span>
 <span class="w">    </span>--out<span class="w"> </span>./resnet_jax.py
 
 <span class="c1"># Convert an entire directory, enabling strict mode</span>
-<span class="c1"># Strict mode fails if an API mapping is missing, rather than passing it through.</span>
+<span class="c1"># Strict mode fails if an API mapping is missing, rather than passing it through. </span>
 ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./src/<span class="w"> </span>--out<span class="w"> </span>./dst/<span class="w"> </span>--strict
 </pre></div>
 </div>
@@ -919,6 +918,13 @@ ml_switcheroo<span class="w"> </span>scaffold<span class="w"> </span>--framework
 
 <span class="c1"># 2. Wizard: Interactive tool to manualy categorize obscure APIs</span>
 ml_switcheroo<span class="w"> </span>wizard<span class="w"> </span>torch
+</pre></div>
+</div>
+</section>
+<section id="operation-definition-define">
+<h3 id="operation-definition-define">5. Operation Definition (<code class="docutils literal notranslate"><span class="pre">define</span></code>)<a class="headerlink" href="#operation-definition-define" title="Link to this heading">¶</a></h3>
+<p>Inject new operations into the Knowledge Base using declarative YAML files.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ml_switcheroo<span class="w"> </span>define<span class="w"> </span>my_ops.yaml
 </pre></div>
 </div>
 </section>
@@ -1004,13 +1010,27 @@ When converting <strong>Flax NNX</strong> (functional) to <strong>Torch</strong>
 <section id="extensibility">
 <h2 id="extensibility">🔌 Extensibility<a class="headerlink" href="#extensibility" title="Link to this heading">¶</a></h2>
 <p>ml-switcheroo is designed to be extended without modifying the core engine.</p>
-<ol class="arabic simple">
+<ol class="arabic">
+<li><p><strong>Add Operations (ODL)</strong>: Use the <strong>Operation Definition Language (YAML)</strong> to define math/neural ops. This is the
+recommended way to add missing functionality.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Erf"</span><span class="w"> </span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"input"</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span>
+<span class="nt">variants</span><span class="p">:</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.erf"</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.lax.erf"</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="#EXTENDING_WITH_DSL.md"><span class="xref myst">EXTENDING_WITH_DSL.md</span></a> for the full guide. Alternative to the YAML DSL you can manually update:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code> and</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (for torch, mlx, tensorflow, jax, etc.)</p></li>
+</ul>
+</li>
 <li><p><strong>Add a Framework</strong>: Create a class inheriting <code class="docutils literal notranslate"><span class="pre">FrameworkAdapter</span></code> in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>.</p></li>
-<li><p><strong>Add Definitions</strong>: Run <code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">scaffold</span></code> or edit <code class="docutils literal notranslate"><span class="pre">snapshots/{fw}_mappings.json</span></code>.</p></li>
 <li><p><strong>Add Logic</strong>: Write a localized hook in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code> (e.g., for custom layer rewrites like
 <code class="docutils literal notranslate"><span class="pre">MultiHeadAttention</span></code> packing).</p></li>
 </ol>
-<p>See <a class="reference internal" href="EXTENDING.html"><span class="std std-doc">EXTENDING.md</span></a> for a detailed guide.</p>
+<p>See <a class="reference internal" href="EXTENDING.html"><span class="std std-doc">EXTENDING.md</span></a> for architectural details on Adapters and Plugins.</p>
 </section>
 <hr class="docutils"/>
 <section id="license">

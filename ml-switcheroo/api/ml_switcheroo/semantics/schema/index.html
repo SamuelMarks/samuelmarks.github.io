@@ -393,6 +393,20 @@
         </li></ul>
             </nav>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Rule" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Rule</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Rule.model_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Rule.model_config</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Rule.if_arg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Rule.if_arg</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Rule.op" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Rule.op</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Rule.is_val" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Rule.is_val</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Rule.use_api" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Rule.use_api</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Variant" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Variant</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Variant.model_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Variant.model_config</span></code></a>
@@ -402,6 +416,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Variant.args" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Variant.args</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Variant.requires_plugin" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Variant.requires_plugin</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Variant.dispatch_rules" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Variant.dispatch_rules</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.schema.Variant.transformation_type" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">Variant.transformation_type</span></code></a>
         </li>
@@ -459,7 +475,7 @@
 <p>This module defines the data structure of the JSON mapping files (<cite>k_array_api.json</cite>, etc.)
 and the Framework Configuration blocks.</p>
 <p>Updated to support richer Argument Definitions (Dictionaries with constraints)
-in <cite>std_args</cite>.</p>
+in <cite>std_args</cite> and Conditional Dispatch Rules.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -473,13 +489,16 @@ in <cite>std_args</cite>.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.FrameworkTraits" title="ml_switcheroo.semantics.schema.FrameworkTraits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrameworkTraits</span></code></a></p></td>
 <td><p>Configuration for a framework's structural behavior.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.Variant" title="ml_switcheroo.semantics.schema.Variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Variant</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.Rule" title="ml_switcheroo.semantics.schema.Rule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rule</span></code></a></p></td>
+<td><p>Declarative rule for conditional logic within a variant.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.Variant" title="ml_switcheroo.semantics.schema.Variant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Variant</span></code></a></p></td>
 <td><p>Defines how a specific framework implements an abstract operation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.OpDefinition" title="ml_switcheroo.semantics.schema.OpDefinition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpDefinition</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.OpDefinition" title="ml_switcheroo.semantics.schema.OpDefinition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpDefinition</span></code></a></p></td>
 <td><p>Definition of an Abstract Operation standard.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.SemanticsFile" title="ml_switcheroo.semantics.schema.SemanticsFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SemanticsFile</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.schema.SemanticsFile" title="ml_switcheroo.semantics.schema.SemanticsFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SemanticsFile</span></code></a></p></td>
 <td><p>Schema representing an entire semantics JSON file.</p></td>
 </tr>
 </tbody>
@@ -682,6 +701,34 @@ is set to <cite>‘allow’</cite>.</p>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py class">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Rule">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.schema.</span></span><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.semantics.schema.Rule" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
+<p>Declarative rule for conditional logic within a variant.
+Evaluated at runtime to dynamically switch APIs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Rule.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><a class="headerlink" href="#ml_switcheroo.semantics.schema.Rule.model_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Rule.if_arg">
+<span class="sig-name descname"><span class="pre">if_arg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.semantics.schema.Rule.if_arg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Rule.op">
+<span class="sig-name descname"><span class="pre">op</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.LogicOp" title="ml_switcheroo.enums.LogicOp"><span class="pre">ml_switcheroo.enums.LogicOp</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.semantics.schema.Rule.op" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Rule.is_val">
+<span class="sig-name descname"><span class="pre">is_val</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.semantics.schema.Rule.is_val" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Rule.use_api">
+<span class="sig-name descname"><span class="pre">use_api</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.semantics.schema.Rule.use_api" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Variant">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.schema.</span></span><span class="sig-name descname"><span class="pre">Variant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.semantics.schema.Variant" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
@@ -702,6 +749,10 @@ is set to <cite>‘allow’</cite>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Variant.requires_plugin">
 <span class="sig-name descname"><span class="pre">requires_plugin</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.semantics.schema.Variant.requires_plugin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Variant.dispatch_rules">
+<span class="sig-name descname"><span class="pre">dispatch_rules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.semantics.schema.Rule" title="ml_switcheroo.semantics.schema.Rule"><span class="pre">Rule</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.semantics.schema.Variant.dispatch_rules" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.schema.Variant.transformation_type">

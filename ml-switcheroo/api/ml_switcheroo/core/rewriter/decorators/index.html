@@ -339,6 +339,11 @@
 It enables:
 1.  <strong>Renaming</strong>: Mapping decorators between frameworks (e.g., <cite>@torch.jit.script</cite> -&gt; <cite>@jax.jit</cite>).
 2.  <strong>Removal</strong>: stripping decorators that have no equivalent in the target framework (if mapped to null).</p>
+<p>Logic robustness handles conflict with <cite>CallMixin</cite>. Since <cite>leave_Decorator</cite> runs
+after child nodes (the decorator expression) are visited, <cite>CallMixin</cite> might have
+already transformed calls inside the decorator (e.g. <cite>@torch.jit.script(optk=True)</cite>).
+To perform accurate lookups, we inspect the <cite>original_node</cite> (preserving Source semantics)
+before applying target logic.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -355,16 +360,22 @@ It enables:
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.decorators.DecoratorMixin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.decorators.</span></span><span class="sig-name descname"><span class="pre">DecoratorMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.decorators.DecoratorMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
-<p>Mixin for transforming Decorator nodes.</p>
+<p>Mixin for transforming Decorator nodes.
+Part of PivotRewriter.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.decorators.DecoratorMixin.leave_Decorator">
 <span class="sig-name descname"><span class="pre">leave_Decorator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Decorator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Decorator</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Decorator</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.decorators.DecoratorMixin.leave_Decorator" title="Link to this definition">¶</a></dt>
 <dd><p>Processes decorators attached to functions or classes.</p>
 <p>Logic:
-1. Identifies the decorator name (handling both <cite>@name</cite> and <cite>@call(…)</cite>).
-2. Looks up the semantic definition.
-3. If the target variant is explicitly <cite>null</cite> (None), removes the decorator.
-4. If the target variant specifies a new API, rewrites the name.</p>
+1. Identifies the decorator name from <cite>original_node</cite> to ensure we key off the</p>
+<blockquote>
+<div><p>Source Framework API, even if <cite>CallMixin</cite> modified the children in <cite>updated_node</cite>.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Looks up the semantic definition.</p></li>
+<li><p>If the target variant is explicitly <cite>null</cite> (None), removes the decorator.</p></li>
+<li><p>If the target variant specifies a new API, rewrites the name.</p></li>
+</ol>
 </dd></dl>
 </dd></dl>
 </section>

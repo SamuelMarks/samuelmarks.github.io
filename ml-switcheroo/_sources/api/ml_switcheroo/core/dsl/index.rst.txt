@@ -12,6 +12,12 @@ ml_switcheroo.core.dsl
    new operation definitions in the codebase, enforcing schema validity before
    AST injection occurs.
 
+   It defines the structure for:
+   - Parameters (types, constraints, shapes, dtypes).
+   - Variants (framework implementations).
+   - Plugins (scaffolding logic).
+   - Operations (abstract definitions).
+
 
 
 Classes
@@ -19,17 +25,41 @@ Classes
 
 .. autoapisummary::
 
+   ml_switcheroo.core.dsl.OpType
    ml_switcheroo.core.dsl.ParameterDef
+   ml_switcheroo.core.dsl.Rule
+   ml_switcheroo.core.dsl.ImportReq
    ml_switcheroo.core.dsl.FrameworkVariant
    ml_switcheroo.core.dsl.PluginType
-   ml_switcheroo.core.dsl.LogicOp
-   ml_switcheroo.core.dsl.Rule
    ml_switcheroo.core.dsl.PluginScaffoldDef
    ml_switcheroo.core.dsl.OperationDef
 
 
 Module Contents
 ---------------
+
+.. py:class:: OpType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Classification of the operation's syntactic usage.
+
+
+   .. py:attribute:: FUNCTION
+      :value: 'function'
+
+
+
+   .. py:attribute:: CONTEXT
+      :value: 'context'
+
+
+
+   .. py:attribute:: DECORATOR
+      :value: 'decorator'
+
+
 
 .. py:class:: ParameterDef(/, **data: Any)
 
@@ -38,8 +68,9 @@ Module Contents
 
    Definition of a single argument in an abstract operation signature.
 
-   Updated to support semantic constraints (min, max, options) to guide
-   fuzzing and validation logic (Bounds Checking).
+   Updated to support semantic constraints (min, max, options), tensor properties
+   (rank, dtype, shape), and function signature attributes (variadic, kind) to
+   guide fuzzing and validation logic.
 
 
    .. py:attribute:: name
@@ -84,21 +115,123 @@ Module Contents
 
 
 
-.. py:class:: FrameworkVariant(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Configuration for how a specific framework implements the operation.
+   .. py:attribute:: rank
+      :type:  Optional[int]
+      :value: None
 
 
-   .. py:attribute:: api
+
+   .. py:attribute:: dtype
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: shape_spec
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: is_variadic
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: kind
       :type:  str
       :value: None
 
 
 
+.. py:class:: Rule(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Declarative rule for conditional logic within a variant or plugin.
+   Evaluated at runtime to dynamically switch APIs.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: if_arg
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: op
+      :type:  ml_switcheroo.enums.LogicOp
+      :value: None
+
+
+
+   .. py:attribute:: is_val
+      :type:  Union[str, int, float, bool, List[Union[str, int, float]]]
+      :value: None
+
+
+
+   .. py:attribute:: use_api
+      :type:  str
+      :value: None
+
+
+
+.. py:class:: ImportReq(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Structured definition for a required import, supporting aliasing.
+
+
+   .. py:attribute:: module
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: alias
+      :type:  Optional[str]
+      :value: None
+
+
+
+.. py:class:: FrameworkVariant(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for how a specific framework implements an operation.
+
+   Defines the API endpoint, argument mappings, required imports, and versioning constraints.
+
+
+   .. py:attribute:: api
+      :type:  Optional[str]
+      :value: None
+
+
+
    .. py:attribute:: args
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: arg_values
+      :type:  Optional[Dict[str, Dict[str, str]]]
+      :value: None
+
+
+
+   .. py:attribute:: kwargs_map
       :type:  Optional[Dict[str, str]]
       :value: None
 
@@ -122,13 +255,79 @@ Module Contents
 
 
 
+   .. py:attribute:: dispatch_rules
+      :type:  List[Rule]
+      :value: None
+
+
+
+   .. py:attribute:: pack_to_tuple
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: layout_map
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
    .. py:attribute:: transformation_type
       :type:  Optional[str]
       :value: None
 
 
 
+   .. py:attribute:: operator
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: macro_template
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_select_index
+      :type:  Optional[int]
+      :value: None
+
+
+
    .. py:attribute:: output_adapter
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_cast
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: min_version
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: max_version
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: required_imports
+      :type:  List[Union[str, ImportReq]]
+      :value: None
+
+
+
+   .. py:attribute:: missing_message
       :type:  Optional[str]
       :value: None
 
@@ -149,92 +348,6 @@ Module Contents
 
    .. py:attribute:: BLOCK
       :value: 'block_transform'
-
-
-
-.. py:class:: LogicOp
-
-   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
-
-
-   Supported boolean operators for conditional rules.
-
-
-   .. py:attribute:: EQ
-      :value: 'eq'
-
-
-
-   .. py:attribute:: NEQ
-      :value: 'neq'
-
-
-
-   .. py:attribute:: GT
-      :value: 'gt'
-
-
-
-   .. py:attribute:: LT
-      :value: 'lt'
-
-
-
-   .. py:attribute:: GTE
-      :value: 'gte'
-
-
-
-   .. py:attribute:: LTE
-      :value: 'lte'
-
-
-
-   .. py:attribute:: IN
-      :value: 'in'
-
-
-
-   .. py:attribute:: NOT_IN
-      :value: 'not_in'
-
-
-
-.. py:class:: Rule(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Declarative rule for conditional logic within a plugin.
-   Used to generate switch-statements in the scaffolded code.
-
-
-   .. py:attribute:: model_config
-
-      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
-
-
-   .. py:attribute:: if_arg
-      :type:  str
-      :value: None
-
-
-
-   .. py:attribute:: op
-      :type:  LogicOp
-      :value: None
-
-
-
-   .. py:attribute:: is_val
-      :type:  Union[str, int, float, bool, List[Union[str, int, float]]]
-      :value: None
-
-
-
-   .. py:attribute:: use_api
-      :type:  str
-      :value: None
 
 
 
@@ -277,6 +390,9 @@ Module Contents
 
    Top-level definition of a new Abstract Operation.
 
+   Contains the semantic signature, documentation, framework implementations,
+   and metadata for verification, fuzzing, and documentation generation.
+
 
    .. py:attribute:: operation
       :type:  str
@@ -290,20 +406,104 @@ Module Contents
 
 
 
+   .. py:attribute:: op_type
+      :type:  OpType
+      :value: None
+
+
+
    .. py:attribute:: std_args
-      :type:  List[ParameterDef]
+      :type:  List[Union[str, Tuple[str, str], ParameterDef, Dict[str, Any]]]
       :value: None
 
 
 
    .. py:attribute:: variants
-      :type:  Dict[str, FrameworkVariant]
+      :type:  Dict[str, Optional[FrameworkVariant]]
       :value: None
 
 
 
    .. py:attribute:: scaffold_plugins
       :type:  List[PluginScaffoldDef]
+      :value: None
+
+
+
+   .. py:attribute:: return_type
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: is_inplace
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: test_rtol
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: test_atol
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: skip_fuzzing
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: nondeterministic
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: differentiable
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: deprecated
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: replaced_by
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: documentation_url
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: device_constraints
+      :type:  List[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_shape_calc
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: complexity
+      :type:  Optional[str]
       :value: None
 
 

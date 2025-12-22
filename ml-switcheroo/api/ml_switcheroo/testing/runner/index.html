@@ -344,9 +344,10 @@ It handles input generation, type adaptation, and crucially, <strong>argument ma
 to ensure that standard inputs are passed to frameworks using their specific
 parameter names (e.g., mapping <cite>axis</cite> to <cite>dim</cite>).</p>
 <dl class="simple">
-<dt>Refactor Note:</dt><dd><p>This module utilizes the central registry in <cite>ml_switcheroo.frameworks</cite> to handle
-output normalization (Framework -&gt; NumPy) by requesting a “numpy” adapter.
-This provides a unified conversion interface and eliminates redundant normalization logic.</p>
+<dt>Updates:</dt><dd><ul class="simple">
+<li><p>Added support for <cite>shape_calc</cite> lambda verification (Feature 20).</p></li>
+<li><p>Uses central registry for output normalization.</p></li>
+</ul>
 </dd>
 </dl>
 <section id="classes">
@@ -381,7 +382,7 @@ This provides a unified conversion interface and eliminates redundant normalizat
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.runner.EquivalenceRunner.verify">
-<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.runner.EquivalenceRunner.verify" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_calc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.runner.EquivalenceRunner.verify" title="Link to this definition">¶</a></dt>
 <dd><p>Runs the operation across all defined variants and compares results.</p>
 <p>This process includes:
 1. Fuzzing: Generates standard NumPy inputs based on <cite>params</cite>, <cite>hints</cite> and <cite>constraints</cite>.
@@ -392,18 +393,20 @@ This provides a unified conversion interface and eliminates redundant normalizat
 <ol class="arabic simple" start="3">
 <li><p>Adaptation: Converts NumPy arrays to framework Tensors.</p></li>
 <li><p>Execution: Runs the functions via dynamic import.</p></li>
-<li><p>Comparison: Converts results back to NumPy and asserts closeness.</p></li>
+<li><p>Normalization: Converts results back to NumPy.</p></li>
+<li><p><strong>Shape Check</strong>: Verifies result shape using <cite>shape_calc</cite> lambda if provided.</p></li>
+<li><p>Comparison: Asserts numeric closeness between frameworks.</p></li>
 </ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variants</strong> – Dictionary of framework implementations from the Semantic
-Knowledge Base.
-Structure: <cite>{“torch”: {“api”: “…”, “args”: {…}}, …}</cite></p></li>
+Knowledge Base.</p></li>
 <li><p><strong>params</strong> – List of standard argument names (e.g. <cite>[‘x’, ‘axis’]</cite>).</p></li>
 <li><p><strong>hints</strong> – Dictionary of type hints (e.g. <cite>{‘axis’: ‘int’}</cite>) to guide
 the fuzzer. Uses explicit types over heuristics.</p></li>
 <li><p><strong>constraints</strong> – Dictionary of constraint maps (min, max, options) to bound fuzzer.</p></li>
+<li><p><strong>shape_calc</strong> – Optional python lambda string (e.g. <cite>lambda x: x.shape</cite>) to verify output shape.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

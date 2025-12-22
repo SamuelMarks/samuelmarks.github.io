@@ -11,6 +11,7 @@ ml_switcheroo.core.rewriter
    to handle specific aspects of the AST transformation:
    - Structure: Class and Function definitions.
    - Calls: Function invocations.
+   - Contexts: With blocks.
    - Attributes: Attribute access.
    - Normalization: Argument mapping.
    - ControlFlow: Loop and branching logic.
@@ -27,6 +28,7 @@ Submodules
    /api/ml_switcheroo/core/rewriter/attributes/index
    /api/ml_switcheroo/core/rewriter/base/index
    /api/ml_switcheroo/core/rewriter/calls/index
+   /api/ml_switcheroo/core/rewriter/contexts/index
    /api/ml_switcheroo/core/rewriter/control_flow/index
    /api/ml_switcheroo/core/rewriter/decorators/index
    /api/ml_switcheroo/core/rewriter/initializers/index
@@ -49,6 +51,7 @@ Classes
    ml_switcheroo.core.rewriter.StructureMixin
    ml_switcheroo.core.rewriter.DecoratorMixin
    ml_switcheroo.core.rewriter.ControlFlowMixin
+   ml_switcheroo.core.rewriter.ContextMixin
    ml_switcheroo.core.rewriter.BaseRewriter
    ml_switcheroo.core.rewriter.PivotRewriter
 
@@ -62,6 +65,13 @@ Package Contents
 
 
    Mixin for transforming Call nodes and unpacking Assignments.
+
+   Responsible for:
+   1.  Handling functional `apply` patterns (Flax).
+   2.  Lifecycle method stripping (`.to()`, `.cuda()`).
+   3.  Plugin dispatch.
+   4.  Standard API pivoting (Lookup -> Normalize -> Rewrite).
+   5.  Output Transformation (Indexing, Casting).
 
 
    .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
@@ -124,6 +134,7 @@ Package Contents
 
 
    Mixin for transforming Decorator nodes.
+   Part of PivotRewriter.
 
 
    .. py:method:: leave_Decorator(original_node: libcst.Decorator, updated_node: libcst.Decorator) -> Union[libcst.Decorator, libcst.RemovalSentinel]
@@ -131,7 +142,8 @@ Package Contents
       Processes decorators attached to functions or classes.
 
       Logic:
-      1. Identifies the decorator name (handling both `@name` and `@call(...)`).
+      1. Identifies the decorator name from `original_node` to ensure we key off the
+         Source Framework API, even if `CallMixin` modified the children in `updated_node`.
       2. Looks up the semantic definition.
       3. If the target variant is explicitly `null` (None), removes the decorator.
       4. If the target variant specifies a new API, rewrites the name.
@@ -164,6 +176,27 @@ Package Contents
       :returns: The transformed node (potentially a
                 FlattenSentinel of unrolled statements) or the original node if untouched.
       :rtype: Union[cst.For, cst.CSTNode]
+
+
+
+.. py:class:: ContextMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+
+
+   Mixin for transforming `With` blocks.
+
+
+   .. py:method:: leave_With(original_node: libcst.With, updated_node: libcst.With) -> Union[libcst.With, libcst.FlattenSentinel]
+
+      Processes 'with' statements.
+
+      Logic:
+      1. Iterate over `with` items (expressions).
+      2. Identify if the expression corresponds to a `CONTEXT` OpType in semantics.
+      3. Check transformation logic:
+         - If `strip_context`, identifying marker is found, lift the body.
+         - Otherwise, allow `CallMixin` (which runs on children) to have already renamed the API.
 
 
 
@@ -269,7 +302,7 @@ Package Contents
 
 .. py:class:: PivotRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
 
-   Bases: :py:obj:`control_flow.ControlFlowMixin`, :py:obj:`decorators.DecoratorMixin`, :py:obj:`calls.CallMixin`, :py:obj:`normalization.NormalizationMixin`, :py:obj:`attributes.AttributeMixin`, :py:obj:`structure.StructureMixin`, :py:obj:`base.BaseRewriter`
+   Bases: :py:obj:`contexts.ContextMixin`, :py:obj:`control_flow.ControlFlowMixin`, :py:obj:`decorators.DecoratorMixin`, :py:obj:`calls.CallMixin`, :py:obj:`normalization.NormalizationMixin`, :py:obj:`attributes.AttributeMixin`, :py:obj:`structure.StructureMixin`, :py:obj:`base.BaseRewriter`
 
 
    The main AST transformer for ml-switcheroo.

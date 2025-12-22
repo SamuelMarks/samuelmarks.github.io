@@ -11,7 +11,7 @@ ml_switcheroo.semantics.schema
    and the Framework Configuration blocks.
 
    Updated to support richer Argument Definitions (Dictionaries with constraints)
-   in `std_args`.
+   in `std_args` and Conditional Dispatch Rules.
 
 
 
@@ -23,6 +23,7 @@ Classes
    ml_switcheroo.semantics.schema.StructuralTraits
    ml_switcheroo.semantics.schema.FrameworkAlias
    ml_switcheroo.semantics.schema.FrameworkTraits
+   ml_switcheroo.semantics.schema.Rule
    ml_switcheroo.semantics.schema.Variant
    ml_switcheroo.semantics.schema.OpDefinition
    ml_switcheroo.semantics.schema.SemanticsFile
@@ -242,6 +243,44 @@ Module Contents
 
 
 
+.. py:class:: Rule(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Declarative rule for conditional logic within a variant.
+   Evaluated at runtime to dynamically switch APIs.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: if_arg
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: op
+      :type:  ml_switcheroo.enums.LogicOp
+      :value: None
+
+
+
+   .. py:attribute:: is_val
+      :type:  Union[str, int, float, bool, List[Union[str, int, float]]]
+      :value: None
+
+
+
+   .. py:attribute:: use_api
+      :type:  str
+      :value: None
+
+
+
 .. py:class:: Variant(/, **data: Any)
 
    Bases: :py:obj:`pydantic.BaseModel`
@@ -269,6 +308,12 @@ Module Contents
 
    .. py:attribute:: requires_plugin
       :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: dispatch_rules
+      :type:  List[Rule]
       :value: None
 
 

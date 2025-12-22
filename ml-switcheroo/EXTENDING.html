@@ -598,16 +598,6 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#architecture-overview" class="md-nav__link">🏗️ Architecture Overview</a>
         </li>
-        <li class="md-nav__item"><a href="#the-operation-definition-language-odl" class="md-nav__link">🚀 1. The Operation Definition Language (ODL)</a><nav class="md-nav">
-              <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#workflow" class="md-nav__link">Workflow</a>
-        </li>
-        <li class="md-nav__item"><a href="#odl-schema-reference-advanced" class="md-nav__link">ODL Schema Reference (Advanced)</a>
-        </li>
-        <li class="md-nav__item"><a href="#declarative-plugin-scaffolding" class="md-nav__link">Declarative Plugin Scaffolding</a>
-        </li></ul>
-            </nav>
-        </li>
         <li class="md-nav__item"><a href="#adding-a-framework-adapter" class="md-nav__link">🔌 2. Adding a Framework Adapter</a>
         </li>
         <li class="md-nav__item"><a href="#plugin-system-custom-code" class="md-nav__link">🧠 3. Plugin System (Custom Code)</a><nav class="md-nav">
@@ -630,13 +620,6 @@ window.addEventListener("load", load);
     
     
       <a href="#architecture-overview" class="md-nav__link">🏗️ Architecture Overview</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="#the-operation-definition-language-odl" class="md-nav__link">🚀 1. The Operation Definition Language (ODL)</a>
       
     
     </li>
@@ -700,16 +683,6 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#architecture-overview" class="md-nav__link">🏗️ Architecture Overview</a>
         </li>
-        <li class="md-nav__item"><a href="#the-operation-definition-language-odl" class="md-nav__link">🚀 1. The Operation Definition Language (ODL)</a><nav class="md-nav">
-              <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#workflow" class="md-nav__link">Workflow</a>
-        </li>
-        <li class="md-nav__item"><a href="#odl-schema-reference-advanced" class="md-nav__link">ODL Schema Reference (Advanced)</a>
-        </li>
-        <li class="md-nav__item"><a href="#declarative-plugin-scaffolding" class="md-nav__link">Declarative Plugin Scaffolding</a>
-        </li></ul>
-            </nav>
-        </li>
         <li class="md-nav__item"><a href="#adding-a-framework-adapter" class="md-nav__link">🔌 2. Adding a Framework Adapter</a>
         </li>
         <li class="md-nav__item"><a href="#plugin-system-custom-code" class="md-nav__link">🧠 3. Plugin System (Custom Code)</a><nav class="md-nav">
@@ -738,14 +711,23 @@ window.addEventListener("load", load);
             
   <section class="tex2jax_ignore mathjax_ignore" id="extending">
 <h1 id="extending--page-root">Extending<a class="headerlink" href="#extending--page-root" title="Link to this heading">¶</a></h1>
-<p><strong>ml-switcheroo</strong> is built on a modular, data-driven architecture. Supporting new operations or entirely new frameworks
-involves populating the <strong>Knowledge Base</strong> rather than modifying the core engine logic.</p>
+<p><strong>ml-switcheroo</strong> is built on a modular, data-driven architecture.</p>
 <p>There are three ways to extend the system, ordered by complexity:</p>
 <ol class="arabic simple">
-<li><p><strong>ODL (YAML)</strong>: Define operations declaratively using the Operation Definition Language. (Recommended)</p></li>
-<li><p><strong>Adapter API</strong>: Write Python classes for full framework support.</p></li>
+<li><ul class="simple">
+<li><p><strong>ODL (YAML)</strong>: Define operations declaratively. <strong>[See: <a class="reference internal" href="#EXTENDING_WITH_DSL.md"><span class="xref myst">EXTENDING_WITH_DSL</span></a>]</strong></p></li>
+<li><p>Or update these Python files (no YAML DSL required):</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (for torch, mlx, tensorflow, jax, etc.)</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Adapter API</strong>: Write Python classes for full framework support (e.g. adding <code class="docutils literal notranslate"><span class="pre">TinyGrad</span></code>).</p></li>
 <li><p><strong>Plugin Hooks</strong>: Write AST transformation logic for complex architectural mismatches.</p></li>
 </ol>
+<p>This document covers <strong>2</strong> and <strong>3</strong>. For adding mathematical operations, please refer to the DSL guide.</p>
 <hr class="docutils"/>
 <section id="architecture-overview">
 <h2 id="architecture-overview">🏗️ Architecture Overview<a class="headerlink" href="#architecture-overview" title="Link to this heading">¶</a></h2>
@@ -753,11 +735,12 @@ involves populating the <strong>Knowledge Base</strong> rather than modifying th
 framework implementations (The Spokes).</p>
 <pre class="mermaid">
         graph TD
-%% Styles
+%% Styles based on ARCHITECTURE.md theme
     classDef hub fill: #f9ab00, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans', rx: 5px
-    classDef adapter fill: #4285f4, stroke: #20344b, stroke-width: 2px, stroke-dasharray: 0, color: #ffffff, font-family: 'Google Sans', rx: 5px
+    classDef adapter fill: #4285f4, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
     classDef plugin fill: #34a853, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
     classDef tool fill: #ea4335, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans', rx: 5px
+    classDef input fill: #ffffff, stroke: #20344b, stroke-width: 1px, color: #20344b, font-family: 'Roboto Mono'
 
     subgraph EXT [Your Extension]
         direction TB
@@ -773,7 +756,7 @@ framework implementations (The Spokes).</p>
     subgraph TOOLS [Automation Tools]
         direction TB
         DEFINE("&lt;b&gt;CLI Command&lt;/b&gt;&lt;br/&gt;ml_switcheroo define&lt;br/&gt;&lt;i&gt;Code Injection&lt;/i&gt;"):::tool
-        YAML("&lt;b&gt;ODL YAML&lt;/b&gt;&lt;br/&gt;Operation Definition&lt;br/&gt;&lt;i&gt;Declarative Spec&lt;/i&gt;"):::tool
+        YAML("&lt;b&gt;ODL YAML&lt;/b&gt;&lt;br/&gt;Operation Definition&lt;br/&gt;&lt;i&gt;Declarative Spec&lt;/i&gt;"):::input
     end
 
 %% Wiring
@@ -782,131 +765,25 @@ framework implementations (The Spokes).</p>
     DEFINE --&gt;|" 2. Inject Mapping "| ADAPTER
     DEFINE --&gt;|" 3. Scaffold File "| PLUGIN
     ADAPTER --&gt;|" Registration "| HUB
-    PLUGIN --&gt;|" Transformation "| HUB
+    PLUGIN -.-&gt;|" AST Transformation "| HUB
     </pre></section>
-<hr class="docutils"/>
-<section id="the-operation-definition-language-odl">
-<h2 id="the-operation-definition-language-odl">🚀 1. The Operation Definition Language (ODL)<a class="headerlink" href="#the-operation-definition-language-odl" title="Link to this heading">¶</a></h2>
-<p>The quickest way to add support for missing operations is via the <code class="docutils literal notranslate"><span class="pre">define</span></code> command. You write a YAML file describing the
-operation, and the tool injects the necessary Python code into the system.</p>
-<section id="workflow">
-<h3 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple">
-<li><p>Create a file <code class="docutils literal notranslate"><span class="pre">my_op.yaml</span></code>.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">define</span> <span class="pre">my_op.yaml</span></code>.</p></li>
-</ol>
-<p>This command automatically:</p>
-<ol class="arabic simple">
-<li><p>Updates the Abstract Standard (Hub) in <code class="docutils literal notranslate"><span class="pre">standards_internal.py</span></code>.</p></li>
-<li><p>Updates Framework Mappings (Spokes) in <code class="docutils literal notranslate"><span class="pre">frameworks/*.py</span></code>.</p></li>
-<li><p>Scaffolds Plugin files (if complex logic is requested).</p></li>
-</ol>
-</section>
-<section id="odl-schema-reference-advanced">
-<h3 id="odl-schema-reference-advanced">ODL Schema Reference (Advanced)<a class="headerlink" href="#odl-schema-reference-advanced" title="Link to this heading">¶</a></h3>
-<p>The ODL has been expanded to support <strong>Semantic Constraints</strong>, <strong>Output Adaptation</strong>, and <strong>Declarative Logic Rules</strong>.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Abstract Definition (The Hub)</span>
-<span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"LogSoftmax"</span>
-<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Applies</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">LogSoftmax</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">n-dimensional</span><span class="nv"> </span><span class="s">input</span><span class="nv"> </span><span class="s">Tensor."</span>
-<span class="nt">std_args</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
-<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">"-1"</span>
-<span class="w">    </span><span class="c1"># Semantics Constraints (Used by the Fuzzer)</span>
-<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-3</span>
-<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"reduction"</span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"str"</span>
-<span class="w">    </span><span class="nt">options</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"mean"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"sum"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"none"</span><span class="w"> </span><span class="p p-Indicator">]</span>
-
-<span class="c1"># 2. Variants (The Spokes)</span>
-<span class="nt">variants</span><span class="p">:</span>
-<span class="w">  </span><span class="c1"># Torch: Direct mapping</span>
-<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.log_softmax"</span>
-
-<span class="w">  </span><span class="c1"># JAX: Argument Renaming</span>
-<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.nn.log_softmax"</span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span>
-
-<span class="w">  </span><span class="c1"># Mixed: Argument Injection + Casting</span>
-<span class="w">  </span><span class="c1"># Useful when target requires fixed parameters not present in source.</span>
-<span class="w">  </span><span class="nt">tensorflow</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"tf.nn.log_softmax"</span>
-<span class="w">    </span><span class="nt">inject_args</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">full_precision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Inject 'full_precision=True'</span>
-<span class="w">    </span><span class="nt">casts</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="s">"float32"</span><span class="w">      </span><span class="c1"># Cast input argument to float32</span>
-
-<span class="w">  </span><span class="c1"># Output Adaptation (Lambda Wrapper)</span>
-<span class="w">  </span><span class="c1"># Useful for APIs that return (val, indices) when you only need val.</span>
-<span class="w">  </span><span class="nt">numpy</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"np.some_func"</span>
-<span class="w">    </span><span class="c1"># Wraps call result: (lambda x: x[0])(np.some_func(...))</span>
-<span class="w">    </span><span class="nt">output_adapter</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">x:</span><span class="nv"> </span><span class="s">x[0]"</span>
-
-<span class="w">  </span><span class="c1"># Infix Transformation</span>
-<span class="w">  </span><span class="c1"># Maps function call to math operator: add(a, b) -&gt; a + b</span>
-<span class="w">  </span><span class="nt">mlx</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"mx.add"</span>
-<span class="w">    </span><span class="nt">transformation_type</span><span class="p">:</span><span class="w"> </span><span class="s">"infix"</span>
-<span class="w">    </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="s">"+"</span>
-</pre></div>
-</div>
-</section>
-<section id="declarative-plugin-scaffolding">
-<h3 id="declarative-plugin-scaffolding">Declarative Plugin Scaffolding<a class="headerlink" href="#declarative-plugin-scaffolding" title="Link to this heading">¶</a></h3>
-<p>If an operation requires conditional logic (e.g., dispatching to different APIs based on an argument value), you can
-define <strong>Rules</strong> in the YAML. The CLI will generate a Python plugin with <code class="docutils literal notranslate"><span class="pre">if/else</span></code> logic pre-written, handling all
-necessary boilerplate.</p>
-<p>Supported Operators: <code class="docutils literal notranslate"><span class="pre">eq</span></code>, <code class="docutils literal notranslate"><span class="pre">neq</span></code>, <code class="docutils literal notranslate"><span class="pre">gt</span></code>, <code class="docutils literal notranslate"><span class="pre">lt</span></code>, <code class="docutils literal notranslate"><span class="pre">gte</span></code>, <code class="docutils literal notranslate"><span class="pre">lte</span></code>, <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">not_in</span></code>.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inside your YAML file:</span>
-<span class="nt">scaffold_plugins</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"resize_dispatcher"</span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"call_transform"</span>
-<span class="w">    </span><span class="nt">doc</span><span class="p">:</span><span class="w"> </span><span class="s">"Dispatches</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">different</span><span class="nv"> </span><span class="s">resize</span><span class="nv"> </span><span class="s">APIs</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">interpolation</span><span class="nv"> </span><span class="s">mode."</span>
-<span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
-<span class="w">      </span><span class="c1"># Rule 1: Exact Match</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
-<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
-<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
-<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_nearest"</span>
-
-<span class="w">      </span><span class="c1"># Rule 2: List Membership (IN)</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
-<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"in"</span>
-<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"bilinear"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"bicubic"</span><span class="w"> </span><span class="p p-Indicator">]</span>
-<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_bilinear"</span>
-
-<span class="w">      </span><span class="c1"># Rule 3: Numeric Comparison</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"size"</span>
-<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"gt"</span>
-<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
-<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_large"</span>
-</pre></div>
-</div>
-</section>
-</section>
 <hr class="docutils"/>
 <section id="adding-a-framework-adapter">
 <h2 id="adding-a-framework-adapter">🔌 2. Adding a Framework Adapter<a class="headerlink" href="#adding-a-framework-adapter" title="Link to this heading">¶</a></h2>
-<p>To support a new library (e.g., <code class="docutils literal notranslate"><span class="pre">tinygrad</span></code> or <code class="docutils literal notranslate"><span class="pre">my_lib</span></code>), you create a Python class that acts as the translation
-interface.</p>
+<p>To support a new library (e.g., <code class="docutils literal notranslate"><span class="pre">tinygrad</span></code>, <code class="docutils literal notranslate"><span class="pre">custom_engine</span></code>), you create a Python class that acts as the translation
+interface. It converts the library’s specific idioms into traits understood by the core engine.</p>
 <p><strong>Location:</strong> <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/my_lib.py</span></code></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.frameworks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_framework</span><span class="p">,</span> <span class="n">FrameworkAdapter</span><span class="p">,</span> <span class="n">StandardMap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.semantics.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuralTraits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SemanticTier</span>
 
 
 <span class="nd">@register_framework</span><span class="p">(</span><span class="s2">"my_lib"</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MyLibAdapter</span><span class="p">:</span>
     <span class="n">display_name</span> <span class="o">=</span> <span class="s2">"My Library"</span>
 
-    <span class="c1"># Optional: Inherit implementation behavior (e.g. 'flax_nnx' inherits 'jax' math capabilities)</span>
+    <span class="c1"># Optional: Inherit implementation behavior (e.g., 'flax_nnx' inherits 'jax' math)</span>
     <span class="n">inherits_from</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Discovery configuration</span>
@@ -915,7 +792,7 @@ interface.</p>
     <span class="c1"># --- 1. Import Logic ---</span>
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">import_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="c1"># How is the library imported? alias is usually what users type (e.g. 'np', 'tf')</span>
+        <span class="c1"># How is the library imported? (Package Name, Common Alias)</span>
         <span class="k">return</span> <span class="p">(</span><span class="s2">"my_lib"</span><span class="p">,</span> <span class="s2">"ml"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -967,6 +844,11 @@ interface.</p>
             <span class="n">lifecycle_strip_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"to"</span><span class="p">,</span> <span class="s2">"cpu"</span><span class="p">],</span>  <span class="c1"># Methods to silently remove</span>
             <span class="n">impurity_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"add_"</span><span class="p">]</span>  <span class="c1"># Methods flagged as side-effects</span>
         <span class="p">)</span>
+
+    <span class="c1"># --- 4. Tiers ---</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">supported_tiers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SemanticTier</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="p">,</span> <span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -979,7 +861,7 @@ managers), you use the <strong>Hook System</strong>.</p>
 <section id="auto-wired-plugins">
 <h3 id="auto-wired-plugins">Auto-Wired Plugins<a class="headerlink" href="#auto-wired-plugins" title="Link to this heading">¶</a></h3>
 <p>You can register a hook and define its semantic mapping (“Hub entry”) in one place using the <code class="docutils literal notranslate"><span class="pre">auto_wire</span></code> parameter. This
-architecture maintains locality of behavior and avoids editing large JSON files manually.</p>
+architecture maintains locality of behavior and avoids editing multiple JSON files manually.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_hook</span><span class="p">,</span> <span class="n">HookContext</span>
 
@@ -1004,7 +886,7 @@ architecture maintains locality of behavior and avoids editing large JSON files 
     <span class="c1"># 2. Use 'ctx' to look up config or API mappings</span>
     <span class="n">target_api</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">lookup_api</span><span class="p">(</span><span class="s2">"Reshape"</span><span class="p">)</span>  <span class="c1"># returns "jnp.reshape"</span>
 
-    <span class="c1"># 3. Perform transformation logic (e.g. check args and modify them)</span>
+    <span class="c1"># 3. Perform transformation logic (e.g., check args and modify them)</span>
     <span class="c1"># This example grabs the function name, ignores args logic for brevity</span>
     <span class="n">new_func</span> <span class="o">=</span> <span class="n">cst</span><span class="o">.</span><span class="n">Name</span><span class="p">(</span><span class="s2">"reshaped_manually"</span><span class="p">)</span>
 

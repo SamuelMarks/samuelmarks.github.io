@@ -343,32 +343,10 @@
 <p>This module provides the <cite>InputFuzzer</cite>, responsible for creating randomized
 NumPy arrays, scalars, and complex container structures to feed into Framework A
 and Framework B during behavioral verification tests.</p>
-<p>It uses a dual-strategy approach:</p>
-<ol class="arabic">
-<li><p><strong>Type Hints (Semantic Validated)</strong>:
-If explicit type information is available (e.g., from Spec files), the fuzzer
-parses these strings using a mini-grammar to generate compliant data.</p>
-<p><strong>Supported Grammar:</strong></p>
-<ul class="simple">
-<li><p>Primitives: <cite>int</cite>, <cite>float</cite>, <cite>bool</cite>, <cite>str</cite></p></li>
-<li><p>Structural: <cite>List[T]</cite>, <cite>Tuple[T, …]</cite>, <cite>Dict[K, V]</cite>, <cite>Optional[T]</cite></p></li>
-<li><p>Unions: <cite>int | float</cite></p></li>
-<li><p>Domain: <cite>Array</cite>, <cite>Tensor</cite>, <cite>dtype</cite></p></li>
-<li><p><strong>Symbolic Shapes</strong>: <cite>Array[‘B’, ‘N’]</cite> (Constraint Solving for consistent dimensions)</p></li>
-</ul>
-</li>
-<li><p><strong>Heuristics (Fallback)</strong>:
-If no hints are available, it infers data types from argument names.
-- <cite>mask</cite>, <cite>condition</cite> -&gt; <cite>bool</cite>
-- <cite>idx</cite>, <cite>axis</cite>, <cite>dim</cite> -&gt; <cite>int</cite> within bounds
-- <cite>x</cite>, <cite>y</cite>, <cite>input</cite> -&gt; <cite>Array (float32)</cite></p></li>
-<li><p><strong>Semantic Constraints</strong>:
-Respects <cite>min</cite>, <cite>max</cite>, and <cite>options</cite> constraints applied to parameters,
-preventing invalid inputs (e.g., negative args for log).</p></li>
-</ol>
 <dl class="simple">
-<dt>Safety:</dt><dd><p>Implements <cite>MAX_RECURSION_DEPTH</cite> to prevent infinite loops when generating
-recursive or deeply nested types.</p>
+<dt>Updates:</dt><dd><ul class="simple">
+<li><p>Support for <cite>dtype</cite> constraints in array generation (Limitation #2 Fix).</p></li>
+</ul>
 </dd>
 </dl>
 <section id="classes">
@@ -407,7 +385,7 @@ have matching lengths.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>params</strong> – List of argument names to generate (e.g. <cite>[‘x’, ‘axis’]</cite>).</p></li>
 <li><p><strong>hints</strong> – Dictionary of <cite>{arg_name: type_string}</cite> derived from Spec.</p></li>
-<li><p><strong>constraints</strong> – Dictionary of <cite>{arg_name: {min, max, options}}</cite>.</p></li>
+<li><p><strong>constraints</strong> – Dictionary of <cite>{arg_name: {min, max, options, dtype}}</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

@@ -52,6 +52,10 @@ Module Contents
       Collapses fully qualified paths to aliases if configured.
       e.g. `torch.nn.Linear` -> `nn.Linear` if `torch.nn` -> `nn` alias exists for this target.
 
+      FIX: Uses `original_node` to determine the full path. This prevents greedy collapsing
+      of shorter prefixes (e.g. 'torch.nn' -> 'nn') from breaking matching of longer prefixes
+      (e.g. 'torch.nn.functional' -> 'F') when traversal bubbles up.
+
 
 
    .. py:method:: leave_Import(original_node: libcst.Import, updated_node: libcst.Import) -> Union[libcst.Import, libcst.RemovalSentinel]

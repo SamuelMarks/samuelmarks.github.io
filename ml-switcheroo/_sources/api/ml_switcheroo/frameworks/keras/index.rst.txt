@@ -10,7 +10,11 @@ ml_switcheroo.frameworks.keras
    This module provides the adapter for Keras 3+, enabling translation between
    Keras and other frameworks (JAX, Torch, TensorFlow).
 
-   Refactor: Definitions populated for Keras specific Layers, Ops, and Vision.
+   It implements:
+   1.  **Layers**: Mapping `keras.layers` (e.g. Dense, Conv2D).
+   2.  **Ops**: Mapping `keras.ops` (backend-agnostic math).
+   3.  **String Types**: Mapping casting operations to string dtypes (`dtype="float32"`).
+   4.  **Discovery**: Runtime introspection of Keras modules.
 
 
 
@@ -60,47 +64,54 @@ Module Contents
 
 
 
-   .. py:method:: get_example_code() -> str
-      :classmethod:
-
-
-
-   .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-
    .. py:property:: search_modules
       :type: List[str]
 
+
+      Modules to scan during discovery.
 
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
+      Canonical import alias.
+
 
    .. py:property:: import_namespaces
       :type: Dict[str, Dict[str, str]]
 
+
+      Namespace remapping rules.
+      Includes numpy alias to ensure `numpy.float32` -> `np.float32`.
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
+      Regex patterns for categorizing APIs.
+
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
+
+      Templates for generating tests.
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
+      Supported capability tiers.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
+
+      Defines Keras structural patterns.
 
 
    .. py:property:: definitions
@@ -109,27 +120,67 @@ Module Contents
 
       Static definitions for Keras mappings.
 
+      Implements **Casting Strategy**:
+      Unlike JAX/NumPy (objects) or Torch (attributes), Keras APIs expect string dtypes
+      or backend-agnostic types (which often default to strings in the high-level API).
+      Standalone types map to NumPy types for compatibility, but Cast operations
+      inject string literals.
+
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
+      Global seed methods.
+
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
+
+      Dynamically collects API for Consensus.
+
 
 
    .. py:method:: convert(data: Any) -> Any
 
+      Converts input object to Keras Tensor.
+
+
 
    .. py:method:: get_serialization_imports() -> List[str]
+
+      Imports for save/load.
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
+      Syntax for save/load.
+
+
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
+      Generates device scope syntax.
+
+
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies manual wiring not covered by definitions.
+
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+      Returns standard example.
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns Keras examples.
+
 
 

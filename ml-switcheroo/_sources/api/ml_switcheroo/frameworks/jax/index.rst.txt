@@ -8,9 +8,12 @@ ml_switcheroo.frameworks.jax
    JAX Core Framework Adapter (Level 0 & Level 1).
 
    This adapter provides support for the functional JAX ecosystem *without* binding
-   to a high-level neural network library like Flax or Haiku.
+   to a high-level neural network library like Flax or Haiku. It maps:
+   1.  **Level 0 (Core)**: JAX Array API (jnp), Activations (jax.nn), and Types.
+   2.  **Level 1 (Common Libs)**: Optax (Optimization) and Orbax (Checkpointing).
 
-   Refactor: Now includes comprehensive definitions for JAX ops and Optax/Orbax via `definitions`.
+   It now includes strict type mappings (e.g. `Float32` -> `jnp.float32`) to support
+   data-driven casting logic.
 
 
 
@@ -45,6 +48,12 @@ Module Contents
 
    Adapter for Core JAX (jax + optax + orbax) without a Neural Framework.
 
+   Handles translations for:
+   -   **Math**: `jnp.abs`, `jnp.sum`, etc.
+   -   **Types**: `jnp.float32`, `jnp.int32`, `jnp.bfloat16`.
+   -   **Casting**: `.astype(...)` synthesis via plugins.
+   -   **Optimization**: `optax.adam`, `optax.sgd`.
+
 
    .. py:attribute:: display_name
       :type:  str
@@ -68,7 +77,7 @@ Module Contents
       :type: List[str]
 
 
-      Scans only core math and optimization libraries.
+      Scans only core math and optimization libraries (no neural layers).
 
 
    .. py:property:: import_alias
@@ -84,49 +93,70 @@ Module Contents
 
 
       Maps source namespaces to JAX equivalents.
+      Example: `torch.nn.functional` -> `jax.nn`.
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
+      Regex patterns for identifying API categories.
+
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
+
+      Returns standard JIT-enabled test templates.
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
+      Defines JAX structural behavior (Transformation rules).
+      Specifies JIT static arguments for compilation safety.
+
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Static Definitions for JAX Core, Optax, Orbax.
+      Static Definitions for JAX Core, Optax, Orbax, and Types.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
+      JAX does not use global seeding methods in the imperative sense.
+
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
 
+      Collects API signatures for discovering new Standards.
+      Supports both Live introspection and Ghost Mode snapshots.
 
-   .. py:method:: convert(data)
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts input data to a JAX array for verification.
+
 
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
       Applies Level 0/1 Stack wiring.
+      Populates the JSON snapshot with manually wired logic.
 
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
+
+
+      Returns a generic JAX example.
 
 
 

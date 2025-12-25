@@ -10,7 +10,9 @@ ml_switcheroo.frameworks.tensorflow
    This module provides the adapter for TensorFlow, supporting both core TF operations
    and legacy Keras integration if present within the TF namespace.
 
-   Refactor: Distributed definitions populated.
+   It implements core Math, Neural, and Extra tiers, and specifically handles
+   TensorFlow's unique casting syntax (`tf.cast(x, dtype)`) which differs from
+   the NumPy/JAX/Torch shorthand or `.astype()` conventions.
 
 
 
@@ -28,6 +30,12 @@ Module Contents
 .. py:class:: TensorFlowAdapter
 
    Adapter for TensorFlow (Core & Keras).
+
+   Supports:
+   1.  **Math**: Low-level `tf.math` operations.
+   2.  **Types**: `tf.float32`, etc.
+   3.  **Casting**: `tf.cast` (Functional API via `args` remapping).
+   4.  **Data**: `tf.data` pipelines via plugins.
 
 
    .. py:attribute:: display_name
@@ -52,35 +60,49 @@ Module Contents
       :type: List[str]
 
 
+      Modules to scan during discovery.
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
+
+      Returns standard alias ('tensorflow', 'tf').
 
 
    .. py:property:: import_namespaces
       :type: Dict[str, Dict[str, str]]
 
 
+      Remaps imports to 'tf' alias.
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
+
+      Categorization regexes.
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
+      Test templates.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
+      Defines Class/Function structure logic.
+
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
+
+      Returns supported tiers.
 
 
    .. py:property:: definitions
@@ -88,36 +110,63 @@ Module Contents
 
 
       Static definitions for core operations.
+      Includes Types and Functional Casting logic.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
+      Global seed methods.
+
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
+      Runtime inspection logic.
+
+
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      No complex wiring needed as definitions handle it.
+
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
+      Returns standard example.
+
+
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Provides execution examples for verification tests.
+
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
+      Generates tf.device context syntax.
+
+
 
    .. py:method:: get_serialization_imports() -> List[str]
+
+      Imports for TF IO.
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
+      Syntax for raw file IO.
 
-   .. py:method:: convert(data)
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts input to TF Tensor.
+
 
 

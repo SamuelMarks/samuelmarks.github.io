@@ -303,14 +303,10 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-ml-switcheroo-plugins-casting-index--page-root" class="md-nav__link">ml_switcheroo.plugins.casting</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#attributes" class="md-nav__link">Attributes</a>
-        </li>
         <li class="md-nav__item"><a href="#functions" class="md-nav__link">Functions</a>
         </li>
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.plugins.casting.TYPE_MAP" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TYPE_MAP</span></code></a>
-        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.plugins.casting.transform_casting" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">transform_casting()</span></code></a>
         </li></ul>
             </nav>
@@ -338,29 +334,10 @@
 1. PyTorch Shorthands: <cite>x.float()</cite>, <cite>x.long()</cite>, <cite>x.half()</cite>, etc.
 2. JAX/NumPy/Array API: <cite>x.astype(dtype)</cite>.</p>
 <p>Transformation:
-1. Detects calls to known shorthand methods.
-2. Changes the method name to <cite>astype</cite>.
-3. Injects the corresponding JAX/Numpy dtype object as the argument.</p>
-<dl class="simple">
-<dt>Mappings:</dt><dd><p>.float()  -&gt; .astype(jnp.float32)
-.double() -&gt; .astype(jnp.float64)
-.half()   -&gt; .astype(jnp.float16)
-.long()   -&gt; .astype(jnp.int64)
-.int()    -&gt; .astype(jnp.int32)
-.bool()   -&gt; .astype(<a href="#id1"><span class="problematic" id="id2">jnp.bool_</span></a>)
-.byte()   -&gt; .astype(jnp.uint8)</p>
-</dd>
-</dl>
-<section id="attributes">
-<h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.casting.TYPE_MAP" title="ml_switcheroo.plugins.casting.TYPE_MAP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TYPE_MAP</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</section>
+1. Detects calls to known shorthand methods (triaged by Rewriter via ‘type_methods’ plugin).
+2. Looks up the <cite>target_type</cite> in the semantic metadata for the abstract operation (e.g., <cite>CastFloat</cite> -&gt; <cite>Float32</cite>).
+3. Queries the Semantics Manager for the target framework’s implementation of that Type (e.g., <cite>Float32</cite> -&gt; <cite>jnp.float32</cite>).
+4. Generates an <cite>.astype(…)</cite> call using the retrieved dtype API.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -373,15 +350,33 @@
 </section>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-<dl class="py data">
-<dt class="sig sig-object py" id="ml_switcheroo.plugins.casting.TYPE_MAP">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.casting.</span></span><span class="sig-name descname"><span class="pre">TYPE_MAP</span></span><a class="headerlink" href="#ml_switcheroo.plugins.casting.TYPE_MAP" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.casting.transform_casting">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.casting.</span></span><span class="sig-name descname"><span class="pre">transform_casting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.casting.transform_casting" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Converts shorthand casts to astype calls.</p>
-<p>Trigger: Operations mapped to ‘Cast’ category or specific methods with <cite>requires_plugin: “type_methods”</cite>.</p>
+<dl class="simple">
+<dt>Logic:</dt><dd><ol class="arabic simple">
+<li><p>Access the Abstract Operation ID (e.g., ‘CastFloat’).</p></li>
+<li><p>Look up the ‘target_type’ metadata (e.g., ‘Float32’).</p></li>
+<li><p>Look up the target framework’s API for ‘Float32’ (e.g., ‘jax.numpy.float32’).</p></li>
+<li><p>Rewrite <cite>x.foo()</cite> -&gt; <cite>x.astype(jax.numpy.float32)</cite>.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>cst.Call</em>) – The source call node.</p></li>
+<li><p><strong>ctx</strong> (<a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><em>HookContext</em></a>) – Context providing access to the Knowledge Base.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed node utilizing <cite>.astype()</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Call</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

@@ -7,7 +7,9 @@ ml_switcheroo.frameworks.numpy
 
    Numpy Framework Adapter.
 
-   Refactor: Definitions populated for NumPy specific Ops.
+   This module provides the implementation definitions for the NumPy API.
+   It maps abstract operations for Math and Extras to `numpy.*` functions
+   and defines type mappings for data-driven casting logic.
 
 
 
@@ -25,6 +27,11 @@ Module Contents
 .. py:class:: NumpyAdapter
 
    Adapter for generic NumPy.
+
+   Provides support for:
+   1.  **Math Tiers**: Basic array operations (abs, mean, sum).
+   2.  **Type Mapping**: Abstract Dtypes to `numpy.float32`, etc.
+   3.  **IO**: Save/Load operations.
 
 
    .. py:attribute:: display_name
@@ -49,20 +56,28 @@ Module Contents
       :type: List[str]
 
 
+      Returns list of numpy submodules to scan.
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
+
+      Returns ('numpy', 'np').
 
 
    .. py:property:: import_namespaces
       :type: Dict[str, Dict[str, str]]
 
 
+      Remaps imports to 'np' alias.
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
+
+      Regex patterns for IO and Randomness.
 
 
    .. py:property:: test_config
@@ -76,23 +91,36 @@ Module Contents
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
+      NumPy supports Arrays (Math) and Extras (IO).
+      It does NOT support Neural layers structurally.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
+
+      Returns default structural traits (no class rewriting).
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
+      Static definitions for NumPy mappings.
+      Includes Math, Extras, Types, and Casting logic.
+
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
+      Returns seed methods.
+
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+      NumPy doesn't implement Layers/Losses structurally.
+
 
 
    .. py:method:: get_example_code() -> str
@@ -111,16 +139,31 @@ Module Contents
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
+      Returns CPU syntax ignoring device requests (NumPy is CPU-only).
+
+
 
    .. py:method:: get_serialization_imports() -> List[str]
+
+      Returns imports for IO.
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
+      Returns np.save/load syntax.
+
+
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
+      No dynamic wiring needed for NumPy.
 
-   .. py:method:: convert(data)
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Attempts to convert input data to a NumPy array.
+
 
 

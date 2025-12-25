@@ -369,8 +369,11 @@
 <span id="ml-switcheroo-frameworks-jax"></span><h1 id="api-ml-switcheroo-frameworks-jax-index--page-root">ml_switcheroo.frameworks.jax<a class="headerlink" href="#api-ml-switcheroo-frameworks-jax-index--page-root" title="Link to this heading">¶</a></h1>
 <p>JAX Core Framework Adapter (Level 0 &amp; Level 1).</p>
 <p>This adapter provides support for the functional JAX ecosystem <em>without</em> binding
-to a high-level neural network library like Flax or Haiku.</p>
-<p>Refactor: Now includes comprehensive definitions for JAX ops and Optax/Orbax via <cite>definitions</cite>.</p>
+to a high-level neural network library like Flax or Haiku. It maps:
+1.  <strong>Level 0 (Core)</strong>: JAX Array API (jnp), Activations (jax.nn), and Types.
+2.  <strong>Level 1 (Common Libs)</strong>: Optax (Optimization) and Orbax (Checkpointing).</p>
+<p>It now includes strict type mappings (e.g. <cite>Float32</cite> -&gt; <cite>jnp.float32</cite>) to support
+data-driven casting logic.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -405,6 +408,11 @@ to a high-level neural network library like Flax or Haiku.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.jax.</span></span><span class="sig-name descname"><span class="pre">JaxCoreAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../common/jax_stack/index.html#ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin" title="ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin</span></code></a></p>
 <p>Adapter for Core JAX (jax + optax + orbax) without a Neural Framework.</p>
+<p>Handles translations for:
+-   <strong>Math</strong>: <cite>jnp.abs</cite>, <cite>jnp.sum</cite>, etc.
+-   <strong>Types</strong>: <cite>jnp.float32</cite>, <cite>jnp.int32</cite>, <cite>jnp.bfloat16</cite>.
+-   <strong>Casting</strong>: <cite>.astype(…)</cite> synthesis via plugins.
+-   <strong>Optimization</strong>: <cite>optax.adam</cite>, <cite>optax.sgd</cite>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'JAX</span> <span class="pre">(Core)'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -420,7 +428,7 @@ to a high-level neural network library like Flax or Haiku.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.search_modules" title="Link to this definition">¶</a></dt>
-<dd><p>Scans only core math and optimization libraries.</p>
+<dd><p>Scans only core math and optimization libraries (no neural layers).</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.import_alias">
@@ -431,46 +439,57 @@ Ensures <cite>import jax.numpy as jnp</cite> is generated.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.import_namespaces">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
-<dd><p>Maps source namespaces to JAX equivalents.</p>
+<dd><p>Maps source namespaces to JAX equivalents.
+Example: <cite>torch.nn.functional</cite> -&gt; <cite>jax.nn</cite>.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Regex patterns for identifying API categories.</p>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.test_config">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.test_config" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns standard JIT-enabled test templates.</p>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.structural_traits" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Defines JAX structural behavior (Transformation rules).
+Specifies JIT static arguments for compilation safety.</p>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.definitions" title="Link to this definition">¶</a></dt>
-<dd><p>Static Definitions for JAX Core, Optax, Orbax.</p>
+<dd><p>Static Definitions for JAX Core, Optax, Orbax, and Types.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.rng_seed_methods">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng_seed_methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.rng_seed_methods" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>JAX does not use global seeding methods in the imperative sense.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.collect_api">
 <span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ml_switcheroo.frameworks.base.GhostRef</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.collect_api" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Collects API signatures for discovering new Standards.
+Supports both Live introspection and Ghost Mode snapshots.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.convert" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.convert" title="Link to this definition">¶</a></dt>
+<dd><p>Converts input data to a JAX array for verification.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.apply_wiring">
 <span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
-<dd><p>Applies Level 0/1 Stack wiring.</p>
+<dd><p>Applies Level 0/1 Stack wiring.
+Populates the JSON snapshot with manually wired logic.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxCoreAdapter.get_example_code">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.jax.JaxCoreAdapter.get_example_code" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a generic JAX example.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.jax.JaxAdapter">

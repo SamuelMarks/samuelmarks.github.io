@@ -36,6 +36,13 @@ Module Contents
 
    Adapter for PyTorch.
 
+   Handles mapping of:
+   1.  **Neural Networks**: `torch.nn.*` layers and containers.
+   2.  **Math**: `torch.*` tensor operations.
+   3.  **Types**: `torch.float32`, etc.
+   4.  **Casting**: `.float()`, `.long()`, etc. mapped to Abstract Casts.
+   5.  **Optimization**: `torch.optim.*`.
+
 
    .. py:attribute:: display_name
       :type:  str
@@ -59,15 +66,21 @@ Module Contents
       :type: List[str]
 
 
+      Search targets for discovery.
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
+      Returns standard alias ('torch', 'torch').
+
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
+
+      Returns supported semantic tiers.
 
 
    .. py:property:: import_namespaces
@@ -76,27 +89,32 @@ Module Contents
 
       Defines how to import specific submodules.
 
-      .. rubric:: Example
+      .. rubric:: Examples
 
-      "torch.nn" -> `import torch.nn as nn` (root='torch', sub='nn', alias='nn')
-      "torch.nn.functional" -> `import torch.nn.functional as F` (root='torch.nn.functional', sub=None, alias='F')
+      "torch.nn" -> `import torch.nn as nn`
+      "torch.nn.functional" -> `import torch.nn.functional as F`
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
+      Regex patterns for categorizing APIs.
+
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
-      Test templates for Torch.
+      Templates for generating physical verification tests.
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
+
+      Defines PyTorch structural patterns.
+      Includes lifecycle method stripping (e.g. .cuda(), .detach()).
 
 
    .. py:property:: definitions
@@ -104,12 +122,14 @@ Module Contents
 
 
       Comprehensive distributed definitions for PyTorch mappings.
-      Moved from standards_internal.py.
+      Maps source API calls to Abstract Operations defined in the Hub.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
+
+      Returns list of RNG seeding methods.
 
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]

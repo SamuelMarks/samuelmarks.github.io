@@ -12,6 +12,12 @@ ml_switcheroo.core.import_fixer
    It also handles collapsing fully qualified paths (e.g. `torch.nn.Linear`) into
    aliases (e.g. `nn.Linear`) based on content injection logic.
 
+   Updates:
+   - Fixed: Correctly transforms `from source import sub` into `import target` calls
+            when the target mapping specifies a root import (sub=None).
+   - Improved: Smart injection now prefers `from root import sub` syntax for aliases
+               where the alias name matches the submodule (e.g. `from flax import nnx`).
+
 
 
 Classes
@@ -65,7 +71,7 @@ Module Contents
 
 
 
-   .. py:method:: leave_ImportFrom(original_node: libcst.ImportFrom, updated_node: libcst.ImportFrom) -> Union[libcst.ImportFrom, libcst.RemovalSentinel]
+   .. py:method:: leave_ImportFrom(original_node: libcst.ImportFrom, updated_node: libcst.ImportFrom) -> Union[libcst.ImportFrom, libcst.Import, libcst.RemovalSentinel]
 
       Inspects ``from ... import ...`` statements.
       Checks module+name against submodule_map.

@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=b25da7e2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=1e32684c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -61,8 +61,9 @@
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.discovery" href="../../discovery/index.html" />
@@ -236,6 +237,13 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
@@ -324,6 +332,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceEventType.IMPORT_ACTION" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceEventType.IMPORT_ACTION</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceEventType.INSPECTION" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceEventType.INSPECTION</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceEventType.AST_SNAPSHOT" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceEventType.AST_SNAPSHOT</span></code></a>
         </li></ul>
             </nav>
         </li>
@@ -340,6 +350,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceEvent.parent_id" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceEvent.parent_id</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceEvent.metadata" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceEvent.metadata</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceEvent.lineno" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceEvent.lineno</span></code></a>
         </li></ul>
             </nav>
         </li>
@@ -356,6 +368,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceLogger.log_warning" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceLogger.log_warning()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceLogger.log_inspection" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceLogger.log_inspection()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceLogger.log_snapshot" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceLogger.log_snapshot()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.tracer.TraceLogger.export" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TraceLogger.export()</span></code></a>
         </li></ul>
@@ -390,7 +404,9 @@
 of the transpiler. It captures:
 1. Lifecycle Phases (Parsing, Analysis, Rewriting).
 2. Semantics Matches (Found <cite>torch.abs</cite> -&gt; Map to <cite>Abs</cite> op).
-3. AST Mutations (Node A transformed to Node B).</p>
+3. AST Mutations (Node A transformed to Node B).
+4. <strong>Source Line Mapping</strong> for interactive visualization.
+5. <strong>AST Snapshots</strong> for visual graph debugging.</p>
 <p>The output is a structured list of Event Log dictionaries suitable for JSON serialization.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
@@ -456,6 +472,10 @@ of the transpiler. It captures:
 <dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceEventType.INSPECTION">
 <span class="sig-name descname"><span class="pre">INSPECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'inspection'</span></em><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceEventType.INSPECTION" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceEventType.AST_SNAPSHOT">
+<span class="sig-name descname"><span class="pre">AST_SNAPSHOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ast_snapshot'</span></em><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceEventType.AST_SNAPSHOT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceEvent">
@@ -484,6 +504,10 @@ of the transpiler. It captures:
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceEvent.metadata">
 <span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceEvent.metadata" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceEvent.lineno">
+<span class="sig-name descname"><span class="pre">lineno</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceEvent.lineno" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -520,7 +544,7 @@ Pops the phase ID from the stack and logs an end event.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceLogger.log_match">
-<span class="sig-name descname"><span class="pre">log_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_api</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_api</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abstract_op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_match" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">log_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_api</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_api</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abstract_op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_match" title="Link to this definition">¶</a></dt>
 <dd><p>Logs a Semantic Match event.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -528,13 +552,14 @@ Pops the phase ID from the stack and logs an end event.</p>
 <li><p><strong>source_api</strong> – The source function name (e.g. <cite>torch.abs</cite>).</p></li>
 <li><p><strong>target_api</strong> – The target implementation (e.g. <cite>jax.numpy.abs</cite>).</p></li>
 <li><p><strong>abstract_op</strong> – The abstract standard key (e.g. <cite>Abs</cite>).</p></li>
+<li><p><strong>lineno</strong> – Optional 1-based source line number.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceLogger.log_mutation">
-<span class="sig-name descname"><span class="pre">log_mutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_mutation" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">log_mutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_mutation" title="Link to this definition">¶</a></dt>
 <dd><p>Logs an AST transformation with code diffs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -542,17 +567,21 @@ Pops the phase ID from the stack and logs an end event.</p>
 <li><p><strong>node_type</strong> – Description of node being changed (e.g. “Call”).</p></li>
 <li><p><strong>before</strong> – Source code snapshot before mutation.</p></li>
 <li><p><strong>after</strong> – Source code snapshot after mutation.</p></li>
+<li><p><strong>lineno</strong> – Optional 1-based source line number.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceLogger.log_warning">
-<span class="sig-name descname"><span class="pre">log_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_warning" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">log_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lineno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_warning" title="Link to this definition">¶</a></dt>
 <dd><p>Logs an analysis warning.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> – The warning text.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> – The warning text.</p></li>
+<li><p><strong>lineno</strong> – Optional 1-based source line number.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -566,6 +595,19 @@ Pops the phase ID from the stack and logs an end event.</p>
 <li><p><strong>node_str</strong> – The code element being inspected.</p></li>
 <li><p><strong>outcome</strong> – The result (e.g., “Skipped”, “Ignored”).</p></li>
 <li><p><strong>detail</strong> – Reason for the outcome.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.core.tracer.TraceLogger.log_snapshot">
+<span class="sig-name descname"><span class="pre">log_snapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mermaid_graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.tracer.TraceLogger.log_snapshot" title="Link to this definition">¶</a></dt>
+<dd><p>Logs a full AST snapshot for visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>description</strong> – Label for the snapshot (e.g. “Before Pivot”).</p></li>
+<li><p><strong>mermaid_graph</strong> – string containing Mermaid diagram definition.</p></li>
 </ul>
 </dd>
 </dl>

@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=b25da7e2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=1e32684c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -61,8 +61,9 @@
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.discovery.inspector" href="../inspector/index.html" />
@@ -236,6 +237,13 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
@@ -367,24 +375,22 @@
 <p>This module provides the <code class="docutils literal notranslate"><span class="pre">SemanticHarvester</span></code>, which inspects Python test files
 written by developers (Human Override Workflow). It analyzes successful test
 calls to reverse-engineer valid argument mappings for the Knowledge Base.</p>
-<dl>
-<dt>Logic:</dt><dd><ol class="arabic">
+<p>Logic:</p>
+<ol class="arabic simple">
 <li><p>Parse a test file’s AST.</p></li>
 <li><p>Scan for imports to resolve aliases (e.g. <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>).</p></li>
 <li><p>Identify test functions (e.g., <code class="docutils literal notranslate"><span class="pre">test_matmul</span></code>).</p></li>
 <li><p>Find calls to the target framework (e.g., <code class="docutils literal notranslate"><span class="pre">jax.numpy.matmul</span></code>).</p></li>
-<li><p>Correlate input arguments to target parameters using:
-- <strong>Naming Convention</strong>: <cite>np_x</cite> matches standard arg <cite>x</cite>.
-- <strong>Explicit Keywords</strong>: <cite>kwargs</cite> match standard arg names directly.
-- <strong>Value-Based Inference</strong>: Matches literals (e.g. <cite>1</cite>, <cite>True</cite>) to</p>
-<blockquote>
-<div><p>type hints defined in the Semantics (e.g., <cite>axis: int</cite>).</p>
-</div></blockquote>
+<li><p>Correlate input arguments to target parameters using:</p>
+<ul class="simple">
+<li><p><strong>Naming Convention</strong>: <cite>np_x</cite> matches standard arg <cite>x</cite>.</p></li>
+<li><p><strong>Explicit Keywords</strong>: <cite>kwargs</cite> match standard arg names directly.</p></li>
+<li><p><strong>Value-Based Inference</strong>: Matches literals (e.g. <cite>1</cite>, <cite>True</cite>) to
+type hints defined in the Semantics (e.g., <cite>axis: int</cite>).</p></li>
+</ul>
 </li>
 <li><p>Construct and return valid mapping dictionaries.</p></li>
 </ol>
-</dd>
-</dl>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -462,9 +468,11 @@ calls to reverse-engineer valid argument mappings for the Knowledge Base.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.discovery.harvester.</span></span><span class="sig-name descname"><span class="pre">TargetCallVisitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_api</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_args_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.discovery.harvester.TargetCallVisitor" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">ast.NodeVisitor</span></code></p>
 <p>Helper AST walker to find specific API calls and extract arguments.</p>
-<p>Implements <strong>Value-Based Inference</strong>:
-- Matches naming conventions (<code class="docutils literal notranslate"><span class="pre">np_x</span></code>).
-- Matches literal types (e.g. <code class="docutils literal notranslate"><span class="pre">1</span></code> is <code class="docutils literal notranslate"><span class="pre">int</span></code>) to Semantic Types (<code class="docutils literal notranslate"><span class="pre">axis:</span> <span class="pre">int</span></code>).</p>
+<p>Implements <strong>Value-Based Inference</strong>:</p>
+<ul class="simple">
+<li><p>Matches naming conventions (<code class="docutils literal notranslate"><span class="pre">np_x</span></code>).</p></li>
+<li><p>Matches literal types (e.g. <code class="docutils literal notranslate"><span class="pre">1</span></code> is <code class="docutils literal notranslate"><span class="pre">int</span></code>) to Semantic Types (<code class="docutils literal notranslate"><span class="pre">axis:</span> <span class="pre">int</span></code>).</p></li>
+</ul>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.harvester.TargetCallVisitor.target_api">
 <span class="sig-name descname"><span class="pre">target_api</span></span><a class="headerlink" href="#ml_switcheroo.discovery.harvester.TargetCallVisitor.target_api" title="Link to this definition">¶</a></dt>

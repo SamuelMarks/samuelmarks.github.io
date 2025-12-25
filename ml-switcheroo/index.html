@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=b25da7e2" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=1e32684c" />
     <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
@@ -61,8 +61,9 @@
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="_static/trace_render.js?v=690b4e4b"></script>
-    <script src="_static/switcheroo_demo.js?v=cd11226c"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="_static/trace_render.js?v=4ddbab91"></script>
+    <script src="_static/switcheroo_demo.js?v=02a13d87"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ml-switcheroo 🔄🦘" href="README.html" />
@@ -226,6 +227,13 @@
     <li class="md-nav__item">
     
     
+      <a href="EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
@@ -303,6 +311,7 @@
 </div>
 <span class="status-badge" id="engine-status">Offline</span>
 </div>
+<!-- Splash Screen -->
 <div class="splash-screen" id="demo-splash">
 <p>Initialize the engine to translate code between frameworks locally.</p>
 <button class="md-btn md-btn-primary" id="btn-load-engine">
@@ -310,17 +319,15 @@
                 </button>
 </div>
 <div id="demo-interface" style="display:none;">
+<!-- Toolbar -->
 <div class="translate-toolbar">
-<!-- Source Column -->
 <div class="select-wrapper">
-<select class="material-select" id="select-src">
-<option selected="" value="torch">PyTorch</option>
+<select class="material-select" id="select-src"><option selected="" value="torch">PyTorch</option>
 <option value="jax">JAX (Core)</option>
 <option value="tensorflow">TensorFlow</option>
 <option value="numpy">NumPy</option>
 <option value="keras">Keras</option>
-<option value="mlx">Apple MLX</option>
-</select>
+<option value="mlx">Apple MLX</option></select>
 <div id="src-flavour-region" style="display:none; margin-left:10px;">
 <select class="material-select-sm" id="src-flavour" style="background:#f0f4c3;">
 <option selected="" value="flax_nnx">Flax NNX</option><option value="paxml">PaxML / Praxis</option>
@@ -328,16 +335,13 @@
 </div>
 </div>
 <button class="swap-icon-btn" id="btn-swap" title="Swap Languages">⇄</button>
-<!-- Target Column -->
 <div class="select-wrapper">
-<select class="material-select" id="select-tgt">
-<option value="torch">PyTorch</option>
+<select class="material-select" id="select-tgt"><option value="torch">PyTorch</option>
 <option selected="" value="jax">JAX (Core)</option>
 <option value="tensorflow">TensorFlow</option>
 <option value="numpy">NumPy</option>
 <option value="keras">Keras</option>
-<option value="mlx">Apple MLX</option>
-</select>
+<option value="mlx">Apple MLX</option></select>
 <div id="tgt-flavour-region" style="display:none; margin-left:10px;">
 <select class="material-select-sm" id="tgt-flavour" style="background:#f0f4c3;">
 <option selected="" value="flax_nnx">Flax NNX</option><option value="paxml">PaxML / Praxis</option>
@@ -345,12 +349,14 @@
 </div>
 </div>
 </div>
+<!-- Examples -->
 <div class="example-toolbar">
 <span class="label">Load Example:</span>
 <select class="material-select-sm" id="select-example">
 <option disabled="" selected="" value="">-- Select a Pattern --</option>
 </select>
 </div>
+<!-- Editors -->
 <div class="editor-grid">
 <div class="editor-group source-group">
 <textarea class="material-input" id="code-source" placeholder="Source code..." spellcheck="false">import torch
@@ -364,7 +370,9 @@ class Model(nn.Module):
 <textarea class="material-input output-bg" id="code-target" placeholder="Translation..." readonly=""></textarea>
 </div>
 </div>
+<!-- Controls -->
 <div class="controls-bar">
+<button class="icon-btn" id="btn-retro" title="Matrix Mode" type="button">🕶️</button>
 <label class="md-switch" title="Strict Mode: Fail on unknown APIs.">
 <input id="chk-strict-mode" type="checkbox"/>
 <span class="md-switch-track"><span class="md-switch-thumb"></span></span>
@@ -372,11 +380,30 @@ class Model(nn.Module):
 </label>
 <button class="md-btn md-btn-accent" disabled="" id="btn-convert">Run Translation</button>
 </div>
-<div class="trace-container" id="trace-visualizer" style="display:none;"></div>
-</div>
-<div class="console-group">
-<div class="editor-label">Engine Logs</div>
+<!-- Three Tabs: Console, Mermaid, Timeline -->
+<div class="output-tabs">
+<input id="tab-console" name="wm-tabs" type="radio"/>
+<label class="tab-label" for="tab-console"><span class="tab-icon">💻</span> Console</label>
+<input id="tab-mermaid" name="wm-tabs" type="radio"/>
+<label class="tab-label" for="tab-mermaid"><span class="tab-icon">🌳</span> AST visualisation</label>
+<input checked="" id="tab-trace" name="wm-tabs" type="radio"/>
+<label class="tab-label" for="tab-trace"><span class="tab-icon">⏱️</span> Timeline</label>
+<div class="tab-panel" id="panel-console">
 <pre id="console-output">Waiting for engine...</pre>
+</div>
+<div class="tab-panel" id="panel-mermaid">
+<div class="ast-toolbar">
+<button class="md-btn md-btn-primary" id="btn-ast-prev" style="padding:4px 10px; font-size:12px;">Before Pivot</button>
+<button class="md-btn md-btn-primary" id="btn-ast-next" style="padding:4px 10px; font-size:12px; opacity:0.6;">After Pivot</button>
+</div>
+<div class="mermaid" id="ast-mermaid-target" style="text-align:center; overflow-x:auto;">
+<em style="color:#999">Run a translation to generate the AST graph.</em>
+</div>
+</div>
+<div class="tab-panel" id="panel-trace">
+<div class="trace-container" id="trace-visualizer"></div>
+</div>
+</div>
 </div>
 </div>
 <div class="toctree-wrapper compound">
@@ -408,6 +435,13 @@ class Model(nn.Module):
 <li class="toctree-l2"><a class="reference internal" href="EXTENDING.html#plugin-system-custom-code">🧠 3. Plugin System (Custom Code)</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="EXTENDING_WITH_DSL.html">Extending with ODL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING_WITH_DSL.html#the-workflow-audit-define">🔄 The Workflow: Audit &amp; Define</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING_WITH_DSL.html#odl-feature-gallery">🧬 ODL Feature Gallery</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING_WITH_DSL.html#verification-constraints-fuzzer">🧪 Verification Constraints (Fuzzer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="EXTENDING_WITH_DSL.html#plugin-scaffolding">🔌 Plugin Scaffolding</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="MAINTENANCE.html">Maintenance</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#the-maintenance-lifecycle">🔄 The Maintenance Lifecycle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MAINTENANCE.html#quick-start-the-bootstrap-script">⚡ Quick Start: The Bootstrap Script</a></li>
@@ -421,6 +455,7 @@ class Model(nn.Module):
 </li>
 <li class="toctree-l1"><a class="reference internal" href="IDEAS.html">Ideas</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="IDEAS.html#advanced-features">Advanced Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IDEAS.html#novel-source-target-frameworks">Novel source/target frameworks</a></li>
 </ul>
 </li>
 </ul>
@@ -438,7 +473,6 @@ class Model(nn.Module):
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#usage">Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#attributes">Attributes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#functions">Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/ml_switcheroo/index.html#package-contents">Package Contents</a></li>
 </ul>

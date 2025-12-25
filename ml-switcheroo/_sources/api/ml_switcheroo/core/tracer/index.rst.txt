@@ -12,6 +12,8 @@ ml_switcheroo.core.tracer
    1. Lifecycle Phases (Parsing, Analysis, Rewriting).
    2. Semantics Matches (Found `torch.abs` -> Map to `Abs` op).
    3. AST Mutations (Node A transformed to Node B).
+   4. **Source Line Mapping** for interactive visualization.
+   5. **AST Snapshots** for visual graph debugging.
 
    The output is a structured list of Event Log dictionaries suitable for JSON serialization.
 
@@ -82,6 +84,11 @@ Module Contents
 
 
 
+   .. py:attribute:: AST_SNAPSHOT
+      :value: 'ast_snapshot'
+
+
+
 .. py:class:: TraceEvent
 
    A single unit of execution history.
@@ -111,6 +118,12 @@ Module Contents
 
    .. py:attribute:: metadata
       :type:  Dict[str, Any]
+
+
+   .. py:attribute:: lineno
+      :type:  Optional[int]
+      :value: None
+
 
 
 .. py:class:: TraceLogger
@@ -143,31 +156,34 @@ Module Contents
 
 
 
-   .. py:method:: log_match(source_api: str, target_api: str, abstract_op: str) -> None
+   .. py:method:: log_match(source_api: str, target_api: str, abstract_op: str, lineno: Optional[int] = None) -> None
 
       Logs a Semantic Match event.
 
       :param source_api: The source function name (e.g. `torch.abs`).
       :param target_api: The target implementation (e.g. `jax.numpy.abs`).
       :param abstract_op: The abstract standard key (e.g. `Abs`).
+      :param lineno: Optional 1-based source line number.
 
 
 
-   .. py:method:: log_mutation(node_type: str, before: str, after: str) -> None
+   .. py:method:: log_mutation(node_type: str, before: str, after: str, lineno: Optional[int] = None) -> None
 
       Logs an AST transformation with code diffs.
 
       :param node_type: Description of node being changed (e.g. "Call").
       :param before: Source code snapshot before mutation.
       :param after: Source code snapshot after mutation.
+      :param lineno: Optional 1-based source line number.
 
 
 
-   .. py:method:: log_warning(message: str) -> None
+   .. py:method:: log_warning(message: str, lineno: Optional[int] = None) -> None
 
       Logs an analysis warning.
 
       :param message: The warning text.
+      :param lineno: Optional 1-based source line number.
 
 
 
@@ -178,6 +194,15 @@ Module Contents
       :param node_str: The code element being inspected.
       :param outcome: The result (e.g., "Skipped", "Ignored").
       :param detail: Reason for the outcome.
+
+
+
+   .. py:method:: log_snapshot(description: str, mermaid_graph: str) -> None
+
+      Logs a full AST snapshot for visualization.
+
+      :param description: Label for the snapshot (e.g. "Before Pivot").
+      :param mermaid_graph: string containing Mermaid diagram definition.
 
 
 

@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=b25da7e2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=1e32684c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -61,8 +61,9 @@
     <script src="../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.static_unroll" href="../static_unroll/index.html" />
@@ -236,6 +237,13 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
@@ -334,12 +342,10 @@
 <p>Plugin for injecting state flags (e.g., training=True/False) based on context.</p>
 <p>This module handles the impedance mismatch between Object-Oriented state management
 (PyTorch’s <cite>model.eval()</cite>, <cite>model.train()</cite>) and Functional statelessness (JAX, Keras functional).</p>
-<p>The plugin consists of two cooperating hooks:
-1.  <cite>capture_eval_state</cite>: Intercepts <cite>model.eval()</cite>/<cite>train()</cite> calls, records the state</p>
-<blockquote>
-<div><p>change in the <cite>HookContext</cite>, and removes the imperative call from the AST.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
+<p>The plugin consists of two cooperating hooks:</p>
+<ol class="arabic simple">
+<li><p><cite>capture_eval_state</cite>: Intercepts <cite>model.eval()</cite>/<cite>train()</cite> calls, records the state
+change in the <cite>HookContext</cite>, and removes the imperative call from the AST.</p></li>
 <li><p><cite>inject_training_flag</cite>: Intercepts calls to the model (e.g. <cite>model(x)</cite>), checks if
 state was recorded, and injects the generic <cite>training=…</cite> keyword argument.</p></li>
 </ol>
@@ -365,13 +371,11 @@ state was recorded, and injects the generic <cite>training=…</cite> keyword ar
 <dd><p>Hook: Injects <cite>training=True/False</cite> kwargs into function calls.</p>
 <p>This hook is triggered on function calls (like <cite>model(x)</cite> or <cite>model.forward(x)</cite>) if
 they map to an abstract operation configured with <cite>requires_plugin=”inject_training_flag”</cite>.</p>
-<p>Logic:
-1. Resolve the name of the object being called (the Receiver).</p>
-<blockquote>
-<div><p>It robustly checks both the full callable name (e.g. <cite>self.layer</cite> in <cite>self.layer(x)</cite>)
-and the parent object (e.g. <cite>model</cite> in <cite>model.forward(x)</cite>).</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
+<p>Logic:</p>
+<ol class="arabic simple">
+<li><p>Resolve the name of the object being called (the Receiver).
+It robustly checks both the full callable name (e.g. <cite>self.layer</cite> in <cite>self.layer(x)</cite>)
+and the parent object (e.g. <cite>model</cite> in <cite>model.forward(x)</cite>).</p></li>
 <li><p>Check <cite>ctx.metadata</cite> to see if <cite>capture_eval_state</cite> previously recorded a state.</p></li>
 <li><p>If state exists, execute the injection of the <cite>training</cite> argument.</p></li>
 </ol>
@@ -391,11 +395,13 @@ and the parent object (e.g. <cite>model</cite> in <cite>model.forward(x)</cite>)
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.state_flag_injection.capture_eval_state">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.state_flag_injection.</span></span><span class="sig-name descname"><span class="pre">capture_eval_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.state_flag_injection.capture_eval_state" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Intercepts <cite>eval()</cite>/<cite>train()</cite> calls to track state removal.</p>
-<p>Action:
-1. Identifies the receiver object (<cite>model</cite>).
-2. Determines mode (<cite>training=True</cite> for .train(), <cite>False</cite> for .eval()).
-3. Updates <cite>ctx.metadata</cite> with this knowledge.
-4. Returns a No-Op node to strip the imperative call from the output code.</p>
+<p>Action:</p>
+<ol class="arabic simple">
+<li><p>Identifies the receiver object (<cite>model</cite>).</p></li>
+<li><p>Determines mode (<cite>training=True</cite> for .train(), <cite>False</cite> for .eval()).</p></li>
+<li><p>Updates <cite>ctx.metadata</cite> with this knowledge.</p></li>
+<li><p>Returns a No-Op node to strip the imperative call from the output code.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

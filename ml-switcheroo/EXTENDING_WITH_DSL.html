@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Extending with ODL &#8212; ml-switcheroo</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=1e32684c" />
+    <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="_static/trace_render.js?v=4ddbab91"></script>
+    <script src="_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Maintenance" href="MAINTENANCE.html" />
+    <link rel="prev" title="Extending" href="EXTENDING.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue data-md-color-accent=light-blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#EXTENDING_WITH_DSL" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="ml-switcheroo"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">ml-switcheroo</span>
+          <span class="md-header-nav__topic"> Extending with ODL </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="ml-switcheroo" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="ml-switcheroo">ml-switcheroo</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Documentation</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="README.html" class="md-nav__link">ml-switcheroo 🔄🦘</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ARCHITECTURE.html" class="md-nav__link">Architecture</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="EXTENDING.html" class="md-nav__link">Extending</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Extending with ODL </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Extending with ODL</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#extending-with-dsl--page-root" class="md-nav__link">Extending with ODL</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-workflow-audit-define" class="md-nav__link">🔄 The Workflow: Audit & Define</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#audit-your-codebase" class="md-nav__link">1. Audit your codebase</a>
+        </li>
+        <li class="md-nav__item"><a href="#describe-the-operation-yaml" class="md-nav__link">2. Describe the Operation (YAML)</a>
+        </li>
+        <li class="md-nav__item"><a href="#inject-into-knowledge-base" class="md-nav__link">3. Inject into Knowledge Base</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#odl-feature-gallery" class="md-nav__link">🧬 ODL Feature Gallery</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#basic-argument-renaming" class="md-nav__link">1. Basic Argument Renaming</a>
+        </li>
+        <li class="md-nav__item"><a href="#argument-injection-casting" class="md-nav__link">2. Argument Injection & Casting</a>
+        </li>
+        <li class="md-nav__item"><a href="#variadic-packing-star-args" class="md-nav__link">3. Variadic Packing (Star-Args)</a>
+        </li>
+        <li class="md-nav__item"><a href="#tensor-layout-permutation" class="md-nav__link">4. Tensor Layout Permutation</a>
+        </li>
+        <li class="md-nav__item"><a href="#macros-composite-operations" class="md-nav__link">5. Macros (Composite Operations)</a>
+        </li>
+        <li class="md-nav__item"><a href="#infix-operators" class="md-nav__link">6. Infix Operators</a>
+        </li>
+        <li class="md-nav__item"><a href="#output-adaptation" class="md-nav__link">7. Output Adaptation</a>
+        </li>
+        <li class="md-nav__item"><a href="#conditional-dispatch-rules" class="md-nav__link">8. Conditional Dispatch (Rules)</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#verification-constraints-fuzzer" class="md-nav__link">🧪 Verification Constraints (Fuzzer)</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-scaffolding" class="md-nav__link">🔌 Plugin Scaffolding</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/EXTENDING_WITH_DSL.md.txt">Show Source</a> </li>
+
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-workflow-audit-define" class="md-nav__link">🔄 The Workflow: Audit & Define</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#odl-feature-gallery" class="md-nav__link">🧬 ODL Feature Gallery</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#verification-constraints-fuzzer" class="md-nav__link">🧪 Verification Constraints (Fuzzer)</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#plugin-scaffolding" class="md-nav__link">🔌 Plugin Scaffolding</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="IDEAS.html" class="md-nav__link">Ideas</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Reference</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="api/index.html" class="md-nav__link">API Reference</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#extending-with-dsl--page-root" class="md-nav__link">Extending with ODL</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-workflow-audit-define" class="md-nav__link">🔄 The Workflow: Audit & Define</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#audit-your-codebase" class="md-nav__link">1. Audit your codebase</a>
+        </li>
+        <li class="md-nav__item"><a href="#describe-the-operation-yaml" class="md-nav__link">2. Describe the Operation (YAML)</a>
+        </li>
+        <li class="md-nav__item"><a href="#inject-into-knowledge-base" class="md-nav__link">3. Inject into Knowledge Base</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#odl-feature-gallery" class="md-nav__link">🧬 ODL Feature Gallery</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#basic-argument-renaming" class="md-nav__link">1. Basic Argument Renaming</a>
+        </li>
+        <li class="md-nav__item"><a href="#argument-injection-casting" class="md-nav__link">2. Argument Injection & Casting</a>
+        </li>
+        <li class="md-nav__item"><a href="#variadic-packing-star-args" class="md-nav__link">3. Variadic Packing (Star-Args)</a>
+        </li>
+        <li class="md-nav__item"><a href="#tensor-layout-permutation" class="md-nav__link">4. Tensor Layout Permutation</a>
+        </li>
+        <li class="md-nav__item"><a href="#macros-composite-operations" class="md-nav__link">5. Macros (Composite Operations)</a>
+        </li>
+        <li class="md-nav__item"><a href="#infix-operators" class="md-nav__link">6. Infix Operators</a>
+        </li>
+        <li class="md-nav__item"><a href="#output-adaptation" class="md-nav__link">7. Output Adaptation</a>
+        </li>
+        <li class="md-nav__item"><a href="#conditional-dispatch-rules" class="md-nav__link">8. Conditional Dispatch (Rules)</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#verification-constraints-fuzzer" class="md-nav__link">🧪 Verification Constraints (Fuzzer)</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-scaffolding" class="md-nav__link">🔌 Plugin Scaffolding</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/EXTENDING_WITH_DSL.md.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="extending-with-odl">
+<h1 id="extending-with-dsl--page-root">Extending with ODL<a class="headerlink" href="#extending-with-dsl--page-root" title="Link to this heading">¶</a></h1>
+<p>The <strong>Operation Definition Language (ODL)</strong> is a declarative YAML schema used to teach <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> new mathematical
+operations without writing Python AST transformation code or manually updating:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code> and</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (for torch, mlx, tensorflow, jax, etc.)</p></li>
+</ul>
+<p>ODL serves as the “DNA” of the transpiler, defining <strong>Inputs</strong> (Arguments, Types, Shapes), <strong>Behavior</strong> (Math logic,
+Side effects), and <strong>Implementation</strong> (How to map it to PyTorch, JAX, TensorFlow, etc.).</p>
+<hr class="docutils"/>
+<section id="the-workflow-audit-define">
+<h2 id="the-workflow-audit-define">🔄 The Workflow: Audit &amp; Define<a class="headerlink" href="#the-workflow-audit-define" title="Link to this heading">¶</a></h2>
+<p>The standard loop for adding missing operations is <strong>Audit <span class="math notranslate nohighlight">\(\to\)</span> Define <span class="math notranslate nohighlight">\(\to\)</span> Inject</strong>.</p>
+<section id="audit-your-codebase">
+<h3 id="audit-your-codebase">1. Audit your codebase<a class="headerlink" href="#audit-your-codebase" title="Link to this heading">¶</a></h3>
+<p>Run the <code class="docutils literal notranslate"><span class="pre">audit</span></code> command on your source project to find APIs that are not yet in the Knowledge Base.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check 'my_model.py' for unmapped PyTorch calls</span>
+ml_switcheroo<span class="w"> </span>audit<span class="w"> </span>my_model.py<span class="w"> </span>--roots<span class="w"> </span>torch
+</pre></div>
+</div>
+<p><strong>Output:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>❌ Missing Operations
+Framework    API Name          Suggestion
+torch        torch.erf         Run 'scaffold' or 'wizard'
+torch        torch.reciprocal  Run 'scaffold' or 'wizard'
+</pre></div>
+</div>
+</section>
+<section id="describe-the-operation-yaml">
+<h3 id="describe-the-operation-yaml">2. Describe the Operation (YAML)<a class="headerlink" href="#describe-the-operation-yaml" title="Link to this heading">¶</a></h3>
+<p>Create a file named <code class="docutils literal notranslate"><span class="pre">math_ops.yaml</span></code> and describe the missing operations using ODL.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># math_ops.yaml</span>
+<span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Erf"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Computes</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">error</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">each</span><span class="nv"> </span><span class="s">element."</span>
+<span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.erf"</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.lax.erf"</span>
+<span class="w">    </span><span class="nt">required_imports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">jax"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="inject-into-knowledge-base">
+<h3 id="inject-into-knowledge-base">3. Inject into Knowledge Base<a class="headerlink" href="#inject-into-knowledge-base" title="Link to this heading">¶</a></h3>
+<p>Run the <code class="docutils literal notranslate"><span class="pre">define</span></code> command. This parses the YAML, validates it against the schema, and injects the Python code directly
+into the <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> source tree.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ml_switcheroo<span class="w"> </span>define<span class="w"> </span>math_ops.yaml
+</pre></div>
+</div>
+<p><strong>Output:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>✅ Updated Hub: src/ml_switcheroo/semantics/standards_internal.py
+✅ Updated Spoke (torch): src/ml_switcheroo/frameworks/torch.py
+✅ Updated Spoke (jax): src/ml_switcheroo/frameworks/jax.py
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="odl-feature-gallery">
+<h2 id="odl-feature-gallery">🧬 ODL Feature Gallery<a class="headerlink" href="#odl-feature-gallery" title="Link to this heading">¶</a></h2>
+<p>The DSL supports complex transpilation logic including layout permutation, argument packing, macros, and conditional
+dispatch.</p>
+<section id="basic-argument-renaming">
+<h3 id="basic-argument-renaming">1. Basic Argument Renaming<a class="headerlink" href="#basic-argument-renaming" title="Link to this heading">¶</a></h3>
+<p>Map argument names between frameworks (e.g., PyTorch <code class="docutils literal notranslate"><span class="pre">dim</span></code> vs JAX <code class="docutils literal notranslate"><span class="pre">axis</span></code>).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Sum"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Sum</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">array</span><span class="nv"> </span><span class="s">elements</span><span class="nv"> </span><span class="s">over</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">given</span><span class="nv"> </span><span class="s">axis."</span>
+<span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"x"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">"None"</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.sum"</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axis</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span><span class="w">  </span><span class="c1"># Map Spec 'axis' -&gt; Torch 'dim'</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.sum"</span>
+<span class="w">    </span><span class="c1"># JAX uses 'axis' natively, no mapping needed</span>
+</pre></div>
+</div>
+</section>
+<section id="argument-injection-casting">
+<h3 id="argument-injection-casting">2. Argument Injection &amp; Casting<a class="headerlink" href="#argument-injection-casting" title="Link to this heading">¶</a></h3>
+<p>Inject fixed parameters required by the target framework but missing in the source.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"LayerNorm"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Applies</span><span class="nv"> </span><span class="s">Layer</span><span class="nv"> </span><span class="s">Normalization."</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"input"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"normalized_shape"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"eps"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.LayerNorm"</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"flax.nnx.LayerNorm"</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">normalized_shape</span><span class="p">:</span><span class="w"> </span><span class="s">"num_features"</span>
+<span class="w">      </span><span class="nt">eps</span><span class="p">:</span><span class="w"> </span><span class="s">"epsilon"</span>
+<span class="w">    </span><span class="c1"># Inject arguments not present in the Abstract Standard</span>
+<span class="w">    </span><span class="nt">inject_args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">use_fast_variance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="c1"># Cast specific inputs to avoid type errors</span>
+<span class="w">    </span><span class="nt">casts</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="s">"float32"</span>
+</pre></div>
+</div>
+</section>
+<section id="variadic-packing-star-args">
+<h3 id="variadic-packing-star-args">3. Variadic Packing (Star-Args)<a class="headerlink" href="#variadic-packing-star-args" title="Link to this heading">¶</a></h3>
+<p>Convert variable positional arguments into a tuple (common in <code class="docutils literal notranslate"><span class="pre">permute</span></code> vs <code class="docutils literal notranslate"><span class="pre">transpose</span></code>).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Permute"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Permutes</span><span class="nv"> </span><span class="s">tensor</span><span class="nv"> </span><span class="s">dimensions."</span>
+<span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="w">  </span><span class="c1"># Mark 'dims' as variadic (*dims)</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"dims"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
+<span class="w">    </span><span class="nt">is_variadic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.permute"</span>
+<span class="w">    </span><span class="c1"># Torch layout: permute(input, *dims)</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.numpy.transpose"</span>
+<span class="w">    </span><span class="c1"># JAX layout: transpose(a, axes=(...))</span>
+<span class="w">    </span><span class="c1"># This instructs the engine to pack *dims into a tuple and pass it to 'axes='</span>
+<span class="w">    </span><span class="nt">pack_to_tuple</span><span class="p">:</span><span class="w"> </span><span class="s">"axes"</span>
+</pre></div>
+</div>
+</section>
+<section id="tensor-layout-permutation">
+<h3 id="tensor-layout-permutation">4. Tensor Layout Permutation<a class="headerlink" href="#tensor-layout-permutation" title="Link to this heading">¶</a></h3>
+<p>Automatically inject <code class="docutils literal notranslate"><span class="pre">transpose</span></code> calls to align memory layouts (e.g., NCHW <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> NHWC).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Conv2d"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"2D</span><span class="nv"> </span><span class="s">Convolution."</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"input"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"weight"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.conv2d"</span>
+<span class="w">    </span><span class="c1"># Torch assumes NCHW</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.lax.conv"</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="s">"lhs"</span>
+<span class="w">      </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="s">"rhs"</span>
+<span class="w">    </span><span class="c1"># JAX LAX expects NHWC. The Engine will wrap inputs/outputs automatically.</span>
+<span class="w">    </span><span class="c1"># Notation matches Einstein summation or explicit dimension chars.</span>
+<span class="w">    </span><span class="nt">layout_map</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="s">"NCHW-&gt;NHWC"</span>
+<span class="w">      </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="s">"OIHW-&gt;HWIO"</span>
+<span class="w">      </span><span class="nt">return</span><span class="p">:</span><span class="w"> </span><span class="s">"NHWC-&gt;NCHW"</span>
+</pre></div>
+</div>
+</section>
+<section id="macros-composite-operations">
+<h3 id="macros-composite-operations">5. Macros (Composite Operations)<a class="headerlink" href="#macros-composite-operations" title="Link to this heading">¶</a></h3>
+<p>Define operations as inline Python expressions rather than function calls. Useful for activation functions or simple
+math combos.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Swish"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.silu"</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Defines an inline template. {x} is replaced by the argument variable.</span>
+<span class="w">    </span><span class="nt">macro_template</span><span class="p">:</span><span class="w"> </span><span class="s">"{x}</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">jax.nn.sigmoid({x})"</span>
+<span class="w">    </span><span class="nt">required_imports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">jax"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="infix-operators">
+<h3 id="infix-operators">6. Infix Operators<a class="headerlink" href="#infix-operators" title="Link to this heading">¶</a></h3>
+<p>Convert function calls to Python operators (e.g., <code class="docutils literal notranslate"><span class="pre">add(a,</span> <span class="pre">b)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code>).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Add"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"a"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"b"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.add"</span>
+<span class="w">  </span><span class="nt">numpy</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Transformation: np.add(a, b) -&gt; a + b</span>
+<span class="w">    </span><span class="nt">transformation_type</span><span class="p">:</span><span class="w"> </span><span class="s">"infix"</span>
+<span class="w">    </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="s">"+"</span>
+</pre></div>
+</div>
+</section>
+<section id="output-adaptation">
+<h3 id="output-adaptation">7. Output Adaptation<a class="headerlink" href="#output-adaptation" title="Link to this heading">¶</a></h3>
+<p>Handle API mismatches in return values (e.g., Tuple vs Scalar).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Max"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.max"</span>
+<span class="w">    </span><span class="c1"># Torch returns (values, indices). We only want values.</span>
+<span class="w">    </span><span class="c1"># Wraps result: (torch.max(x))[0]</span>
+<span class="w">    </span><span class="nt">output_select_index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.max"</span>
+<span class="w">    </span><span class="c1"># Wraps result: (lambda x: x.astype(jnp.float32))(...)</span>
+<span class="w">    </span><span class="nt">output_cast</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.float32"</span>
+</pre></div>
+</div>
+</section>
+<section id="conditional-dispatch-rules">
+<h3 id="conditional-dispatch-rules">8. Conditional Dispatch (Rules)<a class="headerlink" href="#conditional-dispatch-rules" title="Link to this heading">¶</a></h3>
+<p>Dynamically switch the target API based on the <em>value</em> of an argument.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Resize"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"image"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"size"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"mode"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize"</span><span class="w"> </span><span class="c1"># Default</span>
+<span class="w">    </span><span class="nt">dispatch_rules</span><span class="p">:</span>
+<span class="w">      </span><span class="c1"># If mode == 'nearest', switch API</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_nearest"</span>
+<span class="w">      </span><span class="c1"># If mode in ['bilinear', 'bicubic'], switch API</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"in"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"bilinear"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"bicubic"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_bilinear"</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="verification-constraints-fuzzer">
+<h2 id="verification-constraints-fuzzer">🧪 Verification Constraints (Fuzzer)<a class="headerlink" href="#verification-constraints-fuzzer" title="Link to this heading">¶</a></h2>
+<p>You can guide the automated Fuzzer (CI) by adding constraints to <code class="docutils literal notranslate"><span class="pre">std_args</span></code>. This ensures generated tests use valid
+inputs.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"LogSoftmax"</span>
+<span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="w">    </span><span class="c1"># Generate 4D tensors</span>
+<span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="c1"># Enforce float32</span>
+<span class="w">    </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="s">"float32"</span>
+<span class="w">    </span><span class="c1"># Symbolic Shape: Start with Batch, End with Channels</span>
+<span class="w">    </span><span class="nt">shape_spec</span><span class="p">:</span><span class="w"> </span><span class="s">"[B,</span><span class="nv"> </span><span class="s">...,</span><span class="nv"> </span><span class="s">C]"</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
+<span class="w">    </span><span class="c1"># Constrain random integer generation</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"reduction"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"str"</span>
+<span class="w">    </span><span class="c1"># Restrict to enum values</span>
+<span class="w">    </span><span class="nt">options</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"mean"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"sum"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"none"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Verify output shape matches input shape</span>
+<span class="nt">output_shape_calc</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">input,</span><span class="nv"> </span><span class="s">dim,</span><span class="nv"> </span><span class="s">reduction:</span><span class="nv"> </span><span class="s">input.shape"</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils"/>
+<section id="plugin-scaffolding">
+<h2 id="plugin-scaffolding">🔌 Plugin Scaffolding<a class="headerlink" href="#plugin-scaffolding" title="Link to this heading">¶</a></h2>
+<p>If ODL is not expressive enough (e.g., requires complex AST restructing), you can ask the <code class="docutils literal notranslate"><span class="pre">define</span></code> command to generate a
+Python plugin file for you.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"StrangeOp"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Link to a plugin hook</span>
+<span class="w">    </span><span class="nt">requires_plugin</span><span class="p">:</span><span class="w"> </span><span class="s">"my_strange_logic"</span>
+
+<span class="c1"># Define the plugin stubs to generate</span>
+<span class="nt">scaffold_plugins</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"my_strange_logic"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"call_transform"</span>
+<span class="w">    </span><span class="nt">doc</span><span class="p">:</span><span class="w"> </span><span class="s">"Handles</span><span class="nv"> </span><span class="s">strange</span><span class="nv"> </span><span class="s">logic</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">JAX."</span>
+<span class="w">    </span><span class="c1"># Optional: Pre-compile some rules into the python code</span>
+<span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"x"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.zeros_like"</span>
+</pre></div>
+</div>
+<p>Running <code class="docutils literal notranslate"><span class="pre">ml_switcheroo</span> <span class="pre">define</span> <span class="pre">strange.yaml</span></code> will create <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/my_strange_logic.py</span></code> with the
+boilerplate code ready for editing.</p>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="EXTENDING.html" title="Extending"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> "Previous" </span> Extending </span>
+              </div>
+            </a>
+          
+          
+            <a href="MAINTENANCE.html" title="Maintenance"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> "Next" </span> Maintenance </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2025, Samuel Marks.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

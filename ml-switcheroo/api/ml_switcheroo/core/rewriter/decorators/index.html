@@ -52,7 +52,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=b25da7e2" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=1e32684c" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=76e92d11" />
     <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
@@ -61,8 +61,9 @@
     <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="../../../../../_static/trace_render.js?v=690b4e4b"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=cd11226c"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.normalization" href="../normalization/index.html" />
@@ -237,6 +238,13 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../../../MAINTENANCE.html" class="md-nav__link">Maintenance</a>
       
     
@@ -336,9 +344,11 @@
 <span id="ml-switcheroo-core-rewriter-decorators"></span><h1 id="api-ml-switcheroo-core-rewriter-decorators-index--page-root">ml_switcheroo.core.rewriter.decorators<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-decorators-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Decorator Rewriting Mixin.</p>
 <p>This module provides logic to handle Python decorators (e.g., <cite>@torch.jit.script</cite>).
-It enables:
-1.  <strong>Renaming</strong>: Mapping decorators between frameworks (e.g., <cite>@torch.jit.script</cite> -&gt; <cite>@jax.jit</cite>).
-2.  <strong>Removal</strong>: stripping decorators that have no equivalent in the target framework (if mapped to null).</p>
+It enables:</p>
+<ol class="arabic simple">
+<li><p><strong>Renaming</strong>: Mapping decorators between frameworks (e.g., <cite>@torch.jit.script</cite> -&gt; <cite>@jax.jit</cite>).</p></li>
+<li><p><strong>Removal</strong>: stripping decorators that have no equivalent in the target framework (if mapped to null).</p></li>
+</ol>
 <p>Logic robustness handles conflict with <cite>CallMixin</cite>. Since <cite>leave_Decorator</cite> runs
 after child nodes (the decorator expression) are visited, <cite>CallMixin</cite> might have
 already transformed calls inside the decorator (e.g. <cite>@torch.jit.script(optk=True)</cite>).
@@ -366,12 +376,10 @@ Part of PivotRewriter.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.decorators.DecoratorMixin.leave_Decorator">
 <span class="sig-name descname"><span class="pre">leave_Decorator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Decorator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Decorator</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Decorator</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.decorators.DecoratorMixin.leave_Decorator" title="Link to this definition">¶</a></dt>
 <dd><p>Processes decorators attached to functions or classes.</p>
-<p>Logic:
-1. Identifies the decorator name from <cite>original_node</cite> to ensure we key off the</p>
-<blockquote>
-<div><p>Source Framework API, even if <cite>CallMixin</cite> modified the children in <cite>updated_node</cite>.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
+<p>Logic:</p>
+<ol class="arabic simple">
+<li><p>Identifies the decorator name from <cite>original_node</cite> to ensure we key off the
+Source Framework API, even if <cite>CallMixin</cite> modified the children in <cite>updated_node</cite>.</p></li>
 <li><p>Looks up the semantic definition.</p></li>
 <li><p>If the target variant is explicitly <cite>null</cite> (None), removes the decorator.</p></li>
 <li><p>If the target variant specifies a new API, rewrites the name.</p></li>

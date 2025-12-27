@@ -337,16 +337,21 @@
             
   <section id="module-ml_switcheroo.plugins.keras_sequential">
 <span id="ml-switcheroo-plugins-keras-sequential"></span><h1 id="api-ml-switcheroo-plugins-keras-sequential-index--page-root">ml_switcheroo.plugins.keras_sequential<a class="headerlink" href="#api-ml-switcheroo-plugins-keras-sequential-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Plugin for Keras Sequential Container.</p>
-<p>Handles:
-1. Packing <cite>*args</cite> into <cite>[layers]</cite>.
-2. Renaming API to <cite>keras.Sequential</cite>.</p>
+<p>Plugin for Keras Sequential Container Translation.</p>
+<p>This plugin bridges the difference between PyTorch’s <cite>nn.Sequential(*layers)</cite> (variadic args)
+and Keras’s <cite>keras.Sequential([layers])</cite> (list input).</p>
+<p>It performs two key transformations:
+1.  <strong>API Renaming</strong>: Swaps the function name to <cite>keras.Sequential</cite> (or configured API).
+2.  <strong>Argument Packing</strong>: Collects all positional arguments (individual layers) into a</p>
+<blockquote>
+<div><p>single list argument to match the Keras constructor signature.</p>
+</div></blockquote>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.keras_sequential.transform_keras_sequential" title="ml_switcheroo.plugins.keras_sequential.transform_keras_sequential"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_keras_sequential</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Plugin Hook: Packs positional layer arguments into a list for Keras Sequential.</p></td>
+<td><p>Plugin Hook: Transforms Sequential container initialization.</p></td>
 </tr>
 </tbody>
 </table>
@@ -356,9 +361,26 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.keras_sequential.transform_keras_sequential">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.keras_sequential.</span></span><span class="sig-name descname"><span class="pre">transform_keras_sequential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.keras_sequential.transform_keras_sequential" title="Link to this definition">¶</a></dt>
-<dd><p>Plugin Hook: Packs positional layer arguments into a list for Keras Sequential.
-Also renames the function to <cite>keras.Sequential</cite>.</p>
-<p>Decoupling: Executes blindly if wired. Target API renaming relies on context value or defaults.</p>
+<dd><p>Plugin Hook: Transforms Sequential container initialization.</p>
+<dl class="simple">
+<dt>Transformation:</dt><dd><p>Input: <cite>Sequential(layer1, layer2, …)</cite>
+Output: <cite>keras.Sequential([layer1, layer2, …])</cite></p>
+</dd>
+</dl>
+<p>This hook is triggered for operations mapped with <cite>requires_plugin=”keras_sequential_pack”</cite>.
+It uses <cite>ctx.lookup_api(“Sequential”)</cite> to determine the target class name, defaulting
+to <cite>keras.Sequential</cite> if lookup fails.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – The original function call node.</p></li>
+<li><p><strong>ctx</strong> – The plugin execution context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed function call.</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

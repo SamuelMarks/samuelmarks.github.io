@@ -317,11 +317,13 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.analysis.audit.CoverageScanner" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.analysis.audit.CoverageScanner.results" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner.results</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.analysis.audit.CoverageScanner.semantics" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner.semantics</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.analysis.audit.CoverageScanner.allowed_roots" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner.allowed_roots</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.analysis.audit.CoverageScanner.results" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner.results</span></code></a>
+        <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner.results</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.analysis.audit.CoverageScanner.visit_Import" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CoverageScanner.visit_Import()</span></code></a>
         </li>
@@ -354,6 +356,11 @@
   <section id="module-ml_switcheroo.analysis.audit">
 <span id="ml-switcheroo-analysis-audit"></span><h1 id="api-ml-switcheroo-analysis-audit-index--page-root">ml_switcheroo.analysis.audit<a class="headerlink" href="#api-ml-switcheroo-analysis-audit-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Audit functionality to determine coverage gaps for a source codebase.</p>
+<p>This module provides the <a class="reference internal" href="#ml_switcheroo.analysis.audit.CoverageScanner" title="ml_switcheroo.analysis.audit.CoverageScanner"><code class="xref py py-class docutils literal notranslate"><span class="pre">CoverageScanner</span></code></a>, a static analysis visitor
+that inspects source code to identify API usage (calls and attributes) relative
+to specific frameworks (e.g., PyTorch, JAX). It resolves import aliases to
+fully qualified names (FQNs) and checks them against the <code class="xref py py-class docutils literal notranslate"><span class="pre">SemanticsManager</span></code>
+to determine if they are currently supported by the transpiler.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -371,6 +378,19 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.analysis.audit.</span></span><span class="sig-name descname"><span class="pre">CoverageScanner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_roots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTVisitor</span></code></p>
 <p>Scans a file to identify API calls and checks if they exist in the Semantics Manager.</p>
+<p>It tracks import aliases to correctly resolve calls like <cite>jnp.sum</cite> back to
+<cite>jax.numpy.sum</cite> before querying the knowledge base.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.results">
+<span class="sig-name descname"><span class="pre">results</span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.results" title="Link to this definition">¶</a></dt>
+<dd><p>A dictionary mapping Fully Qualified Names (FQN)
+to a tuple of <cite>(is_supported, framework_key)</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Tuple[bool, str]]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.semantics">
 <span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.semantics" title="Link to this definition">¶</a></dt>
@@ -380,25 +400,51 @@
 <span class="sig-name descname"><span class="pre">allowed_roots</span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.allowed_roots" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.results">
-<span class="sig-name descname"><span class="pre">results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.results" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">results</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.visit_Import">
 <span class="sig-name descname"><span class="pre">visit_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.visit_Import" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Visits <cite>import …</cite> statements to populate the alias map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – The CST import node.</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.visit_ImportFrom">
 <span class="sig-name descname"><span class="pre">visit_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.visit_ImportFrom" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Visits <cite>from … import …</cite> statements to populate the alias map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – The CST import-from node.</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.visit_Call">
 <span class="sig-name descname"><span class="pre">visit_Call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.visit_Call" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Visits function call nodes to check the invoked function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – The CST call node.</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.analysis.audit.CoverageScanner.visit_Attribute">
 <span class="sig-name descname"><span class="pre">visit_Attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Attribute</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.analysis.audit.CoverageScanner.visit_Attribute" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Visits attributes to check for framework constants.</p>
+<p>This allows detecting usage like <cite>torch.float32</cite> which are not calls
+but still require support. Checks are idempotent via the results dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> – The CST attribute node.</p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

@@ -386,9 +386,11 @@
   <section id="module-ml_switcheroo.frameworks.paxml">
 <span id="ml-switcheroo-frameworks-paxml"></span><h1 id="api-ml-switcheroo-frameworks-paxml-index--page-root">ml_switcheroo.frameworks.paxml<a class="headerlink" href="#api-ml-switcheroo-frameworks-paxml-index--page-root" title="Link to this heading">¶</a></h1>
 <p>PaxML (Praxis) Framework Adapter (Level 2).</p>
-<p>This adapter specializes the core JAX stack for Google’s PaxML framework.
-It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
-<code class="docutils literal notranslate"><span class="pre">JAXStackMixin</span></code> but implements the unique structural traits of the Praxis library.</p>
+<p>This adapter specializes the core JAX stack for Google’s PaxML framework, specifically
+targeting the <strong>Praxis</strong> layer library.</p>
+<p>It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
+<code class="docutils literal notranslate"><span class="pre">JAXStackMixin</span></code> but implements the unique structural traits of the Praxis library,
+such as the <code class="docutils literal notranslate"><span class="pre">setup()</span></code> lifecycle method for layer definition.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -420,6 +422,10 @@ It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.paxml.</span></span><span class="sig-name descname"><span class="pre">PaxmlAdapter</span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../common/jax_stack/index.html#ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin" title="ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin</span></code></a></p>
 <p>Adapter for PaxML (Praxis Layers) running on JAX.</p>
+<p>Features:
+-   <strong>Lifecycle Translation</strong>: Maps standard <code class="docutils literal notranslate"><span class="pre">__init__</span></code> definitions to Praxis <code class="docutils literal notranslate"><span class="pre">setup()</span></code> methods.
+-   <strong>Layer Mapping</strong>: Maps Torch/Flax layers to <code class="docutils literal notranslate"><span class="pre">praxis.layers.*</span></code>.
+-   <strong>Stack Reuse</strong>: Inherits optimization and math logic from the JAX Core adapter.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.display_name">
 <span class="sig-name descname"><span class="pre">display_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PaxML</span> <span class="pre">/</span> <span class="pre">Praxis'</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.display_name" title="Link to this definition">¶</a></dt>
@@ -435,75 +441,252 @@ It inherits Level 0 (Core JAX) and Level 1 (Optax/Orbax) capabilities from
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.collect_api">
 <span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ml_switcheroo.frameworks.base.GhostRef</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.collect_api" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Collects API definitions for the given category.</p>
+<p>Delegates to <code class="docutils literal notranslate"><span class="pre">JaxCoreAdapter</span></code> for Math, Loss, and Optimizer categories,
+while handling Layer discovery specifically for Praxis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>category</strong> (<a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><em>StandardCategory</em></a>) – The API category to scan.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Found API signatures.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef">GhostRef</a>]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.search_modules" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns list of modules to scan during manual scaffolding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Module names including <code class="docutils literal notranslate"><span class="pre">praxis.layers</span></code> and <code class="docutils literal notranslate"><span class="pre">praxis.base_layer</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_alias" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the primary import alias for the framework.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">("praxis.layers",</span> <span class="pre">"pl")</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_namespaces">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.ImportConfig" title="ml_switcheroo.frameworks.base.ImportConfig"><span class="pre">ml_switcheroo.frameworks.base.ImportConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Defines the semantic roles of Praxis namespaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping of namespaces to tiers.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.ImportConfig" title="ml_switcheroo.frameworks.base.ImportConfig">ImportConfig</a>]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns regex patterns for heuristic categorization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Patterns identifying neural components in Praxis.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, List[str]]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.test_config">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.test_config" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns templates for generating physical test files.
+Extends the JAX base config with Praxis imports.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Code generation templates.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.harness_imports">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harness_imports</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.harness_imports" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns imports required for the verification harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">['import</span> <span class="pre">jax',</span> <span class="pre">'import</span> <span class="pre">jax.random']</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_harness_init_code">
 <span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns Python code helper for initializing JAX random keys in the harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Source code for <code class="docutils literal notranslate"><span class="pre">_make_jax_key</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.supported_tiers">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns supported semantic tiers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array API, Neural, and Extras.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier">SemanticTier</a>]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.declared_magic_args">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">declared_magic_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.declared_magic_args" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns list of magic arguments to strip.
+Praxis usually handles RNG context internally or differently than Flax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty list.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.structural_traits" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Defines structural rewriting rules for Praxis.</p>
+<p>Key Differences:
+-   <strong>Module Base</strong>: <code class="docutils literal notranslate"><span class="pre">praxis.base_layer.BaseLayer</span></code>.
+-   <strong>Init Method</strong>: Replaces <code class="docutils literal notranslate"><span class="pre">__init__</span></code> with <code class="docutils literal notranslate"><span class="pre">setup</span></code>.
+-   <strong>Super Init</strong>: Disabled (not required in Praxis setup).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The configuration object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.StructuralTraits" title="ml_switcheroo.semantics.schema.StructuralTraits">StructuralTraits</a></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.plugin_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plugin_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.PluginTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.plugin_traits" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns plugin capability flags.
+Enables functional control flow and purity analysis (inherited from JAX requirements).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The capability flags.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.PluginTraits" title="ml_switcheroo.semantics.schema.PluginTraits">PluginTraits</a></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.definitions" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns static definitions for Praxis Layers.</p>
+<p>Maps standard Neural ops (Linear, Dropout, Embedding) to <code class="docutils literal notranslate"><span class="pre">praxis.layers.*</span></code>
+and handles specific argument renaming (e.g. <code class="docutils literal notranslate"><span class="pre">in_features</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">input_dims</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The mapping dictionary.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap">StandardMap</a>]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.rng_seed_methods">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng_seed_methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.rng_seed_methods" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns list of global RNG seed methods (Empty for PaxML).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty list.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.convert">
 <span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.convert" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Converts input data to JAX arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Any</em>) – Input data (numpy/list).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>JAX Array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.apply_wiring">
 <span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Applies JAX Stack wiring.</p>
+<p>Injects core JAX math operations and Optax optimizer mappings into the snapshot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>snapshot</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – The snapshot dictionary to modify.</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_example_code">
 <em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_example_code" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns default documentation example code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Neural Tier (Level 2) example.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_tiered_examples">
 <span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.frameworks.paxml.PaxmlAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns tiered example code snippets for documentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping of tier IDs to code.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

@@ -7,6 +7,12 @@ ml_switcheroo.analysis.audit
 
    Audit functionality to determine coverage gaps for a source codebase.
 
+   This module provides the :class:`CoverageScanner`, a static analysis visitor
+   that inspects source code to identify API usage (calls and attributes) relative
+   to specific frameworks (e.g., PyTorch, JAX). It resolves import aliases to
+   fully qualified names (FQNs) and checks them against the :class:`SemanticsManager`
+   to determine if they are currently supported by the transpiler.
+
 
 
 Classes
@@ -27,6 +33,16 @@ Module Contents
 
    Scans a file to identify API calls and checks if they exist in the Semantics Manager.
 
+   It tracks import aliases to correctly resolve calls like `jnp.sum` back to
+   `jax.numpy.sum` before querying the knowledge base.
+
+   .. attribute:: results
+
+      A dictionary mapping Fully Qualified Names (FQN)
+      to a tuple of `(is_supported, framework_key)`.
+
+      :type: Dict[str, Tuple[bool, str]]
+
 
    .. py:attribute:: semantics
 
@@ -40,13 +56,36 @@ Module Contents
 
    .. py:method:: visit_Import(node: libcst.Import) -> None
 
+      Visits `import ...` statements to populate the alias map.
+
+      :param node: The CST import node.
+
+
 
    .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> None
+
+      Visits `from ... import ...` statements to populate the alias map.
+
+      :param node: The CST import-from node.
+
 
 
    .. py:method:: visit_Call(node: libcst.Call) -> None
 
+      Visits function call nodes to check the invoked function.
+
+      :param node: The CST call node.
+
+
 
    .. py:method:: visit_Attribute(node: libcst.Attribute) -> None
+
+      Visits attributes to check for framework constants.
+
+      This allows detecting usage like `torch.float32` which are not calls
+      but still require support. Checks are idempotent via the results dictionary.
+
+      :param node: The CST attribute node.
+
 
 

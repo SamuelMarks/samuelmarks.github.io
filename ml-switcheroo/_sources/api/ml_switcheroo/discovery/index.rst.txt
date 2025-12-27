@@ -3,6 +3,22 @@ ml_switcheroo.discovery
 
 .. py:module:: ml_switcheroo.discovery
 
+.. autoapi-nested-parse::
+
+   Discovery Package.
+
+   This package implements the Knowledge Acquisition layer of ml-switcheroo.
+   It is responsible for identifying operations in machine learning libraries,
+   aligning them with abstract standards, and populating the Semantic Knowledge Base.
+
+   Modules:
+       - ``inspector``: Low-level introspection of Python modules/objects (Live & Ghost).
+       - ``scaffolder``: Heuristic-based scanning to generate initial mappings.
+       - ``consensus``: Algorithms to align divergent API names across frameworks.
+       - ``harvester``: Extraction of semantic rules from manual test files.
+       - ``syncer``: Linking abstract operation definitions to concrete framework APIs.
+
+
 
 Submodules
 ----------
@@ -15,5 +31,240 @@ Submodules
    /api/ml_switcheroo/discovery/inspector/index
    /api/ml_switcheroo/discovery/scaffolder/index
    /api/ml_switcheroo/discovery/syncer/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.discovery.ConsensusEngine
+   ml_switcheroo.discovery.SemanticHarvester
+   ml_switcheroo.discovery.ApiInspector
+   ml_switcheroo.discovery.Scaffolder
+   ml_switcheroo.discovery.FrameworkSyncer
+
+
+Package Contents
+----------------
+
+.. py:class:: ConsensusEngine
+
+   Algorithms for aligning divergent API naming conventions.
+
+   Capabilities:
+
+   1.  **Clustering**: Groups APIs like `HuberLoss`, `huber_loss`, and `Huber` together.
+   2.  **Normalization**: Strips common noise (prefixes/suffixes) to find the semantic root.
+   3.  **Signature Alignment**: Builds a translation map for arguments (e.g., `keepdims` <-> `keep_dims`).
+
+
+   .. py:attribute:: IGNORED_SUFFIXES
+      :value: ['loss', 'error', 'layer', 'block', '2d', '1d', '3d', 'v1', 'v2', 'object', 'op', 'func']
+
+
+
+   .. py:attribute:: ARG_ALIASES
+
+
+   .. py:method:: normalize_name(name: str) -> str
+      :classmethod:
+
+
+      Reduces an API Name to its semantic core for comparison.
+
+      This removes casing, underscores, and common prefixes/suffixes.
+
+      .. rubric:: Examples
+
+      * 'HuberLoss' -> 'huber'
+      * 'reduce_mean' -> 'mean'
+      * 'conv2d' -> 'conv'
+
+      :param name: The raw API name (e.g. 'CrossEntropyLoss').
+      :type name: str
+
+      :returns: The normalized key (e.g. 'crossentropy').
+      :rtype: str
+
+
+
+   .. py:method:: normalize_arg(arg_name: str) -> str
+      :classmethod:
+
+
+      Canonicalizes an argument name using the alias map.
+
+      .. rubric:: Example
+
+      'learning_rate' -> 'lr'
+
+      :param arg_name: The raw argument name.
+      :type arg_name: str
+
+      :returns: The canonical standard name.
+      :rtype: str
+
+
+
+   .. py:method:: cluster(framework_inputs: Dict[str, List[ml_switcheroo.core.ghost.GhostRef]]) -> List[CandidateStandard]
+
+      Groups API definitions from multiple frameworks into Candidates based on name similarity.
+
+      :param framework_inputs: Dictionary mapping 'framework_name' -> List of discovered GhostRefs.
+
+      :returns: A list of potential standards, sorted by descending score.
+      :rtype: List[CandidateStandard]
+
+
+
+   .. py:method:: filter_common(candidates: List[CandidateStandard], min_support: int = 2) -> List[CandidateStandard]
+
+      Filters candidates to keep only those present in a minimum number of frameworks.
+
+      This ensures we only create standards for concepts that are truly shared across
+      ecosystems, avoiding framework-specific noise.
+
+      :param candidates: List of candidates from clustering.
+      :type candidates: List[CandidateStandard]
+      :param min_support: Minimum number of different frameworks that must implement the op.
+      :type min_support: int
+
+      :returns: Filtered list of robust candidates.
+      :rtype: List[CandidateStandard]
+
+
+
+   .. py:method:: align_signatures(candidates: List[CandidateStandard], consensus_threshold: float = 0.5) -> None
+
+      Analyses the arguments of all variants in a candidate to determine Standard Arguments.
+
+      It populates `std_args` on the candidate by voting: if an argument (normalized)
+      appears in >50% of the implementations, it becomes part of the standard signature.
+
+      It also populates `arg_mappings` to translate between the Standard name and
+      the specific framework name (e.g. Standard 'dim' -> Torch 'dim', Jax 'axis').
+
+      :param candidates: List of CandidateStandards to process (in-place modification).
+      :type candidates: List[CandidateStandard]
+      :param consensus_threshold: Fraction of variants that must share an arg (0.0 - 1.0).
+      :type consensus_threshold: float
+
+
+
+.. py:class:: SemanticHarvester(semantics: ml_switcheroo.semantics.manager.SemanticsManager, target_fw: str = 'jax')
+
+   Analyzes Python source code to extract valid API signatures from usage.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: target_fw
+      :value: 'jax'
+
+
+
+   .. py:method:: harvest_file(file_path: pathlib.Path, dry_run: bool = False) -> int
+
+      Scans a file, extracts mappings, and updates the semantics JSONs.
+
+      :param file_path: Path to the python test file.
+      :param dry_run: If True, does not write changes to disk.
+
+      :returns: Number of definitions updated.
+      :rtype: int
+
+
+
+.. py:class:: ApiInspector
+
+   A robust inspector for discovering API surfaces of installed libraries.
+
+   .. attribute:: _package_cache
+
+      Cache of statically parsed Griffe trees
+      to avoid re-parsing large packages.
+
+      :type: Dict[str, griffe.Object]
+
+
+   .. py:method:: inspect(package_name: str, unsafe_modules: Optional[Set[str]] = None) -> Dict[str, Any]
+
+      Scans a package and returns a flat catalog of its public API.
+
+      Attempts static analysis first, then falls back to runtime inspection.
+
+      :param package_name: The importable name of the package (e.g. 'torch', 'jax').
+      :param unsafe_modules: A set of submodule names to exclude from recursion
+                             (e.g., {'_C', 'distributed'}).
+
+      :returns: Dict mapping 'fully.qualified.name' -> {metadata_dict}.
+                Metadata dict contains 'name', 'type', 'params', etc.
+
+
+
+.. py:class:: Scaffolder(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, similarity_threshold: float = 0.8, arity_penalty: float = 0.3)
+
+   Automated discovery tool that aligns framework APIs.
+
+   This class scans multiple frameworks, identifies common operations based
+   on name similarity (e.g., 'torch.abs' == 'jax.numpy.abs'), and generates
+   the initial JSON mappings required for the transpiler.
+
+
+   .. py:attribute:: inspector
+
+
+   .. py:attribute:: console
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: similarity_threshold
+      :value: 0.8
+
+
+
+   .. py:attribute:: arity_penalty
+      :value: 0.3
+
+
+
+   .. py:attribute:: staged_specs
+      :type:  Dict[str, Dict[str, Any]]
+
+
+   .. py:attribute:: staged_mappings
+      :type:  Dict[str, Dict[str, Any]]
+
+
+   .. py:method:: scaffold(frameworks: List[str], root_dir: Optional[pathlib.Path] = None)
+
+      Main entry point. Scans frameworks and builds/updates JSON mappings.
+
+      1. Scans all requested frameworks using `ApiInspector`.
+      2. Aligns APIs against known standards (Specs).
+      3. Uses fuzzy matching to align APIs between frameworks.
+      4. Writes results to disk (semantics/ and snapshots/).
+
+      :param frameworks: List of framework keys to scan (e.g. `['torch', 'jax']`).
+      :param root_dir: Optional root directory path. Defaults to package paths.
+
+
+
+.. py:class:: FrameworkSyncer
+
+   Links abstract operations to concrete framework implementations.
+
+
+   .. py:attribute:: console
+
+
+   .. py:method:: sync(tier_data: Dict[str, Any], framework: str) -> None
+
+      Updates the 'variants' dict in tier_data by hunting for ops in the target framework.
+
 
 

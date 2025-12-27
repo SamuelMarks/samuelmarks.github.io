@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.einsum" href="../einsum/index.html" />
@@ -338,7 +338,11 @@
   <section id="module-ml_switcheroo.plugins.device_checks">
 <span id="ml-switcheroo-plugins-device-checks"></span><h1 id="api-ml-switcheroo-plugins-device-checks-index--page-root">ml_switcheroo.plugins.device_checks<a class="headerlink" href="#api-ml-switcheroo-plugins-device-checks-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for translating Device Availability Checks.</p>
-<p>Maps <cite>torch.cuda.is_available()</cite> to JAX’s <cite>len(jax.devices(‘gpu’)) &gt; 0</cite>.</p>
+<p>This module maps framework-specific availability checks (e.g., <code class="docutils literal notranslate"><span class="pre">torch.cuda.is_available()</span></code>)
+to the target framework’s equivalent by querying the active <code class="docutils literal notranslate"><span class="pre">FrameworkAdapter</span></code>.</p>
+<p>Decoupling:
+Instead of hardcoding JAX or TensorFlow logic, this plugin delegates syntax generation
+to <code class="docutils literal notranslate"><span class="pre">adapter.get_device_check_syntax()</span></code>.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -356,13 +360,27 @@
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.device_checks.</span></span><span class="sig-name descname"><span class="pre">transform_cuda_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.BaseExpression</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.device_checks.transform_cuda_check" title="Link to this definition">¶</a></dt>
 <dd><p>Plugin Hook: Transforms CUDA availability check.</p>
 <dl class="simple">
-<dt>Triggers:</dt><dd><p><cite>torch.cuda.is_available()</cite> via ‘cuda_is_available’ plugin key.</p>
+<dt>Triggers:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">torch.cuda.is_available()</span></code> via ‘cuda_is_available’ plugin key.</p>
 </dd>
-<dt>Transformation:</dt><dd><p>Input:  <cite>torch.cuda.is_available()</cite>
-Output: <cite>len(jax.devices(‘gpu’)) &gt; 0</cite></p>
+<dt>Transformation:</dt><dd><dl class="simple">
+<dt>Input:  <code class="docutils literal notranslate"><span class="pre">torch.cuda.is_available()</span></code></dt><dd><p>Output (JAX):   <code class="docutils literal notranslate"><span class="pre">len(jax.devices('gpu'))</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>
+Output (Keras): <code class="docutils literal notranslate"><span class="pre">len(keras.config.list_logical_devices('GPU'))</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>
+Output (NumPy): <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </dd>
 </dl>
-<p>Note: usage of ‘gpu’ backend string is hardcoded as per standard JAX idiom for CUDA.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – The original CST Call node.</p></li>
+<li><p><strong>ctx</strong> – HookContext for target framework access.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A CST Expression representing the boolean check.</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

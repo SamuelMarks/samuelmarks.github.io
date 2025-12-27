@@ -63,10 +63,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="ml_switcheroo.testing.harness_generator" href="../harness_generator/index.html" />
+    <link rel="next" title="ml_switcheroo.testing.fuzzer.core" href="core/index.html" />
     <link rel="prev" title="ml_switcheroo.testing.batch_runner" href="../batch_runner/index.html" />
   
    
@@ -311,9 +311,11 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-ml-switcheroo-testing-fuzzer-index--page-root" class="md-nav__link">ml_switcheroo.testing.fuzzer</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
+        </li>
         <li class="md-nav__item"><a href="#classes" class="md-nav__link">Classes</a>
         </li>
-        <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#package-contents" class="md-nav__link">Package Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.InputFuzzer" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">InputFuzzer</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
@@ -347,16 +349,23 @@
             
   <section id="module-ml_switcheroo.testing.fuzzer">
 <span id="ml-switcheroo-testing-fuzzer"></span><h1 id="api-ml-switcheroo-testing-fuzzer-index--page-root">ml_switcheroo.testing.fuzzer<a class="headerlink" href="#api-ml-switcheroo-testing-fuzzer-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Input Generation Engine for Semantics Verification.</p>
-<p>This module provides the <cite>InputFuzzer</cite>, responsible for creating randomized
-NumPy arrays, scalars, and complex container structures to feed into Framework A
-and Framework B during behavioral verification tests.</p>
-<dl class="simple">
-<dt>Updates:</dt><dd><ul class="simple">
-<li><p>Support for <cite>dtype</cite> constraints in array generation (Limitation #2 Fix).</p></li>
+<p>Fuzzer Package.</p>
+<p>This package provides the input generation engine for verification tests.
+It exposes the main <cite>InputFuzzer</cite> class which orchestrates the generation
+of random inputs (Arrays, Scalars, Containers) based on semantic type hints
+and constraints.</p>
+<section id="submodules">
+<h2 id="submodules">Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/index.html">ml_switcheroo.testing.fuzzer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generators/index.html">ml_switcheroo.testing.fuzzer.generators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="heuristics/index.html">ml_switcheroo.testing.fuzzer.heuristics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parser/index.html">ml_switcheroo.testing.fuzzer.parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils/index.html">ml_switcheroo.testing.fuzzer.utils</a></li>
 </ul>
-</dd>
-</dl>
+</div>
+</section>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -367,12 +376,16 @@ and Framework B during behavioral verification tests.</p>
 </tbody>
 </table>
 </section>
-<section id="module-contents">
-<h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="package-contents">
+<h2 id="package-contents">Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.</span></span><span class="sig-name descname"><span class="pre">InputFuzzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer" title="Link to this definition">¶</a></dt>
 <dd><p>Generates dummy inputs (Arrays, Scalars, Containers) for equivalence testing.</p>
+<p>Orchestrates:
+1.  Resolution of Explicit Type Hints via Parser.
+2.  Resolution of Implicit Heuristics via Heuristics engine.
+3.  Framework adaptation via Adapters.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.MAX_RECURSION_DEPTH">
 <span class="sig-name descname"><span class="pre">MAX_RECURSION_DEPTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.MAX_RECURSION_DEPTH" title="Link to this definition">¶</a></dt>
@@ -449,12 +462,12 @@ have matching lengths.</p>
             </a>
           
           
-            <a href="../harness_generator/index.html" title="ml_switcheroo.testing.harness_generator"
+            <a href="core/index.html" title="ml_switcheroo.testing.fuzzer.core"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.testing.harness_generator </span>
+                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.testing.fuzzer.core </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

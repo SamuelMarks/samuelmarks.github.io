@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.semantics.paths" href="../paths/index.html" />
@@ -311,10 +311,14 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-ml-switcheroo-semantics-merging-index--page-root" class="md-nav__link">ml_switcheroo.semantics.merging</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#attributes" class="md-nav__link">Attributes</a>
+        </li>
         <li class="md-nav__item"><a href="#functions" class="md-nav__link">Functions</a>
         </li>
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.semantics.merging.TIER_PRECEDENCE" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TIER_PRECEDENCE</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.merging.infer_tier_from_priority" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">infer_tier_from_priority()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.semantics.merging.merge_imports" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">merge_imports()</span></code></a>
@@ -346,10 +350,24 @@
   <section id="module-ml_switcheroo.semantics.merging">
 <span id="ml-switcheroo-semantics-merging"></span><h1 id="api-ml-switcheroo-semantics-merging-index--page-root">ml_switcheroo.semantics.merging<a class="headerlink" href="#api-ml-switcheroo-semantics-merging-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Merging Logic for Semantic Knowledge Base.</p>
+<p>This module handles the aggregation of disparate knowledge sources (Specs, Snapshots)
+into the central SemanticsManager. It resolves conflicts based on Tier Precedence
+and merges framework-specific configurations.</p>
 <p>Handles:
 - Merging Specification Tiers (Math, Neural, Extras).
 - Merging Snapshot Overlays (Framework mappings).
-- Conflict resolution and prioritization.</p>
+- Conflict resolution and prioritization (Warning vs Silencing).
+- Merging Framework Traits and Import Maps.</p>
+<section id="attributes">
+<h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.semantics.merging.TIER_PRECEDENCE" title="ml_switcheroo.semantics.merging.TIER_PRECEDENCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TIER_PRECEDENCE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -374,6 +392,10 @@
 </section>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="ml_switcheroo.semantics.merging.TIER_PRECEDENCE">
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.merging.</span></span><span class="sig-name descname"><span class="pre">TIER_PRECEDENCE</span></span><a class="headerlink" href="#ml_switcheroo.semantics.merging.TIER_PRECEDENCE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.merging.infer_tier_from_priority">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.merging.</span></span><span class="sig-name descname"><span class="pre">infer_tier_from_priority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a></span></span><a class="headerlink" href="#ml_switcheroo.semantics.merging.infer_tier_from_priority" title="Link to this definition">¶</a></dt>
@@ -395,17 +417,36 @@
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.merging.</span></span><span class="sig-name descname"><span class="pre">merge_imports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master_import_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_imports</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.merging.merge_imports" title="Link to this definition">¶</a></dt>
 <dd><p>Merges new import definitions (from __imports__ block) into the master dictionary.
 Updates in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master_import_data</strong> – The central import dictionary.</p></li>
+<li><p><strong>new_imports</strong> – Dictionary of new import rules to merge.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.merging.merge_frameworks">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.merging.</span></span><span class="sig-name descname"><span class="pre">merge_frameworks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.merging.merge_frameworks" title="Link to this definition">¶</a></dt>
 <dd><p>Merges new framework configurations (from __frameworks__ block) into the master.
 Updates in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master_configs</strong> – The central framework definitions dictionary.</p></li>
+<li><p><strong>new_configs</strong> – Dictionary of framework traits to merge.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.merging.merge_tier_data">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.merging.</span></span><span class="sig-name descname"><span class="pre">merge_tier_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_origins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framework_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.merging.merge_tier_data" title="Link to this definition">¶</a></dt>
 <dd><p>Merges content from a Specification file (hub) into the manager state.</p>
+<p>Handles precedence logic: Neural definitions overwrite Array definitions silently
+for upgrades. Duplicate definitions at the same tier level with conflicting signatures
+trigger warnings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -423,6 +464,8 @@ Updates in-place.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.semantics.merging.merge_overlay_data">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.semantics.merging.</span></span><span class="sig-name descname"><span class="pre">merge_overlay_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_origins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">import_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framework_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_templates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.semantics.merging.merge_overlay_data" title="Link to this definition">¶</a></dt>
 <dd><p>Merges a mapping overlay file (snapshot) into the main data.</p>
+<p>Snapshots contain framework-specific implementation overlays (“Spokes”)
+that attach to the Abstract Operations (“Hub”).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

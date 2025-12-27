@@ -8,20 +8,16 @@ ml_switcheroo.plugins.checkpoint_keys
    Plugin for Checkpoint Key Remapping.
 
    Handles the runtime impedance mismatch between PyTorch state dictionaries and
-   Flax/JAX parameter trees.
+   flattened parameter trees.
 
-   Problem:
-   1. Naming: Torch uses `layer.0.weight`. Flax uses `layer_0.kernel` (or `scale` for BN).
-   2. Shapes: Torch Linear/Conv weights are usually `(Out, In, ...)` or `(Out, In)`.
-      Flax weights are `(..., In, Out)`.
-   3. Semantics: `model.load_state_dict(d)` mutates state in Torch. JAX requires returning a new tree.
+   Logic:
+   This plugin converts `load_state_dict(state)` calls into usage of a
+   generated runtime utility `KeyMapper.from_torch(state)`.
 
-   Solution:
-   This plugin converts `model.load_state_dict(state)` calls into usage of a generated runtime
-   utility `KeyMapper.from_torch(state)`.
-
-   It creates the dependency on the `KeyMapper` class, which the transpiler's PreambleGenerator
-   is expected to inject into the output file using the source code defined in `KEY_MAPPER_SOURCE`.
+   Decoupling Logic:
+   The injected `KeyMapper` utility now outputs **NumPy** arrays.
+   This ensures compatibility with JAX, TensorFlow, MLX, and others without
+   forcing a hard dependency on `jax` in the generated code.
 
 
 
@@ -54,11 +50,10 @@ Module Contents
    .. code-block:: python
 
       """ 
-      import jax.numpy as jnp
       import numpy as np
       import re
       
-      class KeyMapper:
+      class KeyMapper: 
         @staticmethod
         def map_name(name): 
           # 1. Standardize replacements
@@ -83,25 +78,29 @@ Module Contents
       
         @staticmethod
         def map_value(key, val): 
-          val = np.array(val) 
+          try: 
+              # Convert Torch tensors or other formats to numpy
+              if hasattr(val, 'cpu'): 
+                  val = val.detach().cpu().numpy() 
+              else: 
+                  val = np.array(val) 
+          except: 
+              return val # Fallback
+      
           # Heuristic Transpose for Dense/Conv kernels
-          # Torch Linear: (Out, In) -> JAX (In, Out) 
-          # Torch Conv2d: (Out, In, H, W) -> JAX (H, W, In, Out) 
-              
           if "weight" in key or "kernel" in key: 
             if val.ndim == 2: 
-              # Linear
+              # Linear: (Out, In) -> (In, Out) 
               val = val.transpose((1, 0)) 
             elif val.ndim == 4: 
               # Conv2d: (O, I, H, W) -> (H, W, I, O) 
               val = val.transpose((2, 3, 1, 0)) 
-          return jnp.array(val) 
+          
+          # Return as numpy array. Target frameworks (JAX, TF, etc) handle numpy inputs. 
+          return val
       
-          @classmethod
-          def from_torch(cls, state_dict): 
-            # Flattened Torch dict -> Nested Flax dict (simplified) 
-            # In reality, Flax usually requires unfreezing a target tree and mapping, 
-            # but here we produce a flat dict with mapped keys/values for loading logic. 
+        @classmethod
+        def from_torch(cls, state_dict): 
             new_dict = {} 
             for k, v in state_dict.items(): 
               nk = cls.map_name(k) 
@@ -121,22 +120,9 @@ Module Contents
    Hook: Transforms load_state_dict calls to KeyMapper usage.
 
    **Transformation**
+   `model.load_state_dict(state, strict=True)` -> `KeyMapper.from_torch(state)`
 
-   .. code-block:: python
-
-       # Input
-       model.load_state_dict(state, strict=True)
-
-       # Output
-       variables = KeyMapper.from_torch(state)
-
-   .. note::
-       In JAX/Flax, one does not simply 'load' into a model in-place.
-       One gets a variable dict. This transformation implies the user variable `model`
-       might need to be reassigned or the result assigned to a parameter variable.
-
-       Since we cannot infer the exact variable to assign to in a generic expression transform,
-       we act on the expression itself. If used as `model.load_state_dict(...)`,
-       it becomes `KeyMapper.from_torch(...)`.
+   Triggers if mapped via `requires_plugin="checkpoint_mapper"`.
+   Injects KeyMapper source code once per file.
 
 

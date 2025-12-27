@@ -5,7 +5,7 @@ ml_switcheroo.core.hooks
 
 .. autoapi-nested-parse::
 
-   Plugin Registry, Hook Context, and Dynamic Loader.
+   Plugin Binding Infrastructure.
 
    This module provides the infrastructure for extending ml-switcheroo via plugins.
    It enables developers to intercept and modify the Abstract Syntax Tree (AST)
@@ -13,8 +13,8 @@ ml_switcheroo.core.hooks
 
    Refactor:
        - Added `auto_wire` support to the `register_hook` decorator.
-       - Plugins can now declare their own Semantic definitions, eliminating
-         the need to edit `standards_internal.py` or JSON files for self-contained features.
+       - Plugins can now declare their own Semantic definitions.
+       - HookContext now exposes `plugin_traits` and `current_variant` for data-driven logic.
 
 
 
@@ -35,8 +35,8 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.hooks.HookContext
    ml_switcheroo.core.hooks.AutoWireSpec
+   ml_switcheroo.core.hooks.HookContext
 
 
 Functions
@@ -62,12 +62,33 @@ Module Contents
 
 .. py:data:: PreambleInjectorType
 
+.. py:class:: AutoWireSpec(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Schema for plugin self-registration metadata.
+   Allows a plugin to define the Semantic Operation it satisfies.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: ops
+      :type:  Dict[str, Dict[str, Any]]
+      :value: None
+
+
+
 .. py:class:: HookContext(semantics: SemanticsManagerType, config: ml_switcheroo.config.RuntimeConfig, arg_injector: Optional[ArgInjectorType] = None, preamble_injector: Optional[PreambleInjectorType] = None)
 
    Context object passed to every plugin hook during transcoding.
 
    Provides read-only access to global state and write access
    to specific injection points (signature args, function body preambles).
+   Now exposes `plugin_traits` and `current_variant` for data-driven decisions.
 
 
    .. py:attribute:: semantics
@@ -87,6 +108,23 @@ Module Contents
       :type:  Optional[str]
       :value: None
 
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+      Returns the capabilities of the current Target Framework.
+      This allows plugins to check functionality (e.g. has_numpy_compatible_arrays)
+      rather than checking the framework name string.
+
+
+   .. py:property:: current_variant
+      :type: Optional[ml_switcheroo.semantics.schema.Variant]
+
+
+      Returns the Variant definition for the current operation/target.
+      Allows plugins to read extra metadata defined in the JSON (e.g. pack_to_tuple).
 
 
    .. py:method:: inject_signature_arg(name: str, annotation: Optional[str] = None) -> None
@@ -128,26 +166,6 @@ Module Contents
    .. py:method:: lookup_signature(op_name: str) -> List[str]
 
       Retrieves standard argument list for a given operation.
-
-
-
-.. py:class:: AutoWireSpec(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Schema for plugin self-registration metadata.
-   Allows a plugin to define the Semantic Operation it satisfies.
-
-
-   .. py:attribute:: model_config
-
-      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
-
-
-   .. py:attribute:: ops
-      :type:  Dict[str, Dict[str, Any]]
-      :value: None
 
 
 

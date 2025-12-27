@@ -10,12 +10,9 @@ ml_switcheroo.plugins.arg_packing
    Essential for mapping vararg APIs (like `torch.permute(x, 0, 2, 1)`) to sequence-based
    APIs (like `jax.numpy.transpose(x, axes=(0, 2, 1))`).
 
-   Strategy:
-   1.  Identify the operation (e.g. `permute_dims`).
-   2.  Lookup the target API (e.g. `jax.numpy.transpose`).
-   3.  Separate the primary input argument (first positional) from the varargs.
-   4.  Pack the trailing varargs into a `Tuple` node.
-   5.  Construct the new call with the sequence passed as a keyword argument (e.g. `axes=...`).
+   Decoupling Update:
+   This plugin no longer checks framework names directly. It reads the `pack_to_tuple`
+   keyword field from the `Variant` metadata exposed via `HookContext`.
 
 
 
@@ -35,21 +32,16 @@ Module Contents
    Plugin Hook: Packs trailing positional arguments into a keyword tuple.
 
    Triggers:
-       Operations marked with `requires_plugin: "pack_varargs"`.
-       Designed for abstract operations like `permute_dims`.
+       Operations marked with `requires_plugin: "pack_varargs"` or manual hook usage.
 
-   Transformation:
-       Input:  `torch.permute(x, 0, 2, 1)`
-       Output: `jax.numpy.transpose(x, axes=(0, 2, 1))` (if mapped)
-
-   Config:
-       Adapts the keyword name based on the target framework.
-       - TensorFlow: uses 'perm'
-       - Default (JAX/NumPy/MLX): uses 'axes'
+   Configuration:
+       The keyword name (e.g. 'axes' vs 'perm') is derived from the Semantic Variant definition:
+       `{"pack_to_tuple": "perm"}` (TensorFlow) vs `{"pack_to_tuple": "axes"}` (JAX).
+       Defaults to "axes" if not specified.
 
    :param node: The original CST Call node.
-   :param ctx: HookContext for API lookup directly from Semantics.
+   :param ctx: HookContext giving access to Semantic definitions.
 
-   :returns: The transformed CST Call node, or original if target mapping is missing.
+   :returns: The transformed CST Call node using keyword tuple arguments.
 
 

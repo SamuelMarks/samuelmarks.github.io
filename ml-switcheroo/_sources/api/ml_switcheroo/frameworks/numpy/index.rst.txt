@@ -8,7 +8,7 @@ ml_switcheroo.frameworks.numpy
    Numpy Framework Adapter.
 
    This module provides the implementation definitions for the NumPy API.
-   It maps abstract operations for Math and Extras to `numpy.*` functions
+   It maps abstract operations for Math and Extras to ``numpy.*`` functions
    and defines type mappings for data-driven casting logic.
 
 
@@ -30,7 +30,7 @@ Module Contents
 
    Provides support for:
    1.  **Math Tiers**: Basic array operations (abs, mean, sum).
-   2.  **Type Mapping**: Abstract Dtypes to `numpy.float32`, etc.
+   2.  **Type Mapping**: Abstract Dtypes to ``numpy.float32``, etc.
    3.  **IO**: Save/Load operations.
 
 
@@ -59,6 +59,11 @@ Module Contents
       Returns list of numpy submodules to scan.
 
 
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
@@ -67,7 +72,7 @@ Module Contents
 
 
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
       Remaps imports to 'np' alias.
@@ -87,6 +92,14 @@ Module Contents
       Test templates for NumPy.
 
 
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
@@ -95,11 +108,23 @@ Module Contents
       It does NOT support Neural layers structurally.
 
 
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
       Returns default structural traits (no class rewriting).
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.frameworks.base.PluginTraits
+
+
+      Plugin capabilities.
 
 
    .. py:property:: definitions
@@ -123,23 +148,21 @@ Module Contents
 
 
 
-   .. py:method:: get_example_code() -> str
-      :classmethod:
-
-
-      Returns the primary example code used for instant demos.
-
-
-
-   .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns NumPy idiomatic examples.
-
-
-
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
       Returns CPU syntax ignoring device requests (NumPy is CPU-only).
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      NumPy does not support GPUs.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      No-op for NumPy.
 
 
 
@@ -164,6 +187,20 @@ Module Contents
    .. py:method:: convert(data: Any) -> Any
 
       Attempts to convert input data to a NumPy array.
+
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+      Returns the primary example code used for instant demos.
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns NumPy idiomatic examples.
 
 
 

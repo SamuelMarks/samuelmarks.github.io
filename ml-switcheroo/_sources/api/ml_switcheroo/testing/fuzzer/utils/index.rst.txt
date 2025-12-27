@@ -1,0 +1,86 @@
+ml_switcheroo.testing.fuzzer.utils
+==================================
+
+.. py:module:: ml_switcheroo.testing.fuzzer.utils
+
+.. autoapi-nested-parse::
+
+   String Parsing and Shape Utilities for the Fuzzer.
+
+   This module provides helper functions for parsing complex type strings
+   (e.g., handling nested brackets in generics) and resolving symbolic dimensions
+   for tensor shapes.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.testing.fuzzer.utils.is_pipe_top_level
+   ml_switcheroo.testing.fuzzer.utils.split_outside_brackets
+   ml_switcheroo.testing.fuzzer.utils.resolve_symbolic_shape
+   ml_switcheroo.testing.fuzzer.utils.adjust_shape_rank
+
+
+Module Contents
+---------------
+
+.. py:function:: is_pipe_top_level(text: str) -> bool
+
+   Checks if a pipe `|` exists outside of brackets `[]`.
+
+   Used to detect Union types (A | B) in Python 3.10+ syntax without
+   getting confused by nested types like `List[int | str]`.
+
+   :param text: The type hint string to analyze.
+   :type text: str
+
+   :returns: True if a top-level pipe is found.
+   :rtype: bool
+
+
+.. py:function:: split_outside_brackets(text: str) -> List[str]
+
+   Splits a string by commas, respecting nested brackets.
+
+   Used to parse generic arguments (e.g., `Tuple[int, List[int]]` -> `['int', 'List[int]']`).
+
+   :param text: The content inside brackets.
+   :type text: str
+
+   :returns: Split parts.
+   :rtype: List[str]
+
+
+.. py:function:: resolve_symbolic_shape(dims_str: str, symbol_map: Dict[str, int]) -> Tuple[int, Ellipsis]
+
+   Parses dimension strings like "'B', 32" or "N, M" into integer tuples.
+
+   Resolves symbolic names using the provided `symbol_map`. If a symbol
+   is encountered for the first time, a random size is assigned and stored
+   in the map to ensure consistency across arguments.
+
+   :param dims_str: The dimensions definition string (e.g. "'N', 32").
+   :type dims_str: str
+   :param symbol_map: Context for resolving symbols like 'N'.
+   :type symbol_map: Dict[str, int]
+
+   :returns: The concrete shape tuple.
+   :rtype: Tuple[int, ...]
+
+
+.. py:function:: adjust_shape_rank(shape: Tuple[int, Ellipsis], required_rank: int) -> Tuple[int, Ellipsis]
+
+   Adjusts a shape tuple to match a required rank by padding or truncation.
+
+   :param shape: The base shape.
+   :type shape: Tuple[int, ...]
+   :param required_rank: The target number of dimensions.
+   :type required_rank: int
+
+   :returns: The adjusted shape.
+   :rtype: Tuple[int, ...]
+
+

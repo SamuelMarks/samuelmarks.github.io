@@ -7,11 +7,24 @@ ml_switcheroo.semantics.merging
 
    Merging Logic for Semantic Knowledge Base.
 
+   This module handles the aggregation of disparate knowledge sources (Specs, Snapshots)
+   into the central SemanticsManager. It resolves conflicts based on Tier Precedence
+   and merges framework-specific configurations.
+
    Handles:
    - Merging Specification Tiers (Math, Neural, Extras).
    - Merging Snapshot Overlays (Framework mappings).
-   - Conflict resolution and prioritization.
+   - Conflict resolution and prioritization (Warning vs Silencing).
+   - Merging Framework Traits and Import Maps.
 
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.semantics.merging.TIER_PRECEDENCE
 
 
 Functions
@@ -29,6 +42,8 @@ Functions
 Module Contents
 ---------------
 
+.. py:data:: TIER_PRECEDENCE
+
 .. py:function:: infer_tier_from_priority(priority: int) -> ml_switcheroo.enums.SemanticTier
 
    Maps a loading priority integer to a Semantic Tier.
@@ -45,16 +60,26 @@ Module Contents
    Merges new import definitions (from __imports__ block) into the master dictionary.
    Updates in-place.
 
+   :param master_import_data: The central import dictionary.
+   :param new_imports: Dictionary of new import rules to merge.
+
 
 .. py:function:: merge_frameworks(master_configs: Dict[str, Dict], new_configs: Dict[str, Any]) -> None
 
    Merges new framework configurations (from __frameworks__ block) into the master.
    Updates in-place.
 
+   :param master_configs: The central framework definitions dictionary.
+   :param new_configs: Dictionary of framework traits to merge.
+
 
 .. py:function:: merge_tier_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], new_content: Dict[str, Any], tier: ml_switcheroo.enums.SemanticTier) -> None
 
    Merges content from a Specification file (hub) into the manager state.
+
+   Handles precedence logic: Neural definitions overwrite Array definitions silently
+   for upgrades. Duplicate definitions at the same tier level with conflicting signatures
+   trigger warnings.
 
    :param data: Master dictionary of operations.
    :param key_origins: Dict tracking where an op was defined (Math vs Neural).
@@ -67,6 +92,9 @@ Module Contents
 .. py:function:: merge_overlay_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], test_templates: Dict[str, Dict], content: Dict[str, Any], filename: str) -> None
 
    Merges a mapping overlay file (snapshot) into the main data.
+
+   Snapshots contain framework-specific implementation overlays ("Spokes")
+   that attach to the Abstract Operations ("Hub").
 
    :param data: Master dictionary of operations.
    :param key_origins: Dict tracking tier origins.

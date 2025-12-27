@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.context_to_function_wrap" href="../context_to_function_wrap/index.html" />
@@ -341,21 +341,8 @@
 <p>Addresses the mismatch between:
 1. PyTorch: <cite>torch.nn.utils.clip_grad_norm_(parameters, max_norm)</cite> (In-place, returns norm).
 2. JAX/Optax: <cite>optax.clip_by_global_norm(max_norm).update(grads, state)</cite> (Functional, returns updates).</p>
-<dl class="simple">
-<dt>Transformation:</dt><dd><p>Input:  <cite>clip_grad_norm_(grads, 1.0)</cite>
-Output: <cite>optax.clip_by_global_norm(1.0).update(grads, None)[0]</cite></p>
-</dd>
-<dt>Limitations:</dt><dd><ul class="simple">
-<li><p><strong>In-place mutation</strong>: PyTorch modifies gradients in-place. JAX requires reassignment (<cite>grads = …</cite>).
-This plugin generates the expression for the clipped gradients. It relies on the user or
-surrounding rewriting logic to ensure this result is assigned back to <cite>grads</cite>.</p></li>
-<li><p><strong>Return Value</strong>: PyTorch returns the Total Norm. Optax returns the Clipped Gradients.
-If the original code uses the return value (e.g. for logging <cite>total_norm</cite>), this translation
-changes semantics.</p></li>
-<li><p><strong>Parameters</strong>: Assumes the first argument passed corresponds to the gradient PyTree in JAX.</p></li>
-</ul>
-</dd>
-</dl>
+<p>Decoupling Update:
+Checks <cite>traits.requires_functional_state</cite> logic.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -373,7 +360,23 @@ changes semantics.</p></li>
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.clipping.</span></span><span class="sig-name descname"><span class="pre">transform_grad_clipping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.clipping.transform_grad_clipping" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Transforms imperative clipping to Optax functional clipping.</p>
 <p>Trigger: <cite>clip_grad_norm_</cite> operation.
-Target: JAX, Flax.</p>
+Target: Frameworks with <cite>requires_functional_state=True</cite> (e.g. JAX, Flax).</p>
+<dl class="simple">
+<dt>Transformation:</dt><dd><p>Input:  <cite>clip_grad_norm_(grads, 1.0)</cite>
+Output: <cite>optax.clip_by_global_norm(1.0).update(grads, None)[0]</cite></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>cst.Call</em>) – The source call.</p></li>
+<li><p><strong>ctx</strong> (<a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><em>HookContext</em></a>) – Execution context with traits.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed node or original if trait not met.</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

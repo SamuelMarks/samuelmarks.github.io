@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.contexts" href="../../contexts/index.html" />
@@ -321,6 +321,8 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.calls.utils.rewrite_stateful_call" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">rewrite_stateful_call()</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.calls.utils.inject_kwarg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">inject_kwarg()</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">inject_rngs_kwarg()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.calls.utils.strip_kwarg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">strip_kwarg()</span></code></a>
@@ -358,40 +360,55 @@
   <section id="module-ml_switcheroo.core.rewriter.calls.utils">
 <span id="ml-switcheroo-core-rewriter-calls-utils"></span><h1 id="api-ml-switcheroo-core-rewriter-calls-utils-index--page-root">ml_switcheroo.core.rewriter.calls.utils<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-calls-utils-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Utility functions for Call Rewriting.</p>
-<p>Validates function patterns and handles structural injections like state objects,
-shims, and layout permutations.</p>
+<p>This module provides helper functions for inspecting and transforming LibCST Call nodes.
+It handles structural tasks such as:</p>
+<ul class="simple">
+<li><p>Detecting functional usage patterns (e.g. <cite>layer.apply</cite>).</p></li>
+<li><p>Rewriting stateful calls.</p></li>
+<li><p>Injecting and stripping keyword arguments generically.</p></li>
+<li><p>Generating permutation/transpose calls based on semantic layout maps.</p></li>
+</ul>
+<dl class="simple">
+<dt>Decoupling Logic:</dt><dd><p>Logic regarding specific framework APIs (e.g., whether to use <cite>permute</cite> vs <cite>transpose</cite>)
+is delegated to the <cite>SemanticsManager</cite>, removing hardcoded framework checks.
+Functional unwrapping detection is driven by <cite>StructuralTraits</cite>.</p>
+</dd>
+</dl>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.is_functional_apply" title="ml_switcheroo.core.rewriter.calls.utils.is_functional_apply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_functional_apply</span></code></a>(→ bool)</p></td>
-<td><p>Detects if a call node matches the <cite>obj.apply</cite> pattern used in Flax Linen.</p></td>
+<td><p>Detects if a call node matches the functional execution pattern (e.g. <cite>obj.apply</cite>).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.rewrite_stateful_call" title="ml_switcheroo.core.rewriter.calls.utils.rewrite_stateful_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rewrite_stateful_call</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Rewrites a call to a stateful object (Functional patterns only).</p></td>
+<td><p>Rewrites a call to a stateful object to match a functional pattern.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg" title="ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_rngs_kwarg</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Injects <cite>rngs=rngs</cite> into a constructor call.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_kwarg" title="ml_switcheroo.core.rewriter.calls.utils.inject_kwarg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_kwarg</span></code></a>(→ libcst.Call)</p></td>
+<td><p>Generic helper to inject a keyword argument into a call.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.strip_kwarg" title="ml_switcheroo.core.rewriter.calls.utils.strip_kwarg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip_kwarg</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Removes a keyword argument from a call node.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg" title="ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_rngs_kwarg</span></code></a>(→ libcst.Call)</p></td>
+<td><p>Legacy wrapper for <cite>inject_kwarg</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.is_super_call" title="ml_switcheroo.core.rewriter.calls.utils.is_super_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_super_call</span></code></a>(→ bool)</p></td>
-<td><p>Helper to identify direct super() usage or super().__init__().</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.strip_kwarg" title="ml_switcheroo.core.rewriter.calls.utils.strip_kwarg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip_kwarg</span></code></a>(→ libcst.Call)</p></td>
+<td><p>Removes a specified keyword argument from a function call.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.is_builtin" title="ml_switcheroo.core.rewriter.calls.utils.is_builtin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_builtin</span></code></a>(→ bool)</p></td>
-<td><p>Avoid spamming logs for standard python builtins unless mapped.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.is_super_call" title="ml_switcheroo.core.rewriter.calls.utils.is_super_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_super_call</span></code></a>(→ bool)</p></td>
+<td><p>Detects if a call is <cite>super()</cite> or <cite>super().method()</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.log_diff" title="ml_switcheroo.core.rewriter.calls.utils.log_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_diff</span></code></a>(→ None)</p></td>
-<td><p>Helper to compute diff and log if changed.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.is_builtin" title="ml_switcheroo.core.rewriter.calls.utils.is_builtin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_builtin</span></code></a>(→ bool)</p></td>
+<td><p>Checks if a name corresponds to a standard Python builtin.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.compute_permutation" title="ml_switcheroo.core.rewriter.calls.utils.compute_permutation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_permutation</span></code></a>(→ Optional[Tuple[int, Ellipsis]])</p></td>
-<td><p>Computes permutation indices to transform source layout to target.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.log_diff" title="ml_switcheroo.core.rewriter.calls.utils.log_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_diff</span></code></a>(→ None)</p></td>
+<td><p>Helper to compute AST diffs and log them to the tracer if changes occurred.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_custom_api_call" title="ml_switcheroo.core.rewriter.calls.utils.inject_custom_api_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_custom_api_call</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Constructs a generic Call node.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.compute_permutation" title="ml_switcheroo.core.rewriter.calls.utils.compute_permutation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_permutation</span></code></a>(→ Optional[Tuple[int, Ellipsis]])</p></td>
+<td><p>Computes permutation indices to transform source layout string to target layout string.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_permute_call" title="ml_switcheroo.core.rewriter.calls.utils.inject_permute_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_permute_call</span></code></a>(→ libcst.CSTNode)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_custom_api_call" title="ml_switcheroo.core.rewriter.calls.utils.inject_custom_api_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_custom_api_call</span></code></a>(→ libcst.Call)</p></td>
+<td><p>Constructs a generic Call node from a name node and argument list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.utils.inject_permute_call" title="ml_switcheroo.core.rewriter.calls.utils.inject_permute_call"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inject_permute_call</span></code></a>(→ libcst.CSTNode)</p></td>
 <td><p>Wraps a CST node with a permutation call valid for the target framework.</p></td>
 </tr>
 </tbody>
@@ -401,43 +418,160 @@ shims, and layout permutations.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.is_functional_apply">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">is_functional_apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.is_functional_apply" title="Link to this definition">¶</a></dt>
-<dd><p>Detects if a call node matches the <cite>obj.apply</cite> pattern used in Flax Linen.</p>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">is_functional_apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'apply'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.is_functional_apply" title="Link to this definition">¶</a></dt>
+<dd><p>Detects if a call node matches the functional execution pattern (e.g. <cite>obj.apply</cite>).</p>
+<p>Driven by the <cite>functional_execution_method</cite> trait of the source framework.
+This genericizes detection to support Flax (<cite>apply</cite>), Haiku (<cite>apply</cite>), or custom
+frameworks (<cite>call_fn</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>cst.Call</em>) – The function call node to inspect.</p></li>
+<li><p><strong>method_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The method name to look for. Defaults to “apply”.
+If None, functional unwrapping is disabled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the call is a method matching the name.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.rewrite_stateful_call">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">rewrite_stateful_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rewriter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.rewrite_stateful_call" title="Link to this definition">¶</a></dt>
-<dd><p>Rewrites a call to a stateful object (Functional patterns only).</p>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">rewrite_stateful_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rewriter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.rewrite_stateful_call" title="Link to this definition">¶</a></dt>
+<dd><p>Rewrites a call to a stateful object to match a functional pattern.</p>
+<p>Used when converting OOP frameworks to Functional ones where state must be passed explicitly.
+Can inject arguments (e.g. <cite>variables</cite>) and change method names (e.g. <cite>__call__</cite> -&gt; <cite>apply</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rewriter</strong> – The BaseRewriter instance (for access to signature stacks and context).</p></li>
+<li><p><strong>node</strong> (<em>cst.Call</em>) – The original call node.</p></li>
+<li><p><strong>instance_name</strong> (<em>str</em>) – The name of the object instance being called.</p></li>
+<li><p><strong>config</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – Configuration dict containing ‘prepend_arg’ and ‘method’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed call node.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Call</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.inject_kwarg">
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">inject_kwarg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.inject_kwarg" title="Link to this definition">¶</a></dt>
+<dd><p>Generic helper to inject a keyword argument into a call.
+Prevents duplication if the argument already exists.</p>
+<p>Format: <cite>func(…, arg_name=val_name)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>cst.Call</em>) – The call node to modify.</p></li>
+<li><p><strong>arg_name</strong> (<em>str</em>) – The keyword argument name.</p></li>
+<li><p><strong>val_name</strong> (<em>str</em>) – The variable name to pass as value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated call node with the injected argument (if not present).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Call</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">inject_rngs_kwarg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.inject_rngs_kwarg" title="Link to this definition">¶</a></dt>
-<dd><p>Injects <cite>rngs=rngs</cite> into a constructor call.</p>
+<dd><p>Legacy wrapper for <cite>inject_kwarg</cite>.
+Injects <cite>rngs=rngs</cite> into a call. Preserved for backward compatibility
+until all consumers migrate to <cite>inject_kwarg</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>cst.Call</em>) – The call node.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Call</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.strip_kwarg">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">strip_kwarg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.strip_kwarg" title="Link to this definition">¶</a></dt>
-<dd><p>Removes a keyword argument from a call node.</p>
+<dd><p>Removes a specified keyword argument from a function call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<em>cst.Call</em>) – The call node.</p></li>
+<li><p><strong>kw_name</strong> (<em>str</em>) – The keyword string to strip.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated node with the argument removed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Call</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.is_super_call">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">is_super_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.is_super_call" title="Link to this definition">¶</a></dt>
-<dd><p>Helper to identify direct super() usage or super().__init__().</p>
+<dd><p>Detects if a call is <cite>super()</cite> or <cite>super().method()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>cst.Call</em>) – The call node.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if it is a super call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.is_builtin">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">is_builtin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.is_builtin" title="Link to this definition">¶</a></dt>
-<dd><p>Avoid spamming logs for standard python builtins unless mapped.</p>
+<dd><p>Checks if a name corresponds to a standard Python builtin.
+Used to prevent excessive logging/tracing of standard language features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The function name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if builtin.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.log_diff">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">log_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.CSTNode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modified</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.CSTNode</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.log_diff" title="Link to this definition">¶</a></dt>
-<dd><p>Helper to compute diff and log if changed.</p>
+<dd><p>Helper to compute AST diffs and log them to the tracer if changes occurred.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<em>str</em>) – Label for the log entry.</p></li>
+<li><p><strong>original</strong> (<em>cst.CSTNode</em>) – The node before transformation.</p></li>
+<li><p><strong>modified</strong> (<em>cst.CSTNode</em>) – The node after transformation.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.compute_permutation">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">compute_permutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_layout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.compute_permutation" title="Link to this definition">¶</a></dt>
-<dd><p>Computes permutation indices to transform source layout to target.</p>
+<dd><p>Computes permutation indices to transform source layout string to target layout string.</p>
 <p class="rubric">Example</p>
 <p>Source: “NCHW”, Target: “NHWC”
 Map: N:0, C:1, H:2, W:3
@@ -446,44 +580,62 @@ Result: (0, 2, 3, 1)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>source_layout</strong> – Source layout string (e.g. “NCHW”).</p></li>
-<li><p><strong>target_layout</strong> – Target layout string (e.g. “NHWC”).</p></li>
+<li><p><strong>source_layout</strong> (<em>str</em>) – Source layout string (e.g. “NCHW”).</p></li>
+<li><p><strong>target_layout</strong> (<em>str</em>) – Target layout string (e.g. “NHWC”).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Tuple of integer indices, or None if invalid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[int, …]</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.inject_custom_api_call">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">inject_custom_api_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func_name_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.BaseExpression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">libcst.Arg</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.inject_custom_api_call" title="Link to this definition">¶</a></dt>
-<dd><p>Constructs a generic Call node.</p>
+<dd><p>Constructs a generic Call node from a name node and argument list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>func_name_node</strong> (<em>cst.BaseExpression</em>) – The function identifier.</p></li>
+<li><p><strong>args</strong> (<em>List</em><em>[</em><em>cst.Arg</em><em>]</em>) – List of arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The constructed call.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.Call</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.utils.inject_permute_call">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.utils.</span></span><span class="sig-name descname"><span class="pre">inject_permute_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.CSTNode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.utils.inject_permute_call" title="Link to this definition">¶</a></dt>
 <dd><p>Wraps a CST node with a permutation call valid for the target framework.</p>
 <dl class="simple">
-<dt>Logic:</dt><dd><ol class="arabic simple">
-<li><p>Finds <cite>permute_dims</cite> definition in Semantics for the target framework.</p></li>
-<li><p>Determines API name (e.g. <cite>jnp.transpose</cite>, <cite>torch.permute</cite>, <cite>tf.transpose</cite>).</p></li>
-<li><p>Determines packing strategy (tuple kwarg vs varargs).</p></li>
-<li><p>Wraps <cite>base_node</cite>.</p></li>
-</ol>
+<dt>Decoupling Logic:</dt><dd><p>It queries the SemanticsManager for the <cite>permute_dims</cite> definition in the target tier.
+It does NOT contain hardcoded framework checks (like “if target == torch”).
+If a definition is missing, it returns the bare node (No-Op), avoiding assumption
+of JAX-style syntax.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_node</strong> – The expression to verify/permute.</p></li>
-<li><p><strong>indices</strong> – Tuple of dimensions to permute (e.g., (0, 2, 3, 1)).</p></li>
-<li><p><strong>semantics</strong> – Manager to look up <cite>permute_dims</cite> syntax.</p></li>
-<li><p><strong>target_fw</strong> – Target framework key.</p></li>
+<li><p><strong>base_node</strong> (<em>cst.CSTNode</em>) – The expression to wrap (the input tensor).</p></li>
+<li><p><strong>indices</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>) – Tuple of dimensions to permute (e.g., (0, 2, 3, 1)).</p></li>
+<li><p><strong>semantics</strong> (<a class="reference internal" href="../../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><em>SemanticsManager</em></a>) – Manager to look up syntax.</p></li>
+<li><p><strong>target_fw</strong> (<em>str</em>) – Target framework key.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>CST Node representing <cite>permute(base_node, indices)</cite>.</p>
+<dd class="field-even"><p>Node representing <cite>permute(base_node, indices)</cite> or original if unsupported.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.CSTNode</p>
 </dd>
 </dl>
 </dd></dl>

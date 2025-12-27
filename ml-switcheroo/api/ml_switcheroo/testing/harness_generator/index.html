@@ -63,11 +63,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.testing.harness_generator_template" href="../harness_generator_template/index.html" />
-    <link rel="prev" title="ml_switcheroo.testing.fuzzer" href="../fuzzer/index.html" />
+    <link rel="prev" title="ml_switcheroo.testing.fuzzer.utils" href="../fuzzer/utils/index.html" />
   
    
 
@@ -348,19 +348,12 @@
 It dynamically extracts source code from the live system to ensure that generated
 harnesses support ALL registered frameworks (Torch, JAX, Keras, etc.) without
 hardcoding switch statements.</p>
-<p>Capabilities:</p>
-<ol class="arabic simple">
-<li><p><strong>Dynamic Shim Generation</strong>: Reads <cite>convert()</cite> methods from all registered
-Framework Adapters and synthesizes a standalone <cite>get_adapter</cite> function.</p></li>
-<li><p><strong>Fuzzer Inlining</strong>: Extracts the <cite>InputFuzzer</cite> class source code.</p></li>
-<li><p><strong>Isolation</strong>: Generated scripts run without <cite>ml_switcheroo</cite> installed.</p></li>
-</ol>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator" title="ml_switcheroo.testing.harness_generator.HarnessGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HarnessGenerator</span></code></a></p></td>
-<td><p>Generates standalone verification scripts.</p></td>
+<td><p>Generates standalone verification scripts tailored to the target framework.</p></td>
 </tr>
 </tbody>
 </table>
@@ -370,7 +363,7 @@ Framework Adapters and synthesizes a standalone <cite>get_adapter</cite> functio
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.harness_generator.HarnessGenerator">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.harness_generator.</span></span><span class="sig-name descname"><span class="pre">HarnessGenerator</span></span><a class="headerlink" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator" title="Link to this definition">¶</a></dt>
-<dd><p>Generates standalone verification scripts.</p>
+<dd><p>Generates standalone verification scripts tailored to the target framework.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.harness_generator.HarnessGenerator.extractor">
 <span class="sig-name descname"><span class="pre">extractor</span></span><a class="headerlink" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator.extractor" title="Link to this definition">¶</a></dt>
@@ -379,6 +372,18 @@ Framework Adapters and synthesizes a standalone <cite>get_adapter</cite> functio
 <dt class="sig sig-object py" id="ml_switcheroo.testing.harness_generator.HarnessGenerator.generate">
 <span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_harness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'torch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jax'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.testing.harness_generator.HarnessGenerator.generate" title="Link to this definition">¶</a></dt>
 <dd><p>Writes the standalone verification script to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_file</strong> – Path to original source.</p></li>
+<li><p><strong>target_file</strong> – Path to transpiled result.</p></li>
+<li><p><strong>output_harness</strong> – Destination path.</p></li>
+<li><p><strong>source_fw</strong> – Key of source framework.</p></li>
+<li><p><strong>target_fw</strong> – Key of target framework.</p></li>
+<li><p><strong>semantics</strong> – Optional dictionary of semantic definitions (for type hints).</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>
@@ -394,7 +399,7 @@ Framework Adapters and synthesizes a standalone <cite>get_adapter</cite> functio
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../fuzzer/index.html" title="ml_switcheroo.testing.fuzzer"
+            <a href="../fuzzer/utils/index.html" title="ml_switcheroo.testing.fuzzer.utils"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -403,7 +408,7 @@ Framework Adapters and synthesizes a standalone <cite>get_adapter</cite> functio
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.testing.fuzzer </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.testing.fuzzer.utils </span>
               </div>
             </a>
           

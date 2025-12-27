@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.loss_wrapper" href="../loss_wrapper/index.html" />
@@ -337,28 +337,24 @@
             
   <section id="module-ml_switcheroo.plugins.loop_unroll">
 <span id="ml-switcheroo-plugins-loop-unroll"></span><h1 id="api-ml-switcheroo-plugins-loop-unroll-index--page-root">ml_switcheroo.plugins.loop_unroll<a class="headerlink" href="#api-ml-switcheroo-plugins-loop-unroll-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Plugin for Unrolling Loops (JAX Scan/Fori_loop).</p>
+<p>Plugin for Unrolling Loops (Functional Control Flow Enforcement).</p>
 <p>This module handles the structural transformation of Python control flow into
-JAX-compatible primitives. Unlike PyTorch, which supports imperative Python loops,
-JAX requires loops to be expressed as functional operators (<cite>jax.lax.scan</cite> or <cite>jax.lax.fori_loop</cite>)
-to enable XLA compilation (JIT).</p>
-<p>Logic:</p>
-<ol class="arabic simple">
-<li><p><strong>Analysis</strong>: Inspects <cite>for</cite> loops to determine if they iterate over a <cite>range</cite> (candidates for <cite>fori_loop</cite>)
-or an iterable (candidates for <cite>scan</cite>).</p></li>
-<li><p><strong>Safety Check</strong>: Because automated loop conversion requires solving the “Carry State” problem
-(identifying which variables are mutated across iterations), this plugin currently defaults to a
-<strong>Safety-First</strong> strategy.</p></li>
-<li><p><strong>Transformation</strong>: Instead of hallucinating broken JAX code, it wraps the loop in an <cite>EscapeHatch</cite>.
-This preserves the original logic while explicitly flagging it as a blocker for JIT compliance,
-guiding the user to manually refactor it into a functional pattern.</p></li>
-</ol>
+functional primitives required by XLA-based frameworks. Unlike PyTorch/TensorFlow Eager,
+which support imperative Python loops, frameworks targeting XLA (like JAX) require
+loops to be expressed as functional operators (<cite>scan</cite> or <cite>fori_loop</cite>) to be compiled.</p>
+<p>The strategy is <strong>Safety-First</strong>:
+1.  <strong>Analysis</strong>: Inspects <cite>for</cite> loops.
+2.  <strong>Trait Check</strong>: Determines if the target framework requires functional control flow.
+3.  <strong>Handling</strong>: Wraps imperative loops in an <cite>EscapeHatch</cite> warning rather than</p>
+<blockquote>
+<div><p>attempting unsafe auto-conversion (solving the “carry state” problem is often undecidable).</p>
+</div></blockquote>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="ml_switcheroo.plugins.loop_unroll.transform_loops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_loops</span></code></a>(→ Union[libcst.For, ...)</p></td>
-<td><p>Plugin Hook: Transforms <cite>for</cite> loops for JAX compliance.</p></td>
+<td><p>Plugin Hook: Transforms or Flags <cite>for</cite> loops for functional compliance.</p></td>
 </tr>
 </tbody>
 </table>
@@ -368,17 +364,18 @@ guiding the user to manually refactor it into a functional pattern.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.loop_unroll.transform_loops">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loop_unroll.</span></span><span class="sig-name descname"><span class="pre">transform_loops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="Link to this definition">¶</a></dt>
-<dd><p>Plugin Hook: Transforms <cite>for</cite> loops for JAX compliance.</p>
+<dd><p>Plugin Hook: Transforms or Flags <cite>for</cite> loops for functional compliance.</p>
 <p>Triggered by the <cite>ControlFlowMixin</cite> when visiting <cite>For</cite> nodes.</p>
 <dl class="simple">
 <dt>Strategy:</dt><dd><ul class="simple">
-<li><p>If Target != JAX: Pass through (Python loops are valid in Torch/TF Eager).</p></li>
+<li><p>Check <cite>ctx.plugin_traits.requires_functional_control_flow</cite>.</p></li>
+<li><p>If False: Pass through (Imperative loops are valid).</p></li>
 <li><dl class="simple">
-<dt>If Target == JAX:</dt><dd><ul>
+<dt>If True:</dt><dd><ul>
 <li><p>Analyze the iterator.</p></li>
-<li><p>If <cite>range()</cite>: Flag as candidates for <cite>jax.lax.fori_loop</cite>.</p></li>
-<li><p>Else: Flag as candidates for <cite>jax.lax.scan</cite>.</p></li>
-<li><p>Wrap in <cite>EscapeHatch</cite> to prevent compilation errors in JAX/XLA.</p></li>
+<li><p>If <cite>range()</cite>: Warn that <cite>jax.lax.fori_loop</cite> (or equivalent) is required.</p></li>
+<li><p>Else: Warn that <cite>scan</cite> is required.</p></li>
+<li><p>Wrap in <cite>EscapeHatch</cite> to prevent compilation errors in the target.</p></li>
 </ul>
 </dd>
 </dl>
@@ -390,7 +387,7 @@ guiding the user to manually refactor it into a functional pattern.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node</strong> – The original CST For loop node.</p></li>
-<li><p><strong>ctx</strong> – Hook context containing framework targets.</p></li>
+<li><p><strong>ctx</strong> – Hook context containing framework configuration traits.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

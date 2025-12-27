@@ -7,13 +7,13 @@ ml_switcheroo.frameworks.common.jax_stack
 
    JAX Stack Common Logic (Level 0 & Level 1).
 
-   This module provides the `JAXStackMixin`, a reusable base for any Framework Adapter
+   This module provides the ``JAXStackMixin``, a reusable base for any Framework Adapter
    built on top of the JAX ecosystem (e.g., Flax, PaxML, Haiku).
 
    It standardizes:
 
-   1.  **Level 0 (Core)**: JIT compilation templates, Device syntax (`jax.devices`),
-       and Array API mappings (`jax.numpy`).
+   1.  **Level 0 (Core)**: JIT compilation templates, Device syntax (``jax.devices``),
+       and Array API mappings (``jax.numpy``).
    2.  **Level 1 (Common Libs)**:
 
        - **Optax**: Optimization primitives and loss functions.
@@ -21,9 +21,7 @@ ml_switcheroo.frameworks.common.jax_stack
 
    Usage:
        class MyJaxFramework(JAXStackMixin):
-           def apply_wiring(self, snapshot):
-               self._apply_stack_wiring(snapshot)
-               # ... custom logic ...
+           # ... logic ...
 
 
 
@@ -56,6 +54,12 @@ Module Contents
 
       Returns standard JAX test generation templates using JIT wrapping.
 
+      Defines:
+      - `import`: Libraries to import.
+      - `convert_input`: Syntax to convert Numpy array to JAX array.
+      - `to_numpy`: Syntax to convert JAX array back to Numpy.
+      - `jit_template`: Detailed JAX JIT syntax with static argument support.
+
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
@@ -67,8 +71,22 @@ Module Contents
       :param device_type: String literal or variable representing device type (e.g., "'cuda'").
       :param device_index: Optional index string (e.g., "0").
 
-      :returns: `jax.devices('gpu')[0]`.
+      :returns: ``jax.devices('gpu')[0]``.
       :rtype: Python code string constructing the device object
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Returns JAX syntax for checking if GPUs are available.
+      Format: ``len(jax.devices('gpu')) > 0``
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      Returns JAX syntax for splitting a PRNG key.
+      Format: ``rng, key = jax.random.split(rng)``
 
 
 

@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.rng_threading" href="../rng_threading/index.html" />
@@ -340,18 +340,14 @@
 <p>Plugin for “View” Semantics and Reshape strictness.</p>
 <dl class="simple">
 <dt>Addresses:</dt><dd><p>PyTorch <cite>tensor.view(*shape)</cite> requires contiguous memory and shares data.
-JAX <cite>jnp.reshape(arr, shape)</cite> works on any array, copying if necessary, producing immutable output.</p>
-</dd>
-<dt>Semantic Mismatch:</dt><dd><p>In PyTorch, <cite>view</cite> is often used as an assertion of zero-copy reshaping.
-In JAX, copy/view distinction is less relevant for correctness due to immutability,
-but relevant for performance.</p>
+JAX/NumPy <cite>reshape(arr, shape)</cite> works on any array.</p>
 </dd>
 <dt>Plugin Logic:</dt><dd><ol class="arabic simple">
 <li><p><strong>Strict Mode</strong>: If <cite>config.strict_mode</cite> is enabled, this plugin can inject
-synchronization (<cite>block_until_ready()</cite>) or explicit copies to isolate performance artifacts,
-depending on the configuration policy. (Prompt request: injects block/copy).</p></li>
-<li><p><strong>Argument Packing</strong>: Handles the conversion from varargs <cite>view(a, b)</cite> to tuple <cite>reshape((a, b))</cite>
-if not already handled by a prior pass.</p></li>
+synchronization (e.g. <cite>block_until_ready()</cite>).</p></li>
+<li><p><strong>Argument Packing</strong>: Packs varargs <cite>view(a, b)</cite> -&gt; <cite>reshape((a, b))</cite>.</p></li>
+<li><p><strong>Decoupling</strong>: Strictly relies on lookup API. If <cite>Reshape</cite> or <cite>View</cite> are
+not mapped in semantics for the target framework, returns original node.</p></li>
 </ol>
 </dd>
 </dl>
@@ -373,8 +369,11 @@ if not already handled by a prior pass.</p></li>
 <dd><p>Hook: Maps <cite>view</cite> -&gt; <cite>reshape</cite> with optional strictness injections.</p>
 <dl class="simple">
 <dt>Transformation:</dt><dd><p>Input: <cite>x.view(a, b)</cite>
-Standard Output: <cite>jax.numpy.reshape(x, (a, b))</cite>
-Strict Output:   <cite>jax.numpy.reshape(x, (a, b)).block_until_ready()</cite></p>
+Standard Output: <cite>target_api(x, (a, b))</cite>
+Strict Output:   <cite>target_api(x, (a, b)).block_until_ready()</cite> [If defined in Traits]</p>
+</dd>
+<dt>Decoupling:</dt><dd><p>Lookup precedence: “Reshape” -&gt; “View”.
+If lookup fails, aborts transformation.</p>
 </dd>
 </dl>
 </dd></dl>

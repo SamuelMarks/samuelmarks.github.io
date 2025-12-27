@@ -5,20 +5,28 @@ ml_switcheroo.core.import_fixer
 
 .. autoapi-nested-parse::
 
-   Import Management Transformer for ml-switcheroo.
+   Import Fixer Package.
 
-   This module is responsible for reading the AST's import references and remapping them
-   based on the data provided by SemanticsManager (Feature 024).
-   It also handles collapsing fully qualified paths (e.g. `torch.nn.Linear`) into
-   aliases (e.g. `nn.Linear`) based on content injection logic.
+   This package provides the ``ImportFixer`` class, a LibCST transformer responsible for:
+   1.  **Injection**: Adding required imports for the target framework.
+   2.  **Pruning**: Removing unused imports from the source framework.
+   3.  **Refinement**: Collapsing aliases and cleaning up re-exports.
 
-   Updates:
+   It is composed of several mixins handling specific AST node types.
 
-   - Fixed: Correctly transforms `from source import sub` into `import target` calls
-     when the target mapping specifies a root import (sub=None).
-   - Improved: Smart injection now prefers `from root import sub` syntax for aliases
-     where the alias name matches the submodule (e.g. `from flax import nnx`).
 
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/core/import_fixer/attributes_mixin/index
+   /api/ml_switcheroo/core/import_fixer/base/index
+   /api/ml_switcheroo/core/import_fixer/imports_mixin/index
+   /api/ml_switcheroo/core/import_fixer/injection_mixin/index
+   /api/ml_switcheroo/core/import_fixer/utils/index
 
 
 Classes
@@ -29,59 +37,20 @@ Classes
    ml_switcheroo.core.import_fixer.ImportFixer
 
 
-Module Contents
----------------
+Package Contents
+----------------
 
-.. py:class:: ImportFixer(source_fws: Union[str, List[str]], target_fw: str, submodule_map: Dict[str, Tuple[str, Optional[str], Optional[str]]], alias_map: Optional[Dict[str, Tuple[str, str]]] = None, preserve_source: bool = False)
+.. py:class:: ImportFixer
 
-   Bases: :py:obj:`libcst.CSTTransformer`
-
-
-   LibCST Transformer that manages top-level imports and path shortening.
+   Bases: :py:obj:`attributes_mixin.AttributeMixin`, :py:obj:`imports_mixin.ImportMixin`, :py:obj:`injection_mixin.InjectionMixin`, :py:obj:`base.BaseImportFixer`
 
 
-   .. py:attribute:: target_fw
+   Composite Transformer for managing imports and namespacing.
 
-
-   .. py:attribute:: submodule_map
-
-
-   .. py:attribute:: alias_map
-
-
-   .. py:attribute:: preserve_source
-      :value: False
-
-
-
-   .. py:method:: leave_Attribute(original_node: libcst.Attribute, updated_node: libcst.Attribute) -> libcst.BaseExpression
-
-      Collapses fully qualified paths to aliases if configured.
-      e.g. `torch.nn.Linear` -> `nn.Linear` if `torch.nn` -> `nn` alias exists for this target.
-
-      FIX: Uses `original_node` to determine the full path. This prevents greedy collapsing
-      of shorter prefixes (e.g. 'torch.nn' -> 'nn') from breaking matching of longer prefixes
-      (e.g. 'torch.nn.functional' -> 'F') when traversal bubbles up.
-
-
-
-   .. py:method:: leave_Import(original_node: libcst.Import, updated_node: libcst.Import) -> Union[libcst.Import, libcst.RemovalSentinel]
-
-      Inspects ``import ...`` statements.
-      Checks aliases against submodule_map or prunes matches to source_fw.
-
-
-
-   .. py:method:: leave_ImportFrom(original_node: libcst.ImportFrom, updated_node: libcst.ImportFrom) -> Union[libcst.ImportFrom, libcst.Import, libcst.RemovalSentinel]
-
-      Inspects ``from ... import ...`` statements.
-      Checks module+name against submodule_map.
-
-
-
-   .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
-
-      Post-process module to inject imports intelligently.
-
+   Inherits functionality from:
+   - :class:`AttributeMixin`: simplifying dotted attribute access.
+   - :class:`ImportMixin`: rewriting import statements.
+   - :class:`InjectionMixin`: injecting missing top-level imports.
+   - :class:`BaseImportFixer`: State management and configuration.
 
 

@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.shape_packing" href="../shape_packing/index.html" />
@@ -346,30 +346,23 @@
 <li><p>JAX/Optax: <cite>schedule_fn = optax.piecewise_constant(…)</cite> (Pure function passed to optimizer).</p></li>
 </ol>
 <p><strong>Transformation</strong></p>
-<ol class="arabic simple">
-<li><p><strong>Instantiation</strong>:</p>
+<ol class="arabic">
+<li><p><strong>Instantiation</strong>:
+-   Detects specific Scheduler constructors via <cite>scheduler_rewire</cite>.
+-   Removes the <cite>optimizer</cite> argument (Arg 0).
+-   Maps hyperparameters to target equivalents using keys defined in the semantic map</p>
+<blockquote>
+<div><p>(e.g. <cite>step_size</cite> -&gt; <cite>transition_steps</cite> for Optax or <cite>decay_steps</cite> for Keras).</p>
+</div></blockquote>
 <ul class="simple">
-<li><p>Detects specific Scheduler constructors.</p></li>
-<li><p>Removes the <cite>optimizer</cite> argument (Arg 0).</p></li>
-<li><p>Maps hyperparameters to Optax equivalents.</p></li>
-<li><p>Changes the API call to an Optax schedule factory.</p></li>
+<li><p>Changes the API call to the target factory declared in the Knowledge Base.</p></li>
 <li><p>Injects <cite>init_value=1.0</cite> (as partial schedule) or tries to preserve semantics.</p></li>
 </ul>
 </li>
-<li><p><strong>Stepping</strong>:</p>
-<ul class="simple">
-<li><p>Detects <cite>scheduler.step()</cite>.</p></li>
-<li><p>Since JAX schedulers are integrated into the gradient transform chain and stepped automatically via state,
-manual stepping is redundant.</p></li>
-<li><p>Replaces <cite>scheduler.step()</cite> with a no-op placeholder <cite>None</cite>.</p></li>
-</ul>
-</li>
+<li><p><strong>Stepping</strong>:
+-   Detects <cite>scheduler.step()</cite> via <cite>scheduler_step_noop</cite>.
+-   Replaces <cite>scheduler.step()</cite> with a no-op placeholder <cite>None</cite>.</p></li>
 </ol>
-<p>Supported Mappings:</p>
-<ul class="simple">
-<li><p><cite>StepLR</cite> -&gt; <cite>optax.exponential_decay(staircase=True)</cite></p></li>
-<li><p><cite>CosineAnnealingLR</cite> -&gt; <cite>optax.cosine_decay_schedule</cite></p></li>
-</ul>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -389,11 +382,14 @@ manual stepping is redundant.</p></li>
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.schedulers.transform_scheduler_init">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.schedulers.</span></span><span class="sig-name descname"><span class="pre">transform_scheduler_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.schedulers.transform_scheduler_init" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Transforms Scheduler instantiation.</p>
+<p>Logic routes based on detected Operation ID in context (StepLR vs Cosine).
+Now fully decoupled: reads target API and argument names from <cite>ctx</cite>.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.schedulers.transform_scheduler_step">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.schedulers.</span></span><span class="sig-name descname"><span class="pre">transform_scheduler_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.schedulers.transform_scheduler_step" title="Link to this definition">¶</a></dt>
-<dd><p>Hook: Replaces <code class="docutils literal notranslate"><span class="pre">scheduler.step()</span></code> with a no-op value (None).</p>
+<dd><p>Hook: Replaces <code class="docutils literal notranslate"><span class="pre">scheduler.step()</span></code> with a no-op value (None).
+Triggered if the scheduler step operation is wired to <cite>scheduler_step_noop</cite>.</p>
 </dd></dl>
 </section>
 </section>

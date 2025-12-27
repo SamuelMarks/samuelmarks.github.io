@@ -5,11 +5,17 @@ ml_switcheroo.core.rewriter.calls.mixer
 
 .. autoapi-nested-parse::
 
-   CallMixin Definition.
+   CallMixin Definition (Aggregator).
 
-   The primary visitor logic for handling `Call` and `Assign` nodes in the AST.
-   This module orchestrates the transformation pipeline by delegating specific tasks
-   (dispatch, reshaping, lifecycle management) to helper modules.
+   Combines various mixins required to handle assignment operations and function
+   invocations in the AST.
+
+   It pulls together logic from:
+   - :class:`InvocationMixin`: Helper logic for complex Call handling.
+   - :class:`AssignmentUnwrapMixin`: Logic for unwrapping functional return tuples.
+   - :class:`BaseRewriter`: Core traversal state management.
+
+   Note: NormalizationMixin and TraitsCachingMixin are inherited implicitly via InvocationMixin.
 
 
 
@@ -26,32 +32,17 @@ Module Contents
 
 .. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
 
-   Mixin for transforming Call nodes and unpacking Assignments.
+   Composite mixin for transforming Call nodes (`func(...)`) and Assignments (`x = ...`).
 
-   Responsible for:
-   1.  Handling functional `apply` patterns (Flax).
-   2.  Lifecycle method stripping (`.to()`, `.cuda()`).
-   3.  Plugin dispatch.
-   4.  Standard API pivoting (Lookup -> Normalize -> Rewrite).
-   5.  Output Transformation (Indexing, Casting).
+   This class aggregates:
+   1.  **Functional Unwrapping**: Handling legacy `apply` patterns (via `AssignmentUnwrapMixin`).
+   2.  **Call Rewriting**: The core engine for remapping APIs, handling plugins, and injecting state (via `InvocationMixin`).
+   3.  **Trait caching**: Performance optimization for framework config lookup (Implicit).
 
-
-   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
-
-      Handles assignment unwrapping for Functional -> OOP transitions.
-
-      Scenario: `y, updates = layer.apply(vars, x)`
-      Target:   `y = layer(x)` (NNX/Torch style)
-
-
-
-   .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
-
-      Rewrites function calls with detailed Trace Logging.
-      Implements Logic 4: Layer Init State Threading.
-
+   Inheritance Order is important: `InvocationMixin` and `AssignmentUnwrapMixin`
+   override specific visitor methods, while `BaseRewriter` provides utilities.
 
 

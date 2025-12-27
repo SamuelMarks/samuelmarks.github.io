@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.scatter" href="../scatter/index.html" />
@@ -342,22 +342,18 @@
 whereas JAX requires explicit passing and splitting of PRNG keys.</p>
 <p>This plugin automates the transition by:
 1.  <strong>Signature Injection</strong>: Adds an <cite>rng</cite> argument to the function definition.
-2.  <strong>Preamble Injection</strong>: Adds <cite>rng, key = jax.random.split(rng)</cite> at the start of the function.
-3.  <strong>Call Rewriting</strong>:</p>
+2.  <strong>Preamble Injection</strong>: Asks the target Adapter for the correct split syntax</p>
 <blockquote>
-<div><ul class="simple">
-<li><p>Appends <cite>key=key</cite> to supported stochastic calls.</p></li>
-<li><p>Strips Torch-specific <cite>generator</cite> arguments (incompatible with JAX).</p></li>
-</ul>
+<div><p>(e.g. <cite>rng, key = jax.random.split(rng)</cite>) and injects it.</p>
 </div></blockquote>
-<p>This ensures standard PyTorch calls like <cite>torch.randn(…, generator=g)</cite> become
-<cite>jax.random.normal(…, key=key)</cite>.</p>
-<p><strong>Configuration</strong>:
-Users can customize the variable naming via <cite>pyproject.toml</cite> or CLI args:</p>
-<ul class="simple">
-<li><p><cite>rng_arg_name</cite>: Name of the argument injected into signature (default: “rng”).</p></li>
-<li><p><cite>key_var_name</cite>: Name of the local key variable split from rng (default: “key”).</p></li>
-</ul>
+<ol class="arabic simple" start="3">
+<li><p><strong>Call Rewriting</strong>:
+- Appends <cite>key=key</cite> to supported stochastic calls.
+- Strips Torch-specific <cite>generator</cite> arguments (incompatible with JAX).</p></li>
+</ol>
+<p>Decoupling:
+Uses <cite>traits.requires_explicit_rng</cite> logic to determine execution, and
+calls <cite>adapter.get_rng_split_syntax()</cite> to determine code generation.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -374,15 +370,18 @@ Users can customize the variable naming via <cite>pyproject.toml</cite> or CLI a
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.rng_threading.inject_prng_threading">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.rng_threading.</span></span><span class="sig-name descname"><span class="pre">inject_prng_threading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.rng_threading.inject_prng_threading" title="Link to this definition">¶</a></dt>
 <dd><p>Plugin Hook: Thread PRNG keys for stochastic operations.</p>
-<p><strong>Triggers</strong></p>
-<ul class="simple">
-<li><p>Operations marked with <code class="docutils literal notranslate"><span class="pre">requires_plugin:</span> <span class="pre">"inject_prng"</span></code> in the Semantic Knowledge Base.</p></li>
-<li><p>Examples: <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.dropout</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.randn</span></code>, <code class="docutils literal notranslate"><span class="pre">torch.bernoulli</span></code>.</p></li>
-</ul>
+<dl class="simple">
+<dt>Triggers:</dt><dd><p>Operations marked with <cite>requires_plugin: “inject_prng”</cite> in the Semantic Knowledge Base.
+Examples: <cite>torch.nn.functional.dropout</cite>, <cite>torch.randn</cite>, <cite>torch.bernoulli</cite>.</p>
+</dd>
+<dt>Logic:</dt><dd><p>Checks <cite>ctx.plugin_traits.requires_explicit_rng</cite>. If True, applies JAX-style threading.
+This allows any framework (not just JAX) to opt-in to this behavior via configuration.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> – The original CST Call node (e.g., <code class="docutils literal notranslate"><span class="pre">torch.dropout(x,</span> <span class="pre">0.5)</span></code>).</p></li>
+<li><p><strong>node</strong> – The original CST Call node (e.g., <cite>torch.dropout(x, 0.5)</cite>).</p></li>
 <li><p><strong>ctx</strong> – The HookContext used to request global scope changes (signature/preamble)
 and read configuration.</p></li>
 </ul>

@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.normalization" href="../normalization/index.html" />
@@ -348,6 +348,8 @@ It enables:</p>
 <ol class="arabic simple">
 <li><p><strong>Renaming</strong>: Mapping decorators between frameworks (e.g., <cite>@torch.jit.script</cite> -&gt; <cite>@jax.jit</cite>).</p></li>
 <li><p><strong>Removal</strong>: stripping decorators that have no equivalent in the target framework (if mapped to null).</p></li>
+<li><p><strong>Trait-Based Handling</strong>: Removes decorators marked as irrelevant by the target framework’s traits,
+decoupling renaming logic from hardcoded framework strings.</p></li>
 </ol>
 <p>Logic robustness handles conflict with <cite>CallMixin</cite>. Since <cite>leave_Decorator</cite> runs
 after child nodes (the decorator expression) are visited, <cite>CallMixin</cite> might have
@@ -381,6 +383,7 @@ Part of PivotRewriter.</p>
 <li><p>Identifies the decorator name from <cite>original_node</cite> to ensure we key off the
 Source Framework API, even if <cite>CallMixin</cite> modified the children in <cite>updated_node</cite>.</p></li>
 <li><p>Looks up the semantic definition.</p></li>
+<li><p>Checks Target Structural Traits for explicit stripping requirements (e.g. <cite>strip_decorators</cite>).</p></li>
 <li><p>If the target variant is explicitly <cite>null</cite> (None), removes the decorator.</p></li>
 <li><p>If the target variant specifies a new API, rewrites the name.</p></li>
 </ol>

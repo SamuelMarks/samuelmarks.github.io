@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.import_fixer" href="../import_fixer/index.html" />
@@ -327,6 +327,14 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.PreambleInjectorType" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PreambleInjectorType</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.AutoWireSpec" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AutoWireSpec</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.AutoWireSpec.model_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AutoWireSpec.model_config</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.AutoWireSpec.ops" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AutoWireSpec.ops</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.semantics" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.semantics</span></code></a>
@@ -338,6 +346,10 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.metadata" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.metadata</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.current_op_id" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.current_op_id</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.plugin_traits" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.plugin_traits</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.current_variant" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.current_variant</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.inject_signature_arg" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.inject_signature_arg()</span></code></a>
         </li>
@@ -352,14 +364,6 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.lookup_api" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.lookup_api()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.HookContext.lookup_signature" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">HookContext.lookup_signature()</span></code></a>
-        </li></ul>
-            </nav>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.AutoWireSpec" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AutoWireSpec</span></code></a><nav class="md-nav">
-              <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.AutoWireSpec.model_config" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AutoWireSpec.model_config</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.hooks.AutoWireSpec.ops" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AutoWireSpec.ops</span></code></a>
         </li></ul>
             </nav>
         </li>
@@ -395,15 +399,15 @@
             
   <section id="module-ml_switcheroo.core.hooks">
 <span id="ml-switcheroo-core-hooks"></span><h1 id="api-ml-switcheroo-core-hooks-index--page-root">ml_switcheroo.core.hooks<a class="headerlink" href="#api-ml-switcheroo-core-hooks-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Plugin Registry, Hook Context, and Dynamic Loader.</p>
+<p>Plugin Binding Infrastructure.</p>
 <p>This module provides the infrastructure for extending ml-switcheroo via plugins.
 It enables developers to intercept and modify the Abstract Syntax Tree (AST)
 during the conversion process using a hook-based system.</p>
 <dl class="simple">
 <dt>Refactor:</dt><dd><ul class="simple">
 <li><p>Added <cite>auto_wire</cite> support to the <cite>register_hook</cite> decorator.</p></li>
-<li><p>Plugins can now declare their own Semantic definitions, eliminating
-the need to edit <cite>standards_internal.py</cite> or JSON files for self-contained features.</p></li>
+<li><p>Plugins can now declare their own Semantic definitions.</p></li>
+<li><p>HookContext now exposes <cite>plugin_traits</cite> and <cite>current_variant</cite> for data-driven logic.</p></li>
 </ul>
 </dd>
 </dl>
@@ -433,11 +437,11 @@ the need to edit <cite>standards_internal.py</cite> or JSON files for self-conta
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HookContext</span></code></a></p></td>
-<td><p>Context object passed to every plugin hook during transcoding.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.hooks.AutoWireSpec" title="ml_switcheroo.core.hooks.AutoWireSpec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AutoWireSpec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.hooks.AutoWireSpec" title="ml_switcheroo.core.hooks.AutoWireSpec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AutoWireSpec</span></code></a></p></td>
 <td><p>Schema for plugin self-registration metadata.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HookContext</span></code></a></p></td>
+<td><p>Context object passed to every plugin hook during transcoding.</p></td>
 </tr>
 </tbody>
 </table>
@@ -483,11 +487,28 @@ the need to edit <cite>standards_internal.py</cite> or JSON files for self-conta
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.hooks.</span></span><span class="sig-name descname"><span class="pre">PreambleInjectorType</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.PreambleInjectorType" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py class">
+<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.AutoWireSpec">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.hooks.</span></span><span class="sig-name descname"><span class="pre">AutoWireSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.hooks.AutoWireSpec" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
+<p>Schema for plugin self-registration metadata.
+Allows a plugin to define the Semantic Operation it satisfies.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.AutoWireSpec.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.AutoWireSpec.model_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.AutoWireSpec.ops">
+<span class="sig-name descname"><span class="pre">ops</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.hooks.AutoWireSpec.ops" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.hooks.</span></span><span class="sig-name descname"><span class="pre">HookContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SemanticsManagerType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_injector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ArgInjectorType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preamble_injector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PreambleInjectorType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext" title="Link to this definition">¶</a></dt>
 <dd><p>Context object passed to every plugin hook during transcoding.</p>
 <p>Provides read-only access to global state and write access
-to specific injection points (signature args, function body preambles).</p>
+to specific injection points (signature args, function body preambles).
+Now exposes <cite>plugin_traits</cite> and <cite>current_variant</cite> for data-driven decisions.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.semantics">
 <span class="sig-name descname"><span class="pre">semantics</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.semantics" title="Link to this definition">¶</a></dt>
@@ -508,6 +529,19 @@ to specific injection points (signature args, function body preambles).</p>
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.current_op_id">
 <span class="sig-name descname"><span class="pre">current_op_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.current_op_id" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.plugin_traits">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plugin_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.PluginTraits" title="ml_switcheroo.semantics.schema.PluginTraits"><span class="pre">ml_switcheroo.semantics.schema.PluginTraits</span></a></em><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.plugin_traits" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the capabilities of the current Target Framework.
+This allows plugins to check functionality (e.g. has_numpy_compatible_arrays)
+rather than checking the framework name string.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.current_variant">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_variant</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.Variant" title="ml_switcheroo.semantics.schema.Variant"><span class="pre">ml_switcheroo.semantics.schema.Variant</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.current_variant" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the Variant definition for the current operation/target.
+Allows plugins to read extra metadata defined in the JSON (e.g. pack_to_tuple).</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookContext.inject_signature_arg">
 <span class="sig-name descname"><span class="pre">inject_signature_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.inject_signature_arg" title="Link to this definition">¶</a></dt>
@@ -543,22 +577,6 @@ to specific injection points (signature args, function body preambles).</p>
 <span class="sig-name descname"><span class="pre">lookup_signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.HookContext.lookup_signature" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves standard argument list for a given operation.</p>
 </dd></dl>
-</dd></dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.AutoWireSpec">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.hooks.</span></span><span class="sig-name descname"><span class="pre">AutoWireSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.hooks.AutoWireSpec" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
-<p>Schema for plugin self-registration metadata.
-Allows a plugin to define the Semantic Operation it satisfies.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.AutoWireSpec.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><a class="headerlink" href="#ml_switcheroo.core.hooks.AutoWireSpec.model_config" title="Link to this definition">¶</a></dt>
-<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
-</dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.hooks.AutoWireSpec.ops">
-<span class="sig-name descname"><span class="pre">ops</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.hooks.AutoWireSpec.ops" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 </dd></dl>
 <dl class="py data">
 <dt class="sig sig-object py" id="ml_switcheroo.core.hooks.HookFunction">

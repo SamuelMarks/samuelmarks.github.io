@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.discovery.scaffolder" href="../scaffolder/index.html" />
@@ -346,18 +346,16 @@
 <p>Inspection Engine for Python Packages.</p>
 <p>This module provides the <a class="reference internal" href="#ml_switcheroo.discovery.inspector.ApiInspector" title="ml_switcheroo.discovery.inspector.ApiInspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApiInspector</span></code></a>, a hybrid static-dynamic analysis tool
 designed to extract API signatures (functions, classes, and attributes) from Python packages.</p>
-<p>It employs a two-stage strategy:</p>
-<ol class="arabic simple">
-<li><p><strong>Static Analysis (Griffe)</strong>: Attempts to parse the source code first. This is safer
-and preserves comments/docstrings better, but fails on compiled modules (C-Extensions).</p></li>
-<li><p><strong>Runtime Introspection (Inspect)</strong>: Falls back to importing the module and inspecting
-live objects. This is required for frameworks like PyTorch, TensorFlow, and MLX which
-rely heavily on compiled bindings.</p></li>
-</ol>
+<p>It employs a two-stage strategy:
+1.  <strong>Static Analysis (Griffe)</strong>: Attempts to parse the source code first.
+2.  <strong>Runtime Introspection (Inspect)</strong>: Falls back to importing the module and inspecting</p>
+<blockquote>
+<div><p>live objects.</p>
+</div></blockquote>
 <p><strong>Memory Safety</strong>:
-Includes recursion safeguards (visited set tracking) to prevent infinite loops
-or memory explosion when traversing circular references in large libraries like PyTorch.
-It also blacklists known heavy internals (<cite>_C</cite>, <cite>distributed</cite>, <cite>cuda</cite>) to prevent hangs during scanning.</p>
+Includes recursion safeguards (visited set tracking) and an optional blacklist
+to prevent infinite loops or memory explosion when traversing circular references
+in large libraries like PyTorch or TensorFlow.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -386,11 +384,15 @@ It also blacklists known heavy internals (<cite>_C</cite>, <cite>distributed</ci
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.discovery.inspector.ApiInspector.inspect">
-<span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.inspector.ApiInspector.inspect" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsafe_modules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.discovery.inspector.ApiInspector.inspect" title="Link to this definition">¶</a></dt>
 <dd><p>Scans a package and returns a flat catalog of its public API.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>package_name</strong> – The importable name of the package.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>package_name</strong> – The importable name of the package.</p></li>
+<li><p><strong>unsafe_modules</strong> – A set of submodule names to exclude from recursion
+(e.g., {‘_C’, ‘distributed’}).</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict mapping ‘fully.qualified.name’ -&gt; {metadata_dict}.</p>

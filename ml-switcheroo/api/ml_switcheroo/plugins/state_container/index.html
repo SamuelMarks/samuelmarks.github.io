@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.state_flag_injection" href="../state_flag_injection/index.html" />
@@ -347,34 +347,39 @@
 <span id="ml-switcheroo-plugins-state-container"></span><h1 id="api-ml-switcheroo-plugins-state-container-index--page-root">ml_switcheroo.plugins.state_container<a class="headerlink" href="#api-ml-switcheroo-plugins-state-container-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for handling Stateful Container Logic.</p>
 <p>Handles mapping of container management methods between frameworks, particularly
-impedance mismatches between PyTorch’s imperative <cite>register_buffer</cite>/<cite>parameters</cite> system
-and Flax NNX’s explicit state management.</p>
-<p>Mappings (Torch -&gt; JAX/NNX):</p>
-<ol class="arabic simple">
-<li><p><cite>self.register_buffer(“name”, t)</cite> -&gt; <cite>setattr(self, “name”, flax.nnx.BatchStat(t))</cite></p></li>
-<li><p><cite>self.register_parameter(“name”, p)</cite> -&gt; <cite>setattr(self, “name”, flax.nnx.Param(p))</cite></p></li>
-<li><p><cite>model.state_dict()</cite> -&gt; <cite>flax.nnx.state(model).to_pure_dict()</cite></p></li>
-<li><p><cite>model.load_state_dict(sd)</cite> -&gt; <cite>flax.nnx.update(model, sd)</cite></p></li>
-<li><p><cite>model.parameters()</cite> -&gt; <cite>flax.nnx.state(model, flax.nnx.Param).values()</cite></p></li>
-</ol>
+impedance mismatches between imperative usage (PyTorch’s <cite>register_buffer</cite>) and
+functional explicit state management (JAX/Flax/MLX).</p>
+<p>This module converts:
+1. <cite>self.register_buffer(“name”, t)</cite> -&gt; <cite>setattr(self, “name”, Wrapper(t))</cite>
+2. <cite>self.register_parameter(“name”, p)</cite> -&gt; <cite>setattr(self, “name”, ParamWrapper(p))</cite>
+3. <cite>model.state_dict()</cite> -&gt; <cite>StateFunc(model).to_pure_dict()</cite>
+4. <cite>model.load_state_dict(sd)</cite> -&gt; <cite>UpdateFunc(model, sd)</cite>
+5. <cite>model.parameters()</cite> -&gt; <cite>StateFunc(model, ParamWrapper).values()</cite></p>
+<dl class="simple">
+<dt>Decoupling:</dt><dd><p>The specific wrapper definitions (e.g. <cite>flax.nnx.BatchStat</cite> or <cite>custom.State</cite>)
+must be defined in the Semantic Knowledge Base. Lookups are strict; if no
+mapping exists for the Abstract Operation (e.g. ‘BatchStat’), the hook
+aborts and preserves the original code.</p>
+</dd>
+</dl>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.state_container.convert_register_buffer" title="ml_switcheroo.plugins.state_container.convert_register_buffer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_register_buffer</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Transforms <cite>self.register_buffer('name', tensor)</cite> -&gt; <cite>setattr(self, 'name', nnx.BatchStat(tensor))</cite>.</p></td>
+<td><p>Transforms <cite>register_buffer</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.state_container.convert_register_parameter" title="ml_switcheroo.plugins.state_container.convert_register_parameter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_register_parameter</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Transforms <cite>self.register_parameter('name', param)</cite> -&gt; <cite>setattr(self, 'name', nnx.Param(param))</cite>.</p></td>
+<td><p>Transforms <cite>register_parameter</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.state_container.convert_state_dict" title="ml_switcheroo.plugins.state_container.convert_state_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_state_dict</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Transforms <cite>model.state_dict()</cite> -&gt; <cite>flax.nnx.state(model).to_pure_dict()</cite>.</p></td>
+<td><p>Transforms <cite>state_dict</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.state_container.convert_load_state_dict" title="ml_switcheroo.plugins.state_container.convert_load_state_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_load_state_dict</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Transforms <cite>model.load_state_dict(state)</cite> -&gt; <cite>flax.nnx.update(model, state)</cite>.</p></td>
+<td><p>Transforms <cite>load_state_dict</cite>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.state_container.convert_parameters" title="ml_switcheroo.plugins.state_container.convert_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_parameters</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Transforms <cite>model.parameters()</cite> -&gt; <cite>flax.nnx.state(model, flax.nnx.Param).values()</cite>.</p></td>
+<td><p>Transforms <cite>parameters</cite>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -384,27 +389,37 @@ and Flax NNX’s explicit state management.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.state_container.convert_register_buffer">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.state_container.</span></span><span class="sig-name descname"><span class="pre">convert_register_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.state_container.convert_register_buffer" title="Link to this definition">¶</a></dt>
-<dd><p>Transforms <cite>self.register_buffer(‘name’, tensor)</cite> -&gt; <cite>setattr(self, ‘name’, nnx.BatchStat(tensor))</cite>.</p>
+<dd><p>Transforms <cite>register_buffer</cite>.</p>
+<p>Target: <cite>setattr(self, ‘name’, Wrapper(tensor))</cite></p>
+<p>Abstract Op Lookup: “BatchStat”</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.state_container.convert_register_parameter">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.state_container.</span></span><span class="sig-name descname"><span class="pre">convert_register_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.state_container.convert_register_parameter" title="Link to this definition">¶</a></dt>
-<dd><p>Transforms <cite>self.register_parameter(‘name’, param)</cite> -&gt; <cite>setattr(self, ‘name’, nnx.Param(param))</cite>.</p>
+<dd><p>Transforms <cite>register_parameter</cite>.</p>
+<p>Target: <cite>setattr(self, ‘name’, ParamWrapper(param))</cite></p>
+<p>Abstract Op Lookup: “Param”</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.state_container.convert_state_dict">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.state_container.</span></span><span class="sig-name descname"><span class="pre">convert_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.state_container.convert_state_dict" title="Link to this definition">¶</a></dt>
-<dd><p>Transforms <cite>model.state_dict()</cite> -&gt; <cite>flax.nnx.state(model).to_pure_dict()</cite>.</p>
+<dd><p>Transforms <cite>state_dict</cite>.</p>
+<p>Target: <cite>StateFunc(model).to_pure_dict()</cite></p>
+<p>Abstract Op Lookup: “ModuleState”</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.state_container.convert_load_state_dict">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.state_container.</span></span><span class="sig-name descname"><span class="pre">convert_load_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.state_container.convert_load_state_dict" title="Link to this definition">¶</a></dt>
-<dd><p>Transforms <cite>model.load_state_dict(state)</cite> -&gt; <cite>flax.nnx.update(model, state)</cite>.</p>
+<dd><p>Transforms <cite>load_state_dict</cite>.</p>
+<p>Target: <cite>UpdateFunc(model, state)</cite></p>
+<p>Abstract Op Lookup: “UpdateState”</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.state_container.convert_parameters">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.state_container.</span></span><span class="sig-name descname"><span class="pre">convert_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.state_container.convert_parameters" title="Link to this definition">¶</a></dt>
-<dd><p>Transforms <cite>model.parameters()</cite> -&gt; <cite>flax.nnx.state(model, flax.nnx.Param).values()</cite>.</p>
+<dd><p>Transforms <cite>parameters</cite>.</p>
+<p>Target: <cite>StateFunc(model, ParamType).values()</cite></p>
+<p>Abstract Op Lookup: “ModuleState”, “Param”</p>
 </dd></dl>
 </section>
 </section>

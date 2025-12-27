@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.casting" href="../casting/index.html" />
@@ -340,16 +340,12 @@
 <p>Plugin for Functionalizing Batch Normalization (State Unwrapping).</p>
 <p>Addresses the semantic mismatch between:
 1.  <strong>PyTorch (In-Place)</strong>: <cite>y = bn(x)</cite>. Updates <cite>running_mean</cite>/<cite>var</cite> attributes on <cite>bn</cite> silently.
-2.  <strong>JAX/Flax (Functional)</strong>: <cite>y, new_state = bn(x, mutable=[‘batch_stats’])</cite>. State updates are returned explicitly.</p>
+2.  <strong>Functional Frameworks (JAX)</strong>: <cite>y, new_state = bn(x, mutable=[‘batch_stats’])</cite>.</p>
 <p>This plugin:
-1.  Injects specific kwargs required by Flax (<cite>use_running_average</cite>, <cite>mutable</cite>).
+1.  Injects specific kwargs (<cite>use_running_average</cite>, <cite>mutable</cite>).
 2.  Adapts the return value to fit into an expression context by selecting the output tensor <cite>[0]</cite>.</p>
-<p><strong>Limitation</strong>:
-This plugin solves the <em>Forward Pass</em> compatibility. It effectively discards the updated state
-(<cite>new_state</cite>), effectively turning the layer into inference-mode regarding state persistence,
-unless the surrounding code is manually refactored to handle the tuple return.
-This is a necessary compromise to allow <cite>y = bn(x)</cite> to compile in JAX without extensive
-dataflow analysis of the entire training loop.</p>
+<p>Decoupling Update:
+Checks <cite>traits.requires_functional_state</cite> instead of hardcoding target frameworks.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -371,12 +367,11 @@ dataflow analysis of the entire training loop.</p>
 Output: <cite>self.bn1(x, use_running_average=not training, mutable=[‘batch_stats’])[0]</cite></p>
 </dd>
 <dt>Logic:</dt><dd><ol class="arabic simple">
-<li><p><strong>Mode Switching</strong>: Injects <cite>use_running_average=not training</cite>.
-This assumes a <cite>training</cite> boolean variable exists in the scope (commonly injected
-by <cite>src/ml_switcheroo/plugins/state_flag_injection.py</cite>).</p></li>
-<li><p><strong>Mutability</strong>: Injects <cite>mutable=[‘batch_stats’]</cite> to allow tracking stats during training.</p></li>
-<li><p><strong>Unwrapping</strong>: Applies <cite>[0]</cite> subscript to the result call. Flax returns <cite>(tensor, updates)</cite>,
-we select <cite>tensor</cite> to maintain compatibility with operators expecting a single array (like <cite>relu</cite>).</p></li>
+<li><p><strong>Capability Check</strong>: Verifies if the target framework requires
+functional state processing via <cite>plugin_traits.requires_functional_state</cite>.</p></li>
+<li><p><strong>Mode Switching</strong>: Injects <cite>use_running_average=not training</cite>.</p></li>
+<li><p><strong>Mutability</strong>: Injects <cite>mutable=[‘batch_stats’]</cite>.</p></li>
+<li><p><strong>Unwrapping</strong>: Applies <cite>[0]</cite> subscript to return just the tensor.</p></li>
 </ol>
 </dd>
 </dl>

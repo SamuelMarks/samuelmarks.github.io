@@ -12,7 +12,7 @@ ml_switcheroo.plugins.padding
    2. JAX/NumPy (`pad(x, ((n_b, n_a), (c_b, c_a), ...))`): Explicit per-dimension tuples.
 
    This plugin transforms standard 4D tensor padding (images) into the explicit
-   tuple-of-tuples format required by XLA compilers.
+   tuple-of-tuples format required by XLA compilers and NumPy-compatible libraries.
 
 
 
@@ -29,7 +29,16 @@ Module Contents
 
 .. py:function:: transform_padding(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
 
-   Hook: Transforms padding coordinate format.
+   Hook: Transforms padding coordinate format from Torch style to NumPy style.
+
    Trigger: Operations mapped to 'pad' with `requires_plugin: "padding_converter"`.
+
+   Decoupling:
+       Strictly looks up 'Pad' API. If missing, returns original node.
+
+   :param node: The original CST Call node.
+   :param ctx: Hook Context containing target framework metadata.
+
+   :returns: The transformed CST Call node if mapping exists, else original.
 
 

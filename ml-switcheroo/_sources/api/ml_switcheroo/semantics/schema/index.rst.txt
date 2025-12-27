@@ -10,8 +10,10 @@ ml_switcheroo.semantics.schema
    This module defines the data structure of the JSON mapping files (`k_array_api.json`, etc.)
    and the Framework Configuration blocks.
 
-   Updated to support richer Argument Definitions (Dictionaries with constraints)
-   in `std_args` and Conditional Dispatch Rules.
+   Updated to support:
+   - `PluginTraits`: Capability flags for decoupling plugins from framework identifiers.
+   - Rich Argument Definitions in `std_args`.
+   - Conditional Dispatch Rules.
 
 
 
@@ -20,17 +22,70 @@ Classes
 
 .. autoapisummary::
 
+   ml_switcheroo.semantics.schema.PluginTraits
    ml_switcheroo.semantics.schema.StructuralTraits
    ml_switcheroo.semantics.schema.FrameworkAlias
    ml_switcheroo.semantics.schema.FrameworkTraits
    ml_switcheroo.semantics.schema.Rule
    ml_switcheroo.semantics.schema.Variant
+   ml_switcheroo.semantics.schema.ParameterDef
    ml_switcheroo.semantics.schema.OpDefinition
    ml_switcheroo.semantics.schema.SemanticsFile
 
 
 Module Contents
 ---------------
+
+.. py:class:: PluginTraits(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Defines capability flags for a framework to guide plugin logic.
+   This decouples plugins from hardcoded framework names (e.g., checking "if jax"
+   becomes "if traits.has_numpy_compatible_arrays").
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: has_numpy_compatible_arrays
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: requires_explicit_rng
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: requires_functional_state
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: requires_functional_control_flow
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: enforce_purity_analysis
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: strict_materialization_method
+      :type:  Optional[str]
+      :value: None
+
+
 
 .. py:class:: StructuralTraits(/, **data: Any)
 
@@ -53,6 +108,18 @@ Module Contents
 
 
    .. py:attribute:: forward_method
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: known_inference_methods
+      :type:  Set[str]
+      :value: None
+
+
+
+   .. py:attribute:: functional_execution_method
       :type:  Optional[str]
       :value: None
 
@@ -82,6 +149,12 @@ Module Contents
 
 
 
+   .. py:attribute:: auto_strip_magic_args
+      :type:  bool
+      :value: None
+
+
+
    .. py:attribute:: lifecycle_strip_methods
       :type:  List[str]
       :value: None
@@ -100,6 +173,12 @@ Module Contents
 
 
 
+   .. py:attribute:: implicit_method_roots
+      :type:  List[str]
+      :value: None
+
+
+
    .. py:attribute:: jit_static_args
       :type:  List[str]
       :value: None
@@ -111,85 +190,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   !!! abstract "Usage Documentation"
-       [Models](../concepts/models.md)
-
-   A base class for creating Pydantic models.
-
-   .. attribute:: __class_vars__
-
-      The names of the class variables defined on the model.
-
-   .. attribute:: __private_attributes__
-
-      Metadata about the private attributes of the model.
-
-   .. attribute:: __signature__
-
-      The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
-
-   .. attribute:: __pydantic_complete__
-
-      Whether model building is completed, or if there are still undefined fields.
-
-   .. attribute:: __pydantic_core_schema__
-
-      The core schema of the model.
-
-   .. attribute:: __pydantic_custom_init__
-
-      Whether the model has a custom `__init__` function.
-
-   .. attribute:: __pydantic_decorators__
-
-      Metadata containing the decorators defined on the model.
-      This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
-
-   .. attribute:: __pydantic_generic_metadata__
-
-      Metadata for generic models; contains data used for a similar purpose to
-      __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
-
-   .. attribute:: __pydantic_parent_namespace__
-
-      Parent namespace of the model, used for automatic rebuilding of models.
-
-   .. attribute:: __pydantic_post_init__
-
-      The name of the post-init method for the model, if defined.
-
-   .. attribute:: __pydantic_root_model__
-
-      Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
-
-   .. attribute:: __pydantic_serializer__
-
-      The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
-
-   .. attribute:: __pydantic_validator__
-
-      The `pydantic-core` `SchemaValidator` used to validate instances of the model.
-
-   .. attribute:: __pydantic_fields__
-
-      A dictionary of field names and their corresponding [`FieldInfo`][pydantic.fields.FieldInfo] objects.
-
-   .. attribute:: __pydantic_computed_fields__
-
-      A dictionary of computed field names and their corresponding [`ComputedFieldInfo`][pydantic.fields.ComputedFieldInfo] objects.
-
-   .. attribute:: __pydantic_extra__
-
-      A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
-      is set to `'allow'`.
-
-   .. attribute:: __pydantic_fields_set__
-
-      The names of fields explicitly set during instantiation.
-
-   .. attribute:: __pydantic_private__
-
-      Values of private attributes set on the model instance.
+   Configuration for global module aliasing.
 
 
    .. py:attribute:: module
@@ -239,6 +240,12 @@ Module Contents
 
    .. py:attribute:: traits
       :type:  Optional[StructuralTraits]
+      :value: None
+
+
+
+   .. py:attribute:: plugin_traits
+      :type:  Optional[PluginTraits]
       :value: None
 
 
@@ -306,6 +313,30 @@ Module Contents
 
 
 
+   .. py:attribute:: arg_values
+      :type:  Optional[Dict[str, Dict[str, str]]]
+      :value: None
+
+
+
+   .. py:attribute:: kwargs_map
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+   .. py:attribute:: inject_args
+      :type:  Optional[Dict[str, Union[str, int, float, bool]]]
+      :value: None
+
+
+
+   .. py:attribute:: casts
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
    .. py:attribute:: requires_plugin
       :type:  Optional[str]
       :value: None
@@ -314,6 +345,18 @@ Module Contents
 
    .. py:attribute:: dispatch_rules
       :type:  List[Rule]
+      :value: None
+
+
+
+   .. py:attribute:: pack_to_tuple
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: layout_map
+      :type:  Optional[Dict[str, str]]
       :value: None
 
 
@@ -330,8 +373,130 @@ Module Contents
 
 
 
+   .. py:attribute:: macro_template
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_select_index
+      :type:  Optional[int]
+      :value: None
+
+
+
    .. py:attribute:: output_adapter
       :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_cast
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: min_version
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: max_version
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: required_imports
+      :type:  List[Union[str, Any]]
+      :value: None
+
+
+
+   .. py:attribute:: missing_message
+      :type:  Optional[str]
+      :value: None
+
+
+
+.. py:class:: ParameterDef(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Definition of a single argument in an abstract operation signature.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: type
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: doc
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: default
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: min
+      :type:  Optional[float]
+      :value: None
+
+
+
+   .. py:attribute:: max
+      :type:  Optional[float]
+      :value: None
+
+
+
+   .. py:attribute:: options
+      :type:  Optional[List[Union[str, int, float, bool]]]
+      :value: None
+
+
+
+   .. py:attribute:: rank
+      :type:  Optional[int]
+      :value: None
+
+
+
+   .. py:attribute:: dtype
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: shape_spec
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: is_variadic
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: kind
+      :type:  str
       :value: None
 
 
@@ -349,6 +514,12 @@ Module Contents
       Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
 
+   .. py:attribute:: operation
+      :type:  Optional[str]
+      :value: None
+
+
+
    .. py:attribute:: description
       :type:  Optional[str]
       :value: None
@@ -362,13 +533,85 @@ Module Contents
 
 
    .. py:attribute:: std_args
-      :type:  List[Union[str, Tuple[str, str], Dict[str, Any]]]
+      :type:  List[Union[str, Tuple[str, str], ParameterDef, Dict[str, Any]]]
       :value: None
 
 
 
    .. py:attribute:: variants
       :type:  Dict[str, Optional[Variant]]
+      :value: None
+
+
+
+   .. py:attribute:: scaffold_plugins
+      :type:  List[Any]
+      :value: None
+
+
+
+   .. py:attribute:: op_type
+      :type:  Any
+      :value: 'function'
+
+
+
+   .. py:attribute:: return_type
+      :type:  Optional[str]
+      :value: 'Any'
+
+
+
+   .. py:attribute:: is_inplace
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: test_rtol
+      :type:  float
+      :value: 0.001
+
+
+
+   .. py:attribute:: test_atol
+      :type:  float
+      :value: 0.0001
+
+
+
+   .. py:attribute:: skip_fuzzing
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: nondeterministic
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: differentiable
+      :type:  bool
+      :value: True
+
+
+
+   .. py:attribute:: deprecated
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: output_shape_calc
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: complexity
+      :type:  Optional[str]
       :value: None
 
 

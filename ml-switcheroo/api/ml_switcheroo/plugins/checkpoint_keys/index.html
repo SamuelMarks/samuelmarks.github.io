@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.clipping" href="../clipping/index.html" />
@@ -343,21 +343,14 @@
 <span id="ml-switcheroo-plugins-checkpoint-keys"></span><h1 id="api-ml-switcheroo-plugins-checkpoint-keys-index--page-root">ml_switcheroo.plugins.checkpoint_keys<a class="headerlink" href="#api-ml-switcheroo-plugins-checkpoint-keys-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for Checkpoint Key Remapping.</p>
 <p>Handles the runtime impedance mismatch between PyTorch state dictionaries and
-Flax/JAX parameter trees.</p>
-<p>Problem:
-1. Naming: Torch uses <cite>layer.0.weight</cite>. Flax uses <cite>layer_0.kernel</cite> (or <cite>scale</cite> for BN).
-2. Shapes: Torch Linear/Conv weights are usually <cite>(Out, In, …)</cite> or <cite>(Out, In)</cite>.</p>
-<blockquote>
-<div><p>Flax weights are <cite>(…, In, Out)</cite>.</p>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p>Semantics: <cite>model.load_state_dict(d)</cite> mutates state in Torch. JAX requires returning a new tree.</p></li>
-</ol>
-<p>Solution:
-This plugin converts <cite>model.load_state_dict(state)</cite> calls into usage of a generated runtime
-utility <cite>KeyMapper.from_torch(state)</cite>.</p>
-<p>It creates the dependency on the <cite>KeyMapper</cite> class, which the transpiler’s PreambleGenerator
-is expected to inject into the output file using the source code defined in <cite>KEY_MAPPER_SOURCE</cite>.</p>
+flattened parameter trees.</p>
+<p>Logic:
+This plugin converts <cite>load_state_dict(state)</cite> calls into usage of a
+generated runtime utility <cite>KeyMapper.from_torch(state)</cite>.</p>
+<p>Decoupling Logic:
+The injected <cite>KeyMapper</cite> utility now outputs <strong>NumPy</strong> arrays.
+This ensures compatibility with JAX, TensorFlow, MLX, and others without
+forcing a hard dependency on <cite>jax</cite> in the generated code.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -384,7 +377,6 @@ is expected to inject into the output file using the source code defined in <cit
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.checkpoint_keys.KEY_MAPPER_SOURCE">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.checkpoint_keys.</span></span><span class="sig-name descname"><span class="pre">KEY_MAPPER_SOURCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="headerlink" href="#ml_switcheroo.plugins.checkpoint_keys.KEY_MAPPER_SOURCE" title="Link to this definition">¶</a></dt>
 <dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">import jax.numpy as jnp</span>
 <span class="sd">import numpy as np</span>
 <span class="sd">import re</span>
 
@@ -413,25 +405,29 @@ is expected to inject into the output file using the source code defined in <cit
 
 <span class="sd">  @staticmethod</span>
 <span class="sd">  def map_value(key, val):</span>
-<span class="sd">    val = np.array(val)</span>
-<span class="sd">    # Heuristic Transpose for Dense/Conv kernels</span>
-<span class="sd">    # Torch Linear: (Out, In) -&gt; JAX (In, Out)</span>
-<span class="sd">    # Torch Conv2d: (Out, In, H, W) -&gt; JAX (H, W, In, Out)</span>
+<span class="sd">    try:</span>
+<span class="sd">        # Convert Torch tensors or other formats to numpy</span>
+<span class="sd">        if hasattr(val, 'cpu'):</span>
+<span class="sd">            val = val.detach().cpu().numpy()</span>
+<span class="sd">        else:</span>
+<span class="sd">            val = np.array(val)</span>
+<span class="sd">    except:</span>
+<span class="sd">        return val # Fallback</span>
 
+<span class="sd">    # Heuristic Transpose for Dense/Conv kernels</span>
 <span class="sd">    if "weight" in key or "kernel" in key:</span>
 <span class="sd">      if val.ndim == 2:</span>
-<span class="sd">        # Linear</span>
+<span class="sd">        # Linear: (Out, In) -&gt; (In, Out)</span>
 <span class="sd">        val = val.transpose((1, 0))</span>
 <span class="sd">      elif val.ndim == 4:</span>
 <span class="sd">        # Conv2d: (O, I, H, W) -&gt; (H, W, I, O)</span>
 <span class="sd">        val = val.transpose((2, 3, 1, 0))</span>
-<span class="sd">    return jnp.array(val)</span>
 
-<span class="sd">    @classmethod</span>
-<span class="sd">    def from_torch(cls, state_dict):</span>
-<span class="sd">      # Flattened Torch dict -&gt; Nested Flax dict (simplified)</span>
-<span class="sd">      # In reality, Flax usually requires unfreezing a target tree and mapping,</span>
-<span class="sd">      # but here we produce a flat dict with mapped keys/values for loading logic.</span>
+<span class="sd">    # Return as numpy array. Target frameworks (JAX, TF, etc) handle numpy inputs.</span>
+<span class="sd">    return val</span>
+
+<span class="sd">  @classmethod</span>
+<span class="sd">  def from_torch(cls, state_dict):</span>
 <span class="sd">      new_dict = {}</span>
 <span class="sd">      for k, v in state_dict.items():</span>
 <span class="sd">        nk = cls.map_name(k)</span>
@@ -446,23 +442,10 @@ is expected to inject into the output file using the source code defined in <cit
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.checkpoint_keys.transform_checkpoint_keys">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.checkpoint_keys.</span></span><span class="sig-name descname"><span class="pre">transform_checkpoint_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.checkpoint_keys.transform_checkpoint_keys" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Transforms load_state_dict calls to KeyMapper usage.</p>
-<p><strong>Transformation</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Input</span>
-<span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># Output</span>
-<span class="n">variables</span> <span class="o">=</span> <span class="n">KeyMapper</span><span class="o">.</span><span class="n">from_torch</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In JAX/Flax, one does not simply ‘load’ into a model in-place.
-One gets a variable dict. This transformation implies the user variable <cite>model</cite>
-might need to be reassigned or the result assigned to a parameter variable.</p>
-<p>Since we cannot infer the exact variable to assign to in a generic expression transform,
-we act on the expression itself. If used as <cite>model.load_state_dict(…)</cite>,
-it becomes <cite>KeyMapper.from_torch(…)</cite>.</p>
-</div>
+<p><strong>Transformation</strong>
+<cite>model.load_state_dict(state, strict=True)</cite> -&gt; <cite>KeyMapper.from_torch(state)</cite></p>
+<p>Triggers if mapped via <cite>requires_plugin=”checkpoint_mapper”</cite>.
+Injects KeyMapper source code once per file.</p>
 </dd></dl>
 </section>
 </section>

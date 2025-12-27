@@ -63,10 +63,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="ml_switcheroo.core.rewriter" href="../rewriter/index.html" />
+    <link rel="next" title="ml_switcheroo.core.import_fixer.attributes_mixin" href="attributes_mixin/index.html" />
     <link rel="prev" title="ml_switcheroo.core.hooks" href="../hooks/index.html" />
   
    
@@ -311,29 +311,13 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#api-ml-switcheroo-core-import-fixer-index--page-root" class="md-nav__link">ml_switcheroo.core.import_fixer</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#submodules" class="md-nav__link">Submodules</a>
+        </li>
         <li class="md-nav__item"><a href="#classes" class="md-nav__link">Classes</a>
         </li>
-        <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#package-contents" class="md-nav__link">Package Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code></a><nav class="md-nav">
-              <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.target_fw" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.target_fw</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.submodule_map" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.submodule_map</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.alias_map" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.alias_map</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.preserve_source" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.preserve_source</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_Attribute" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.leave_Attribute()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_Import" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.leave_Import()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_ImportFrom" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.leave_ImportFrom()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_Module" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer.leave_Module()</span></code></a>
-        </li></ul>
-            </nav>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.import_fixer.ImportFixer" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -355,77 +339,46 @@
             
   <section id="module-ml_switcheroo.core.import_fixer">
 <span id="ml-switcheroo-core-import-fixer"></span><h1 id="api-ml-switcheroo-core-import-fixer-index--page-root">ml_switcheroo.core.import_fixer<a class="headerlink" href="#api-ml-switcheroo-core-import-fixer-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Import Management Transformer for ml-switcheroo.</p>
-<p>This module is responsible for reading the AST’s import references and remapping them
-based on the data provided by SemanticsManager (Feature 024).
-It also handles collapsing fully qualified paths (e.g. <cite>torch.nn.Linear</cite>) into
-aliases (e.g. <cite>nn.Linear</cite>) based on content injection logic.</p>
-<p>Updates:</p>
-<ul class="simple">
-<li><p>Fixed: Correctly transforms <cite>from source import sub</cite> into <cite>import target</cite> calls
-when the target mapping specifies a root import (sub=None).</p></li>
-<li><p>Improved: Smart injection now prefers <cite>from root import sub</cite> syntax for aliases
-where the alias name matches the submodule (e.g. <cite>from flax import nnx</cite>).</p></li>
+<p>Import Fixer Package.</p>
+<p>This package provides the <code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code> class, a LibCST transformer responsible for:
+1.  <strong>Injection</strong>: Adding required imports for the target framework.
+2.  <strong>Pruning</strong>: Removing unused imports from the source framework.
+3.  <strong>Refinement</strong>: Collapsing aliases and cleaning up re-exports.</p>
+<p>It is composed of several mixins handling specific AST node types.</p>
+<section id="submodules">
+<h2 id="submodules">Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="attributes_mixin/index.html">ml_switcheroo.core.import_fixer.attributes_mixin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base/index.html">ml_switcheroo.core.import_fixer.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="imports_mixin/index.html">ml_switcheroo.core.import_fixer.imports_mixin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="injection_mixin/index.html">ml_switcheroo.core.import_fixer.injection_mixin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils/index.html">ml_switcheroo.core.import_fixer.utils</a></li>
 </ul>
+</div>
+</section>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.import_fixer.ImportFixer" title="ml_switcheroo.core.import_fixer.ImportFixer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImportFixer</span></code></a></p></td>
-<td><p>LibCST Transformer that manages top-level imports and path shortening.</p></td>
+<td><p>Composite Transformer for managing imports and namespacing.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="module-contents">
-<h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="package-contents">
+<h2 id="package-contents">Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.import_fixer.</span></span><span class="sig-name descname"><span class="pre">ImportFixer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_fws</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submodule_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
-<p>LibCST Transformer that manages top-level imports and path shortening.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.target_fw">
-<span class="sig-name descname"><span class="pre">target_fw</span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.target_fw" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.submodule_map">
-<span class="sig-name descname"><span class="pre">submodule_map</span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.submodule_map" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.alias_map">
-<span class="sig-name descname"><span class="pre">alias_map</span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.alias_map" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.preserve_source">
-<span class="sig-name descname"><span class="pre">preserve_source</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.preserve_source" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.leave_Attribute">
-<span class="sig-name descname"><span class="pre">leave_Attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Attribute</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.BaseExpression</span></span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_Attribute" title="Link to this definition">¶</a></dt>
-<dd><p>Collapses fully qualified paths to aliases if configured.
-e.g. <cite>torch.nn.Linear</cite> -&gt; <cite>nn.Linear</cite> if <cite>torch.nn</cite> -&gt; <cite>nn</cite> alias exists for this target.</p>
-<p>FIX: Uses <cite>original_node</cite> to determine the full path. This prevents greedy collapsing
-of shorter prefixes (e.g. ‘torch.nn’ -&gt; ‘nn’) from breaking matching of longer prefixes
-(e.g. ‘torch.nn.functional’ -&gt; ‘F’) when traversal bubbles up.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.leave_Import">
-<span class="sig-name descname"><span class="pre">leave_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Import</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_Import" title="Link to this definition">¶</a></dt>
-<dd><p>Inspects <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">...</span></code> statements.
-Checks aliases against submodule_map or prunes matches to source_fw.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.leave_ImportFrom">
-<span class="sig-name descname"><span class="pre">leave_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.ImportFrom</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.Import</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_ImportFrom" title="Link to this definition">¶</a></dt>
-<dd><p>Inspects <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">...</span> <span class="pre">import</span> <span class="pre">...</span></code> statements.
-Checks module+name against submodule_map.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.ImportFixer.leave_Module">
-<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer.leave_Module" title="Link to this definition">¶</a></dt>
-<dd><p>Post-process module to inject imports intelligently.</p>
-</dd></dl>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.import_fixer.</span></span><span class="sig-name descname"><span class="pre">ImportFixer</span></span><a class="headerlink" href="#ml_switcheroo.core.import_fixer.ImportFixer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="attributes_mixin/index.html#ml_switcheroo.core.import_fixer.attributes_mixin.AttributeMixin" title="ml_switcheroo.core.import_fixer.attributes_mixin.AttributeMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attributes_mixin.AttributeMixin</span></code></a>, <a class="reference internal" href="imports_mixin/index.html#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin" title="ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">imports_mixin.ImportMixin</span></code></a>, <a class="reference internal" href="injection_mixin/index.html#ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin" title="ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">injection_mixin.InjectionMixin</span></code></a>, <a class="reference internal" href="base/index.html#ml_switcheroo.core.import_fixer.base.BaseImportFixer" title="ml_switcheroo.core.import_fixer.base.BaseImportFixer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base.BaseImportFixer</span></code></a></p>
+<p>Composite Transformer for managing imports and namespacing.</p>
+<p>Inherits functionality from:
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeMixin</span></code>: simplifying dotted attribute access.
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">ImportMixin</span></code>: rewriting import statements.
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">InjectionMixin</span></code>: injecting missing top-level imports.
+- <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseImportFixer</span></code>: State management and configuration.</p>
 </dd></dl>
 </section>
 </section>
@@ -454,12 +407,12 @@ Checks module+name against submodule_map.</p>
             </a>
           
           
-            <a href="../rewriter/index.html" title="ml_switcheroo.core.rewriter"
+            <a href="attributes_mixin/index.html" title="ml_switcheroo.core.import_fixer.attributes_mixin"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.core.rewriter </span>
+                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.core.import_fixer.attributes_mixin </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

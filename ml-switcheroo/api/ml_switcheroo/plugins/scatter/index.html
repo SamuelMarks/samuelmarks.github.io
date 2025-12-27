@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.schedulers" href="../schedulers/index.html" />
@@ -344,18 +344,17 @@
 <p>This plugin converts:
 - <cite>x.scatter_(dim, index, src)</cite> -&gt; <cite>x.at[index].set(src)</cite> (Simple Case)
 - <cite>x.scatter(dim, index, src)</cite> -&gt; <cite>x.at[index].set(src)</cite> (Out-of-place)</p>
-<p>Warning:
-This plugin currently handles the primary case where indices match the tensor rank
-or simple 1D scattering. Complex <cite>dim</cite> arguments often require <cite>jax.lax.scatter</cite>
-which has a very different signature closer to <cite>tf.scatter_nd</cite>.
-This implementation maps to the high-level <cite>at[].set()</cite> utility which covers
-the majority of user-facing logic (e.g. masking, simple updates).</p>
+<dl class="simple">
+<dt>Decoupling Logic:</dt><dd><p>Removed framework checks. This logic executes if the operation is mapped
+via <cite>requires_plugin=”scatter_indexer”</cite>.</p>
+</dd>
+</dl>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.scatter.transform_scatter" title="ml_switcheroo.plugins.scatter.transform_scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_scatter</span></code></a>(→ libcst.CSTNode)</p></td>
-<td><p>Hook: Transforms scatter method calls into JAX index-update syntax.</p></td>
+<td><p>Hook: Transforms scatter method calls into index-update syntax (JAX style).</p></td>
 </tr>
 </tbody>
 </table>
@@ -365,9 +364,8 @@ the majority of user-facing logic (e.g. masking, simple updates).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.scatter.transform_scatter">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.scatter.</span></span><span class="sig-name descname"><span class="pre">transform_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.scatter.transform_scatter" title="Link to this definition">¶</a></dt>
-<dd><p>Hook: Transforms scatter method calls into JAX index-update syntax.</p>
-<p>Trigger: Operations mapped with <cite>requires_plugin: “scatter_indexer”</cite>.
-Target: JAX/Flax.</p>
+<dd><p>Hook: Transforms scatter method calls into index-update syntax (JAX style).</p>
+<p>Trigger: Operations mapped with <cite>requires_plugin: “scatter_indexer”</cite>.</p>
 <dl class="simple">
 <dt>Transformation:</dt><dd><p>Input:  <cite>tensor.scatter_(dim, index, src)</cite>
 Output: <cite>tensor.at[index].set(src)</cite></p>
@@ -376,11 +374,18 @@ Output: <cite>tensor.at[index].set(src)</cite></p>
 <p>Note regarding <cite>dim</cite>:
 JAX’s <cite>at[index]</cite> syntax implies the indices are fully specified or slicing.
 PyTorch’s <cite>scatter</cite> applies along a <cite>dim</cite>.
-Simply swapping <cite>scatter(dim, idx, src)</cite> to <cite>at[idx].set(src)</cite> is only valid if
-<cite>idx</cite> is compatible with JAX advanced indexing for that shape.</p>
-<p>However, for the purpose of structural transpilation, <cite>at[idx].set(src)</cite> is the
-nearest syntactic equivalent. Proper dimension handling often requires <cite>take_along_axis</cite>
-generics or <cite>jax.lax.scatter_add</cite> which is lower level.</p>
+This transformation maps to the high-level <cite>at[idx].set(src)</cite> utility.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – The original CST Call (scatter).</p></li>
+<li><p><strong>ctx</strong> – The hook context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The transformed CST Call (at[].set()).</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

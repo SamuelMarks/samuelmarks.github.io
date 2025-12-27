@@ -8,15 +8,16 @@ ml_switcheroo.frameworks.base
    Base Protocol and Registry for Framework Adapters.
 
    This module defines the interface that all Framework Adapters must implement.
-   It acts as the primary contact point between the `ASTEngine` and the specific
+   It acts as the primary contact point between the ``ASTEngine`` and the specific
    ML library implementations (plugins).
 
    Key Capabilities (Hybrid Loading):
-   - Adapters possess an `init_mode` (LIVE or GHOST).
-   - In LIVE mode, they introspect installed packages.
-   - In GHOST mode, they load cached JSON snapshots.
+   - Adapters possess an ``init_mode`` (LIVE or GHOST).
+   - In **LIVE** mode, they introspect installed packages module-by-module.
+   - In **GHOST** mode, they load cached JSON snapshots.
 
-   Update: Enhanced StandardMap schema and import definitions.
+   The ``definitions`` and ``specifications`` properties allow adapters to
+   self-declare their capabilities and new standards to the SemanticsManager.
 
 
 
@@ -35,6 +36,7 @@ Classes
 
    ml_switcheroo.frameworks.base.StandardCategory
    ml_switcheroo.frameworks.base.InitMode
+   ml_switcheroo.frameworks.base.ImportConfig
    ml_switcheroo.frameworks.base.StandardMap
    ml_switcheroo.frameworks.base.FrameworkAdapter
 
@@ -59,16 +61,7 @@ Module Contents
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   str(object='') -> str
-   str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-   Create a new string object from the given object. If encoding or
-   errors is specified, then the object must expose a data buffer
-   that will be decoded using the given encoding and error handler.
-   Otherwise, returns the result of object.__str__() (if defined)
-   or repr(object).
-   encoding defaults to sys.getdefaultencoding().
-   errors defaults to 'strict'.
+   Enumeration of API categories for discovery.
 
 
    .. py:attribute:: LOSS
@@ -96,16 +89,7 @@ Module Contents
    Bases: :py:obj:`str`, :py:obj:`enum.Enum`
 
 
-   str(object='') -> str
-   str(bytes_or_buffer[, encoding[, errors]]) -> str
-
-   Create a new string object from the given object. If encoding or
-   errors is specified, then the object must expose a data buffer
-   that will be decoded using the given encoding and error handler.
-   Otherwise, returns the result of object.__str__() (if defined)
-   or repr(object).
-   encoding defaults to sys.getdefaultencoding().
-   errors defaults to 'strict'.
+   Initialization mode for adapters.
 
 
    .. py:attribute:: LIVE
@@ -115,6 +99,29 @@ Module Contents
 
    .. py:attribute:: GHOST
       :value: 'ghost'
+
+
+
+.. py:class:: ImportConfig(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for an exposed namespace.
+
+   Used by adapters to self-declare the semantic role of their modules.
+   Example: ``torch.nn`` declares itself as ``tier=NEURAL``.
+
+
+   .. py:attribute:: tier
+      :type:  ml_switcheroo.enums.SemanticTier
+      :value: None
+
+
+
+   .. py:attribute:: recommended_alias
+      :type:  Optional[str]
+      :value: None
 
 
 
@@ -187,6 +194,18 @@ Module Contents
 
 
 
+   .. py:attribute:: arg_values
+      :type:  Optional[Dict[str, Dict[str, str]]]
+      :value: None
+
+
+
+   .. py:attribute:: required_imports
+      :type:  List[Union[str, Any]]
+      :value: None
+
+
+
 .. py:class:: FrameworkAdapter
 
    Bases: :py:obj:`Protocol`
@@ -194,12 +213,47 @@ Module Contents
 
    Protocol definition for a Framework Adapter.
 
+   Adapters provide translation traits, discovery logic, and syntax generation
+   for specific machine learning frameworks.
+
 
    .. py:method:: convert(data: Any) -> Any
+
+      Converts input data (List, NumPy) to the framework's Tensor format.
+      Used by the Fuzzer for validation.
+
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
+
+
+      Templates for generating physical test files (imports, conversions).
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Returns a list of import statements required for the verification harness initialization logic.
+      E.g. ["import jax", "import jax.random"]
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Returns Python code to define initialization helpers for the verification harness.
+      Used to inject framework-specific PRNG key generation logic into the generated test script.
+
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+      Returns a python code snippet that checks if an object 'obj' is a tensor of this framework
+      and returns its numpy representation.
+
+      .. rubric:: Example
+
+      return "if hasattr(obj, 'numpy'): return obj.numpy()"
 
 
 
@@ -207,62 +261,134 @@ Module Contents
       :type: List[str]
 
 
+      List of module names to scan during discovery.
+
 
    .. py:property:: display_name
       :type: str
 
+
+      Human-readable name of the framework.
 
 
    .. py:property:: ui_priority
       :type: int
 
 
+      Sort priority for UI display (lower is earlier).
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
+
+      Dictionary of Regex patterns for categorizing APIs.
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
+      List of semantic tiers supported by this framework.
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
+
+      The primary import tuple (e.g. ('torch', 'torch')).
 
 
    .. py:property:: inherits_from
       :type: Optional[str]
 
 
+      Optional parent framework key to inherit behavior from.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
+
+      Configuration for class/function rewriting.
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+      Returns flags controlling plugin behavior (e.g. supported casting syntax).
+      Default should be PluginTraits().
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
+      List of global RNG seeding method names.
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      List of state/context argument names this framework injects/uses
+      (e.g., ['rngs'] for Flax, ['key'] for JAX).
+      Used to build the global list of arguments to strip from other frameworks.
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Returns a set of submodule names to exclude from recursive introspection.
+      Prevents crashes on C-extensions or internals (e.g., '_C', 'distributed').
+
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Generates code for device object creation.
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Returns syntax for checking GPU/Accelerator availability.
+      Example: ``torch.cuda.is_available()`` or ``len(jax.devices('gpu')) > 0``.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      Returns syntax for splitting an RNG state (Preamble Injection).
+      Example: ``rng, key = jax.random.split(rng)``.
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
+      Generates code for save/load operations.
+
+
 
    .. py:method:: get_serialization_imports() -> List[str]
+
+      Returns list of imports required for serialization.
+
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
+      Returns the primary code example for documentation.
+
+
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns examples for each supported tier.
+
 
 
    .. py:property:: definitions
@@ -272,18 +398,37 @@ Module Contents
       Returns the framework's static implementation of Middle Layer Operations.
 
 
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.semantics.schema.OpDefinition]
+
+
+      Returns the framework's DEFINITION of operations (The Hub reference).
+      Allows adapters to introduce new Abstract Standards to the system.
+
+
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, Union[Dict[str, str], ImportConfig]]
 
 
-      Returns import path remapping rules.
-      Format: {"source.mod": {"root": "target", "sub": "mod", "alias": "alias"}}
+      Exposes namespaces provided by this framework with Tier metadata.
+
+      New Self-Declaration Format:
+          { "torch.nn": ImportConfig(tier=SemanticTier.NEURAL, recommended_alias="nn") }
+
+      Legacy Format (Deprecated):
+          { "source.mod": {"root": "target", "sub": "mod", "alias": "alias"} }
 
 
    .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
+      Collects APIs for consensus discovery.
+
+
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies manual patches to the snapshot dictionary.
+
 
 
 .. py:function:: load_snapshot_for_adapter(fw_key: str) -> Dict[str, Any]
@@ -293,5 +438,11 @@ Module Contents
 
 .. py:function:: register_framework(name: str)
 
+   Decorator to register a framework adapter class.
+
+
 .. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
+
+   Factory to retrieve an instantiated adapter.
+
 

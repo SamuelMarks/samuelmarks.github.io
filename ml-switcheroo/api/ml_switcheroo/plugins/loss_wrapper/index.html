@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.method_property" href="../method_property/index.html" />
@@ -339,15 +339,26 @@
 <span id="ml-switcheroo-plugins-loss-wrapper"></span><h1 id="api-ml-switcheroo-plugins-loss-wrapper-index--page-root">ml_switcheroo.plugins.loss_wrapper<a class="headerlink" href="#api-ml-switcheroo-plugins-loss-wrapper-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for Loss Reduction Semantics.</p>
 <p>Addresses the mismatch between:
-1. PyTorch: <cite>loss = F.cross_entropy(x, y, reduction=’mean’)</cite> (Scalar output by default).
-2. JAX/Optax: <cite>loss = optax.softmax_cross_entropy(x, y)</cite> (Vector output per batch).</p>
+1. PyTorch: <cite>loss = F.cross_entropy(…, reduction=’mean’)</cite> (Scalar output by default).
+2. Functional Frameworks (JAX/Optax): <cite>loss = optax.softmax_cross_entropy(x, y)</cite></p>
+<blockquote>
+<div><p>(Vector output per batch element).</p>
+</div></blockquote>
 <p>JAX libraries typically return the loss <em>per sample</em> to support vmap/pmap flexibility.
 PyTorch defaults to averaging (<cite>mean</cite>) immediately.</p>
 <p>Transformation:
 1. Detects <cite>reduction</cite> keyword argument.
 2. Strips the argument (as Optax/JAX funcs don’t usually accept it).
-3. Wraps the function call in <cite>jnp.mean()</cite> (default/mean) or <cite>jnp.sum()</cite>.
-4. If <cite>reduction=’none’</cite>, leaves the vector output alone.</p>
+3. Wraps the function call in <cite>Mean(x)</cite> or <cite>Sum(x)</cite>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Dynamically looks up “Mean” or “Sum” API from the Semantic Knowledge Base.</p></li>
+<li><p>Supports any target framework definition (e.g. <cite>tf.reduce_mean</cite>, <cite>jnp.mean</cite>, <cite>mx.mean</cite>).</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>If <cite>reduction=’none’</cite>, leaves the vector output alone.</p></li>
+</ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -365,7 +376,18 @@ PyTorch defaults to averaging (<cite>mean</cite>) immediately.</p>
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loss_wrapper.</span></span><span class="sig-name descname"><span class="pre">transform_loss_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.loss_wrapper.transform_loss_reduction" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Wraps loss functions to apply reduction.</p>
 <p>Trigger: Operations mapped with <cite>requires_plugin: “loss_reduction”</cite>.
-Target: JAX, Flax.</p>
+Target: Frameworks requiring explicit reduction (JAX, Flax).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – The original CST Call node.</p></li>
+<li><p><strong>ctx</strong> – HookContext for API lookup.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed Call node (wrapped or unwrapped).</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

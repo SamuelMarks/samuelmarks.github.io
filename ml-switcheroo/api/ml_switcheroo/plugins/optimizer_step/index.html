@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.padding" href="../padding/index.html" />
@@ -342,21 +342,25 @@
   <section id="module-ml_switcheroo.plugins.optimizer_step">
 <span id="ml-switcheroo-plugins-optimizer-step"></span><h1 id="api-ml-switcheroo-plugins-optimizer-step-index--page-root">ml_switcheroo.plugins.optimizer_step<a class="headerlink" href="#api-ml-switcheroo-plugins-optimizer-step-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for Optimizer Step Translation.</p>
-<p>Handles the conversion of imperative optimization steps (PyTorch) to
-functional state updates (JAX/Optax).</p>
+<p>Handles the conversion of imperative optimization steps (e.g., PyTorch) to
+functional state updates (e.g., JAX/Optax).</p>
+<p>This logic is <strong>Wired-Only</strong>: It executes blindly if the semantic map requests it.</p>
 <p>Transformations:
-1.  <strong>Instantiation</strong>: Strips <cite>model.parameters()</cite> from the constructor, as Optax</p>
+1.  <strong>Instantiation (`optimizer_constructor`)</strong>:</p>
 <blockquote>
-<div><p>initializes state separately.
-*   Input: <cite>opt = torch.optim.Adam(model.parameters(), lr=0.01)</cite>
-*   Output: <cite>opt = optax.adam(learning_rate=0.01)</cite></p>
+<div><ul class="simple">
+<li><p>Strips the first argument (commonly <cite>model.parameters()</cite> in Torch) because
+functional optimizers (Optax) are initialized stateless/factory-style.</p></li>
+<li><p>Input: <cite>opt = torch.optim.Adam(model.parameters(), lr=0.01)</cite></p></li>
+<li><p>Output: <cite>opt = optax.adam(lr=0.01)</cite></p></li>
+</ul>
 </div></blockquote>
 <ol class="arabic simple" start="2">
-<li><p><strong>Step Execution</strong>: Rewrites <cite>step()</cite> to the Optax update/apply sequence.
-*   Input: <cite>optimizer.step()</cite>
-*   Output: <cite>updates, opt_state = optimizer.update(grads, opt_state, params)</cite>
-*           <cite>params = optax.apply_updates(params, updates)</cite></p></li>
-<li><p><strong>Zero Grad</strong>: Strips <cite>zero_grad()</cite> as JAX handles gradients explicitly via <cite>grad</cite> or <cite>value_and_grad</cite>.</p></li>
+<li><p><strong>Step Execution (`optimizer_step`)</strong>:
+- Flags <cite>step()</cite> calls as requiring manual intervention or functional rewrite.
+- Output: An <cite>EscapeHatch</cite> warning block suggesting the update pattern.</p></li>
+<li><p><strong>Zero Grad (`optimizer_zero_grad`)</strong>:
+- Strips the call completely (No-Op), as functional gradients don’t accumulate state.</p></li>
 </ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
@@ -380,25 +384,22 @@ functional state updates (JAX/Optax).</p>
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.optimizer_step.transform_optimizer_init">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.optimizer_step.</span></span><span class="sig-name descname"><span class="pre">transform_optimizer_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.optimizer_step.transform_optimizer_init" title="Link to this definition">¶</a></dt>
 <dd><p>Hook to rewrite Optimizer instantiation.
-Removes the first argument (parameters) if targeting JAX, as Optax is functional.</p>
+Removes the first argument (parameters) to support factory-pattern initialization.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.optimizer_step.transform_optimizer_step">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.optimizer_step.</span></span><span class="sig-name descname"><span class="pre">transform_optimizer_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.optimizer_step.transform_optimizer_step" title="Link to this definition">¶</a></dt>
 <dd><p>Hook to rewrite <code class="docutils literal notranslate"><span class="pre">optimizer.step()</span></code>.</p>
-<p><strong>JAX Target</strong></p>
-<ul class="simple">
-<li><p>Emits the functional update pattern.</p></li>
-<li><p>Assumes existence of <code class="docutils literal notranslate"><span class="pre">grads</span></code>, <code class="docutils literal notranslate"><span class="pre">opt_state</span></code>, <code class="docutils literal notranslate"><span class="pre">params</span></code> variables in the local scope.</p></li>
-<li><p>Use EscapeHatch to warn user if variables can’t be inferred.</p></li>
-</ul>
+<p>Since <cite>step()</cite> logic implies side-effects on the optimizer state and parameters,
+which doesn’t translate 1:1 to functional updates without knowing variable names
+(params, grads, opt_state), this hook emits a specialized Escape Hatch.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.optimizer_step.strip_zero_grad">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.optimizer_step.</span></span><span class="sig-name descname"><span class="pre">strip_zero_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.optimizer_step.strip_zero_grad" title="Link to this definition">¶</a></dt>
 <dd><p>Hook for <code class="docutils literal notranslate"><span class="pre">optimizer.zero_grad()</span></code>.</p>
-<p><strong>JAX Target</strong></p>
-<p>Removes the call (No-op), as JAX gradients are not accumulated by default.</p>
+<p>Removes the call (No-op), as gradient accumulation is generally explicit
+in functional frameworks.</p>
 </dd></dl>
 </section>
 </section>

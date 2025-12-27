@@ -7,11 +7,12 @@ ml_switcheroo.frameworks.flax_nnx
 
    Flax NNX Framework Adapter (Level 2).
 
-   This adapter builds upon the core JAX stack to support the **Flax NNX**
-   neural network library. It inherits math/optimizer logic from ``JAXStackMixin``
-   but implements dynamic discovery for NNX Modules.
+   Extends the JAX core adapter with Flax's Neural Network Extensions (nnx).
 
-   Refactor: Populates definitions for Neural Layers and Import Namespaces.
+   - Uses dynamic or snapshot mode discovery.
+   - Provides clear import alias for `from flax import nnx`.
+   - Defines the correct base class `flax.nnx.Module`.
+   - Wires important plugins and structural traits.
 
 
 
@@ -43,9 +44,12 @@ Module Contents
    Bases: :py:obj:`ml_switcheroo.frameworks.common.jax_stack.JAXStackMixin`
 
 
-   Adapter for the Flax NNX Framework (The Object-Oriented JAX API).
+   Adapter class for Flax NNX.
 
-   Links standard Neural Layer definitions to ``flax.nnx.*``.
+   Inherits from JAXStackMixin for core math/optax behavior and adds:
+   - Explicit neural network layers and activations.
+   - Correct import aliasing for `from flax import nnx`.
+   - Structural traits targeting Flax's nnx Module base.
 
 
    .. py:attribute:: display_name
@@ -68,11 +72,13 @@ Module Contents
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
 
-      Collects API definitions.
+      Collect API definitions for discovery.
 
-      Delegates Loss/Optimizer/Activation scanning to the Core JAX adapter
-      (which scans Optax/JAX.nn), and implements specific logic for scanning
-      Flax NNX Layers.
+      :param category: The API category (layer, activation, etc.)
+      :type category: StandardCategory
+
+      :returns: List of found API references.
+      :rtype: List[GhostRef]
 
 
 
@@ -80,31 +86,78 @@ Module Contents
       :type: List[str]
 
 
-      Modules to scan during Scaffolding.
+      Modules to scan for discovery.
+
+      :returns: Ordered list of module names.
+      :rtype: List[str]
 
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
+      Returns the base package and alias to guide import injection.
+      Used by ImportFixer to map `flax.nnx` root usage to `nnx` alias.
+
+      :returns: (root_package, alias)
+      :rtype: Tuple[str, str]
+
 
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
+
+      Declares self namespaces with tiers and recommended aliases.
+
+      :returns: Mapping of package paths to configs.
+      :rtype: Dict[str, ImportConfig]
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
+      Regex patterns for heuristic category assignment during scaffolding.
+
+      :returns: Mapping of tiers to regex lists.
+      :rtype: Dict[str, List[str]]
+
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
+      Test code templates extended from JAX core.
+
+      :returns: Test harness code snippets/templates.
+      :rtype: Dict[str, str]
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Imports for Harness generation.
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Logic to create Flax NNX Rngs.
+
+
 
    .. py:property:: supported_tiers
-      :type: List[Any]
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+      Semantic tiers supported by this adapter.
+
+      :returns: Supported tiers.
+      :rtype: List[SemanticTier]
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
 
 
 
@@ -112,28 +165,50 @@ Module Contents
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
-      Defines Flax NNX specific structural transformations (Level 2).
-      Requires injection of `rngs` argument for stochastic layers.
+      Structural rewriting traits guiding the pivot rewriter.
+      Explicitly defines `flax.nnx.Module` to ensure clean inheritance rewriting
+      without internal submodule leakage.
+
+      :returns: Configuration of base class, methods, and injections.
+      :rtype: StructuralTraits
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.frameworks.base.PluginTraits
+
+
+      Plugin capabilities indicating required behaviors in the target framework.
+
+      :returns: Flags controlling plugin execution.
+      :rtype: PluginTraits
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Static definitions for Flax NNX.
+      Static standard operation definitions specific to Flax NNX.
+
+      :returns: Mapping of standard op names to framework implementations.
+      :rtype: Dict[str, StandardMap]
 
 
-   .. py:property:: rng_seed_methods
-      :type: List[str]
+   .. py:method:: convert(data: Any) -> Any
 
+      Converts generic data to framework-specific Pytree/arrays.
 
+      :returns: Converted data tailored to JAX/Flax ecosystem.
 
-   .. py:method:: convert(data)
 
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
-      Applies Stack wiring + Flax NNX specific logic.
+      Applies manual wiring and modifies the snapshot to alias 'flax.nnx.' to 'nnx.'.
+
+      Adds plugin wiring for key interface methods.
+
+      :param snapshot: The mapping snapshot dictionary.
+      :type snapshot: Dict[str, Any]
 
 
 
@@ -141,7 +216,19 @@ Module Contents
       :classmethod:
 
 
+      Example neural network showcasing Flax NNX idiomatic usage.
+
+      :returns: Example source code string.
+      :rtype: str
+
+
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Provides tier-specific example usages for documentation and tests.
+
+      :returns: Dictionary mapping tier names to code snippets.
+      :rtype: Dict[str, str]
+
 
 

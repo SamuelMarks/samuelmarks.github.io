@@ -9,11 +9,11 @@ ml_switcheroo.frameworks.mlx
 
    This module provides the adapter for Apple's MLX array framework.
    It supports:
-   1.  **Unified Memory math**: Mapping `mlx.core` operations.
-   2.  **Neural Networks**: Mapping `mlx.nn` layers and containers.
+   1.  **Unified Memory math**: Mapping ``mlx.core`` operations.
+   2.  **Neural Networks**: Mapping ``mlx.nn`` layers and containers.
    3.  **Discovery**: Runtime introspection of the MLX API surface.
-   4.  **Types**: Mapping Abstract Types to `mlx.core` dtypes (e.g. `mx.float32`).
-   5.  **Casting**: Generic casting plugin integration via `.astype()`.
+   4.  **Types**: Mapping Abstract Types to ``mlx.core`` dtypes (e.g. ``mx.float32``).
+   5.  **Casting**: Generic casting plugin integration via ``.astype()``.
 
    Refactor: Distributed definitions populated for MLX specific Layers, Ops, Optimizers, and Types.
 
@@ -64,17 +64,16 @@ Module Contents
       :type: Tuple[str, str]
 
 
-      `import mlx.core as mx`.
+      ``import mlx.core as mx``.
 
       :type: Default alias for core array operations
 
 
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
-      Defines namespace mapping for source-to-target imports.
-      Maps `torch.nn` -> `mlx.nn` (aliased as `nn`) and `mlx.core` mappings.
+      Self-declaration of namespaces.
 
 
    .. py:property:: discovery_heuristics
@@ -91,11 +90,26 @@ Module Contents
       Templates for generating physical verification tests.
 
 
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
       Returns supported semantic tiers (Array, Neural, Extras).
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      Implicit RNG.
 
 
    .. py:property:: structural_traits
@@ -106,6 +120,11 @@ Module Contents
 
       Updated to strip 'rngs' argument coming from Flax NNX, as MLX
       handles initialization statefully/eagerly.
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.frameworks.base.PluginTraits
+
 
 
    .. py:property:: definitions
@@ -152,6 +171,20 @@ Module Contents
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
       Returns device constructor syntax.
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Check if default device is GPU.
+      Note: MLX Unified Memory doesn't have strict 'is_available' but we check backend.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      MLX usually uses implicit state, but if explicit mode is requested,
+      return 'pass' as split logic differs significantly.
 
 
 

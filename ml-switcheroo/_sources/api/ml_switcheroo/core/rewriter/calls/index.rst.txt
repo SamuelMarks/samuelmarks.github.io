@@ -18,8 +18,11 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /api/ml_switcheroo/core/rewriter/calls/assignment/index
    /api/ml_switcheroo/core/rewriter/calls/dispatch/index
+   /api/ml_switcheroo/core/rewriter/calls/invocation/index
    /api/ml_switcheroo/core/rewriter/calls/mixer/index
+   /api/ml_switcheroo/core/rewriter/calls/traits_cache/index
    /api/ml_switcheroo/core/rewriter/calls/transformers/index
    /api/ml_switcheroo/core/rewriter/calls/utils/index
 
@@ -37,32 +40,17 @@ Package Contents
 
 .. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
 
-   Mixin for transforming Call nodes and unpacking Assignments.
+   Composite mixin for transforming Call nodes (`func(...)`) and Assignments (`x = ...`).
 
-   Responsible for:
-   1.  Handling functional `apply` patterns (Flax).
-   2.  Lifecycle method stripping (`.to()`, `.cuda()`).
-   3.  Plugin dispatch.
-   4.  Standard API pivoting (Lookup -> Normalize -> Rewrite).
-   5.  Output Transformation (Indexing, Casting).
+   This class aggregates:
+   1.  **Functional Unwrapping**: Handling legacy `apply` patterns (via `AssignmentUnwrapMixin`).
+   2.  **Call Rewriting**: The core engine for remapping APIs, handling plugins, and injecting state (via `InvocationMixin`).
+   3.  **Trait caching**: Performance optimization for framework config lookup (Implicit).
 
-
-   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
-
-      Handles assignment unwrapping for Functional -> OOP transitions.
-
-      Scenario: `y, updates = layer.apply(vars, x)`
-      Target:   `y = layer(x)` (NNX/Torch style)
-
-
-
-   .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
-
-      Rewrites function calls with detailed Trace Logging.
-      Implements Logic 4: Layer Init State Threading.
-
+   Inheritance Order is important: `InvocationMixin` and `AssignmentUnwrapMixin`
+   override specific visitor methods, while `BaseRewriter` provides utilities.
 
 

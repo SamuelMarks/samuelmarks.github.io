@@ -60,33 +60,18 @@ Package Contents
 
 .. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
 
-   Mixin for transforming Call nodes and unpacking Assignments.
+   Composite mixin for transforming Call nodes (`func(...)`) and Assignments (`x = ...`).
 
-   Responsible for:
-   1.  Handling functional `apply` patterns (Flax).
-   2.  Lifecycle method stripping (`.to()`, `.cuda()`).
-   3.  Plugin dispatch.
-   4.  Standard API pivoting (Lookup -> Normalize -> Rewrite).
-   5.  Output Transformation (Indexing, Casting).
+   This class aggregates:
+   1.  **Functional Unwrapping**: Handling legacy `apply` patterns (via `AssignmentUnwrapMixin`).
+   2.  **Call Rewriting**: The core engine for remapping APIs, handling plugins, and injecting state (via `InvocationMixin`).
+   3.  **Trait caching**: Performance optimization for framework config lookup (Implicit).
 
-
-   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
-
-      Handles assignment unwrapping for Functional -> OOP transitions.
-
-      Scenario: `y, updates = layer.apply(vars, x)`
-      Target:   `y = layer(x)` (NNX/Torch style)
-
-
-
-   .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
-
-      Rewrites function calls with detailed Trace Logging.
-      Implements Logic 4: Layer Init State Threading.
-
+   Inheritance Order is important: `InvocationMixin` and `AssignmentUnwrapMixin`
+   override specific visitor methods, while `BaseRewriter` provides utilities.
 
 
 .. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
@@ -95,6 +80,10 @@ Package Contents
 
 
    Mixin class providing argument normalization and operator transformation logic.
+
+   Dependencies:
+       Requires `self.semantics` (SemanticsManager) and `self.config` (RuntimeConfig)
+       to be available on the instance (inherited from BaseRewriter).
 
 
 .. py:class:: AttributeMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
@@ -145,8 +134,9 @@ Package Contents
       1. Identifies the decorator name from `original_node` to ensure we key off the
          Source Framework API, even if `CallMixin` modified the children in `updated_node`.
       2. Looks up the semantic definition.
-      3. If the target variant is explicitly `null` (None), removes the decorator.
-      4. If the target variant specifies a new API, rewrites the name.
+      3. Checks Target Structural Traits for explicit stripping requirements (e.g. `strip_decorators`).
+      4. If the target variant is explicitly `null` (None), removes the decorator.
+      5. If the target variant specifies a new API, rewrites the name.
 
 
 

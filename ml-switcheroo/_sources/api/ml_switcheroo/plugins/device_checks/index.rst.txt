@@ -7,7 +7,12 @@ ml_switcheroo.plugins.device_checks
 
    Plugin for translating Device Availability Checks.
 
-   Maps `torch.cuda.is_available()` to JAX's `len(jax.devices('gpu')) > 0`.
+   This module maps framework-specific availability checks (e.g., ``torch.cuda.is_available()``)
+   to the target framework's equivalent by querying the active ``FrameworkAdapter``.
+
+   Decoupling:
+   Instead of hardcoding JAX or TensorFlow logic, this plugin delegates syntax generation
+   to ``adapter.get_device_check_syntax()``.
 
 
 
@@ -27,12 +32,17 @@ Module Contents
    Plugin Hook: Transforms CUDA availability check.
 
    Triggers:
-       `torch.cuda.is_available()` via 'cuda_is_available' plugin key.
+       ``torch.cuda.is_available()`` via 'cuda_is_available' plugin key.
 
    Transformation:
-       Input:  `torch.cuda.is_available()`
-       Output: `len(jax.devices('gpu')) > 0`
+       Input:  ``torch.cuda.is_available()``
+        Output (JAX):   ``len(jax.devices('gpu')) > 0``
+        Output (Keras): ``len(keras.config.list_logical_devices('GPU')) > 0``
+        Output (NumPy): ``False``
 
-   Note: usage of 'gpu' backend string is hardcoded as per standard JAX idiom for CUDA.
+   :param node: The original CST Call node.
+   :param ctx: HookContext for target framework access.
+
+   :returns: A CST Expression representing the boolean check.
 
 

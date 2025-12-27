@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.mlx_optimizers" href="../mlx_optimizers/index.html" />
@@ -342,8 +342,7 @@
 <p>Plugin for MLX Ecosystem Mapping.</p>
 <p>Handles:
 1. Compilation: <cite>@torch.compile</cite> -&gt; <cite>@mx.compile</cite>.
-2. Eager Evaluation: <cite>torch.cuda.synchronize()</cite> -&gt; <cite>mx.eval(state)</cite>.
-3. Streams: <cite>torch.cuda.stream</cite> -&gt; <cite>mx.stream(mx.gpu)</cite>.</p>
+2. Eager Evaluation: <cite>torch.cuda.synchronize()</cite> -&gt; Warning/No-op.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -352,7 +351,7 @@
 <td><p>Hook: Maps JIT compilation decorators.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.mlx_extras.transform_synchronize" title="ml_switcheroo.plugins.mlx_extras.transform_synchronize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_synchronize</span></code></a>(→ libcst.CSTNode)</p></td>
-<td><p>Hook: Maps barrier synchronization.</p></td>
+<td><p>Hook: Maps barrier synchronization to a warning.</p></td>
 </tr>
 </tbody>
 </table>
@@ -363,26 +362,22 @@
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.mlx_extras.transform_compiler">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.mlx_extras.</span></span><span class="sig-name descname"><span class="pre">transform_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Decorator</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.mlx_extras.transform_compiler" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Maps JIT compilation decorators.</p>
-<p>Triggers: <cite>torch.compile</cite> (via <cite>requires_plugin: “mlx_compiler”</cite>).</p>
+<p>Triggers: Operations mapped with <cite>requires_plugin: “mlx_compiler”</cite>.</p>
 <dl class="simple">
 <dt>Transformation:</dt><dd><p>Input:  <cite>@torch.compile(fullgraph=True, dynamic=True)</cite>
 Output: <cite>@mx.compile</cite> (stripping incompatible kwargs).</p>
 </dd>
+<dt>Decoupling:</dt><dd><p>Looks up the <cite>Compile</cite> operation API in semantics (e.g. <cite>mlx.core.compile</cite>).</p>
+</dd>
 </dl>
-<p>Note: MLX’s compiler (<cite>mx.compile</cite>) is largely drop-in but does not support
-PyTorch specific flags like <cite>fullgraph</cite> or <cite>backend</cite>.</p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.mlx_extras.transform_synchronize">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.mlx_extras.</span></span><span class="sig-name descname"><span class="pre">transform_synchronize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.mlx_extras.transform_synchronize" title="Link to this definition">¶</a></dt>
-<dd><p>Hook: Maps barrier synchronization.</p>
-<p>Input:  <cite>torch.cuda.synchronize()</cite>
-Output: <cite>mx.eval(state_vars)</cite> or <cite>mx.async_eval()</cite>?</p>
-<p>MLX is lazy. Correct sync is <cite>mx.eval(tensors)</cite>.
-Since <cite>synchronize()</cite> in Torch catches up everything globally,
-we map it to a comment or specific stream sync if possible.</p>
-<p>Strict mapping: <cite>mx.eval()</cite> requires arguments (what to eval).
-If we can’t find arguments, we emit a comment.</p>
+<dd><p>Hook: Maps barrier synchronization to a warning.</p>
+<p>MLX is lazy, but <cite>torch.cuda.synchronize()</cite> implies a global device barrier.
+Equivalent <cite>mx.eval()</cite> requires arguments. Since we cannot infer state variables here,
+we replace the call with a print statement to alert the user.</p>
 </dd></dl>
 </section>
 </section>

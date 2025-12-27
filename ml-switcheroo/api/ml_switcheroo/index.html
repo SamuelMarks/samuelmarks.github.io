@@ -63,11 +63,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="ml_switcheroo.__main__" href="__main__/index.html" />
-    <link rel="prev" title="injector_fw" href="../injector_fw/index.html" />
+    <link rel="prev" title="injector_fw.utils" href="../injector_fw/utils/index.html" />
   
    
 
@@ -398,10 +398,13 @@ for programmatic usage.</p>
 <section id="simple-string-conversion">
 <h3 id="simple-string-conversion">Simple String Conversion<a class="headerlink" href="#simple-string-conversion" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ml_switcheroo</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mls</span>
+<span class="c1"># Auto-detects defaults based on installed libraries (e.g. Torch -&gt; JAX)</span>
 <span class="n">code</span> <span class="o">=</span> <span class="s2">"y = torch.abs(x)"</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">mls</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s2">"torch"</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">"jax"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">mls</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-<span class="c1"># y = jax.numpy.abs(x)</span>
+
+<span class="c1"># Explicit conversion</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">mls</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s2">"torch"</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">"jax"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -470,7 +473,7 @@ for programmatic usage.</p>
 <dd></dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.convert">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.</span></span><span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'torch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jax'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">semantics.manager.SemanticsManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.convert" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.</span></span><span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin_settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">semantics.manager.SemanticsManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.convert" title="Link to this definition">¶</a></dt>
 <dd><p>Transpiles a string of Python code from one framework to another.</p>
 <p>This is a high-level convenience wrapper around the <cite>ASTEngine</cite>. For file-based
 conversions or batch processing, consider using <cite>ml_switcheroo.cli</cite> or using
@@ -479,8 +482,10 @@ conversions or batch processing, consider using <cite>ml_switcheroo.cli</cite> o
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>code</strong> (<em>str</em>) – The source code to convert.</p></li>
-<li><p><strong>source</strong> (<em>str</em>) – The source framework key (e.g., “torch”, “jax”).</p></li>
-<li><p><strong>target</strong> (<em>str</em>) – The target framework key (e.g., “jax”, “tensorflow”).</p></li>
+<li><p><strong>source</strong> (<em>str</em><em>, </em><em>optional</em>) – The source framework key (e.g., “torch”).
+If None, determined dynamically by priority via <cite>RuntimeConfig</cite>.</p></li>
+<li><p><strong>target</strong> (<em>str</em><em>, </em><em>optional</em>) – The target framework key (e.g., “jax”).
+If None, determined dynamically by priority via <cite>RuntimeConfig</cite>.</p></li>
 <li><p><strong>strict</strong> (<em>bool</em>) – If True, the engine will return an error if an API
 cannot be mapped. If False (default), the original code
 is preserved wrapped in escape hatch comments.</p></li>
@@ -514,7 +519,7 @@ If None, a new one is initialized from disk.</p></li>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../injector_fw/index.html" title="injector_fw"
+            <a href="../injector_fw/utils/index.html" title="injector_fw.utils"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -523,7 +528,7 @@ If None, a new one is initialized from disk.</p></li>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> injector_fw </span>
+                      class="md-footer-nav__direction"> "Previous" </span> injector_fw.utils </span>
               </div>
             </a>
           

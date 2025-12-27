@@ -7,6 +7,9 @@ ml_switcheroo.plugins.tf_data_loader
 
    Plugin for Native TensorFlow Data Pipeline Generation.
 
+   Converts generic `DataLoader` usage into `tf.data.Dataset` pipelines.
+   Blind execution based on wiring.
+
 
 
 Functions
@@ -21,4 +24,11 @@ Module Contents
 ---------------
 
 .. py:function:: transform_tf_dataloader(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> Union[libcst.Call, libcst.FlattenSentinel]
+
+   Plugin Hook: Rewrites DataLoader construction into tf.data chain.
+
+   Triggers if mapped via `requires_plugin`.
+   Input: `DataLoader(TensorDataset(x, y), batch_size=32, shuffle=True)`
+   Output: `tf.data.Dataset.from_tensor_slices((x, y)).shuffle(1024).batch(32).prefetch(AUTOTUNE)`
+
 

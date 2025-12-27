@@ -9,19 +9,14 @@ ml_switcheroo.plugins.reshape
 
    Addresses:
        PyTorch `tensor.view(*shape)` requires contiguous memory and shares data.
-       JAX `jnp.reshape(arr, shape)` works on any array, copying if necessary, producing immutable output.
-
-   Semantic Mismatch:
-       In PyTorch, `view` is often used as an assertion of zero-copy reshaping.
-       In JAX, copy/view distinction is less relevant for correctness due to immutability,
-       but relevant for performance.
+       JAX/NumPy `reshape(arr, shape)` works on any array.
 
    Plugin Logic:
        1.  **Strict Mode**: If `config.strict_mode` is enabled, this plugin can inject
-           synchronization (`block_until_ready()`) or explicit copies to isolate performance artifacts,
-           depending on the configuration policy. (Prompt request: injects block/copy).
-       2.  **Argument Packing**: Handles the conversion from varargs `view(a, b)` to tuple `reshape((a, b))`
-           if not already handled by a prior pass.
+           synchronization (e.g. `block_until_ready()`).
+       2.  **Argument Packing**: Packs varargs `view(a, b)` -> `reshape((a, b))`.
+       3.  **Decoupling**: Strictly relies on lookup API. If `Reshape` or `View` are
+           not mapped in semantics for the target framework, returns original node.
 
 
 
@@ -42,7 +37,11 @@ Module Contents
 
    Transformation:
        Input: `x.view(a, b)`
-       Standard Output: `jax.numpy.reshape(x, (a, b))`
-       Strict Output:   `jax.numpy.reshape(x, (a, b)).block_until_ready()`
+       Standard Output: `target_api(x, (a, b))`
+       Strict Output:   `target_api(x, (a, b)).block_until_ready()` [If defined in Traits]
+
+   Decoupling:
+       Lookup precedence: "Reshape" -> "View".
+       If lookup fails, aborts transformation.
 
 

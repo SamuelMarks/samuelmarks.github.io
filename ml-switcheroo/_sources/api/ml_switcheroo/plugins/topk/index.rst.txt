@@ -7,6 +7,17 @@ ml_switcheroo.plugins.topk
 
    Plugin for TopK Output Adaptation.
 
+   Addresses semantic mismatch:
+   1.  **PyTorch**: `values, indices = torch.topk(x, k)` (Returns named-tuple-like result).
+   2.  **JAX**: `values, indices = jax.lax.top_k(x, k)` (Returns tuple).
+
+   Transformation:
+   Wraps the target function call in a `collections.namedtuple` factory construction.
+
+   Decoupling Logic:
+   - Strict API lookup for "TopK".
+   - If not found, returns original node.
+
 
 
 Functions
@@ -21,4 +32,13 @@ Module Contents
 ---------------
 
 .. py:function:: transform_topk(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
+
+   Hook: Wraps target top_k call in a NamedTuple constructor.
+
+   :param node: The original CST Call node.
+   :param ctx: HookContext for API lookup.
+
+   :returns: The transformed call.
+   :rtype: cst.Call
+
 

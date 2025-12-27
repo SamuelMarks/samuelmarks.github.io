@@ -22,10 +22,11 @@ ml_switcheroo.generated_tests.generator
        - Compare outputs using `np.allclose`.
        - **Verify Output Shape** if `output_shape_calc` is defined in the ODL.
 
-   JIT Logic:
-       If a template specifies `jit_wrap: True` (e.g., JAX), the generator inspects the
-       framework traits to identify `static_argnums` (arguments like `axis` or `keepdims`)
-       and generates valid `jax.jit(fn, static_argnums=(...))` wrappers.
+   JIT Logic (Decoupled):
+       If a template specifies a `jit_template`, the generator wraps the execution call.
+       It resolves `{fn}` to the closure logic and `{static_argnums}` to the indices
+       of static arguments. Hardcoded JAX fallbacks have been removed; frameworks must
+       supply valid templates.
 
 
 

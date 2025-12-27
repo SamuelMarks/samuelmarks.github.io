@@ -12,8 +12,7 @@ ml_switcheroo.frameworks.jax
    1.  **Level 0 (Core)**: JAX Array API (jnp), Activations (jax.nn), and Types.
    2.  **Level 1 (Common Libs)**: Optax (Optimization) and Orbax (Checkpointing).
 
-   It now includes strict type mappings (e.g. `Float32` -> `jnp.float32`) to support
-   data-driven casting logic.
+   It specifically enables `requires_explicit_rng` in plugin traits.
 
 
 
@@ -84,16 +83,14 @@ Module Contents
       :type: Tuple[str, str]
 
 
-      Defines the canonical import alias for the framework root.
-      Ensures `import jax.numpy as jnp` is generated.
+      Defines the canonical import alias ('jax.numpy', 'jnp').
 
 
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
-      Maps source namespaces to JAX equivalents.
-      Example: `torch.nn.functional` -> `jax.nn`.
+      Self-declared namespace roles.
 
 
    .. py:property:: discovery_heuristics
@@ -110,6 +107,24 @@ Module Contents
       Returns standard JIT-enabled test templates.
 
 
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Imports required for JAX initialization logic.
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Returns logic to create JAX PRNG Keys.
+
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
@@ -118,11 +133,14 @@ Module Contents
       Specifies JIT static arguments for compilation safety.
 
 
-   .. py:property:: definitions
-      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.frameworks.base.PluginTraits
 
 
-      Static Definitions for JAX Core, Optax, Orbax, and Types.
+      Defines logic capabilities for plugins.
+      Enables NumPy compatibility and explicit RNG threading.
+
+      IMPORTANT: Enforces Purity Analysis to catch side-effects unsafe for functional trace.
 
 
    .. py:property:: rng_seed_methods
@@ -130,6 +148,14 @@ Module Contents
 
 
       JAX does not use global seeding methods in the imperative sense.
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Static Definitions for JAX Core, Optax, Orbax, and Types.
+      Moved from `standards_internal.py` for decoupling.
 
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
@@ -157,6 +183,12 @@ Module Contents
 
 
       Returns a generic JAX example.
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Provides default tiered examples for the base adapter.
 
 
 

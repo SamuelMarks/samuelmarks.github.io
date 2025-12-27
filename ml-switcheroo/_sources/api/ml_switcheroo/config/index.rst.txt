@@ -6,7 +6,11 @@ ml_switcheroo.config
 .. autoapi-nested-parse::
 
    Runtime Configuration Store.
-   Updated to support Framework Flavours (Hierarchical Selection).
+   Supports Dynamic Defaults, TOML loading, and Framework Flavours.
+
+   This module resolves default Source and Target frameworks by querying the
+   `ui_priority` of registered adapters, ensuring the logic is completely agnotistic
+   to the specific libraries installed.
 
 
 
@@ -50,7 +54,9 @@ Module Contents
    Returns a list of framework keys sorted by UI Priority.
 
    The sort order is determined by the `ui_priority` attribute of the
-   registered FrameworkAdapter. Lower numbers appear first.
+   registered FrameworkAdapter. Lower numbers appear first (Source default).
+
+   If no priority is defined, defaults to 999.
 
    :returns: Sorted list of framework identifiers (e.g. ['torch', 'jax']).
    :rtype: List[str]
@@ -118,47 +124,25 @@ Module Contents
 
       Ensures the framework is registered in the system.
 
-      :param v: The framework key to validate.
-      :type v: str
-
-      :returns: The normalized (lowercase) framework key.
-      :rtype: str
-
-      :raises ValueError: If the framework is not found in the registry.
-
 
 
    .. py:property:: effective_source
       :type: str
 
 
-      Resolves the specific framework key to use for source logic.
-
-      If a flavour (e.g. 'flax_nnx') is provided, it overrides the general framework ('jax').
-
-      :returns: The active source framework key.
-      :rtype: str
+      Returns source flavour if present, else source framework.
 
 
    .. py:property:: effective_target
       :type: str
 
 
-      Resolves the specific framework key to use for target logic.
-
-      :returns: The active target framework key.
-      :rtype: str
+      Returns target flavour if present, else target framework.
 
 
    .. py:method:: parse_plugin_settings(schema: Type[T]) -> T
 
-      Validates the raw plugin settings dictionary against a specific Pydantic model.
-
-      :param schema: The Pydantic model class defining expected settings.
-      :type schema: Type[T]
-
-      :returns: An instance of the schema model populated with runtime values.
-      :rtype: T
+      Validates plugin settings against a Pydantic model.
 
 
 
@@ -166,40 +150,13 @@ Module Contents
       :classmethod:
 
 
-      Loads configuration from pyproject.toml and overrides with CLI arguments.
-
-      :param source: Override for source framework.
-      :type source: Optional[str]
-      :param target: Override for target framework.
-      :type target: Optional[str]
-      :param source_flavour: Override for source flavour.
-      :type source_flavour: Optional[str]
-      :param target_flavour: Override for target flavour.
-      :type target_flavour: Optional[str]
-      :param strict_mode: Override for strict mode setting.
-      :type strict_mode: Optional[bool]
-      :param plugin_settings: Additional CLI plugin settings.
-      :type plugin_settings: Optional[Dict]
-      :param validation_report: Override for validation report path.
-      :type validation_report: Optional[Path]
-      :param search_path: Directory to start searching for TOML config.
-      :type search_path: Optional[Path]
-
-      :returns: The fully resolved configuration object.
-      :rtype: RuntimeConfig
+      Loads configuration from pyproject.toml, overriding with CLI arguments.
+      Defaults are calculated dynamically via factory methods if not found.
 
 
 
 .. py:function:: parse_cli_key_values(items: Optional[List[str]]) -> Dict[str, Any]
 
-   Parses a list of 'key=value' strings into a dictionary.
-
-   Types are inferred (int, float, bool, or string).
-
-   :param items: List of raw CLI strings directly from argparse.
-   :type items: Optional[List[str]]
-
-   :returns: Parsed dictionary.
-   :rtype: Dict[str, Any]
+   Parses a list of 'key=value' strings into a dictionary with type inference.
 
 

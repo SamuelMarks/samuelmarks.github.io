@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.attention_packing" href="../attention_packing/index.html" />
@@ -340,12 +340,9 @@
 <p>Plugin for packing variable positional arguments into a sequence (tuple/list).</p>
 <p>Essential for mapping vararg APIs (like <cite>torch.permute(x, 0, 2, 1)</cite>) to sequence-based
 APIs (like <cite>jax.numpy.transpose(x, axes=(0, 2, 1))</cite>).</p>
-<p>Strategy:
-1.  Identify the operation (e.g. <cite>permute_dims</cite>).
-2.  Lookup the target API (e.g. <cite>jax.numpy.transpose</cite>).
-3.  Separate the primary input argument (first positional) from the varargs.
-4.  Pack the trailing varargs into a <cite>Tuple</cite> node.
-5.  Construct the new call with the sequence passed as a keyword argument (e.g. <cite>axes=…</cite>).</p>
+<p>Decoupling Update:
+This plugin no longer checks framework names directly. It reads the <cite>pack_to_tuple</cite>
+keyword field from the <cite>Variant</cite> metadata exposed via <cite>HookContext</cite>.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -363,26 +360,22 @@ APIs (like <cite>jax.numpy.transpose(x, axes=(0, 2, 1))</cite>).</p>
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.arg_packing.</span></span><span class="sig-name descname"><span class="pre">pack_varargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.arg_packing.pack_varargs" title="Link to this definition">¶</a></dt>
 <dd><p>Plugin Hook: Packs trailing positional arguments into a keyword tuple.</p>
 <dl class="simple">
-<dt>Triggers:</dt><dd><p>Operations marked with <cite>requires_plugin: “pack_varargs”</cite>.
-Designed for abstract operations like <cite>permute_dims</cite>.</p>
+<dt>Triggers:</dt><dd><p>Operations marked with <cite>requires_plugin: “pack_varargs”</cite> or manual hook usage.</p>
 </dd>
-<dt>Transformation:</dt><dd><p>Input:  <cite>torch.permute(x, 0, 2, 1)</cite>
-Output: <cite>jax.numpy.transpose(x, axes=(0, 2, 1))</cite> (if mapped)</p>
-</dd>
-<dt>Config:</dt><dd><p>Adapts the keyword name based on the target framework.
-- TensorFlow: uses ‘perm’
-- Default (JAX/NumPy/MLX): uses ‘axes’</p>
+<dt>Configuration:</dt><dd><p>The keyword name (e.g. ‘axes’ vs ‘perm’) is derived from the Semantic Variant definition:
+<cite>{“pack_to_tuple”: “perm”}</cite> (TensorFlow) vs <cite>{“pack_to_tuple”: “axes”}</cite> (JAX).
+Defaults to “axes” if not specified.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node</strong> – The original CST Call node.</p></li>
-<li><p><strong>ctx</strong> – HookContext for API lookup directly from Semantics.</p></li>
+<li><p><strong>ctx</strong> – HookContext giving access to Semantic definitions.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The transformed CST Call node, or original if target mapping is missing.</p>
+<dd class="field-even"><p>The transformed CST Call node using keyword tuple arguments.</p>
 </dd>
 </dl>
 </dd></dl>

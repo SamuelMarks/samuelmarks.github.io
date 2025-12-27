@@ -1,0 +1,68 @@
+ml_switcheroo.core.rewriter.calls.invocation
+============================================
+
+.. py:module:: ml_switcheroo.core.rewriter.calls.invocation
+
+.. autoapi-nested-parse::
+
+   Function Invocation Rewriter.
+
+   This module provides the ``InvocationMixin``, the core component responsible for
+   rewriting `Call` nodes. It orchestrates a complex pipeline of transformations:
+
+   1.  **Functional Unwrapping**: Removing `apply` or `call_fn` wrappers.
+   2.  **Plugin Dispatch**: Delegating complex logic to registered hooks.
+   3.  **Lifecycle Management**: Stripping framework-specific methods like `.to()` or `.cuda()`.
+   4.  **State Management**: Rewriting calls to stateful objects/layers.
+   5.  **Standard API Pivoting**:
+       -   Resolving abstract operations.
+       -   Evaluating conditional dispatch rules.
+       -   Normalizing arguments via the Semantic Specification.
+       -   Applying Tensor Layout Permutations.
+   6.  **Output Transformation**: Applying casting or indexing adapters to the result.
+   7.  **State Threading**: Injecting state arguments (like `rngs`) in constructors.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: InvocationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin`
+
+
+   Mixin for transforming Call nodes (`func(...)`).
+
+   This class contains the primary logic for mapping function calls between frameworks.
+   It relies on `NormalizationMixin` for argument mapping and `TraitsCachingMixin` for
+   accessing framework configurations.
+
+
+   .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
+
+      Rewrites function calls with detailed Trace Logging.
+
+      The transformation pipeline proceeds in stages:
+      1.  **Structure**: Unwrap functional `apply` calls, handle plugins, handle lifecycle methods.
+      2.  **API Resolution**: Lookup the function name in the Semantic Knowledge Base.
+      3.  **Argument Rewrite**: Normalize arguments, check dispatch rules, applying pivots.
+      4.  **Transformation**: Rewrites call as Infix, Inline Lambda, Macro, or Standard Call.
+      5.  **Output**: Applies indexing, output adapters, or casting.
+      6.  **Context**: Helper logic for specific contexts like `__init__` (state threading).
+
+      :param original: The original CST node (before children were visited).
+      :param updated: The CST node with transformed children (arguments processed).
+
+      :returns: The transformed CST node (Call, Expr, or other).
+
+
+

@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.optimizer_step" href="../optimizer_step/index.html" />
@@ -337,24 +337,28 @@
             
   <section id="module-ml_switcheroo.plugins.nnx_to_torch_params">
 <span id="ml-switcheroo-plugins-nnx-to-torch-params"></span><h1 id="api-ml-switcheroo-plugins-nnx-to-torch-params-index--page-root">ml_switcheroo.plugins.nnx_to_torch_params<a class="headerlink" href="#api-ml-switcheroo-plugins-nnx-to-torch-params-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Plugin for converting Flax NNX Variable definitions to PyTorch Parameters.</p>
+<p>Plugin for converting Flax NNX Variable definitions to PyTorch-style Parameters.</p>
 <p>This module provides AST transformations to handle the impedance mismatch between
 Flax NNX’s explicit variable declarations (<cite>nnx.Param</cite>, <cite>nnx.BatchStat</cite>) and
 PyTorch’s <cite>nn.Parameter</cite> pattern.</p>
 <p>It handles:</p>
 <ol class="arabic simple">
-<li><p><strong>Trainable Parameters</strong>: <cite>nnx.Param(val)</cite> -&gt; <cite>torch.nn.Parameter(val)</cite>.</p></li>
-<li><p><strong>Non-Trainable State</strong>: <cite>nnx.BatchStat(val)</cite> -&gt; <cite>torch.nn.Parameter(val, requires_grad=False)</cite>.
-<em>Note: While PyTorch typically uses `register_buffer` for this, converting an Assignment
-expression to a `register_buffer` statement is structurally complex in AST replacement.
-Using non-grad Parameters is a semantic equivalent for state persistence.</em></p></li>
+<li><p><strong>Trainable Parameters</strong>: <cite>nnx.Param(val)</cite> -&gt; <cite>TargetParam(val)</cite>.</p></li>
+<li><p><strong>Non-Trainable State</strong>: <cite>nnx.BatchStat(val)</cite> -&gt; <cite>TargetParam(val, requires_grad=False)</cite>.</p></li>
 </ol>
+<dl class="simple">
+<dt>Decoupling:</dt><dd><p>Logic is triggered solely by the <cite>requires_plugin=”nnx_param_to_torch”</cite> wiring.
+The target class name is resolved via <cite>ctx.lookup_api</cite> based on the abstract Operation ID.
+If no mapping is found in the Knowledge Base, the transformation aborts (returns original node),
+preventing hardcoded fallbacks to <cite>torch.nn.Parameter</cite>.</p>
+</dd>
+</dl>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.plugins.nnx_to_torch_params.transform_nnx_param" title="ml_switcheroo.plugins.nnx_to_torch_params.transform_nnx_param"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_nnx_param</span></code></a>(→ libcst.Call)</p></td>
-<td><p>Plugin Hook: Transforms valid NNX Variable declarations into PyTorch Parameters.</p></td>
+<td><p>Plugin Hook: Transforms valid NNX Variable declarations into PyTorch-style Parameters.</p></td>
 </tr>
 </tbody>
 </table>
@@ -364,27 +368,27 @@ Using non-grad Parameters is a semantic equivalent for state persistence.</em></
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.nnx_to_torch_params.transform_nnx_param">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.nnx_to_torch_params.</span></span><span class="sig-name descname"><span class="pre">transform_nnx_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.nnx_to_torch_params.transform_nnx_param" title="Link to this definition">¶</a></dt>
-<dd><p>Plugin Hook: Transforms valid NNX Variable declarations into PyTorch Parameters.</p>
+<dd><p>Plugin Hook: Transforms valid NNX Variable declarations into PyTorch-style Parameters.</p>
 <dl class="simple">
-<dt>Triggers:</dt><dd><p>Operations marked with <cite>requires_plugin: “nnx_param_to_torch”</cite> in Semantic JSONs.
+<dt>Triggers:</dt><dd><p>Operations marked with <cite>requires_plugin: “nnx_param_to_torch”</cite>.
 Targeting: <cite>flax.nnx.Param</cite>, <cite>flax.nnx.Variable</cite>, <cite>flax.nnx.BatchStat</cite>.</p>
 </dd>
-<dt>Transformation Logic:</dt><dd><ul class="simple">
-<li><p>Checks the source function signature/name via context or node analysis.</p></li>
-<li><p>Maps <cite>nnx.Param</cite> -&gt; <cite>torch.nn.Parameter</cite> (Trainable).</p></li>
-<li><p>Maps <cite>nnx.BatchStat</cite>/<cite>Variable</cite> -&gt; <cite>torch.nn.Parameter(…, requires_grad=False)</cite>.</p></li>
-</ul>
+<dt>Logic:</dt><dd><ol class="arabic simple">
+<li><p>Determines if the source variable was trainable (<cite>Param</cite>) or not (<cite>BatchStat</cite>, <cite>Variable</cite>).</p></li>
+<li><p>Looks up the target API for the current operation.</p></li>
+<li><p>Injects <cite>requires_grad=False</cite> if not trainable.</p></li>
+</ol>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> (<em>cst.Call</em>) – The original CST Call node (e.g., <cite>nnx.Param(zeros(1))</cite>).</p></li>
-<li><p><strong>ctx</strong> (<a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><em>HookContext</em></a>) – The HookContext containing config and semantics.</p></li>
+<li><p><strong>node</strong> – The original CST Call node (e.g., <cite>nnx.Param(zeros(1))</cite>).</p></li>
+<li><p><strong>ctx</strong> – The HookContext containing configuration.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The transformed CST Call node.</p>
+<dd class="field-even"><p>The transformed CST Call node or original if mapping missing.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>cst.Call</p>

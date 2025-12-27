@@ -1,0 +1,106 @@
+injector_fw.core
+================
+
+.. py:module:: injector_fw.core
+
+.. autoapi-nested-parse::
+
+   Core Logic for Framework Adapter AST Transformer.
+
+   This module defines the `FrameworkInjector` class, which handles the localized
+   insertion of new Semantic Operations into existing Python framework adapter files.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   injector_fw.core.FrameworkInjector
+
+
+Module Contents
+---------------
+
+.. py:class:: FrameworkInjector(target_fw: str, op_name: str, variant: ml_switcheroo.core.dsl.FrameworkVariant)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   Injects a `StandardMap` entry into a Framework Adapter's definitions.
+
+   It performs a targeted search for:
+
+   1. A class decorated with `@register_framework("target_fw")`.
+   2. A method named `definitions` decorated with `@property`.
+   3. A `return` statement returning a `Dict`.
+
+   Additionally, it scans the module for existing imports and injects missing
+   dependencies required by the new mapping (e.g. injecting `import scipy` if
+   the API is `scipy.special.erf`).
+
+
+   .. py:attribute:: target_fw
+
+
+   .. py:attribute:: op_name
+
+
+   .. py:attribute:: variant
+
+
+   .. py:attribute:: found
+      :value: False
+
+
+
+   .. py:method:: visit_Import(node: libcst.Import) -> None
+
+      Tracks existing top-level imports.
+
+
+
+   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> None
+
+      Tracks existing from-imports.
+
+
+
+   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
+
+      Checks if the class matches the target framework via decorator.
+
+
+
+   .. py:method:: leave_ClassDef(original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
+
+      Exit class scope.
+
+
+
+   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
+
+      Enters functions. Only interested if inside target class and named 'definitions'.
+
+
+
+   .. py:method:: leave_FunctionDef(original_node: libcst.FunctionDef, updated_node: libcst.FunctionDef) -> libcst.FunctionDef
+
+      Exit function scope.
+
+
+
+   .. py:method:: leave_Return(original_node: libcst.Return, updated_node: libcst.Return) -> Union[libcst.Return, libcst.RemovalSentinel]
+
+      Intercepts the return statement of the definitions property.
+      Injects the new key-value into the dictionary.
+
+
+
+   .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
+
+      Post-process module to inject missing top-level imports.
+
+
+

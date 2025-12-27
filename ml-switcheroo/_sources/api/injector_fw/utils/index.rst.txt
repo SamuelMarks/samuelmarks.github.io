@@ -1,0 +1,71 @@
+injector_fw.utils
+=================
+
+.. py:module:: injector_fw.utils
+
+.. autoapi-nested-parse::
+
+   Utilities for AST Node Construction and Inspection.
+
+   This module provides helper functions to convert Python runtime objects (dictionaries,
+   lists, primitives) into LibCST nodes, as well as utilities for inspecting import definitions.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   injector_fw.utils.get_import_root
+   injector_fw.utils.is_docstring
+   injector_fw.utils.is_future_import
+   injector_fw.utils.convert_to_cst_literal
+
+
+Module Contents
+---------------
+
+.. py:function:: get_import_root(node: Union[libcst.Name, libcst.Attribute]) -> str
+
+   Recursively extracts the root package name from a CST node.
+
+   :param node: The AST node representing the module name.
+
+   :returns: The root package identifier (e.g. "scipy" from "scipy.special").
+   :rtype: str
+
+
+.. py:function:: is_docstring(node: libcst.CSTNode, idx: int) -> bool
+
+   Checks if a statement node represents a module docstring.
+
+   :param node: The statement node to check.
+   :param idx: The index of the statement within the module body.
+
+   :returns: True if it is a docstring (Expr containing String at index 0).
+   :rtype: bool
+
+
+.. py:function:: is_future_import(node: libcst.CSTNode) -> bool
+
+   Checks if a statement is a `from __future__ import ...` directive.
+
+   :param node: The statement node to check.
+
+   :returns: True if it is a future import.
+   :rtype: bool
+
+
+.. py:function:: convert_to_cst_literal(val: Any) -> libcst.BaseExpression
+
+   Recursively converts a python primitive or container to a CST node.
+
+   Supports: int, float, bool, str, list, tuple, dict, None.
+
+   :param val: The python value to convert.
+
+   :returns: The resulting AST node.
+   :rtype: cst.BaseExpression
+
+

@@ -15,24 +15,16 @@ ml_switcheroo.plugins.schedulers
    **Transformation**
 
    1.  **Instantiation**:
-
-       -   Detects specific Scheduler constructors.
+       -   Detects specific Scheduler constructors via `scheduler_rewire`.
        -   Removes the `optimizer` argument (Arg 0).
-       -   Maps hyperparameters to Optax equivalents.
-       -   Changes the API call to an Optax schedule factory.
+       -   Maps hyperparameters to target equivalents using keys defined in the semantic map
+           (e.g. `step_size` -> `transition_steps` for Optax or `decay_steps` for Keras).
+       -   Changes the API call to the target factory declared in the Knowledge Base.
        -   Injects `init_value=1.0` (as partial schedule) or tries to preserve semantics.
 
    2.  **Stepping**:
-
-       -   Detects `scheduler.step()`.
-       -   Since JAX schedulers are integrated into the gradient transform chain and stepped automatically via state,
-           manual stepping is redundant.
+       -   Detects `scheduler.step()` via `scheduler_step_noop`.
        -   Replaces `scheduler.step()` with a no-op placeholder `None`.
-
-   Supported Mappings:
-
-   -   `StepLR` -> `optax.exponential_decay(staircase=True)`
-   -   `CosineAnnealingLR` -> `optax.cosine_decay_schedule`
 
 
 
@@ -52,9 +44,13 @@ Module Contents
 
    Hook: Transforms Scheduler instantiation.
 
+   Logic routes based on detected Operation ID in context (StepLR vs Cosine).
+   Now fully decoupled: reads target API and argument names from `ctx`.
+
 
 .. py:function:: transform_scheduler_step(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
 
    Hook: Replaces ``scheduler.step()`` with a no-op value (None).
+   Triggered if the scheduler step operation is wired to `scheduler_step_noop`.
 
 

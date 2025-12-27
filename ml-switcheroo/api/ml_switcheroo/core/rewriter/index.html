@@ -63,11 +63,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.attributes" href="attributes/index.html" />
-    <link rel="prev" title="ml_switcheroo.core.import_fixer" href="../import_fixer/index.html" />
+    <link rel="prev" title="ml_switcheroo.core.import_fixer.utils" href="../import_fixer/utils/index.html" />
   
    
 
@@ -317,13 +317,7 @@
         </li>
         <li class="md-nav__item"><a href="#package-contents" class="md-nav__link">Package Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.CallMixin" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CallMixin</span></code></a><nav class="md-nav">
-              <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.CallMixin.leave_Assign" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CallMixin.leave_Assign()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.CallMixin.leave_Call" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CallMixin.leave_Call()</span></code></a>
-        </li></ul>
-            </nav>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.CallMixin" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CallMixin</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.NormalizationMixin" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">NormalizationMixin</span></code></a>
         </li>
@@ -437,7 +431,7 @@ to handle specific aspects of the AST transformation:
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.CallMixin" title="ml_switcheroo.core.rewriter.CallMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CallMixin</span></code></a></p></td>
-<td><p>Mixin for transforming Call nodes and unpacking Assignments.</p></td>
+<td><p>Composite mixin for transforming Call nodes (<cite>func(...)</cite>) and Assignments (<cite>x = ...</cite>).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.NormalizationMixin" title="ml_switcheroo.core.rewriter.NormalizationMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NormalizationMixin</span></code></a></p></td>
 <td><p>Mixin class providing argument normalization and operator transformation logic.</p></td>
@@ -471,33 +465,25 @@ to handle specific aspects of the AST transformation:
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.CallMixin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.</span></span><span class="sig-name descname"><span class="pre">CallMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.CallMixin" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="normalization/index.html#ml_switcheroo.core.rewriter.normalization.NormalizationMixin" title="ml_switcheroo.core.rewriter.normalization.NormalizationMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.normalization.NormalizationMixin</span></code></a>, <a class="reference internal" href="base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
-<p>Mixin for transforming Call nodes and unpacking Assignments.</p>
-<p>Responsible for:
-1.  Handling functional <cite>apply</cite> patterns (Flax).
-2.  Lifecycle method stripping (<cite>.to()</cite>, <cite>.cuda()</cite>).
-3.  Plugin dispatch.
-4.  Standard API pivoting (Lookup -&gt; Normalize -&gt; Rewrite).
-5.  Output Transformation (Indexing, Casting).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.CallMixin.leave_Assign">
-<span class="sig-name descname"><span class="pre">leave_Assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Assign</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.CallMixin.leave_Assign" title="Link to this definition">¶</a></dt>
-<dd><p>Handles assignment unwrapping for Functional -&gt; OOP transitions.</p>
-<p>Scenario: <cite>y, updates = layer.apply(vars, x)</cite>
-Target:   <cite>y = layer(x)</cite> (NNX/Torch style)</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.CallMixin.leave_Call">
-<span class="sig-name descname"><span class="pre">leave_Call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.BinaryOperation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.UnaryOperation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.CallMixin.leave_Call" title="Link to this definition">¶</a></dt>
-<dd><p>Rewrites function calls with detailed Trace Logging.
-Implements Logic 4: Layer Init State Threading.</p>
-</dd></dl>
+<dd><p>Bases: <a class="reference internal" href="calls/invocation/index.html#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin" title="ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin</span></code></a>, <a class="reference internal" href="calls/assignment/index.html#ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin" title="ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin</span></code></a>, <a class="reference internal" href="base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
+<p>Composite mixin for transforming Call nodes (<cite>func(…)</cite>) and Assignments (<cite>x = …</cite>).</p>
+<p>This class aggregates:
+1.  <strong>Functional Unwrapping</strong>: Handling legacy <cite>apply</cite> patterns (via <cite>AssignmentUnwrapMixin</cite>).
+2.  <strong>Call Rewriting</strong>: The core engine for remapping APIs, handling plugins, and injecting state (via <cite>InvocationMixin</cite>).
+3.  <strong>Trait caching</strong>: Performance optimization for framework config lookup (Implicit).</p>
+<p>Inheritance Order is important: <cite>InvocationMixin</cite> and <cite>AssignmentUnwrapMixin</cite>
+override specific visitor methods, while <cite>BaseRewriter</cite> provides utilities.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.NormalizationMixin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.</span></span><span class="sig-name descname"><span class="pre">NormalizationMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.NormalizationMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
 <p>Mixin class providing argument normalization and operator transformation logic.</p>
+<dl class="simple">
+<dt>Dependencies:</dt><dd><p>Requires <cite>self.semantics</cite> (SemanticsManager) and <cite>self.config</cite> (RuntimeConfig)
+to be available on the instance (inherited from BaseRewriter).</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.AttributeMixin">
@@ -538,6 +524,7 @@ Part of PivotRewriter.</p>
 <li><p>Identifies the decorator name from <cite>original_node</cite> to ensure we key off the
 Source Framework API, even if <cite>CallMixin</cite> modified the children in <cite>updated_node</cite>.</p></li>
 <li><p>Looks up the semantic definition.</p></li>
+<li><p>Checks Target Structural Traits for explicit stripping requirements (e.g. <cite>strip_decorators</cite>).</p></li>
 <li><p>If the target variant is explicitly <cite>null</cite> (None), removes the decorator.</p></li>
 <li><p>If the target variant specifies a new API, rewrites the name.</p></li>
 </ol>
@@ -745,7 +732,7 @@ transformer logic. This class is the entry point for the ASTEngine.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../import_fixer/index.html" title="ml_switcheroo.core.import_fixer"
+            <a href="../import_fixer/utils/index.html" title="ml_switcheroo.core.import_fixer.utils"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -754,7 +741,7 @@ transformer logic. This class is the entry point for the ASTEngine.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.import_fixer </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.import_fixer.utils </span>
               </div>
             </a>
           

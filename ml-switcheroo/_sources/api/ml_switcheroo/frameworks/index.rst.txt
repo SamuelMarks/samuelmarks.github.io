@@ -7,8 +7,14 @@ ml_switcheroo.frameworks
 
    Framework Adapters Package.
 
-   Automatically discovers and registers framework adapters.
-   Exposes concrete Adapter classes for testing/typing convenience.
+   Automatically discovers and registers framework adapters by scanning this
+   directory for modules. This allows for "Zero-Edit" extensibility: simply drop
+   a new adapter file (e.g., `tinygrad.py`) into this folder, and it will be
+   automatically registered.
+
+   This module exposes the registry helpers (`get_adapter`, `available_frameworks`)
+   but relies on the side-effects of importing submodules to populate the
+   internal `_ADAPTER_REGISTRY`.
 
 
 
@@ -29,20 +35,6 @@ Submodules
    /api/ml_switcheroo/frameworks/paxml/index
    /api/ml_switcheroo/frameworks/tensorflow/index
    /api/ml_switcheroo/frameworks/torch/index
-
-
-Attributes
-----------
-
-.. autoapisummary::
-
-   ml_switcheroo.frameworks.TorchAdapter
-   ml_switcheroo.frameworks.JaxAdapter
-   ml_switcheroo.frameworks.FlaxNNXAdapter
-   ml_switcheroo.frameworks.PaxmlAdapter
-   ml_switcheroo.frameworks.NumpyAdapter
-   ml_switcheroo.frameworks.TensorFlowAdapter
-   ml_switcheroo.frameworks.MLXAdapter
 
 
 Classes
@@ -73,12 +65,47 @@ Package Contents
 
    Protocol definition for a Framework Adapter.
 
+   Adapters provide translation traits, discovery logic, and syntax generation
+   for specific machine learning frameworks.
+
 
    .. py:method:: convert(data: Any) -> Any
+
+      Converts input data (List, NumPy) to the framework's Tensor format.
+      Used by the Fuzzer for validation.
+
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
+
+
+      Templates for generating physical test files (imports, conversions).
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Returns a list of import statements required for the verification harness initialization logic.
+      E.g. ["import jax", "import jax.random"]
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Returns Python code to define initialization helpers for the verification harness.
+      Used to inject framework-specific PRNG key generation logic into the generated test script.
+
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+      Returns a python code snippet that checks if an object 'obj' is a tensor of this framework
+      and returns its numpy representation.
+
+      .. rubric:: Example
+
+      return "if hasattr(obj, 'numpy'): return obj.numpy()"
 
 
 
@@ -86,62 +113,134 @@ Package Contents
       :type: List[str]
 
 
+      List of module names to scan during discovery.
+
 
    .. py:property:: display_name
       :type: str
 
+
+      Human-readable name of the framework.
 
 
    .. py:property:: ui_priority
       :type: int
 
 
+      Sort priority for UI display (lower is earlier).
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
+
+      Dictionary of Regex patterns for categorizing APIs.
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
+      List of semantic tiers supported by this framework.
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
+
+      The primary import tuple (e.g. ('torch', 'torch')).
 
 
    .. py:property:: inherits_from
       :type: Optional[str]
 
 
+      Optional parent framework key to inherit behavior from.
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
+
+      Configuration for class/function rewriting.
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+      Returns flags controlling plugin behavior (e.g. supported casting syntax).
+      Default should be PluginTraits().
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
+      List of global RNG seeding method names.
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      List of state/context argument names this framework injects/uses
+      (e.g., ['rngs'] for Flax, ['key'] for JAX).
+      Used to build the global list of arguments to strip from other frameworks.
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Returns a set of submodule names to exclude from recursive introspection.
+      Prevents crashes on C-extensions or internals (e.g., '_C', 'distributed').
+
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Generates code for device object creation.
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Returns syntax for checking GPU/Accelerator availability.
+      Example: ``torch.cuda.is_available()`` or ``len(jax.devices('gpu')) > 0``.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      Returns syntax for splitting an RNG state (Preamble Injection).
+      Example: ``rng, key = jax.random.split(rng)``.
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
+      Generates code for save/load operations.
+
+
 
    .. py:method:: get_serialization_imports() -> List[str]
+
+      Returns list of imports required for serialization.
+
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
+      Returns the primary code example for documentation.
+
+
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns examples for each supported tier.
+
 
 
    .. py:property:: definitions
@@ -151,54 +250,58 @@ Package Contents
       Returns the framework's static implementation of Middle Layer Operations.
 
 
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.semantics.schema.OpDefinition]
+
+
+      Returns the framework's DEFINITION of operations (The Hub reference).
+      Allows adapters to introduce new Abstract Standards to the system.
+
+
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, Union[Dict[str, str], ImportConfig]]
 
 
-      Returns import path remapping rules.
-      Format: {"source.mod": {"root": "target", "sub": "mod", "alias": "alias"}}
+      Exposes namespaces provided by this framework with Tier metadata.
+
+      New Self-Declaration Format:
+          { "torch.nn": ImportConfig(tier=SemanticTier.NEURAL, recommended_alias="nn") }
+
+      Legacy Format (Deprecated):
+          { "source.mod": {"root": "target", "sub": "mod", "alias": "alias"} }
 
 
    .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
+      Collects APIs for consensus discovery.
+
+
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies manual patches to the snapshot dictionary.
+
 
 
 .. py:function:: register_framework(name: str)
 
+   Decorator to register a framework adapter class.
+
+
 .. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
 
-.. py:data:: TorchAdapter
-   :value: None
-
-
-.. py:data:: JaxAdapter
-   :value: None
-
-
-.. py:data:: FlaxNNXAdapter
-   :value: None
-
-
-.. py:data:: PaxmlAdapter
-   :value: None
-
-
-.. py:data:: NumpyAdapter
-   :value: None
-
-
-.. py:data:: TensorFlowAdapter
-   :value: None
-
-
-.. py:data:: MLXAdapter
-   :value: None
+   Factory to retrieve an instantiated adapter.
 
 
 .. py:function:: available_frameworks() -> List[str]
 
    Returns a list of all registered framework keys.
+
+   The keys are populated dynamically. Usage example:
+   >>> if "tinygrad" in available_frameworks():
+   ...     print("TinyGrad is supported!")
+
+   :returns: A list of identifier strings (e.g. ['torch', 'jax']).
+   :rtype: List[str]
 
 

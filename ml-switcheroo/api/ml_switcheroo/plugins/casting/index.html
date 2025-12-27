@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.plugins.checkpoint_keys" href="../checkpoint_keys/index.html" />
@@ -343,9 +343,10 @@
 2. JAX/NumPy/Array API: <cite>x.astype(dtype)</cite>.</p>
 <p>Transformation:
 1. Detects calls to known shorthand methods (triaged by Rewriter via ‘type_methods’ plugin).
-2. Looks up the <cite>target_type</cite> in the semantic metadata for the abstract operation (e.g., <cite>CastFloat</cite> -&gt; <cite>Float32</cite>).
-3. Queries the Semantics Manager for the target framework’s implementation of that Type (e.g., <cite>Float32</cite> -&gt; <cite>jnp.float32</cite>).
-4. Generates an <cite>.astype(…)</cite> call using the retrieved dtype API.</p>
+2. Checks if the target framework declares <cite>has_numpy_compatible_arrays</cite> in its traits.
+3. Looks up the <cite>target_type</cite> in the semantic metadata for the abstract operation.
+4. Queries the Semantics Manager for the target framework’s implementation of that Type.
+5. Generates an <cite>.astype(…)</cite> call using the retrieved dtype API.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -364,6 +365,7 @@
 <dd><p>Hook: Converts shorthand casts to astype calls.</p>
 <dl class="simple">
 <dt>Logic:</dt><dd><ol class="arabic simple">
+<li><p>Verify target framework supports numpy array semantics (via Traits).</p></li>
 <li><p>Access the Abstract Operation ID (e.g., ‘CastFloat’).</p></li>
 <li><p>Look up the ‘target_type’ metadata (e.g., ‘Float32’).</p></li>
 <li><p>Look up the target framework’s API for ‘Float32’ (e.g., ‘jax.numpy.float32’).</p></li>

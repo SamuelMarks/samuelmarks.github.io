@@ -63,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=02a13d87"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.testing.linter" href="../linter/index.html" />
@@ -338,11 +338,14 @@
   <section id="module-ml_switcheroo.testing.harness_generator_template">
 <span id="ml-switcheroo-testing-harness-generator-template"></span><h1 id="api-ml-switcheroo-testing-harness-generator-template-index--page-root">ml_switcheroo.testing.harness_generator_template<a class="headerlink" href="#api-ml-switcheroo-testing-harness-generator-template-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Template for the Verification Harness.</p>
-<p>This template is populated by <cite>HarnessGenerator</cite>. It accepts:
-- source/target paths
-- frameworks
-- hints configuration
-- <strong>fuzzer_implementation</strong>: The extracted source code of the fuzzer class.</p>
+<p>This template is populated by <cite>HarnessGenerator</cite>. It provides a completely generic
+skeleton for running <cite>source_func(x) == target_func(x)</cite> checks.</p>
+<p>Key placeholders:
+- {imports}: Framework-specific imports (e.g., ‘import jax’).
+- {init_helpers}: Framework-specific helper function definitions (e.g., ‘_make_jax_key’).
+- {param_injection_logic}: Dynamic dispatch logic to inject state/rng args.
+- {fuzzer_implementation}: The extracted source code of the InputFuzzer class.
+- {to_numpy_logic}: Dynamic tensor-to-numpy conversion snippets.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -370,24 +373,11 @@
 <span class="sd">from typing import Any, List, Dict, Tuple, Optional, Union</span>
 <span class="sd">import numpy as np</span>
 
+<span class="sd"># --- DYNAMIC FRAMEWORK IMPORTS ---</span>
+<span class="sd">{imports}</span>
+
 <span class="sd"># --- HELPERS FOR STATE INJECTION ---</span>
-
-<span class="sd">def _make_jax_key(seed):</span>
-<span class="sd">    "Attempts to create a JAX PRNGKey."</span>
-<span class="sd">    try:</span>
-<span class="sd">        import jax</span>
-<span class="sd">        import jax.random</span>
-<span class="sd">        return jax.random.PRNGKey(seed)</span>
-<span class="sd">    except ImportError:</span>
-<span class="sd">        return "mock_jax_key"</span>
-
-<span class="sd">def _make_flax_rngs(seed):</span>
-<span class="sd">    "Attempts to create a Flax NNX Rngs object."</span>
-<span class="sd">    try:</span>
-<span class="sd">        from flax import nnx</span>
-<span class="sd">        return nnx.Rngs(seed)</span>
-<span class="sd">    except ImportError:</span>
-<span class="sd">        return "mock_flax_rngs"</span>
+<span class="sd">{init_helpers}</span>
 
 <span class="sd"># --- INJECTED FUZZER LOGIC ---</span>
 
@@ -401,12 +391,10 @@
 <span class="sd">    except ImportError:</span>
 <span class="sd">        return obj</span>
 
-<span class="sd">    if hasattr(obj, "detach"): # Torch</span>
-<span class="sd">        return obj.detach().cpu().numpy()</span>
-<span class="sd">    if hasattr(obj, "__array__"): # JAX/Numpy</span>
-<span class="sd">        return np.array(obj)</span>
-<span class="sd">    if hasattr(obj, "numpy"): # TF</span>
-<span class="sd">        return obj.numpy()</span>
+<span class="sd">    # --- DYNAMIC TENSOR CONVERSION ---</span>
+<span class="sd">    {to_numpy_logic}</span>
+
+<span class="sd">    # --- GENERIC CONTAINER RECURSION ---</span>
 <span class="sd">    if isinstance(obj, (list, tuple)):</span>
 <span class="sd">         return [to_numpy(x) for x in obj]</span>
 <span class="sd">    return obj</span>
@@ -494,14 +482,9 @@
 
 <span class="sd">            for tp in tgt_params:</span>
 <span class="sd">                if tp not in tgt_inputs:</span>
-<span class="sd">                    val = None</span>
-<span class="sd">                    if tp in ["rng", "key"]:</span>
-<span class="sd">                        val = _make_jax_key(seed=42)</span>
-<span class="sd">                    elif tp == "rngs":</span>
-<span class="sd">                        val = _make_flax_rngs(seed=42)</span>
-
-<span class="sd">                    if val is not None:</span>
-<span class="sd">                        tgt_inputs[tp] = val</span>
+<span class="sd">                    # Dynamic Injection Block</span>
+<span class="sd">                    {param_injection_logic}</span>
+<span class="sd">                    pass</span>
 <span class="sd">        except ValueError:</span>
 <span class="sd">            pass</span>
 
@@ -527,6 +510,9 @@
 <span class="sd">                passes += 1</span>
 <span class="sd">            else:</span>
 <span class="sd">                print(f"❌ {{func_name}}: Mismatch")</span>
+<span class="sd">                # Print debug info on mismatch</span>
+<span class="sd">                # print(f"Src: {{val_src}}")</span>
+<span class="sd">                # print(f"Tgt: {{val_tgt}}")</span>
 <span class="sd">                failures += 1</span>
 
 <span class="sd">        except Exception as e:</span>

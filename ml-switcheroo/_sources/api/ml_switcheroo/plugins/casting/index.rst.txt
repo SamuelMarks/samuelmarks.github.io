@@ -13,9 +13,10 @@ ml_switcheroo.plugins.casting
 
    Transformation:
    1. Detects calls to known shorthand methods (triaged by Rewriter via 'type_methods' plugin).
-   2. Looks up the `target_type` in the semantic metadata for the abstract operation (e.g., `CastFloat` -> `Float32`).
-   3. Queries the Semantics Manager for the target framework's implementation of that Type (e.g., `Float32` -> `jnp.float32`).
-   4. Generates an `.astype(...)` call using the retrieved dtype API.
+   2. Checks if the target framework declares `has_numpy_compatible_arrays` in its traits.
+   3. Looks up the `target_type` in the semantic metadata for the abstract operation.
+   4. Queries the Semantics Manager for the target framework's implementation of that Type.
+   5. Generates an `.astype(...)` call using the retrieved dtype API.
 
 
 
@@ -35,10 +36,11 @@ Module Contents
    Hook: Converts shorthand casts to astype calls.
 
    Logic:
-       1. Access the Abstract Operation ID (e.g., 'CastFloat').
-       2. Look up the 'target_type' metadata (e.g., 'Float32').
-       3. Look up the target framework's API for 'Float32' (e.g., 'jax.numpy.float32').
-       4. Rewrite `x.foo()` -> `x.astype(jax.numpy.float32)`.
+       1. Verify target framework supports numpy array semantics (via Traits).
+       2. Access the Abstract Operation ID (e.g., 'CastFloat').
+       3. Look up the 'target_type' metadata (e.g., 'Float32').
+       4. Look up the target framework's API for 'Float32' (e.g., 'jax.numpy.float32').
+       5. Rewrite `x.foo()` -> `x.astype(jax.numpy.float32)`.
 
    :param node: The source call node.
    :type node: cst.Call

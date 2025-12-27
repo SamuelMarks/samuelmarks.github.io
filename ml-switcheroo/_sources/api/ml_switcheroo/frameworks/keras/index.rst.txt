@@ -7,14 +7,14 @@ ml_switcheroo.frameworks.keras
 
    Keras (v3) Framework Adapter.
 
-   This module provides the adapter for Keras 3+, enabling translation between
-   Keras and other frameworks (JAX, Torch, TensorFlow).
+   This module implements the adapter for the Keras 3 framework, supporting
+   multi-backend translation (JAX/Torch/TensorFlow).
 
-   It implements:
-   1.  **Layers**: Mapping `keras.layers` (e.g. Dense, Conv2D).
-   2.  **Ops**: Mapping `keras.ops` (backend-agnostic math).
-   3.  **String Types**: Mapping casting operations to string dtypes (`dtype="float32"`).
-   4.  **Discovery**: Runtime introspection of Keras modules.
+   It handles:
+   1.  **Math**: Mapping `keras.ops.*` (backend-agnostic math).
+   2.  **Layers**: Mapping `keras.layers.*`.
+   3.  **Discovery**: Runtime introspection of the Keras API surface.
+   4.  **Ghost Mode**: Silent fallback when Keras is not installed.
 
 
 
@@ -43,7 +43,9 @@ Module Contents
 
 .. py:class:: KerasAdapter
 
-   Adapter for Keras 3+ (Multi-backend).
+   Adapter for Keras v3 (Multi-backend).
+
+   Provides definitions for Keras Core Ops, Layers, and Models.
 
 
    .. py:attribute:: display_name
@@ -68,63 +70,93 @@ Module Contents
       :type: List[str]
 
 
-      Modules to scan during discovery.
+      Returns list of search modules.
+
+      If in Ghost Mode, returns empty list to prevent Scaffolder
+      from attempting to import missing modules.
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Submodules to exclude from recursive scans.
 
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
-      Canonical import alias.
+      Default import alias.
 
 
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
-      Namespace remapping rules.
-      Includes numpy alias to ensure `numpy.float32` -> `np.float32`.
+      Namespace mapping for import fixer.
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      Regex patterns for categorizing APIs.
+      Regex patterns for scaffold categorization.
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
-      Templates for generating tests.
+      Templates for test code generation.
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Imports for verification harness.
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Init code for verification harness.
+
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Supported capability tiers.
+      Supported semantic tiers.
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      List of framework-specific magic arguments.
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
-      Defines Keras structural patterns.
+      Structural transformation rules.
+
+
+   .. py:property:: plugin_traits
+      :type: Any
+
+
+      Plugin behavior flags.
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Static definitions for Keras mappings.
-
-      Implements **Casting Strategy**:
-      Unlike JAX/NumPy (objects) or Torch (attributes), Keras APIs expect string dtypes
-      or backend-agnostic types (which often default to strings in the high-level API).
-      Standalone types map to NumPy types for compatibility, but Cast operations
-      inject string literals.
+      Static mappings for Keras.
 
 
    .. py:property:: rng_seed_methods
@@ -134,39 +166,51 @@ Module Contents
       Global seed methods.
 
 
-   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
-      Dynamically collects API for Consensus.
+      Collects API definitions via introspection or snapshot.
 
 
 
    .. py:method:: convert(data: Any) -> Any
 
-      Converts input object to Keras Tensor.
+      Converts input data to Keras Tensor.
 
 
 
    .. py:method:: get_serialization_imports() -> List[str]
 
-      Imports for save/load.
+      Imports for saving/loading.
 
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      Syntax for save/load.
+      Syntax for saving/loading models.
 
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
-      Generates device scope syntax.
+      Syntax for device scoping.
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Syntax for checking GPU availability.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      Keras handles RNG state internally.
 
 
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
-      Applies manual wiring not covered by definitions.
+      Applies configuration wiring.
 
 
 
@@ -174,13 +218,13 @@ Module Contents
       :classmethod:
 
 
-      Returns standard example.
+      Returns example code.
 
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
 
-      Returns Keras examples.
+      Returns tiered examples.
 
 
 

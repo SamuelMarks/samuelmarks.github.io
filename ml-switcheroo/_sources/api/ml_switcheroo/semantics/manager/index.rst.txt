@@ -7,22 +7,15 @@ ml_switcheroo.semantics.manager
 
    SemanticsManager for Knowledge Base Loading and Updating.
 
-   This module is responsible for locating, loading, and merging semantic
-   specification files (JSONs) into a unified Knowledge Graph.
+   This module acts as the central database and coordinator for the Semantic
+   Knowledge Base. It delegates file loading and registry introspection to helper
+   modules, serving as the primary API for querying operation definitions.
 
-   Updates:
-   - Calls `_hydrate_defaults_from_registry` to merge code-defined variants.
-   - Merges `adapter.definitions` as valid overlays.
-   - Merges `adapter.import_namespaces` into import maps.
+   Core Responsibilities:
+   1.  **State Management**: Holds the merged view of operations, traits, and aliases.
+   2.  **Querying**: Resolves Abstract Operations to Framework-Specific Variants.
+   3.  **Coordination**: Triggers file loaders and code hydrators on initialization.
 
-
-
-Attributes
-----------
-
-.. autoapisummary::
-
-   ml_switcheroo.semantics.manager.DISCOVERED_FILENAMES
 
 
 Classes
@@ -36,18 +29,17 @@ Classes
 Module Contents
 ---------------
 
-.. py:data:: DISCOVERED_FILENAMES
-
 .. py:class:: SemanticsManager
 
    Central database for semantic mappings and configuration.
 
+   It aggregates data from three sources:
+   1.  **Internal Standards**: Hardcoded defaults (`standards_internal.py`).
+   2.  **File System**: JSON Specs (`semantics/`) and Overlays (`snapshots/`).
+   3.  **Code Registry**: Python classes (`FrameworkAdapter`, `Plugin`).
+
 
    .. py:attribute:: data
-      :type:  Dict[str, Dict]
-
-
-   .. py:attribute:: import_data
       :type:  Dict[str, Dict]
 
 
@@ -59,39 +51,91 @@ Module Contents
       :type:  Dict[str, Dict]
 
 
-   .. py:method:: get_all_rng_methods() -> Set[str]
-
-
-   .. py:method:: resolve_variant(abstract_id: str, target_fw: str) -> Optional[Dict[str, Any]]
-
-
-   .. py:method:: load_validation_report(report_path: pathlib.Path) -> None
-
-
-   .. py:method:: is_verified(abstract_id: str) -> bool
-
-
-   .. py:method:: get_definition_by_id(abstract_id: str) -> Optional[Dict[str, Any]]
-
-
-   .. py:method:: get_definition(api_name: str) -> Optional[Tuple[str, Dict]]
-
-
-   .. py:method:: get_known_apis() -> Dict[str, Dict]
+   .. py:attribute:: known_magic_args
+      :type:  Set[str]
 
 
    .. py:method:: get_import_map(target_fw: str) -> Dict[str, Tuple[str, Optional[str], Optional[str]]]
 
+      Generates the import mapping for the ImportFixer based on Tier linking.
+
+      :param target_fw: The framework being targeted.
+
+      :returns: Dict mapping source import paths to (root, sub, alias) tuples.
+
+
+
+   .. py:method:: resolve_variant(abstract_id: str, target_fw: str) -> Optional[Dict[str, Any]]
+
+      Resolves the implementation of an abstract operation for a specific framework.
+
+      Handles inheritance lookups (e.g. if 'flax_nnx' doesn't define 'abs', check 'jax').
+
+      :param abstract_id: The abstract operation name.
+      :param target_fw: The target framework key.
+
+      :returns: The variant dictionary or None.
+
+
+
+   .. py:method:: is_verified(abstract_id: str) -> bool
+
+      Returns True if the operation is marked verified (or untracked).
+
+
+
+   .. py:method:: get_definition_by_id(abstract_id: str) -> Optional[Dict[str, Any]]
+
+      Direct dictionary access.
+
+
+
+   .. py:method:: get_definition(api_name: str) -> Optional[Tuple[str, Dict]]
+
+      Reverse lookup from concrete API string.
+
+
+
+   .. py:method:: get_known_apis() -> Dict[str, Dict]
+
+      Returns full knowledge graph.
+
+
 
    .. py:method:: get_framework_config(framework: str) -> Dict[str, Any]
+
+      Returns definition of framework traits.
+
 
 
    .. py:method:: get_test_template(framework: str) -> Optional[Dict[str, str]]
 
+      Returns testing codegen templates.
+
+
 
    .. py:method:: get_framework_aliases() -> Dict[str, Tuple[str, str]]
 
+      Returns a map of {fw: (module, alias)}.
+
+
+
+   .. py:method:: get_all_rng_methods() -> Set[str]
+
+      Returns aggregate list of random seeding methods.
+
+
+
+   .. py:method:: load_validation_report(report_path: pathlib.Path) -> None
+
+      Loads a CI verification report to gate unavailable operations.
+
+
 
    .. py:method:: update_definition(abstract_id: str, new_data: Dict[str, Any]) -> None
+
+      Updates an operation definition in memory and persists to disk.
+      Used by Harvester/Wizard tools.
+
 
 

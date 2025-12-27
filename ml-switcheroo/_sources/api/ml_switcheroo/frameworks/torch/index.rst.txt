@@ -5,7 +5,15 @@ ml_switcheroo.frameworks.torch
 
 .. autoapi-nested-parse::
 
-   PyTorch Adapter with Dynamic Introspection.
+   PyTorch Framework Adapter.
+
+   This module implements the `FrameworkAdapter` protocol for PyTorch.
+   It provides:
+   1.  **Import Abstraction**: Self-declared namespace mappings (e.g. `torch.nn` is `NEURAL`).
+   2.  **Semantic Definitions**: A comprehensive mapping of Abstract Operations to `torch.*` APIs.
+       This moves the "Golden Set" logic out of the central hub and into this file.
+   3.  **Discovery**: Heuristics and logic for scanning the installed `torch` library
+       to discover new operations dynamically.
 
 
 
@@ -34,14 +42,10 @@ Module Contents
 
 .. py:class:: TorchAdapter
 
-   Adapter for PyTorch.
+   Adapter for PyTorch (Meta).
 
-   Handles mapping of:
-   1.  **Neural Networks**: `torch.nn.*` layers and containers.
-   2.  **Math**: `torch.*` tensor operations.
-   3.  **Types**: `torch.float32`, etc.
-   4.  **Casting**: `.float()`, `.long()`, etc. mapped to Abstract Casts.
-   5.  **Optimization**: `torch.optim.*`.
+   Handles Source and Target translation rules for PyTorch, including
+   `torch.nn`, `torch.optim`, and `torch.func` (vmap/grad).
 
 
    .. py:attribute:: display_name
@@ -51,7 +55,7 @@ Module Contents
 
 
    .. py:attribute:: inherits_from
-      :type:  None
+      :type:  Optional[str]
       :value: None
 
 
@@ -62,105 +66,166 @@ Module Contents
 
 
 
-   .. py:property:: search_modules
-      :type: List[str]
-
-
-      Search targets for discovery.
-
-
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
-      Returns standard alias ('torch', 'torch').
-
-
-   .. py:property:: supported_tiers
-      :type: List[ml_switcheroo.enums.SemanticTier]
-
-
-      Returns supported semantic tiers.
+      Returns the primary root import alias ('torch', 'torch').
 
 
    .. py:property:: import_namespaces
-      :type: Dict[str, Dict[str, str]]
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
-      Defines how to import specific submodules.
+      Defines the semantic roles of PyTorch namespaces.
+      Used by the SemanticsManager to link Source imports to Target imports.
 
-      .. rubric:: Examples
 
-      "torch.nn" -> `import torch.nn as nn`
-      "torch.nn.functional" -> `import torch.nn.functional as F`
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+      Modules to scan during `scaffold` or `sync` operations.
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Submodules that cause recursion depth errors or C-Extension crashes
+      during dynamic introspection.
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      Regex patterns for categorizing APIs.
+      Regex patterns (strings) to categorize discovered APIs.
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+      Returns the semantic tiers fully supported by this adapter.
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
-      Templates for generating physical verification tests.
+      Templates used by `gen-tests` to create physical verification files.
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      No special imports needed for harness initialization.
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      No special initialization helpers needed.
+
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
 
 
-      Defines PyTorch structural patterns.
-      Includes lifecycle method stripping (e.g. .cuda(), .detach()).
+      Defines how classes and functions are rewritten when targeting PyTorch.
 
 
-   .. py:property:: definitions
-      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.frameworks.base.PluginTraits
 
 
-      Comprehensive distributed definitions for PyTorch mappings.
-      Maps source API calls to Abstract Operations defined in the Hub.
+      Capabilities flags. PyTorch uses imperative state and eager execution.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      Returns list of RNG seeding methods.
+      Global seed setting methods detected as impure side-effects.
 
 
-   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
-
-      Collects API signatures dynamically.
-
+   .. py:property:: declared_magic_args
+      :type: List[str]
 
 
-   .. py:method:: get_device_syntax(device_type: str, device_index: None | str = None) -> str
+      Torch emits no magic args, all state is implicit.
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      The definitive mapping of Abstract Operations to PyTorch APIs.
+      Moved from `standards_internal.py` to decouple the Core from Frameworks.
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Generates code for device creation.
+      Example: "torch.device('cuda', 0)"
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Returns PyTorch syntax for checking CUDA availability.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      PyTorch uses global state-based randomness, so explicit splitting is a no-op.
+      Returns 'pass' to maintain valid block syntax if injected blindly.
+
 
 
    .. py:method:: get_serialization_imports() -> List[str]
 
 
-   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: None | str = None) -> str
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+      Generates save/load syntax.
+
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
+      Default example for documentation.
+
+
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
 
+      Provides code snippets for "Wizard" or "Demo" usage.
 
-   .. py:method:: convert(data)
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts input data (numpy, lists) into PyTorch Tensors for verification runners.
+
+
+
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
+
+      Implementation of the Ghost Protocol.
+      Scans the locally installed PyTorch library for API definitions corresponding
+      to the requested category (Loss, Layer, etc.).
+
 
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
-      Applies manual fixes.
+      Apply manual patches to the standard mappings if necessary.
 
 
 

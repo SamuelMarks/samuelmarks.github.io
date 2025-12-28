@@ -7,8 +7,8 @@ ml_switcheroo.testing.fuzzer.generators
 
    Primitive Generation Logic for the Fuzzer.
 
-   This module contains functions to generate random scalars and NumPy arrays
-   respecting specified constraints (min, max, dtype).
+   This module contains functions to generate random scalars, NumPy arrays,
+   and dummy callables respecting specified constraints (min, max, dtype).
 
 
 
@@ -21,6 +21,7 @@ Functions
    ml_switcheroo.testing.fuzzer.generators.generate_scalar_float
    ml_switcheroo.testing.fuzzer.generators.generate_array
    ml_switcheroo.testing.fuzzer.generators.get_random_shape
+   ml_switcheroo.testing.fuzzer.generators.generate_fake_callable
 
 
 Module Contents
@@ -72,5 +73,22 @@ Module Contents
 
    :returns: The random or seeded shape.
    :rtype: Tuple[int, ...]
+
+
+.. py:function:: generate_fake_callable(constraints: Dict[str, Any] = None) -> Any
+
+   Generates a dummy function (identity) for functional ops.
+
+   This is critical for fuzzer verification of HOFs (Higher Order Functions)
+   like `vmap`, `grad`, or `jit` which expect a callable input.
+
+   The return value is a lambda that accepts any arguments and returns the first one.
+   This ensures compatibility with unary ops (`f(x)`) and binary ops (`f(x, y)`).
+
+   :param constraints: Unused, kept for API consistency.
+   :type constraints: Dict[str, Any]
+
+   :returns: A lambda function `lambda x, *args, **kwargs: x`.
+   :rtype: Callable
 
 

@@ -5,20 +5,18 @@ ml_switcheroo.core.rewriter.base
 
 .. autoapi-nested-parse::
 
-   Base Rewriter Implementation with Alias and Scope Resolution.
+   Base Rewriter Implementation.
 
-   This module provides the ``BaseRewriter`` class, which serves as the foundation for
-   the ``PivotRewriter``. It handles:
+   The foundation for the ``PivotRewriter``, aggregating mixins for:
+   - Resolution (Aliases)
+   - Scoping (State Tracking)
+   - Version Checking
+   - Error Handling
 
-   1.  **State Management**: Tracking the current scope (global vs class vs function)
-       to handle stateful variable detection.
-   2.  **Alias Resolution**: Tracking ``import as`` statements to resolve ``t.abs`` back
-       to ``torch.abs`` or ``np.sum`` to ``numpy.sum``.
-   3.  **Error Reporting**: Collecting failures during the AST walk to be bubbled
-       up to the ``ASTEngine``.
-   4.  **Hook Infrastructure**: initializing the ``HookContext`` used by plugins.
-   5.  **Global Injection**: Handling file-level preamble injection (``leave_Module``).
-   6.  **Import Injection**: Processing dynamic import requirements from variants.
+   Also provides core infrastructure for:
+   - HookContext initialization.
+   - Global Preamble Injection.
+   - Knowledge Base Lookups (`_get_mapping`).
 
 
 
@@ -35,13 +33,10 @@ Module Contents
 
 .. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
 
-   Bases: :py:obj:`libcst.CSTTransformer`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`libcst.CSTTransformer`
 
 
    The base class for AST transformation traversal.
-
-   Provides common utilities for scope tracking, alias resolution, and error bubbling,
-   which are utilized by the specific Mixins (CallMixin, StructureMixin, etc.).
 
 
    .. py:attribute:: semantics
@@ -69,67 +64,6 @@ Module Contents
    .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
 
       Injects module-level preambles (e.g. Shim classes) requested by plugins.
-      Ensures injection happens after docstrings to maintain valid Python help text.
-
-      :param original_node: Logic before transformation.
-      :param updated_node: Logic after transformation.
-
-      :returns: The module with injected preambles.
-      :rtype: cst.Module
-
-
-
-   .. py:method:: visit_Import(node: libcst.Import) -> Optional[bool]
-
-      Scans ``import ...`` statements to populate the alias map.
-      Example: ``import torch.nn as nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
-
-      :param node: Import statement node.
-
-      :returns: False to stop traversal of children.
-      :rtype: Optional[bool]
-
-
-
-   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> Optional[bool]
-
-      Scans ``from ... import ...`` statements to populate the alias map.
-      Example: ``from torch import nn`` -> ``_alias_map['nn'] = 'torch.nn'``.
-
-      :param node: ImportFrom statement node.
-
-      :returns: False to stop traversal of children.
-      :rtype: Optional[bool]
-
-
-
-   .. py:method:: visit_SimpleStatementLine(node: libcst.SimpleStatementLine) -> Optional[bool]
-
-      Resets error tracking at the start of each line.
-      Errors bubble up from children (Expressions) to this Statement handler.
-
-      :param node: The statement line node.
-
-      :returns: True to continue traversal.
-      :rtype: Optional[bool]
-
-
-
-   .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
-
-      Handles error bubbling from expression rewrites.
-
-      If errors occurred during processing of this line's children (e.g. failing
-      to rewrite a function call), wrap the line in an ``EscapeHatch``.
-
-      Prioritizes errors (reverting to original code) over warnings (using updated code).
-
-      :param original_node: The node before children were visited.
-      :param updated_node: The node after children transformation.
-
-      :returns: The resulted node
-                (possibly wrapped with comments).
-      :rtype: Union[cst.SimpleStatementLine, cst.FlattenSentinel]
 
 
 

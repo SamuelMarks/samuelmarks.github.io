@@ -7,20 +7,16 @@ ml_switcheroo.core.rewriter.calls.invocation
 
    Function Invocation Rewriter.
 
-   This module provides the ``InvocationMixin``, the core component responsible for
-   rewriting `Call` nodes. It orchestrates a complex pipeline of transformations:
+   This module provides the :class:`InvocationMixin`, a component of the
+   :class:`PivotRewriter` responsible for transforming function call nodes within
+   the Abstract Syntax Tree (AST).
 
-   1.  **Functional Unwrapping**: Removing `apply` or `call_fn` wrappers.
-   2.  **Plugin Dispatch**: Delegating complex logic to registered hooks.
-   3.  **Lifecycle Management**: Stripping framework-specific methods like `.to()` or `.cuda()`.
-   4.  **State Management**: Rewriting calls to stateful objects/layers.
-   5.  **Standard API Pivoting**:
-       -   Resolving abstract operations.
-       -   Evaluating conditional dispatch rules.
-       -   Normalizing arguments via the Semantic Specification.
-       -   Applying Tensor Layout Permutations.
-   6.  **Output Transformation**: Applying casting or indexing adapters to the result.
-   7.  **State Threading**: Injecting state arguments (like `rngs`) in constructors.
+   It orchestrates three phases of processing:
+   1.  **Pre-Processing**: Checks for functional unwrapping, plugin claims, and lifecycle methods.
+   2.  **Strategy Execution**: Switches API calls based on Semantic Definitions, handling
+       infix operators, macros, and standard function renaming. This phase includes compatibility checks
+       and deprecation warnings.
+   3.  **Post-Processing**: Applies output adapters, casting, and state threading logic.
 
 
 
@@ -40,29 +36,14 @@ Module Contents
    Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin`
 
 
-   Mixin for transforming Call nodes (`func(...)`).
-
-   This class contains the primary logic for mapping function calls between frameworks.
-   It relies on `NormalizationMixin` for argument mapping and `TraitsCachingMixin` for
-   accessing framework configurations.
+   Mixin for transforming :class:`libcst.Call` nodes.
+   Integrates normalization, trait lookup, and transformation strategies.
 
 
    .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
 
-      Rewrites function calls with detailed Trace Logging.
-
-      The transformation pipeline proceeds in stages:
-      1.  **Structure**: Unwrap functional `apply` calls, handle plugins, handle lifecycle methods.
-      2.  **API Resolution**: Lookup the function name in the Semantic Knowledge Base.
-      3.  **Argument Rewrite**: Normalize arguments, check dispatch rules, applying pivots.
-      4.  **Transformation**: Rewrites call as Infix, Inline Lambda, Macro, or Standard Call.
-      5.  **Output**: Applies indexing, output adapters, or casting.
-      6.  **Context**: Helper logic for specific contexts like `__init__` (state threading).
-
-      :param original: The original CST node (before children were visited).
-      :param updated: The CST node with transformed children (arguments processed).
-
-      :returns: The transformed CST node (Call, Expr, or other).
+      Visits and rewrites a function call node.
+      Delegates logic to Pre/Strategy/Post handler modules.
 
 
 

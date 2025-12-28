@@ -323,6 +323,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.generators.generate_array" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">generate_array()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.generators.get_random_shape" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">get_random_shape()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.generators.generate_fake_callable" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">generate_fake_callable()</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -345,8 +347,8 @@
   <section id="module-ml_switcheroo.testing.fuzzer.generators">
 <span id="ml-switcheroo-testing-fuzzer-generators"></span><h1 id="api-ml-switcheroo-testing-fuzzer-generators-index--page-root">ml_switcheroo.testing.fuzzer.generators<a class="headerlink" href="#api-ml-switcheroo-testing-fuzzer-generators-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Primitive Generation Logic for the Fuzzer.</p>
-<p>This module contains functions to generate random scalars and NumPy arrays
-respecting specified constraints (min, max, dtype).</p>
+<p>This module contains functions to generate random scalars, NumPy arrays,
+and dummy callables respecting specified constraints (min, max, dtype).</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -362,6 +364,9 @@ respecting specified constraints (min, max, dtype).</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.testing.fuzzer.generators.get_random_shape" title="ml_switcheroo.testing.fuzzer.generators.get_random_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_random_shape</span></code></a>(→ Tuple[int, Ellipsis])</p></td>
 <td><p>Selects a random rank (1-4) and random dimensions (2-5).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.testing.fuzzer.generators.generate_fake_callable" title="ml_switcheroo.testing.fuzzer.generators.generate_fake_callable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_fake_callable</span></code></a>(→ Any)</p></td>
+<td><p>Generates a dummy function (identity) for functional ops.</p></td>
 </tr>
 </tbody>
 </table>
@@ -433,6 +438,26 @@ respecting specified constraints (min, max, dtype).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Tuple[int, …]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.generators.generate_fake_callable">
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.generators.</span></span><span class="sig-name descname"><span class="pre">generate_fake_callable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.generators.generate_fake_callable" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a dummy function (identity) for functional ops.</p>
+<p>This is critical for fuzzer verification of HOFs (Higher Order Functions)
+like <cite>vmap</cite>, <cite>grad</cite>, or <cite>jit</cite> which expect a callable input.</p>
+<p>The return value is a lambda that accepts any arguments and returns the first one.
+This ensures compatibility with unary ops (<cite>f(x)</cite>) and binary ops (<cite>f(x, y)</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>constraints</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – Unused, kept for API consistency.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A lambda function <cite>lambda x, *args, **kwargs: x</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
 </dd>
 </dl>
 </dd></dl>

@@ -67,7 +67,7 @@
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.calls.mixer" href="../mixer/index.html" />
-    <link rel="prev" title="ml_switcheroo.core.rewriter.calls.dispatch" href="../dispatch/index.html" />
+    <link rel="prev" title="ml_switcheroo.core.rewriter.calls.guards" href="../guards/index.html" />
   
    
 
@@ -344,27 +344,25 @@
   <section id="module-ml_switcheroo.core.rewriter.calls.invocation">
 <span id="ml-switcheroo-core-rewriter-calls-invocation"></span><h1 id="api-ml-switcheroo-core-rewriter-calls-invocation-index--page-root">ml_switcheroo.core.rewriter.calls.invocation<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-calls-invocation-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Function Invocation Rewriter.</p>
-<p>This module provides the <code class="docutils literal notranslate"><span class="pre">InvocationMixin</span></code>, the core component responsible for
-rewriting <cite>Call</cite> nodes. It orchestrates a complex pipeline of transformations:</p>
-<ol class="arabic simple">
-<li><p><strong>Functional Unwrapping</strong>: Removing <cite>apply</cite> or <cite>call_fn</cite> wrappers.</p></li>
-<li><p><strong>Plugin Dispatch</strong>: Delegating complex logic to registered hooks.</p></li>
-<li><p><strong>Lifecycle Management</strong>: Stripping framework-specific methods like <cite>.to()</cite> or <cite>.cuda()</cite>.</p></li>
-<li><p><strong>State Management</strong>: Rewriting calls to stateful objects/layers.</p></li>
-<li><p><strong>Standard API Pivoting</strong>:
--   Resolving abstract operations.
--   Evaluating conditional dispatch rules.
--   Normalizing arguments via the Semantic Specification.
--   Applying Tensor Layout Permutations.</p></li>
-<li><p><strong>Output Transformation</strong>: Applying casting or indexing adapters to the result.</p></li>
-<li><p><strong>State Threading</strong>: Injecting state arguments (like <cite>rngs</cite>) in constructors.</p></li>
+<p>This module provides the <a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin" title="ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InvocationMixin</span></code></a>, a component of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">PivotRewriter</span></code> responsible for transforming function call nodes within
+the Abstract Syntax Tree (AST).</p>
+<p>It orchestrates three phases of processing:
+1.  <strong>Pre-Processing</strong>: Checks for functional unwrapping, plugin claims, and lifecycle methods.
+2.  <strong>Strategy Execution</strong>: Switches API calls based on Semantic Definitions, handling</p>
+<blockquote>
+<div><p>infix operators, macros, and standard function renaming. This phase includes compatibility checks
+and deprecation warnings.</p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><strong>Post-Processing</strong>: Applies output adapters, casting, and state threading logic.</p></li>
 </ol>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin" title="ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvocationMixin</span></code></a></p></td>
-<td><p>Mixin for transforming Call nodes (<cite>func(...)</cite>).</p></td>
+<td><p>Mixin for transforming <code class="xref py py-class docutils literal notranslate"><span class="pre">libcst.Call</span></code> nodes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -373,34 +371,15 @@ rewriting <cite>Call</cite> nodes. It orchestrates a complex pipeline of transfo
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.invocation.</span></span><span class="sig-name descname"><span class="pre">InvocationMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.invocation.</span></span><span class="sig-name descname"><span class="pre">InvocationMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/calls/invocation.py#L34-L115"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../normalization/index.html#ml_switcheroo.core.rewriter.normalization.NormalizationMixin" title="ml_switcheroo.core.rewriter.normalization.NormalizationMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.normalization.NormalizationMixin</span></code></a>, <a class="reference internal" href="../traits_cache/index.html#ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin" title="ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin</span></code></a></p>
-<p>Mixin for transforming Call nodes (<cite>func(…)</cite>).</p>
-<p>This class contains the primary logic for mapping function calls between frameworks.
-It relies on <cite>NormalizationMixin</cite> for argument mapping and <cite>TraitsCachingMixin</cite> for
-accessing framework configurations.</p>
+<p>Mixin for transforming <code class="xref py py-class docutils literal notranslate"><span class="pre">libcst.Call</span></code> nodes.
+Integrates normalization, trait lookup, and transformation strategies.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin.leave_Call">
-<span class="sig-name descname"><span class="pre">leave_Call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.BinaryOperation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.UnaryOperation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin.leave_Call" title="Link to this definition">¶</a></dt>
-<dd><p>Rewrites function calls with detailed Trace Logging.</p>
-<p>The transformation pipeline proceeds in stages:
-1.  <strong>Structure</strong>: Unwrap functional <cite>apply</cite> calls, handle plugins, handle lifecycle methods.
-2.  <strong>API Resolution</strong>: Lookup the function name in the Semantic Knowledge Base.
-3.  <strong>Argument Rewrite</strong>: Normalize arguments, check dispatch rules, applying pivots.
-4.  <strong>Transformation</strong>: Rewrites call as Infix, Inline Lambda, Macro, or Standard Call.
-5.  <strong>Output</strong>: Applies indexing, output adapters, or casting.
-6.  <strong>Context</strong>: Helper logic for specific contexts like <cite>__init__</cite> (state threading).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>original</strong> – The original CST node (before children were visited).</p></li>
-<li><p><strong>updated</strong> – The CST node with transformed children (arguments processed).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The transformed CST node (Call, Expr, or other).</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">leave_Call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.BinaryOperation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.UnaryOperation</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/calls/invocation.py#L40-L115"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin.leave_Call" title="Link to this definition">¶</a></dt>
+<dd><p>Visits and rewrites a function call node.
+Delegates logic to Pre/Strategy/Post handler modules.</p>
 </dd></dl>
 </dd></dl>
 </section>
@@ -416,7 +395,7 @@ accessing framework configurations.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../dispatch/index.html" title="ml_switcheroo.core.rewriter.calls.dispatch"
+            <a href="../guards/index.html" title="ml_switcheroo.core.rewriter.calls.guards"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -425,7 +404,7 @@ accessing framework configurations.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.rewriter.calls.dispatch </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.rewriter.calls.guards </span>
               </div>
             </a>
           

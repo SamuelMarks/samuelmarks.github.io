@@ -307,6 +307,8 @@
         </li>
         <li class="md-nav__item"><a href="#injector_plugin.TEMPLATE_HEADER" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_HEADER</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF_AUTO_WIRE</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#injector_plugin.TEMPLATE_FUNC_DEF" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#injector_plugin.BodyExtractor" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BodyExtractor</span></code></a><nav class="md-nav">
@@ -369,6 +371,8 @@
         </li>
         <li class="md-nav__item"><a href="#injector_plugin.TEMPLATE_HEADER" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_HEADER</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF_AUTO_WIRE</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#injector_plugin.TEMPLATE_FUNC_DEF" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#injector_plugin.BodyExtractor" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">BodyExtractor</span></code></a><nav class="md-nav">
@@ -415,7 +419,9 @@
 <p>Generates valid Python source files for new hooks in the plugins directory.
 Used by the CLI to provide a starting point for complex logic implementations.
 Feature 083: Supports compiling declarative rules including complex operators into switch statements.
-Feature 084: Supports Preservative Updates (Body Extraction).</p>
+Feature 084: Supports Preservative Updates (Body Extraction).
+Feature 085: Enforces PEP8 Filenaming (Snake Case).
+Feature 086: Auto-Wire Dictionary injection.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -426,7 +432,10 @@ Feature 084: Supports Preservative Updates (Body Extraction).</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#injector_plugin.TEMPLATE_HEADER" title="injector_plugin.TEMPLATE_HEADER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPLATE_HEADER</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#injector_plugin.TEMPLATE_FUNC_DEF" title="injector_plugin.TEMPLATE_FUNC_DEF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE" title="injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF_AUTO_WIRE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#injector_plugin.TEMPLATE_FUNC_DEF" title="injector_plugin.TEMPLATE_FUNC_DEF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TEMPLATE_FUNC_DEF</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -485,6 +494,19 @@ Feature 084: Supports Preservative Updates (Body Extraction).</p>
 <span class="sd">"""</span>
 <span class="sd">import libcst as cst</span>
 <span class="sd">from ml_switcheroo.core.hooks import register_hook, HookContext</span>
+
+<span class="sd">"""</span>
+</pre></div>
+</div>
+</details></dd></dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE">
+<span class="sig-prename descclassname"><span class="pre">injector_plugin.</span></span><span class="sig-name descname"><span class="pre">TEMPLATE_FUNC_DEF_AUTO_WIRE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="headerlink" href="#injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE" title="Link to this definition">¶</a></dt>
+<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""@register_hook(trigger="{name}", auto_wire={auto_wire})</span>
+<span class="sd">def {name}(node: {node_type}, ctx: HookContext) -&gt; cst.CSTNode:</span>
+<span class="sd">    """</span>
+    <span class="n">Plugin</span> <span class="n">Hook</span><span class="p">:</span> <span class="p">{</span><span class="n">doc</span><span class="p">}</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">"""</span>
 </pre></div>
 </div>
@@ -492,8 +514,7 @@ Feature 084: Supports Preservative Updates (Body Extraction).</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="injector_plugin.TEMPLATE_FUNC_DEF">
 <span class="sig-prename descclassname"><span class="pre">injector_plugin.</span></span><span class="sig-name descname"><span class="pre">TEMPLATE_FUNC_DEF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="headerlink" href="#injector_plugin.TEMPLATE_FUNC_DEF" title="Link to this definition">¶</a></dt>
-<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
-<span class="sd">@register_hook("{name}")</span>
+<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""@register_hook("{name}")</span>
 <span class="sd">def {name}(node: {node_type}, ctx: HookContext) -&gt; cst.CSTNode:</span>
 <span class="sd">    """</span>
     <span class="n">Plugin</span> <span class="n">Hook</span><span class="p">:</span> <span class="p">{</span><span class="n">doc</span><span class="p">}</span>

@@ -1,0 +1,50 @@
+ml_switcheroo.core.rewriter.errors
+==================================
+
+.. py:module:: ml_switcheroo.core.rewriter.errors
+
+.. autoapi-nested-parse::
+
+   Error Handling Mixin.
+
+   Manages the reporting of translation failures and the injection of Escape Hatch
+   mechanisms to preserve code validity when transformation is impossible.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin
+
+
+Module Contents
+---------------
+
+.. py:class:: ErrorHandlingMixin
+
+   Mixin for bubbling errors and wrapping statements.
+
+   Assumed attributes on self:
+       _current_stmt_errors (List[str]): List of errors for current statement.
+       _current_stmt_warnings (List[str]): List of warnings for current statement.
+
+
+   .. py:method:: visit_SimpleStatementLine(node: libcst.SimpleStatementLine) -> Optional[bool]
+
+      Resets error tracking at the start of each line.
+      Errors bubble up from children (Expressions) to this Statement handler.
+
+
+
+   .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      Handles error bubbling from expression rewrites.
+
+      If errors occurred during processing of this line's children,
+      wrap the line in an ``EscapeHatch`` and revert to the original node.
+
+
+

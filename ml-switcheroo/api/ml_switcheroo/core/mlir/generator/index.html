@@ -328,7 +328,11 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.ctx" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MlirToPythonGenerator.ctx</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.inline_expressions" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MlirToPythonGenerator.inline_expressions</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.usage_counts" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MlirToPythonGenerator.usage_counts</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.usage_consumers" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MlirToPythonGenerator.usage_consumers</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.deferred_exprs" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MlirToPythonGenerator.deferred_exprs</span></code></a>
         </li>
@@ -365,14 +369,19 @@ MLIR CST object model and reconstructs valid Python code via LibCST.</p>
 3.  <strong>Trivia Restoration</strong>: Transforms <cite>// comment</cite> back to <cite># comment</cite>.
 4.  <strong>Expression Folding</strong>: Inlines single-use intermediates (SSA values) to</p>
 <blockquote>
-<div><p>produce Pythonic code (e.g. <cite>f(x)</cite> instead of <cite>_1=x; _2=f(_1);</cite>).</p>
+<div><p>produce Pythonic code (e.g. <cite>f(x)</cite> instead of <cite>_1=x; _2=f(_1);</cite>) <em>if enabled</em>.</p>
 </div></blockquote>
 <p>Feature Hardening:
 - Robustly handles <cite>sw.op</cite> “type” attributes for deep class hierarchies (e.g. <cite>torch.nn.Conv2d</cite>).
 - Distinguishes between static operation calls (<cite>sw.op</cite>) and dynamic calls (<cite>sw.call</cite>).
 - Ensures valid assignment generation for results.
 - <strong>Naming Heuristics</strong>: Preserves variable names based on SSA IDs or Type Hints, prioritizing stability.
-- <strong>Type Reconstruction</strong>: Restores Python type hints from MLIR <cite>!sw.type</cite> annotations.</p>
+- <strong>Type Reconstruction</strong>: Restores Python type hints from MLIR <cite>!sw.type</cite> annotations.
+- <strong>Void Assignment Suppression</strong>: Strips assignments like <cite>_0 = super().__init__()</cite> if unused or void-like.
+- <strong>Explicit Re-rolling</strong>: Defaults to sequential statements (SSA form) for clarity unless inlining is requested.
+- <strong>Smart Heuristics</strong>: Forces inlining of <cite>super()</cite> and <cite>getattr</cite> to prevent verbose <cite>_0 = super()</cite> assignments.
+- <strong>Statement Fusion</strong>: fuses operations into <cite>setattr</cite> and <cite>return</cite> to restore idiomatic syntax (<cite>self.x = y</cite>).
+- <strong>Semantic Naming</strong>: Extracts readable variable names from operation types (e.g., <cite>_flatten</cite> from <cite>torch.flatten</cite>).</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -390,12 +399,12 @@ MLIR CST object model and reconstructs valid Python code via LibCST.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.NamingContext">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.mlir.generator.</span></span><span class="sig-name descname"><span class="pre">NamingContext</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L37-L151"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.NamingContext" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.mlir.generator.</span></span><span class="sig-name descname"><span class="pre">NamingContext</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L44-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.NamingContext" title="Link to this definition">¶</a></dt>
 <dd><p>Tracks mapping between MLIR SSA IDs and Python variable names.
 Ensures generated names are valid identifiers.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.NamingContext.register">
-<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssa_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L63-L131"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.NamingContext.register" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssa_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L70-L153"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.NamingContext.register" title="Link to this definition">¶</a></dt>
 <dd><p>Assigns a valid Python name to an SSA value.</p>
 <p>Naming Strategy:
 1. If hint provided: Use hint (cleaned).
@@ -408,7 +417,7 @@ Ensures generated names are valid identifiers.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ssa_name</strong> – The MLIR variable name (e.g. “%0”, “%arg0”).</p></li>
-<li><p><strong>hint</strong> – Optional string to guide naming (e.g. “x” from original source).</p></li>
+<li><p><strong>hint</strong> – Optional string to guide naming (e.g. “flatten” from torch.flatten).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -418,7 +427,7 @@ Ensures generated names are valid identifiers.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.NamingContext.lookup">
-<span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssa_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L133-L151"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.NamingContext.lookup" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssa_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L155-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.NamingContext.lookup" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves Python name for SSA ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -432,15 +441,23 @@ Ensures generated names are valid identifiers.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.mlir.generator.</span></span><span class="sig-name descname"><span class="pre">MlirToPythonGenerator</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L154-L516"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.mlir.generator.</span></span><span class="sig-name descname"><span class="pre">MlirToPythonGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inline_expressions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L176-L634"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator" title="Link to this definition">¶</a></dt>
 <dd><p>Transpiler back-end: MLIR CST -&gt; Python LibCST.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.ctx">
 <span class="sig-name descname"><span class="pre">ctx</span></span><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.ctx" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.inline_expressions">
+<span class="sig-name descname"><span class="pre">inline_expressions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.inline_expressions" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.usage_counts">
 <span class="sig-name descname"><span class="pre">usage_counts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.usage_counts" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.usage_consumers">
+<span class="sig-name descname"><span class="pre">usage_consumers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../nodes/index.html#ml_switcheroo.core.mlir.nodes.OperationNode" title="ml_switcheroo.core.mlir.nodes.OperationNode"><span class="pre">ml_switcheroo.core.mlir.nodes.OperationNode</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.usage_consumers" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.deferred_exprs">
@@ -448,7 +465,7 @@ Ensures generated names are valid identifiers.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../nodes/index.html#ml_switcheroo.core.mlir.nodes.ModuleNode" title="ml_switcheroo.core.mlir.nodes.ModuleNode"><span class="pre">ml_switcheroo.core.mlir.nodes.ModuleNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L166-L183"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.generate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../nodes/index.html#ml_switcheroo.core.mlir.nodes.ModuleNode" title="ml_switcheroo.core.mlir.nodes.ModuleNode"><span class="pre">ml_switcheroo.core.mlir.nodes.ModuleNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L202-L219"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.generate" title="Link to this definition">¶</a></dt>
 <dd><p>Main entry point. Converts MLIR Module to Python Module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

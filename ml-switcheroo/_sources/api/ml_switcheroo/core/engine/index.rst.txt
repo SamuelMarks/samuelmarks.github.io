@@ -13,20 +13,29 @@ ml_switcheroo.core.engine
 
    The Engine pipeline consists of:
 
-   1.  **Preprocessing**: Parsing source code into a LibCST tree.
-   2.  **Safety Analysis**:
+   1.  **Ingestion Phase**:
+       - If `source="mlir"`, parses MLIR text and hydrates a Python AST.
+       - Otherwise, parses Python source code into a LibCST tree.
 
-       *   **Purity**: Checking for side effects if targeting functional frameworks (JAX).
-       *   **Lifecycle**: Verifying variable initialization.
-       *   **Dependencies**: Scanning for unmapped 3rd-party imports.
+   2.  **MLIR Emission (Target="mlir")**:
+       - If the target is "mlir", the pipeline short-circuits here.
+       - The AST is converted to MLIR IR text and returned immediately.
 
-   3.  **Semantic Pivoting**: Executing the `PivotRewriter` to map API calls and structure.
+   3.  **Safety Analysis (Standard)**:
+       - **Purity**: Checking for side effects if targeting functional frameworks (JAX).
+       - **Lifecycle**: Verifying variable initialization.
+       - **Dependencies**: Scanning for unmapped 3rd-party imports.
+
+   4.  **Semantic Pivoting**: Executing the `PivotRewriter` to map API calls and structure.
        *Creates AST Snapshots for visualization before and after this phase using Mermaid.*
 
-   4.  **Post-processing**:
+   5.  **Intermediate Representation (MLIR) Roundtrip** (Optional):
+       - If `intermediate="mlir"`, the pivot result is converted to MLIR text,
+         parsed back, and regenerated into Python to verify fidelity.
 
-       *   **Import Fixer**: Injecting necessary imports and removing unused source imports.
-       *   **Structural Linting**: Verifying no artifacts from the source framework remain.
+   6.  **Post-processing**:
+       - **Import Fixer**: Injecting necessary imports and removing unused source imports.
+       - **Structural Linting**: Verifying no artifacts from the source framework remain.
 
    The engine relies on `RuntimeConfig` to resolve 'Flavours' (e.g., distinguishing
    `flax_nnx` from generic `jax`) to load the correct structural traits.
@@ -87,7 +96,7 @@ Module Contents
       :rtype: bool
 
 
-.. py:class:: ASTEngine(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None)
+.. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
 
    The main compilation unit.
 
@@ -105,6 +114,11 @@ Module Contents
 
 
    .. py:attribute:: strict_mode
+
+
+   .. py:attribute:: intermediate
+      :value: None
+
 
 
    .. py:method:: parse(code: str) -> libcst.Module
@@ -136,18 +150,6 @@ Module Contents
    .. py:method:: run(code: str) -> ConversionResult
 
       Executes the full transpilation pipeline.
-
-      Passes performed:
-
-      1.  Parse.
-      2.  Purity Scan (if targeting traits.enforce_purity_analysis).
-      3.  Lifecycle Analysis (Init/Forward mismatch).
-      4.  Dependency Scan (Checking 3rd party libs).
-      5.  Pivot Rewrite (The main transformation).
-          *Includes visual snapshots before and after.*
-      6.  Import Fixer (Injecting new imports, pruning old ones).
-          *Checks for lingering usage before pruning.*
-      7.  Structural Linting (Verifying output cleanliness).
 
       :param code: The input source string.
       :type code: str

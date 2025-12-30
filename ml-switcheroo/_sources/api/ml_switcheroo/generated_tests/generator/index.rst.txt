@@ -5,29 +5,10 @@ ml_switcheroo.generated_tests.generator
 
 .. autoapi-nested-parse::
 
-   Dynamic Test Code Generator (Physical Synthesizer).
+   Generator engine for creating cross-framework ML operator tests.
 
-   This module is responsible for creating physical Python test files based on the
-   Semantic Knowledge Base.
-
-   It operations in two stages:
-
-   1.  **Template Resolution**: It aggregates execution templates (`import`, `convert_input`, `to_numpy`)
-       from the SemanticsManager, prioritizing overlays (snapshots) over registry defaults.
-   2.  **Code Emission**: It iterates over Operations in the Spec, generating `def test_gen_<opname>()`
-       functions that:
-
-       - Generate random inputs using type hints.
-       - Execute the operation across all available backends (Torch, JAX, etc.).
-       - Compare outputs using `np.allclose`.
-       - **Verify Output Shape** if `output_shape_calc` is defined in the ODL.
-       - **Verify Output Type** if `return_type` is defined in the ODL.
-
-   JIT Logic (Decoupled):
-       If a template specifies a `jit_template`, the generator wraps the execution call.
-       It resolves `{fn}` to the closure logic and `{static_argnums}` to the indices
-       of static arguments. Hardcoded JAX fallbacks have been removed; frameworks must
-       supply valid templates.
+   This module provides the TestGenerator class which parses semantic operator
+   definitions and outputs PyTest-compatible Python files.
 
 
 
@@ -42,20 +23,25 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: TestGenerator(semantics_mgr: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None)
+.. py:class:: TestGenerator(semantics_mgr: Any = None)
 
-   Generates Pytest-compatible test files from Semantic Operations.
+   Generates PyTest files for ML operators across frameworks (Torch, JAX, etc.).
+
+   Handles argument constraints, type checking, gradient verification, and
+   runtime environment setup (e.g. seeding).
 
 
    .. py:attribute:: semantics_mgr
+      :value: None
 
 
-   .. py:method:: generate(semantics: Dict[str, Any], output_path: pathlib.Path) -> None
 
-      Generates a test file containing functions for each operation in semantics.
+   .. py:method:: generate(semantics: Dict[str, Any], out_file: pathlib.Path) -> None
 
-      :param semantics: Dictionary of operations (result of mgr.get_known_apis()).
-      :param output_path: Destination path for the .py file.
+      Generate a test file based on the provided semantics.
+
+      :param semantics: Dictionary mapping operator names to their definitions.
+      :param out_file: Path to write the generated Python file.
 
 
 

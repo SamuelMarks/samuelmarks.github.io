@@ -66,7 +66,7 @@
     <script src="../../../../_static/switcheroo_demo.js?v=dbbae551"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="ml_switcheroo.importers" href="../../importers/index.html" />
+    <link rel="next" title="ml_switcheroo.generated_tests.runtime" href="../runtime/index.html" />
     <link rel="prev" title="ml_switcheroo.generated_tests" href="../index.html" />
   
    
@@ -237,7 +237,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with DSL</a>
       
     
     </li>
@@ -343,37 +343,15 @@
             
   <section id="module-ml_switcheroo.generated_tests.generator">
 <span id="ml-switcheroo-generated-tests-generator"></span><h1 id="api-ml-switcheroo-generated-tests-generator-index--page-root">ml_switcheroo.generated_tests.generator<a class="headerlink" href="#api-ml-switcheroo-generated-tests-generator-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Dynamic Test Code Generator (Physical Synthesizer).</p>
-<p>This module is responsible for creating physical Python test files based on the
-Semantic Knowledge Base.</p>
-<p>It operations in two stages:</p>
-<ol class="arabic simple">
-<li><p><strong>Template Resolution</strong>: It aggregates execution templates (<cite>import</cite>, <cite>convert_input</cite>, <cite>to_numpy</cite>)
-from the SemanticsManager, prioritizing overlays (snapshots) over registry defaults.</p></li>
-<li><p><strong>Code Emission</strong>: It iterates over Operations in the Spec, generating <cite>def test_gen_&lt;opname&gt;()</cite>
-functions that:</p>
-<ul class="simple">
-<li><p>Generate random inputs using type hints.</p></li>
-<li><p>Execute the operation across all available backends (Torch, JAX, etc.).</p></li>
-<li><p>Compare outputs using <cite>np.allclose</cite>.</p></li>
-<li><p><strong>Verify Output Shape</strong> if <cite>output_shape_calc</cite> is defined in the ODL.</p></li>
-<li><p><strong>Verify Output Type</strong> if <cite>return_type</cite> is defined in the ODL.</p></li>
-</ul>
-</li>
-</ol>
-<dl class="simple">
-<dt>JIT Logic (Decoupled):</dt><dd><p>If a template specifies a <cite>jit_template</cite>, the generator wraps the execution call.
-It resolves <cite>{fn}</cite> to the closure logic and <cite>{static_argnums}</cite> to the indices
-of static arguments. Hardcoded JAX fallbacks have been removed; frameworks must
-supply valid templates.</p>
-</dd>
-</dl>
+<p>Generator engine for creating cross-framework ML operator tests.</p>
+<p>This module provides the TestGenerator class which parses semantic operator
+definitions and outputs PyTest-compatible Python files.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.generated_tests.generator.TestGenerator" title="ml_switcheroo.generated_tests.generator.TestGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestGenerator</span></code></a></p></td>
-<td><p>Generates Pytest-compatible test files from Semantic Operations.</p></td>
+<td><p>Generates PyTest files for ML operators across frameworks (Torch, JAX, etc.).</p></td>
 </tr>
 </tbody>
 </table>
@@ -382,21 +360,23 @@ supply valid templates.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.generator.TestGenerator">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.generator.</span></span><span class="sig-name descname"><span class="pre">TestGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics_mgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.generated_tests.generator.TestGenerator" title="Link to this definition">¶</a></dt>
-<dd><p>Generates Pytest-compatible test files from Semantic Operations.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.generator.</span></span><span class="sig-name descname"><span class="pre">TestGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics_mgr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.generated_tests.generator.TestGenerator" title="Link to this definition">¶</a></dt>
+<dd><p>Generates PyTest files for ML operators across frameworks (Torch, JAX, etc.).</p>
+<p>Handles argument constraints, type checking, gradient verification, and
+runtime environment setup (e.g. seeding).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.generator.TestGenerator.semantics_mgr">
-<span class="sig-name descname"><span class="pre">semantics_mgr</span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.generator.TestGenerator.semantics_mgr" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">semantics_mgr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.generated_tests.generator.TestGenerator.semantics_mgr" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.generator.TestGenerator.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.generator.TestGenerator.generate" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a test file containing functions for each operation in semantics.</p>
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.generator.TestGenerator.generate" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a test file based on the provided semantics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>semantics</strong> – Dictionary of operations (result of mgr.get_known_apis()).</p></li>
-<li><p><strong>output_path</strong> – Destination path for the .py file.</p></li>
+<li><p><strong>semantics</strong> – Dictionary mapping operator names to their definitions.</p></li>
+<li><p><strong>out_file</strong> – Path to write the generated Python file.</p></li>
 </ul>
 </dd>
 </dl>
@@ -429,12 +409,12 @@ supply valid templates.</p>
             </a>
           
           
-            <a href="../../importers/index.html" title="ml_switcheroo.importers"
+            <a href="../runtime/index.html" title="ml_switcheroo.generated_tests.runtime"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.importers </span>
+                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.generated_tests.runtime </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

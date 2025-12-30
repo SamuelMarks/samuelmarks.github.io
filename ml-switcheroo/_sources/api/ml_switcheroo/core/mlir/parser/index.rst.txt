@@ -1,0 +1,100 @@
+ml_switcheroo.core.mlir.parser
+==============================
+
+.. py:module:: ml_switcheroo.core.mlir.parser
+
+.. autoapi-nested-parse::
+
+   MLIR Recursive Descent Parser.
+
+   This module parses text-based MLIR code into the CST object model defined in `nodes.py`.
+   It is designed to preserve trivia (comments/whitespace) to support high-fidelity
+   round-trip transformations.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.mlir.parser.Token
+   ml_switcheroo.core.mlir.parser.Tokenizer
+   ml_switcheroo.core.mlir.parser.MlirParser
+
+
+Module Contents
+---------------
+
+.. py:class:: Token
+
+   .. py:attribute:: kind
+      :type:  str
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+   .. py:attribute:: line
+      :type:  int
+
+
+   .. py:attribute:: col
+      :type:  int
+
+
+.. py:class:: Tokenizer(text: str)
+
+   .. py:attribute:: PATTERN_DEFS
+
+
+   .. py:attribute:: text
+
+
+   .. py:method:: tokenize() -> Generator[Token, None, None]
+
+
+.. py:class:: MlirParser(text: str)
+
+   .. py:attribute:: tokenizer
+
+
+   .. py:attribute:: tokens
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:attribute:: trivia_buffer
+      :type:  List[ml_switcheroo.core.mlir.nodes.TriviaNode]
+      :value: []
+
+
+
+   .. py:method:: peek(offset: int = 0) -> Token
+
+
+   .. py:method:: consume() -> Token
+
+
+   .. py:method:: match(kind: str) -> bool
+
+
+   .. py:method:: expect(kind: str) -> Token
+
+
+   .. py:method:: parse() -> ml_switcheroo.core.mlir.nodes.ModuleNode
+
+
+   .. py:method:: parse_block(is_top_level: bool = False) -> ml_switcheroo.core.mlir.nodes.BlockNode
+
+
+   .. py:method:: parse_operation() -> Optional[ml_switcheroo.core.mlir.nodes.OperationNode]
+
+
+   .. py:method:: parse_region() -> ml_switcheroo.core.mlir.nodes.RegionNode
+
+

@@ -237,7 +237,7 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      <a href="../../../../EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with DSL</a>
       
     
     </li>
@@ -339,6 +339,8 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.engine.ASTEngine.strict_mode" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ASTEngine.strict_mode</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.engine.ASTEngine.intermediate" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ASTEngine.intermediate</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.engine.ASTEngine.parse" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ASTEngine.parse()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.engine.ASTEngine.to_source" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ASTEngine.to_source()</span></code></a>
@@ -372,23 +374,28 @@
 It coordinates the various analysis and transformation passes required to convert code
 from a source framework to a target framework.</p>
 <p>The Engine pipeline consists of:</p>
-<ol class="arabic simple">
-<li><p><strong>Preprocessing</strong>: Parsing source code into a LibCST tree.</p></li>
-<li><p><strong>Safety Analysis</strong>:</p>
-<ul class="simple">
-<li><p><strong>Purity</strong>: Checking for side effects if targeting functional frameworks (JAX).</p></li>
-<li><p><strong>Lifecycle</strong>: Verifying variable initialization.</p></li>
-<li><p><strong>Dependencies</strong>: Scanning for unmapped 3rd-party imports.</p></li>
-</ul>
-</li>
+<ol class="arabic">
+<li><p><strong>Ingestion Phase</strong>:
+- If <cite>source=”mlir”</cite>, parses MLIR text and hydrates a Python AST.
+- Otherwise, parses Python source code into a LibCST tree.</p></li>
+<li><p><strong>MLIR Emission (Target=”mlir”)</strong>:
+- If the target is “mlir”, the pipeline short-circuits here.
+- The AST is converted to MLIR IR text and returned immediately.</p></li>
+<li><p><strong>Safety Analysis (Standard)</strong>:
+- <strong>Purity</strong>: Checking for side effects if targeting functional frameworks (JAX).
+- <strong>Lifecycle</strong>: Verifying variable initialization.
+- <strong>Dependencies</strong>: Scanning for unmapped 3rd-party imports.</p></li>
 <li><p><strong>Semantic Pivoting</strong>: Executing the <cite>PivotRewriter</cite> to map API calls and structure.
 <em>Creates AST Snapshots for visualization before and after this phase using Mermaid.</em></p></li>
-<li><p><strong>Post-processing</strong>:</p>
-<ul class="simple">
-<li><p><strong>Import Fixer</strong>: Injecting necessary imports and removing unused source imports.</p></li>
-<li><p><strong>Structural Linting</strong>: Verifying no artifacts from the source framework remain.</p></li>
-</ul>
+<li><p><strong>Intermediate Representation (MLIR) Roundtrip</strong> (Optional):
+- If <cite>intermediate=”mlir”</cite>, the pivot result is converted to MLIR text,</p>
+<blockquote>
+<div><p>parsed back, and regenerated into Python to verify fidelity.</p>
+</div></blockquote>
 </li>
+<li><p><strong>Post-processing</strong>:
+- <strong>Import Fixer</strong>: Injecting necessary imports and removing unused source imports.
+- <strong>Structural Linting</strong>: Verifying no artifacts from the source framework remain.</p></li>
 </ol>
 <p>The engine relies on <cite>RuntimeConfig</cite> to resolve ‘Flavours’ (e.g., distinguishing
 <cite>flax_nnx</cite> from generic <cite>jax</cite>) to load the correct structural traits.</p>
@@ -409,7 +416,7 @@ from a source framework to a target framework.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ConversionResult">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.engine.</span></span><span class="sig-name descname"><span class="pre">ConversionResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L51-L72"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.engine.</span></span><span class="sig-name descname"><span class="pre">ConversionResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L65-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ConversionResult" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Structured result of a single file conversion.</p>
 <dl class="py attribute">
@@ -444,7 +451,7 @@ from a source framework to a target framework.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.engine.</span></span><span class="sig-name descname"><span class="pre">ASTEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L75-L319"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.engine.</span></span><span class="sig-name descname"><span class="pre">ASTEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plugin_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intermediate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L89-L413"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine" title="Link to this definition">¶</a></dt>
 <dd><p>The main compilation unit.</p>
 <p>This class encapsulates the state and logic required to transpile a single unit of code.
 It manages the lifecycle of the LibCST tree and the invocation of visitor passes.</p>
@@ -464,9 +471,13 @@ It manages the lifecycle of the LibCST tree and the invocation of visitor passes
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.strict_mode">
 <span class="sig-name descname"><span class="pre">strict_mode</span></span><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.strict_mode" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.intermediate">
+<span class="sig-name descname"><span class="pre">intermediate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.intermediate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L129-L142"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.parse" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L146-L159"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.parse" title="Link to this definition">¶</a></dt>
 <dd><p>Parses source string into a LibCST Module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -485,7 +496,7 @@ It manages the lifecycle of the LibCST tree and the invocation of visitor passes
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.to_source">
-<span class="sig-name descname"><span class="pre">to_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L144-L154"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.to_source" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L161-L171"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.to_source" title="Link to this definition">¶</a></dt>
 <dd><p>Converts CST back to source string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -501,20 +512,8 @@ It manages the lifecycle of the LibCST tree and the invocation of visitor passes
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.engine.ASTEngine.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.core.engine.ConversionResult" title="ml_switcheroo.core.engine.ConversionResult"><span class="pre">ConversionResult</span></a></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L204-L319"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.run" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="#ml_switcheroo.core.engine.ConversionResult" title="ml_switcheroo.core.engine.ConversionResult"><span class="pre">ConversionResult</span></a></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/engine.py#L256-L413"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.engine.ASTEngine.run" title="Link to this definition">¶</a></dt>
 <dd><p>Executes the full transpilation pipeline.</p>
-<p>Passes performed:</p>
-<ol class="arabic simple">
-<li><p>Parse.</p></li>
-<li><p>Purity Scan (if targeting traits.enforce_purity_analysis).</p></li>
-<li><p>Lifecycle Analysis (Init/Forward mismatch).</p></li>
-<li><p>Dependency Scan (Checking 3rd party libs).</p></li>
-<li><p>Pivot Rewrite (The main transformation).
-<em>Includes visual snapshots before and after.</em></p></li>
-<li><p>Import Fixer (Injecting new imports, pruning old ones).
-<em>Checks for lingering usage before pruning.</em></p></li>
-<li><p>Structural Linting (Verifying output cleanliness).</p></li>
-</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>code</strong> (<em>str</em>) – The input source string.</p>

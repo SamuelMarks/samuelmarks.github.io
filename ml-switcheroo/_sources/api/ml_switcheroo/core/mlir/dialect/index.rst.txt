@@ -1,0 +1,124 @@
+ml_switcheroo.core.mlir.dialect
+===============================
+
+.. py:module:: ml_switcheroo.core.mlir.dialect
+
+.. autoapi-nested-parse::
+
+   Switcheroo Dialect Definition ('sw').
+
+   This module formally defines the MLIR operations for the 'sw' high-level dialect.
+   It acts as the schema validation layer for the custom IR, ensuring that
+   transformations produce semantically valid intermediate representations.
+
+   Operations:
+   - `sw.module`: Represents a Class or Scope container.
+   - `sw.func`: Represents a Function definition.
+   - `sw.op`: Represents a generic Operation instantiation (e.g. Layers).
+   - `sw.call`: Represents a function invocation.
+   - `sw.getattr`: Represents attribute access (v = self.layer).
+   - `sw.setattr`: Represents attribute assignment (self.layer = v).
+   - `sw.constant`: Represents literals.
+   - `sw.return`: Control flow exit.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.mlir.dialect.SW_MODULE
+   ml_switcheroo.core.mlir.dialect.SW_FUNC
+   ml_switcheroo.core.mlir.dialect.SW_OP
+   ml_switcheroo.core.mlir.dialect.SW_CALL
+   ml_switcheroo.core.mlir.dialect.SW_GETATTR
+   ml_switcheroo.core.mlir.dialect.SW_SETATTR
+   ml_switcheroo.core.mlir.dialect.SW_CONSTANT
+   ml_switcheroo.core.mlir.dialect.SW_RETURN
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.mlir.dialect.OpSchema
+   ml_switcheroo.core.mlir.dialect.DialectRegistry
+
+
+Module Contents
+---------------
+
+.. py:class:: OpSchema
+
+   Validation schema for a MLIR operation.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: num_regions
+      :type:  int
+      :value: 0
+
+
+
+   .. py:attribute:: required_attributes
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:attribute:: has_results
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: validate(node: ml_switcheroo.core.mlir.nodes.OperationNode) -> bool
+
+      Checks if the CST node conforms to the dialect schema.
+
+
+
+.. py:data:: SW_MODULE
+
+.. py:data:: SW_FUNC
+
+.. py:data:: SW_OP
+
+.. py:data:: SW_CALL
+
+.. py:data:: SW_GETATTR
+
+.. py:data:: SW_SETATTR
+
+.. py:data:: SW_CONSTANT
+
+.. py:data:: SW_RETURN
+
+.. py:class:: DialectRegistry
+
+   Central registry for dialect validation.
+
+
+   .. py:method:: validate_op(node: ml_switcheroo.core.mlir.nodes.OperationNode) -> bool
+      :classmethod:
+
+
+      Validates a single operation node against the schema.
+      Returns False if op is unknown or invalid.
+
+
+
+   .. py:method:: get_abstract_op(op_name: str) -> str
+      :classmethod:
+
+
+      Maps a high-level framework op string (e.g. 'Linear') to the canonical dialect op.
+      Currently they all map to 'sw.op' with type attributes, but this allows future expansion.
+
+
+

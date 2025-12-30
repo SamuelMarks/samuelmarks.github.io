@@ -616,19 +616,17 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#structural-traits" class="md-nav__link">Structural Traits</a>
         </li>
-        <li class="md-nav__item"><a href="#hierarchy-flavours" class="md-nav__link">Hierarchy & Flavours</a>
+        <li class="md-nav__item"><a href="#plugin-traits" class="md-nav__link">Plugin Traits</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#discovery-consensus" class="md-nav__link">🤖 4. Discovery & Consensus</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ghost-protocol" class="md-nav__link">Ghost Protocol</a>
+        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
         </li>
-        <li class="md-nav__item"><a href="#consensus-engine" class="md-nav__link">Consensus Engine</a>
+        <li class="md-nav__item"><a href="#plugin-hooks-in-src-ml-switcheroo-plugins" class="md-nav__link">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)</a>
         </li></ul>
             </nav>
-        </li>
-        <li class="md-nav__item"><a href="#plugin-system" class="md-nav__link">🧠 5. Plugin System</a>
         </li></ul>
             </nav>
         </li>
@@ -669,14 +667,7 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="#discovery-consensus" class="md-nav__link">🤖 4. Discovery & Consensus</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="#plugin-system" class="md-nav__link">🧠 5. Plugin System</a>
+      <a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a>
       
     
     </li></ul>
@@ -692,7 +683,7 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
-      <a href="EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with ODL</a>
+      <a href="EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with DSL</a>
       
     
     </li>
@@ -762,19 +753,17 @@ window.addEventListener("load", load);
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#structural-traits" class="md-nav__link">Structural Traits</a>
         </li>
-        <li class="md-nav__item"><a href="#hierarchy-flavours" class="md-nav__link">Hierarchy & Flavours</a>
+        <li class="md-nav__item"><a href="#plugin-traits" class="md-nav__link">Plugin Traits</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#discovery-consensus" class="md-nav__link">🤖 4. Discovery & Consensus</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#ghost-protocol" class="md-nav__link">Ghost Protocol</a>
+        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
         </li>
-        <li class="md-nav__item"><a href="#consensus-engine" class="md-nav__link">Consensus Engine</a>
+        <li class="md-nav__item"><a href="#plugin-hooks-in-src-ml-switcheroo-plugins" class="md-nav__link">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)</a>
         </li></ul>
             </nav>
-        </li>
-        <li class="md-nav__item"><a href="#plugin-system" class="md-nav__link">🧠 5. Plugin System</a>
         </li></ul>
             </nav>
         </li>
@@ -794,16 +783,16 @@ window.addEventListener("load", load);
             
   <section class="tex2jax_ignore mathjax_ignore" id="architecture">
 <h1 id="architecture--page-root">Architecture<a class="headerlink" href="#architecture--page-root" title="Link to this heading">¶</a></h1>
-<p><strong>ml-switcheroo</strong> is a deterministic, specification-driven transpiler designed to convert Deep Learning code between frameworks (e.g., PyTorch to JAX/Flax) with mathematical rigor.</p>
-<p>It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem by decoupling <strong>Specification</strong> (the Abstract Operation) from <strong>Implementation</strong> (the Framework API) using a <strong>Hub-and-Spoke</strong> architecture. Rather than writing translators for every pair of frameworks (Torch<span class="math notranslate nohighlight">\(\to\)</span>JAX, JAX<span class="math notranslate nohighlight">\(\to\)</span>TF, TF<span class="math notranslate nohighlight">\(\to\)</span>Torch), we map every framework to a central “Abstract Standard.”</p>
+<p><strong>ml-switcheroo</strong> is a deterministic, specification-driven transpiler designed to convert Deep Learning code between frameworks (e.g., PyTorch to JAX/Flax, Keras 3 to TensorFlow) with mathematical rigor.</p>
+<p>It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem by decoupling <strong>Specification</strong> (the Abstract Operation) from <strong>Implementation</strong> (the Framework API) using a <strong>Hub-and-Spoke</strong> architecture. Rather than writing translators for every pair of frameworks, we map every framework to a central “Abstract Standard.”</p>
 <hr class="docutils"/>
 <section id="the-semantic-pivot-strategy">
 <h2 id="the-semantic-pivot-strategy">🏗️ The Semantic Pivot Strategy<a class="headerlink" href="#the-semantic-pivot-strategy" title="Link to this heading">¶</a></h2>
 <p>The conversion process is a three-step movement through an abstract intermediate state:</p>
 <ol class="arabic simple">
-<li><p><strong>Ingest (Source <span class="math notranslate nohighlight">\(\to\)</span> Hub):</strong> The system identifies a framework call (e.g., <code class="docutils literal notranslate"><span class="pre">torch.permute</span></code>) and maps it to an <strong>Abstract Operation</strong> (e.g., <code class="docutils literal notranslate"><span class="pre">permute_dims</span></code>) using the source framework’s snapshot.</p></li>
-<li><p><strong>Pivot (Normalization):</strong> Arguments are reordered, renamed, and unpacked to match the Abstract Standard (The “Hub” signature).</p></li>
-<li><p><strong>Project (Hub <span class="math notranslate nohighlight">\(\to\)</span> Target):</strong> The system looks up the implementation for the target framework (e.g., <code class="docutils literal notranslate"><span class="pre">jax.numpy.transpose</span></code>) and generates the corresponding AST, applying any necessary plugin logic (Argument Packing, State Injection).</p></li>
+<li><p><strong>Ingest (Source <span class="math notranslate nohighlight">\(\to\)</span> Hub):</strong> The system identifies a framework call (e.g., <code class="docutils literal notranslate"><span class="pre">torch.permute</span></code>) and maps it to an <strong>Abstract Operation</strong> (e.g., <code class="docutils literal notranslate"><span class="pre">permute_dims</span></code>) using the source framework’s snapshot or adapter definition.</p></li>
+<li><p><strong>Pivot (Normalization):</strong> Arguments are reordered, renamed, unpacked, and validated to match the Abstract Standard (The “Hub” signature).</p></li>
+<li><p><strong>Project (Hub <span class="math notranslate nohighlight">\(\to\)</span> Target):</strong> The system looks up the implementation for the target framework (e.g., <code class="docutils literal notranslate"><span class="pre">jax.numpy.transpose</span></code>) and generates the corresponding AST, applying any necessary DSL logic (Layout Permutation, Macros) or Plugin hooks.</p></li>
 </ol>
 </section>
 <hr class="docutils"/>
@@ -823,27 +812,27 @@ window.addEventListener("load", load);
     subgraph P1 ["1. Ingestion Phase"]
         direction TB
         STANDARDS("External Specs&lt;br/&gt;(ONNX / Array API)"):::input
-        LIBS("Installed Libs&lt;br/&gt;(Torch / JAX)"):::input
+        CODE("Adapter Classes&lt;br/&gt;(frameworks/*.py)"):::input
         
-        INSPECTOR("Inspector &amp;&lt;br/&gt;Scaffolder"):::build
+        LOADER("Registry &amp; File&lt;br/&gt;Loaders"):::build
         
-        STANDARDS --&gt; INSPECTOR
-        LIBS --&gt; INSPECTOR
+        STANDARDS --&gt; LOADER
+        CODE --&gt; LOADER
     end
 
     %% --- PHASE 2: STORAGE ---
-    subgraph P2 ["2. Distributed Storage"]
+    subgraph P2 ["2. Semantics Manager"]
         direction TB
-        HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
-        SPOKE[("&lt;b&gt;The Spokes (Overlays)&lt;/b&gt;&lt;br/&gt;snapshots/*_mappings.json&lt;br/&gt;&lt;i&gt;Framework Variants&lt;/i&gt;")]:::spoke
+        HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;standards_internal.py&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
+        SPOKE[("&lt;b&gt;The Spokes (Variants)&lt;/b&gt;&lt;br/&gt;snapshots/*.json&lt;br/&gt;&lt;i&gt;Framework Implementations&lt;/i&gt;")]:::spoke
         
         %% Internal Context Link
         SPOKE -.-&gt;|" Hydrates "| HUB
     end
 
-    %% Flow P1 -&gt; P2 (Creates Vertical Spine)
-    INSPECTOR --&gt;|"Populate"| HUB
-    INSPECTOR --&gt;|"Populate"| SPOKE
+    %% Flow P1 -&gt; P2
+    LOADER --&gt;|"Populate"| HUB
+    LOADER --&gt;|"Populate"| SPOKE
 
     %% --- PHASE 3: VERIFICATION ---
     subgraph P3 ["3. Verification Phase"]
@@ -851,28 +840,27 @@ window.addEventListener("load", load);
         TESTER("TestGen &amp; Fuzzer"):::build
     end
 
-    %% Flow P2 -&gt; P3 (Continues Vertical Spine)
-    HUB -.-&gt;|"Read Spec"| TESTER
-    SPOKE -.-&gt;|"Read Variant"| TESTER
+    %% Flow P2 -&gt; P3
+    HUB -.-&gt;|"Read Constraints"| TESTER
+    SPOKE -.-&gt;|"Read Variants"| TESTER
     </pre><section id="the-hub-semantic-specifications">
 <h3 id="the-hub-semantic-specifications">The Hub: Semantic Specifications<a class="headerlink" href="#the-hub-semantic-specifications" title="Link to this heading">¶</a></h3>
-<p>Located in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/*.json</span></code>. Defines <strong>WHAT</strong> an operation is.</p>
+<p>Defines <strong>WHAT</strong> an operation is. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code> and JSON files.</p>
 <ul class="simple">
-<li><p><strong>Tier A (Math):</strong> <code class="docutils literal notranslate"><span class="pre">k_array_api.json</span></code> — Imported from the Python Array API Standard (NumPy-like ops).</p></li>
-<li><p><strong>Tier B (Neural):</strong> <code class="docutils literal notranslate"><span class="pre">k_neural_net.json</span></code> — Imported from ONNX Operators (Layers, Activations).</p></li>
-<li><p><strong>Tier C (Extras):</strong> <code class="docutils literal notranslate"><span class="pre">k_framework_extras.json</span></code> — Framework utilities, IO, and internal consensus standards.</p></li>
-<li><p><strong>Discovery:</strong> <code class="docutils literal notranslate"><span class="pre">k_discovered.json</span></code> — Generated by the Consensus Engine.</p></li>
+<li><p><strong>Tier A (Math):</strong> <code class="docutils literal notranslate"><span class="pre">k_array_api.json</span></code> — Array API Standard (NumPy-like).</p></li>
+<li><p><strong>Tier B (Neural):</strong> <code class="docutils literal notranslate"><span class="pre">k_neural_net.json</span></code> — ONNX Operators (Layers, Activations).</p></li>
+<li><p><strong>Tier C (Extras):</strong> <code class="docutils literal notranslate"><span class="pre">k_framework_extras.json</span></code> — Framework utilities, IO, and internals.</p></li>
 </ul>
 </section>
 <section id="the-spokes-framework-overlays">
 <h3 id="the-spokes-framework-overlays">The Spokes: Framework Overlays<a class="headerlink" href="#the-spokes-framework-overlays" title="Link to this heading">¶</a></h3>
-<p>Located in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/{framework}_mappings.json</span></code>. Defines <strong>HOW</strong> a specific framework implements the standard.</p>
+<p>Defines <strong>HOW</strong> a specific framework implements the standard. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (Live) or <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code> (Ghost).</p>
 <ul class="simple">
 <li><p><strong>API Path:</strong> E.g., <code class="docutils literal notranslate"><span class="pre">torch.abs</span></code>, <code class="docutils literal notranslate"><span class="pre">jax.numpy.abs</span></code>.</p></li>
 <li><p><strong>Argument Map:</strong> E.g., <code class="docutils literal notranslate"><span class="pre">{"input":</span> <span class="pre">"x",</span> <span class="pre">"dim":</span> <span class="pre">"axis"}</span></code>.</p></li>
-<li><p><strong>Plugin Hooks:</strong> Links to complex logic (e.g., <code class="docutils literal notranslate"><span class="pre">requires_plugin:</span> <span class="pre">"decompose_alpha"</span></code>).</p></li>
+<li><p><strong>DSL Config:</strong> Layout maps, Macros, Type Casting rules.</p></li>
 </ul>
-<p>This architecture supports <strong>Ghost Mode</strong>: The engine can transpile code even if the source or target framework libraries are not installed locally, because the API signatures are captured in these JSON snapshots.</p>
+<p>This architecture supports <strong>Ghost Mode</strong>: The engine can transpile code even if the source or target framework libraries are not installed locally, because the API signatures are captured in JSON snapshots.</p>
 </section>
 </section>
 <hr class="docutils"/>
@@ -899,7 +887,7 @@ window.addEventListener("load", load);
         SERVER[("Semantics&lt;br/&gt;Manager")]:::kb
         
         REWRITER("2. Pivot Rewriter"):::process
-        PLUGINS{{Plugin System}}:::plugin
+        PLUGINS{{Plugin &amp; DSL System}}:::plugin
         
         FIXER("3. Refinement&lt;br/&gt;(Import Fixer)"):::process
     end
@@ -917,27 +905,27 @@ window.addEventListener("load", load);
     FIXER --&gt; TGT
     </pre><section id="analysis-phase">
 <h3 id="analysis-phase">1. Analysis Phase<a class="headerlink" href="#analysis-phase" title="Link to this heading">¶</a></h3>
-<p>Before touching the code, the engine scans for safety violations, particularly when targeting functional frameworks like JAX.</p>
+<p>Before touching the code, the engine scans for safety violations.</p>
 <ul class="simple">
-<li><p><strong>PurityScanner:</strong> Detects side effects (IO, Globals, in-place list mutation) that break <code class="docutils literal notranslate"><span class="pre">jit</span></code>.</p></li>
+<li><p><strong>PurityScanner:</strong> Detects side effects (IO, Globals, in-place list mutation) unsafe for JAX/XLA.</p></li>
 <li><p><strong>LifecycleTracker:</strong> Ensures all class attributes used in <code class="docutils literal notranslate"><span class="pre">forward</span></code> are initialized in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p></li>
-<li><p><strong>DependencyScanner:</strong> Checks for unmapped 3rd-party imports (e.g., pandas/cv2).</p></li>
+<li><p><strong>DependencyScanner:</strong> Checks for unmapped 3rd-party imports (e.g., <code class="docutils literal notranslate"><span class="pre">pandas/cv2</span></code>).</p></li>
 </ul>
 </section>
 <section id="rewriting-phase-pivotrewriter">
 <h3 id="rewriting-phase-pivotrewriter">2. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#rewriting-phase-pivotrewriter" title="Link to this heading">¶</a></h3>
 <p>The core transformer is built on a Mixin architecture:</p>
 <ul class="simple">
-<li><p><strong>StructureMixin:</strong> Handles Class/Function definitions. It converts <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> to <code class="docutils literal notranslate"><span class="pre">flax.nnx.Module</span></code>, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code> to <code class="docutils literal notranslate"><span class="pre">__call__</span></code>, and injects state arguments (<code class="docutils literal notranslate"><span class="pre">rngs</span></code>) into constructors.</p></li>
-<li><p><strong>CallMixin:</strong> Handles function invocations. Resolves the source call to an Abstract ID, looks up the target implementation, creates argument pivots, and dispatches plugins.</p></li>
-<li><p><strong>NormalizationMixin:</strong> Handles argument type alignment (keyword vs positional).</p></li>
+<li><p><strong>StructureMixin:</strong> Handles Class/Function definitions. Converts <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> to <code class="docutils literal notranslate"><span class="pre">flax.nnx.Module</span></code>, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code>, and injects state arguments (<code class="docutils literal notranslate"><span class="pre">rngs</span></code>) into constructors.</p></li>
+<li><p><strong>CallMixin:</strong> Handles function invocations. Resolves the source call to an Abstract ID, looks up the target implementation, creates argument pivots, applies functional unwrapping, and dispatches plugins.</p></li>
+<li><p><strong>NormalizationMixin:</strong> Handles argument type alignment (keyword vs positional), defaults injection, and variadic packing.</p></li>
 <li><p><strong>AttributesMixin:</strong> Handles constant renaming (e.g., <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">jnp.float32</span></code>).</p></li>
 </ul>
 </section>
 <section id="refinement-phase">
 <h3 id="refinement-phase">3. Refinement Phase<a class="headerlink" href="#refinement-phase" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>ImportFixer:</strong> An intelligent pass that scans the <em>generated</em> AST. It injects required imports (e.g., <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) only if used and prunes unused source imports (e.g., <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">torch</span></code>). It handles alias conflicts and standard naming conventions defined in <code class="docutils literal notranslate"><span class="pre">SemanticsManager</span></code>.</p></li>
+<li><p><strong>ImportFixer:</strong> An intelligent pass that scans the <em>generated</em> AST. It injects required imports (e.g., <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) only if used and prunes unused source imports. It handles alias conflicts defined in <code class="docutils literal notranslate"><span class="pre">SemanticsManager</span></code>.</p></li>
 <li><p><strong>StructuralLinter:</strong> A final sanity check that flags any residual artifacts from the source framework that failed conversion.</p></li>
 </ul>
 </section>
@@ -945,7 +933,7 @@ window.addEventListener("load", load);
 <hr class="docutils"/>
 <section id="framework-adapters-traits-hierarchy">
 <h2 id="framework-adapters-traits-hierarchy">🔌 3. Framework Adapters (Traits &amp; Hierarchy)<a class="headerlink" href="#framework-adapters-traits-hierarchy" title="Link to this heading">¶</a></h2>
-<p>Support for specific libraries resides in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>. Adapters are Python classes that provide <strong>Traits</strong> to the engine rather than hardcoded logic.</p>
+<p>Support for specific libraries resides in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>. Adapters provide <strong>Traits</strong> to the engine rather than hardcoded logic.</p>
 <section id="structural-traits">
 <h3 id="structural-traits">Structural Traits<a class="headerlink" href="#structural-traits" title="Link to this heading">¶</a></h3>
 <p>Adapters define a <code class="docutils literal notranslate"><span class="pre">StructuralTraits</span></code> configuration object that controls syntax generation:</p>
@@ -953,51 +941,43 @@ window.addEventListener("load", load);
 <li><p><code class="docutils literal notranslate"><span class="pre">module_base</span></code>: The base class for layers (e.g., <code class="docutils literal notranslate"><span class="pre">"flax.nnx.Module"</span></code>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">forward_method</span></code>: The inference method name (<code class="docutils literal notranslate"><span class="pre">"forward"</span></code> vs <code class="docutils literal notranslate"><span class="pre">"call"</span></code> vs <code class="docutils literal notranslate"><span class="pre">"__call__"</span></code>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">inject_magic_args</span></code>: Tuple of arguments to inject into signatures (e.g., <code class="docutils literal notranslate"><span class="pre">[("rngs",</span> <span class="pre">"nnx.Rngs")]</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">lifestyle_strip_methods</span></code>: Methods to silently remove (e.g., <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>, <code class="docutils literal notranslate"><span class="pre">.detach()</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lifecycle_strip_methods</span></code>: Methods to silently remove (e.g., <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>, <code class="docutils literal notranslate"><span class="pre">.detach()</span></code>).</p></li>
 </ul>
 </section>
-<section id="hierarchy-flavours">
-<h3 id="hierarchy-flavours">Hierarchy &amp; Flavours<a class="headerlink" href="#hierarchy-flavours" title="Link to this heading">¶</a></h3>
-<p>The system supports hierarchical framework definitions:</p>
+<section id="plugin-traits">
+<h3 id="plugin-traits">Plugin Traits<a class="headerlink" href="#plugin-traits" title="Link to this heading">¶</a></h3>
+<p>Adapters define <code class="docutils literal notranslate"><span class="pre">PluginTraits</span></code> to toggle logic blocks used by generic plugins:</p>
 <ul class="simple">
-<li><p><strong>JAX Core (Level 1):</strong> Provides math mappings (<code class="docutils literal notranslate"><span class="pre">jnp</span></code>), optimizations (<code class="docutils literal notranslate"><span class="pre">optax</span></code>), and serialization (<code class="docutils literal notranslate"><span class="pre">orbax</span></code>).</p></li>
-<li><p><strong>Flax NNX (Level 2):</strong> Inherits from JAX Core via <code class="docutils literal notranslate"><span class="pre">inherits_from="jax"</span></code>, gaining all math/opt capabilities while adding Neural Network structural traits (<code class="docutils literal notranslate"><span class="pre">nnx.Module</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_numpy_compatible_arrays</span></code>: Enables <code class="docutils literal notranslate"><span class="pre">.astype()</span></code> casting and tuple-padding logic (JAX/TF/NumPy/MLX).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requires_explicit_rng</span></code>: Enables PRNG key threading logic (JAX/Flax).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requires_functional_state</span></code>: Enables BatchNorm state unwrapping logic (JAX).</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils"/>
-<section id="discovery-consensus">
-<h2 id="discovery-consensus">🤖 4. Discovery &amp; Consensus<a class="headerlink" href="#discovery-consensus" title="Link to this heading">¶</a></h2>
-<p>The system includes an automated pipeline to grow the Knowledge Base.</p>
-<section id="ghost-protocol">
-<h3 id="ghost-protocol">Ghost Protocol<a class="headerlink" href="#ghost-protocol" title="Link to this heading">¶</a></h3>
-<p>The <code class="docutils literal notranslate"><span class="pre">GhostInspector</span></code> can introspect APIs of installed libraries (Live Mode) or load API signatures from JSON files (Ghost Mode). This allows the Scaffolder and Consensus Engine to run in restricted environments (CI, WebAssembly) without requiring heavy dependencies like PyTorch or TensorFlow to be installed.</p>
-</section>
-<section id="consensus-engine">
-<h3 id="consensus-engine">Consensus Engine<a class="headerlink" href="#consensus-engine" title="Link to this heading">¶</a></h3>
-<p>Located in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/discovery/consensus.py</span></code>. It implements a voting algorithm to discover “Unofficial Standards”.</p>
-<ol class="arabic simple">
-<li><p><strong>Cluster:</strong> Groups APIs across frameworks by normalized name (e.g., <code class="docutils literal notranslate"><span class="pre">HuberLoss</span></code>, <code class="docutils literal notranslate"><span class="pre">huber_loss</span></code>, <code class="docutils literal notranslate"><span class="pre">Huber</span></code> <span class="math notranslate nohighlight">\(\to\)</span> Cluster “Huber”).</p></li>
-<li><p><strong>Align:</strong> Analyzes signatures to find common parameters (e.g., if 3/4 frameworks use <code class="docutils literal notranslate"><span class="pre">epsilon</span></code>, it becomes a standard argument).</p></li>
-<li><p><strong>Persist:</strong> Writes the new standard to <code class="docutils literal notranslate"><span class="pre">k_discovered.json</span></code>.</p></li>
-</ol>
-</section>
-</section>
-<hr class="docutils"/>
-<section id="plugin-system">
-<h2 id="plugin-system">🧠 5. Plugin System<a class="headerlink" href="#plugin-system" title="Link to this heading">¶</a></h2>
-<p>For operations that cannot be mapped 1:1 (e.g., architectural differences or complex argument logic), the engine delegates to <strong>Hook Functions</strong> in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>.</p>
+<section id="dsl-plugin-system">
+<h2 id="dsl-plugin-system">🧠 4. DSL &amp; Plugin System<a class="headerlink" href="#dsl-plugin-system" title="Link to this heading">¶</a></h2>
+<p>The system favors declarative logic in the ODL (Operation Definition Language) over python code, but falls back to Python Hooks for complex structural changes.</p>
+<section id="core-dsl-logic-in-pivotrewriter">
+<h3 id="core-dsl-logic-in-pivotrewriter">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#core-dsl-logic-in-pivotrewriter" title="Link to this heading">¶</a></h3>
+<p>Common patterns are handled directly by the engine using the ODL schema:</p>
 <ul class="simple">
-<li><p><strong>HookContext:</strong> Provides plugins with access to the <code class="docutils literal notranslate"><span class="pre">SemanticsManager</span></code> and global configuration.</p></li>
-<li><p><strong>Common Plugins:</strong></p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">decompose_alpha</span></code>: <code class="docutils literal notranslate"><span class="pre">add(x,</span> <span class="pre">y,</span> <span class="pre">alpha=2)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">add(x,</span> <span class="pre">y*2)</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pack_varargs</span></code>: <code class="docutils literal notranslate"><span class="pre">permute(x,</span> <span class="pre">0,</span> <span class="pre">1)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">transpose(x,</span> <span class="pre">axes=(0,</span> <span class="pre">1))</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">state_flag_injection</span></code>: Injects <code class="docutils literal notranslate"><span class="pre">training=True/False</span></code> kwargs based on context calls like <code class="docutils literal notranslate"><span class="pre">.eval()</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rng_threading</span></code>: Transforms global seed logic to explicitly threaded PRNG keys for JAX.</p></li>
+<li><p><strong>Variadic Packing:</strong> <code class="docutils literal notranslate"><span class="pre">pack_to_tuple="axes"</span></code> converts <code class="docutils literal notranslate"><span class="pre">permute(x,</span> <span class="pre">0,</span> <span class="pre">1)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">transpose(x,</span> <span class="pre">axes=(0,</span> <span class="pre">1))</span></code>.</p></li>
+<li><p><strong>Layout Mapping:</strong> <code class="docutils literal notranslate"><span class="pre">layout_map={"input":</span> <span class="pre">"NCHW-&gt;NHWC"}</span></code> injects permutation calls automatically.</p></li>
+<li><p><strong>Macros:</strong> <code class="docutils literal notranslate"><span class="pre">macro_template="{x}</span> <span class="pre">*</span> <span class="pre">sigmoid({x})"</span></code> expands composite ops inline.</p></li>
+<li><p><strong>Dispatch Rules:</strong> <code class="docutils literal notranslate"><span class="pre">dispatch_rules</span></code> switch APIs based on argument values (e.g. <code class="docutils literal notranslate"><span class="pre">mode="nearest"</span></code> uses a different function).</p></li>
 </ul>
-</li>
+</section>
+<section id="plugin-hooks-in-src-ml-switcheroo-plugins">
+<h3 id="plugin-hooks-in-src-ml-switcheroo-plugins">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)<a class="headerlink" href="#plugin-hooks-in-src-ml-switcheroo-plugins" title="Link to this heading">¶</a></h3>
+<p>Complex architectural mismatches are handled by Python functions registered via <code class="docutils literal notranslate"><span class="pre">@register_hook</span></code>.</p>
+<ul class="simple">
+<li><p><strong>RNG Threading (<code class="docutils literal notranslate"><span class="pre">rng_threading</span></code>):</strong> Transforms global seeds to explicit JAX keys. Injects <code class="docutils literal notranslate"><span class="pre">rng,</span> <span class="pre">key</span> <span class="pre">=</span> <span class="pre">split(rng)</span></code> preambles and adds <code class="docutils literal notranslate"><span class="pre">key</span></code> arguments.</p></li>
+<li><p><strong>Context Wrappers (<code class="docutils literal notranslate"><span class="pre">context_to_function_wrap</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> to <code class="docutils literal notranslate"><span class="pre">contextlib.nullcontext()</span></code> for JAX, stripping the global state semantics while preserving the block.</p></li>
+<li><p><strong>State Containers (<code class="docutils literal notranslate"><span class="pre">state_container</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">register_buffer</span></code>/<code class="docutils literal notranslate"><span class="pre">Parameter</span></code> calls into framework-specific object wrappers (e.g., <code class="docutils literal notranslate"><span class="pre">nnx.BatchStat</span></code>, <code class="docutils literal notranslate"><span class="pre">nnx.Param</span></code>).</p></li>
+<li><p><strong>IO Handlers (<code class="docutils literal notranslate"><span class="pre">io_handler</span></code>):</strong> Maps <code class="docutils literal notranslate"><span class="pre">torch.save</span></code> to <code class="docutils literal notranslate"><span class="pre">orbax.checkpoint</span></code> or <code class="docutils literal notranslate"><span class="pre">tf.io.write_file</span></code> depending on the target adapter’s I/O configuration.</p></li>
 </ul>
+</section>
 </section>
 </section>
 

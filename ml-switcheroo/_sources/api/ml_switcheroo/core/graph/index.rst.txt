@@ -12,6 +12,7 @@ ml_switcheroo.core.graph
    data flow (Edges).
 
    Shared by:
+
    - TikZ Backend (Visualizer)
    - HTML Backend (Grid Layout)
 
@@ -43,29 +44,23 @@ Module Contents
 
    Represents a computation unit (Layer) in the graph.
 
-   .. attribute:: id
-
-      Unique identifier (e.g. 'conv1').
-
-   .. attribute:: kind
-
-      Operation type (e.g. 'Conv2d', 'Input', 'Output').
-
-   .. attribute:: metadata
-
-      Dictionary of configuration parameters (e.g. kernel_size=3).
-
 
    .. py:attribute:: id
       :type:  str
+
+      Unique identifier (e.g. 'conv1').
 
 
    .. py:attribute:: kind
       :type:  str
 
+      Operation type (e.g. 'Conv2d', 'Input', 'Output').
+
 
    .. py:attribute:: metadata
       :type:  Dict[str, str]
+
+      Dictionary of configuration parameters (e.g. ``kernel_size=3``).
 
 
 .. py:class:: LogicalEdge
@@ -76,9 +71,13 @@ Module Contents
    .. py:attribute:: source
       :type:  str
 
+      Source node ID.
+
 
    .. py:attribute:: target
       :type:  str
+
+      Target node ID.
 
 
 .. py:class:: LogicalGraph
@@ -91,11 +90,15 @@ Module Contents
       :value: []
 
 
+      Ordered list of nodes in the graph.
+
 
    .. py:attribute:: edges
       :type:  List[LogicalEdge]
       :value: []
 
+
+      List of directed edges between nodes.
 
 
 .. py:function:: topological_sort(graph: LogicalGraph) -> List[LogicalNode]
@@ -115,9 +118,10 @@ Module Contents
    LibCST Visitor that extracts a LogicalGraph from Python source code.
 
    Two-Pass Logic:
-   1.  **Init Pass**: Scans `__init__` or `setup` to register named layers
-       assigned to `self`. Populates the node registry.
-   2.  **Forward Pass**: Scans `forward` or `__call__` to trace variable usage.
+
+   1.  **Init Pass**: Scans ``__init__`` or ``setup`` to register named layers
+       assigned to ``self``. Populates the node registry.
+   2.  **Forward Pass**: Scans ``forward`` or ``__call__`` to trace variable usage.
        Builds edges between registered nodes based on data flow.
 
 

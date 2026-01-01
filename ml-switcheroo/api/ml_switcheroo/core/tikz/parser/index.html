@@ -422,7 +422,7 @@ and reconstructs the <cite>LogicalGraph</cite> representation. It effectively re
 the operation of the <cite>TikzEmitter</cite>.</p>
 <p>Capabilities:
 1.  <strong>Tokenization</strong>: Regex-based lexer for LaTeX commands, groups, and options.
-2.  <strong>Structural Parsing</strong>: Identifies nodes, edges, and environments.
+2.  <strong>Structural Parsing</strong>: Identifies nodes, edges, and environments via recursive descent.
 3.  <strong>Metadata Extraction</strong>: Parses HTML-like tabular environments embedded in</p>
 <blockquote>
 <div><p>node labels to recover layer hyperparameters (e.g., kernel size, stride).</p>
@@ -439,7 +439,7 @@ the rest of the transpiler pipeline.</p></li>
 <td><p>Enumeration of LaTeX/TikZ token types.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.tikz.parser.Token" title="ml_switcheroo.core.tikz.parser.Token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Token</span></code></a></p></td>
-<td><p>A lexical unit.</p></td>
+<td><p>A lexical unit with position info.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.tikz.parser.TikzLexer" title="ml_switcheroo.core.tikz.parser.TikzLexer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TikzLexer</span></code></a></p></td>
 <td><p>Regex-based tokenizer for TikZ source code.</p></td>
@@ -517,7 +517,7 @@ the rest of the transpiler pipeline.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.Token">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.tikz.parser.</span></span><span class="sig-name descname"><span class="pre">Token</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L44-L51"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.Token" title="Link to this definition">¶</a></dt>
-<dd><p>A lexical unit.</p>
+<dd><p>A lexical unit with position info.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.Token.kind">
 <span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ml_switcheroo.core.tikz.parser.TokenKind" title="ml_switcheroo.core.tikz.parser.TokenKind"><span class="pre">TokenKind</span></a></em><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.Token.kind" title="Link to this definition">¶</a></dt>
@@ -537,8 +537,10 @@ the rest of the transpiler pipeline.</p></li>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.TikzLexer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.tikz.parser.</span></span><span class="sig-name descname"><span class="pre">TikzLexer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L54-L118"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzLexer" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.tikz.parser.</span></span><span class="sig-name descname"><span class="pre">TikzLexer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L54-L126"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzLexer" title="Link to this definition">¶</a></dt>
 <dd><p>Regex-based tokenizer for TikZ source code.</p>
+<p>Splits raw LaTeX strings into a stream of typed Tokens, handling
+symbols, commands, strings, and whitespace.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.TikzLexer.PATTERNS">
 <span class="sig-name descname"><span class="pre">PATTERNS</span></span><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzLexer.PATTERNS" title="Link to this definition">¶</a></dt>
@@ -561,13 +563,25 @@ the rest of the transpiler pipeline.</p></li>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.TikzLexer.tokenize">
-<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.core.tikz.parser.Token" title="ml_switcheroo.core.tikz.parser.Token"><span class="pre">Token</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L85-L118"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzLexer.tokenize" title="Link to this definition">¶</a></dt>
-<dd><p>Converts the full string into a list of Tokens, filtering whitespace/comments.</p>
+<span class="sig-name descname"><span class="pre">tokenize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ml_switcheroo.core.tikz.parser.Token" title="ml_switcheroo.core.tikz.parser.Token"><span class="pre">Token</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L89-L126"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzLexer.tokenize" title="Link to this definition">¶</a></dt>
+<dd><p>Converts the full string into a list of Tokens.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Sequence of tokens, excluding comments and whitespace.</dt><dd><p>Ends with an EOF token.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="#ml_switcheroo.core.tikz.parser.Token" title="ml_switcheroo.core.tikz.parser.Token">Token</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.TikzParser">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.tikz.parser.</span></span><span class="sig-name descname"><span class="pre">TikzParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L121-L378"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzParser" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.tikz.parser.</span></span><span class="sig-name descname"><span class="pre">TikzParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L129-L389"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzParser" title="Link to this definition">¶</a></dt>
 <dd><p>Parses tokenized TikZ code into a LogicalGraph.</p>
 <p>This parser implements a recursive descent strategy tailored to the specific
 TikZ subset produced by the <cite>TikzEmitter</cite>. It is not a general-purpose
@@ -590,8 +604,8 @@ TeX parser.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.tikz.parser.TikzParser.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="../analyser/index.html#ml_switcheroo.core.tikz.analyser.LogicalGraph" title="ml_switcheroo.core.tikz.analyser.LogicalGraph"><span class="pre">ml_switcheroo.core.tikz.analyser.LogicalGraph</span></a></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L136-L166"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzParser.parse" title="Link to this definition">¶</a></dt>
-<dd><p>Main entry point.</p>
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">ml_switcheroo.core.tikz.analyser.LogicalGraph</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/tikz/parser.py#L145-L175"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.tikz.parser.TikzParser.parse" title="Link to this definition">¶</a></dt>
+<dd><p>Main entry point. Iterates top-level commands.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The reconstructed graph extracted from the visual definition.</p>

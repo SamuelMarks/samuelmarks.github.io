@@ -22,73 +22,11 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.tikz.analyser.LogicalNode
-   ml_switcheroo.core.tikz.analyser.LogicalEdge
-   ml_switcheroo.core.tikz.analyser.LogicalGraph
    ml_switcheroo.core.tikz.analyser.GraphExtractor
 
 
 Module Contents
 ---------------
-
-.. py:class:: LogicalNode
-
-   Represents a computation unit (Layer) in the graph.
-
-   .. attribute:: id
-
-      Unique identifier (e.g. 'conv1').
-
-   .. attribute:: kind
-
-      Operation type (e.g. 'Conv2d', 'Input', 'Output').
-
-   .. attribute:: metadata
-
-      Dictionary of configuration parameters (e.g. kernel_size=3).
-
-
-   .. py:attribute:: id
-      :type:  str
-
-
-   .. py:attribute:: kind
-      :type:  str
-
-
-   .. py:attribute:: metadata
-      :type:  Dict[str, str]
-
-
-.. py:class:: LogicalEdge
-
-   Represents data flow between two nodes.
-
-
-   .. py:attribute:: source
-      :type:  str
-
-
-   .. py:attribute:: target
-      :type:  str
-
-
-.. py:class:: LogicalGraph
-
-   Language-agnostic representation of the neural network structure.
-
-
-   .. py:attribute:: nodes
-      :type:  List[LogicalNode]
-      :value: []
-
-
-
-   .. py:attribute:: edges
-      :type:  List[LogicalEdge]
-      :value: []
-
-
 
 .. py:class:: GraphExtractor
 
@@ -98,6 +36,7 @@ Module Contents
    LibCST Visitor that extracts a LogicalGraph from Python source code.
 
    Two-Pass Logic:
+
    1.  **Init Pass**: Scans `__init__` or `setup` to register named layers
        assigned to `self`. Populates the node registry.
    2.  **Forward Pass**: Scans `forward` or `__call__` to trace variable usage.
@@ -108,7 +47,7 @@ Module Contents
 
 
    .. py:attribute:: layer_registry
-      :type:  Dict[str, LogicalNode]
+      :type:  Dict[str, ml_switcheroo.core.graph.LogicalNode]
 
 
    .. py:attribute:: provenance

@@ -48,7 +48,7 @@ Package Contents
 
    Abstract base class for all MIDL nodes.
 
-   Enforces a `to_latex()` method for serialization support.
+   Enforces a ``to_latex()`` method for serialization support.
 
 
    .. py:method:: to_latex() -> str
@@ -68,19 +68,13 @@ Package Contents
 
 
    Root container representing the Model definition block.
-   Maps to the `DefModel` environment.
-
-   .. attribute:: name
-
-      The model class name.
-
-   .. attribute:: children
-
-      List of body statements (Memory, Input, Ops, Return).
+   Maps to the ``DefModel`` environment.
 
 
    .. py:attribute:: name
       :type:  str
+
+      The model class name.
 
 
    .. py:attribute:: children
@@ -88,10 +82,12 @@ Package Contents
       :value: []
 
 
+      List of body statements (Memory, Input, Ops, Return).
+
 
    .. py:method:: to_latex() -> str
 
-      Render the full \begin{DefModel}...\end{DefModel} block.
+      Render the full ``\begin{DefModel}...\end{DefModel}`` block.
 
 
 
@@ -101,28 +97,34 @@ Package Contents
 
 
    Represents stateful memory allocation (e.g., Weights/Layers).
-   Maps to the `\Attribute` macro.
+   Maps to the ``\Attribute`` macro.
 
-   .. rubric:: Example
+   Example::
 
-   \Attribute{conv}{Conv2d}{in=1, out=32, k=3}
+       \Attribute{conv}{Conv2d}{in=1, out=32, k=3}
 
 
    .. py:attribute:: node_id
       :type:  str
 
+      The unique identifier for the attribute.
+
 
    .. py:attribute:: op_type
       :type:  str
+
+      The operation type (e.g., 'Conv2d').
 
 
    .. py:attribute:: config
       :type:  Dict[str, str]
 
+      Configuration parameters for the layer.
+
 
    .. py:method:: to_latex() -> str
 
-      Render to \Attribute macro.
+      Render to ``\Attribute`` macro.
 
 
 
@@ -132,24 +134,28 @@ Package Contents
 
 
    Represents the model input definition.
-   Maps to the `\Input` macro.
+   Maps to the ``\Input`` macro.
 
-   .. rubric:: Example
+   Example::
 
-   \Input{x}{[B, 1, 28, 28]}
+       \Input{x}{[B, 1, 28, 28]}
 
 
    .. py:attribute:: name
       :type:  str
 
+      Name of the input variable.
+
 
    .. py:attribute:: shape
       :type:  str
 
+      Shape descriptor string.
+
 
    .. py:method:: to_latex() -> str
 
-      Render to \Input macro.
+      Render to ``\Input`` macro.
 
 
 
@@ -159,32 +165,40 @@ Package Contents
 
 
    Represents a stateless operation call.
-   Maps to the `\Op` macro.
+   Maps to the ``\Op`` macro.
 
-   .. rubric:: Example
+   Example::
 
-   \Op{s2}{Flatten}{s1, start=1}{[B, 21632]}
+       \Op{s2}{Flatten}{s1, start=1}{[B, 21632]}
 
 
    .. py:attribute:: node_id
       :type:  str
 
+      The unique identifier to assign the result to.
+
 
    .. py:attribute:: op_type
       :type:  str
+
+      The operation type (e.g., 'Flatten').
 
 
    .. py:attribute:: args
       :type:  List[str]
 
+      List of arguments passed to the operation.
+
 
    .. py:attribute:: shape
       :type:  str
 
+      Resulting shape descriptor.
+
 
    .. py:method:: to_latex() -> str
 
-      Render to \Op macro.
+      Render to ``\Op`` macro.
 
 
 
@@ -194,32 +208,40 @@ Package Contents
 
 
    Represents a call to a stateful layer defined in Memory.
-   Maps to the `\StateOp` macro.
+   Maps to the ``\StateOp`` macro.
 
-   .. rubric:: Example
+   Example::
 
-   \StateOp{s1}{conv}{x}{[B, 32, 26, 26]}
+       \StateOp{s1}{conv}{x}{[B, 32, 26, 26]}
 
 
    .. py:attribute:: node_id
       :type:  str
 
+      The unique identifier to assign the result to.
+
 
    .. py:attribute:: attribute_id
       :type:  str
+
+      The ID of the attribute being called.
 
 
    .. py:attribute:: args
       :type:  List[str]
 
+      List of arguments passed to the call.
+
 
    .. py:attribute:: shape
       :type:  str
 
+      Resulting shape descriptor.
+
 
    .. py:method:: to_latex() -> str
 
-      Render to \StateOp macro.
+      Render to ``\StateOp`` macro.
 
 
 
@@ -229,20 +251,22 @@ Package Contents
 
 
    Represents the output return statement.
-   Maps to the `\Return` macro.
+   Maps to the ``\Return`` macro.
 
-   .. rubric:: Example
+   Example::
 
-   \Return{s3}
+       \Return{s3}
 
 
    .. py:attribute:: target_id
       :type:  str
 
+      The variable ID to return.
+
 
    .. py:method:: to_latex() -> str
 
-      Render to \Return macro.
+      Render to ``\Return`` macro.
 
 
 

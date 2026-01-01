@@ -351,22 +351,27 @@
 <p>Handles the conversion of imperative optimization steps (e.g., PyTorch) to
 functional state updates (e.g., JAX/Optax).</p>
 <p>This logic is <strong>Wired-Only</strong>: It executes blindly if the semantic map requests it.</p>
-<p>Transformations:
-1.  <strong>Instantiation (`optimizer_constructor`)</strong>:</p>
-<blockquote>
-<div><ul class="simple">
+<p>Transformations:</p>
+<ol class="arabic simple">
+<li><p><strong>Instantiation (`optimizer_constructor`)</strong>:</p>
+<ul class="simple">
 <li><p>Strips the first argument (commonly <cite>model.parameters()</cite> in Torch) because
 functional optimizers (Optax) are initialized stateless/factory-style.</p></li>
 <li><p>Input: <cite>opt = torch.optim.Adam(model.parameters(), lr=0.01)</cite></p></li>
 <li><p>Output: <cite>opt = optax.adam(lr=0.01)</cite></p></li>
 </ul>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p><strong>Step Execution (`optimizer_step`)</strong>:
-- Flags <cite>step()</cite> calls as requiring manual intervention or functional rewrite.
-- Output: An <cite>EscapeHatch</cite> warning block suggesting the update pattern.</p></li>
-<li><p><strong>Zero Grad (`optimizer_zero_grad`)</strong>:
-- Strips the call completely (No-Op), as functional gradients don’t accumulate state.</p></li>
+</li>
+<li><p><strong>Step Execution (`optimizer_step`)</strong>:</p>
+<ul class="simple">
+<li><p>Flags <cite>step()</cite> calls as requiring manual intervention or functional rewrite.</p></li>
+<li><p>Output: An <cite>EscapeHatch</cite> warning block suggesting the update pattern.</p></li>
+</ul>
+</li>
+<li><p><strong>Zero Grad (`optimizer_zero_grad`)</strong>:</p>
+<ul class="simple">
+<li><p>Strips the call completely (No-Op), as functional gradients don’t accumulate state.</p></li>
+</ul>
+</li>
 </ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
@@ -389,8 +394,19 @@ functional optimizers (Optax) are initialized stateless/factory-style.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.optimizer_step.transform_optimizer_init">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.optimizer_step.</span></span><span class="sig-name descname"><span class="pre">transform_optimizer_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Call</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.optimizer_step.transform_optimizer_init" title="Link to this definition">¶</a></dt>
-<dd><p>Hook to rewrite Optimizer instantiation.
-Removes the first argument (parameters) to support factory-pattern initialization.</p>
+<dd><p>Hook to rewrite Optimizer instantiation.</p>
+<p>Removes the first argument (parameters) to support factory-pattern initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – Original CST call.</p></li>
+<li><p><strong>ctx</strong> – Hook context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed CST call.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.optimizer_step.transform_optimizer_step">
@@ -399,6 +415,17 @@ Removes the first argument (parameters) to support factory-pattern initializatio
 <p>Since <cite>step()</cite> logic implies side-effects on the optimizer state and parameters,
 which doesn’t translate 1:1 to functional updates without knowing variable names
 (params, grads, opt_state), this hook emits a specialized Escape Hatch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – Original CST call.</p></li>
+<li><p><strong>ctx</strong> – Hook context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>CST node wrapped with escape hatch comments.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.optimizer_step.strip_zero_grad">
@@ -406,6 +433,17 @@ which doesn’t translate 1:1 to functional updates without knowing variable nam
 <dd><p>Hook for <code class="docutils literal notranslate"><span class="pre">optimizer.zero_grad()</span></code>.</p>
 <p>Removes the call (No-op), as gradient accumulation is generally explicit
 in functional frameworks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – Original CST call.</p></li>
+<li><p><strong>ctx</strong> – Hook context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A CST Name(‘None’) representing a no-op expression.</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

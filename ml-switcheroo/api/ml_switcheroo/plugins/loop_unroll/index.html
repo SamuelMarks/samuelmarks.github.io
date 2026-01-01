@@ -348,13 +348,13 @@
 functional primitives required by XLA-based frameworks. Unlike PyTorch/TensorFlow Eager,
 which support imperative Python loops, frameworks targeting XLA (like JAX) require
 loops to be expressed as functional operators (<cite>scan</cite> or <cite>fori_loop</cite>) to be compiled.</p>
-<p>The strategy is <strong>Safety-First</strong>:
-1.  <strong>Analysis</strong>: Inspects <cite>for</cite> loops.
-2.  <strong>Trait Check</strong>: Determines if the target framework requires functional control flow.
-3.  <strong>Handling</strong>: Wraps imperative loops in an <cite>EscapeHatch</cite> warning rather than</p>
-<blockquote>
-<div><p>attempting unsafe auto-conversion (solving the “carry state” problem is often undecidable).</p>
-</div></blockquote>
+<p>The strategy is <strong>Safety-First</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Analysis</strong>: Inspects <cite>for</cite> loops.</p></li>
+<li><p><strong>Trait Check</strong>: Determines if the target framework requires functional control flow.</p></li>
+<li><p><strong>Handling</strong>: Wraps imperative loops in an <cite>EscapeHatch</cite> warning rather than
+attempting unsafe auto-conversion (solving the “carry state” problem is often undecidable).</p></li>
+</ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -372,8 +372,8 @@ loops to be expressed as functional operators (<cite>scan</cite> or <cite>fori_l
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loop_unroll.</span></span><span class="sig-name descname"><span class="pre">transform_loops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.FlattenSentinel</span></span></span><a class="headerlink" href="#ml_switcheroo.plugins.loop_unroll.transform_loops" title="Link to this definition">¶</a></dt>
 <dd><p>Plugin Hook: Transforms or Flags <cite>for</cite> loops for functional compliance.</p>
 <p>Triggered by the <cite>ControlFlowMixin</cite> when visiting <cite>For</cite> nodes.</p>
-<dl class="simple">
-<dt>Strategy:</dt><dd><ul class="simple">
+<p>Strategy:</p>
+<ul class="simple">
 <li><p>Check <cite>ctx.plugin_traits.requires_functional_control_flow</cite>.</p></li>
 <li><p>If False: Pass through (Imperative loops are valid).</p></li>
 <li><dl class="simple">
@@ -387,8 +387,6 @@ loops to be expressed as functional operators (<cite>scan</cite> or <cite>fori_l
 </dl>
 </li>
 </ul>
-</dd>
-</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

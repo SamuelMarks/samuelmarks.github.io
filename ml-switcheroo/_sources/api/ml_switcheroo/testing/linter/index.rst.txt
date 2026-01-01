@@ -69,29 +69,56 @@ Module Contents
 
       Checks `import x`, `import x as y`.
 
+      Logs violations if the root package is forbidden.
+      Tracks aliases to detect usage later in the file.
+
+      :param node: The Import node.
+
 
 
    .. py:method:: leave_Import(node: libcst.Import) -> None
+
+      Exits the import scope context.
+
+      :param node: The Import node being exited.
+
 
 
    .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> None
 
       Checks `from x import y`.
 
+      Logs violations if the module root matches forbidden set.
+
+      :param node: The ImportFrom node.
+
 
 
    .. py:method:: leave_ImportFrom(node: libcst.ImportFrom) -> None
+
+      Exits the import-from scope context.
+
+      :param node: The ImportFrom node being exited.
+
 
 
    .. py:method:: visit_Name(node: libcst.Name) -> None
 
       Checks usage of aliased forbidden variables (e.g. `t.abs()` where `t` is torch).
 
+      Ignores names inside import definition statements.
+
+      :param node: The Name node.
+
 
 
    .. py:method:: visit_Attribute(node: libcst.Attribute) -> None
 
       Checks attributes to provide more specific error messages (e.g. `torch.abs`).
+
+      If the left side of the attribute matches a forbidden alias, logs an error.
+
+      :param node: The Attribute node.
 
 
 

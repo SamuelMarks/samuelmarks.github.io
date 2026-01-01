@@ -352,22 +352,23 @@
 <li><p>JAX/Optax: <cite>schedule_fn = optax.piecewise_constant(…)</cite> (Pure function passed to optimizer).</p></li>
 </ol>
 <p><strong>Transformation</strong></p>
-<ol class="arabic">
-<li><p><strong>Instantiation</strong>:
--   Detects specific Scheduler constructors via <cite>scheduler_rewire</cite>.
--   Removes the <cite>optimizer</cite> argument (Arg 0).
--   Maps hyperparameters to target equivalents using keys defined in the semantic map</p>
-<blockquote>
-<div><p>(e.g. <cite>step_size</cite> -&gt; <cite>transition_steps</cite> for Optax or <cite>decay_steps</cite> for Keras).</p>
-</div></blockquote>
+<ol class="arabic simple">
+<li><p><strong>Instantiation</strong>:</p>
 <ul class="simple">
+<li><p>Detects specific Scheduler constructors via <cite>scheduler_rewire</cite>.</p></li>
+<li><p>Removes the <cite>optimizer</cite> argument (Arg 0).</p></li>
+<li><p>Maps hyperparameters to target equivalents using keys defined in the semantic map
+(e.g. <cite>step_size</cite> -&gt; <cite>transition_steps</cite> for Optax or <cite>decay_steps</cite> for Keras).</p></li>
 <li><p>Changes the API call to the target factory declared in the Knowledge Base.</p></li>
 <li><p>Injects <cite>init_value=1.0</cite> (as partial schedule) or tries to preserve semantics.</p></li>
 </ul>
 </li>
-<li><p><strong>Stepping</strong>:
--   Detects <cite>scheduler.step()</cite> via <cite>scheduler_step_noop</cite>.
--   Replaces <cite>scheduler.step()</cite> with a no-op placeholder <cite>None</cite>.</p></li>
+<li><p><strong>Stepping</strong>:</p>
+<ul class="simple">
+<li><p>Detects <cite>scheduler.step()</cite> via <cite>scheduler_step_noop</cite>.</p></li>
+<li><p>Replaces <cite>scheduler.step()</cite> with a no-op placeholder <cite>None</cite>.</p></li>
+</ul>
+</li>
 </ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
@@ -390,6 +391,17 @@
 <dd><p>Hook: Transforms Scheduler instantiation.</p>
 <p>Logic routes based on detected Operation ID in context (StepLR vs Cosine).
 Now fully decoupled: reads target API and argument names from <cite>ctx</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> – Original CST call.</p></li>
+<li><p><strong>ctx</strong> – Hook context containing operation ID.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transformed CST call.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.schedulers.transform_scheduler_step">

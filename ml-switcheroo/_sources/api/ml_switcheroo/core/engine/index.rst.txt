@@ -7,11 +7,12 @@ ml_switcheroo.core.engine
 
    Orchestration Engine for AST Transformations.
 
-   This module provides the `ASTEngine`, the primary driver for the transpilation process.
+   This module provides the ``ASTEngine``, the primary driver for the transpilation process.
    It coordinates the various analysis and transformation passes required to convert code
    from a source framework to a target framework.
 
    Pipeline:
+
    1.  **Ingestion**: Adapter Hooks (LaTeX) or Standard Parsing (Python/MLIR/TikZ).
    2.  **Emission**: Adapter Hooks (LaTeX) or Standard Emission (Python/MLIR/TikZ).
    3.  **Transformation**: Purity, Lifecycle, Dependency checks, Rewriting, Import Fixing.
@@ -35,85 +36,7 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   !!! abstract "Usage Documentation"
-       [Models](../concepts/models.md)
-
-   A base class for creating Pydantic models.
-
-   .. attribute:: __class_vars__
-
-      The names of the class variables defined on the model.
-
-   .. attribute:: __private_attributes__
-
-      Metadata about the private attributes of the model.
-
-   .. attribute:: __signature__
-
-      The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
-
-   .. attribute:: __pydantic_complete__
-
-      Whether model building is completed, or if there are still undefined fields.
-
-   .. attribute:: __pydantic_core_schema__
-
-      The core schema of the model.
-
-   .. attribute:: __pydantic_custom_init__
-
-      Whether the model has a custom `__init__` function.
-
-   .. attribute:: __pydantic_decorators__
-
-      Metadata containing the decorators defined on the model.
-      This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
-
-   .. attribute:: __pydantic_generic_metadata__
-
-      Metadata for generic models; contains data used for a similar purpose to
-      __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
-
-   .. attribute:: __pydantic_parent_namespace__
-
-      Parent namespace of the model, used for automatic rebuilding of models.
-
-   .. attribute:: __pydantic_post_init__
-
-      The name of the post-init method for the model, if defined.
-
-   .. attribute:: __pydantic_root_model__
-
-      Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
-
-   .. attribute:: __pydantic_serializer__
-
-      The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
-
-   .. attribute:: __pydantic_validator__
-
-      The `pydantic-core` `SchemaValidator` used to validate instances of the model.
-
-   .. attribute:: __pydantic_fields__
-
-      A dictionary of field names and their corresponding [`FieldInfo`][pydantic.fields.FieldInfo] objects.
-
-   .. attribute:: __pydantic_computed_fields__
-
-      A dictionary of computed field names and their corresponding [`ComputedFieldInfo`][pydantic.fields.ComputedFieldInfo] objects.
-
-   .. attribute:: __pydantic_extra__
-
-      A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
-      is set to `'allow'`.
-
-   .. attribute:: __pydantic_fields_set__
-
-      The names of fields explicitly set during instantiation.
-
-   .. attribute:: __pydantic_private__
-
-      Values of private attributes set on the model instance.
+   Container for the results of a transpilation job.
 
 
    .. py:attribute:: code
@@ -144,10 +67,14 @@ Module Contents
       :type: bool
 
 
+      Check if the result contains any error messages.
+
 
 .. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
 
    The main compilation unit.
+
+   Orchestrates parsing, analysis, transformation, and code generation.
 
 
    .. py:attribute:: semantics
@@ -175,10 +102,39 @@ Module Contents
 
    .. py:method:: parse(code: str) -> libcst.Module
 
+      Parses Python source code into a LibCST module.
+
+      :param code: Source code string.
+
+      :returns: A parsed CST object.
+
+
 
    .. py:method:: to_source(tree: libcst.Module) -> str
 
+      Converts a LibCST module back to source code string.
+
+      :param tree: The modified CST module.
+
+      :returns: The generated Python code.
+
+
 
    .. py:method:: run(code: str) -> ConversionResult
+
+      Executes the full transpilation pipeline.
+
+      Steps:
+
+      1.  **Ingestion**: Parse source (Python/MLIR/LaTeX) to AST.
+      2.  **Short-Circuit**: If target is non-Python (MLIR/TikZ/Latex), emit immediately.
+      3.  **Analysis**: Run Purity, Lifecycle, and Dependency checks.
+      4.  **Rewriting**: Execute `PivotRewriter` to transform the AST.
+      5.  **Refinement**: Run `ImportFixer` and `StructuralLinter` to clean results.
+
+      :param code: The source code string to transpile.
+
+      :returns: A `ConversionResult` containing the output code, errors, and execution trace.
+
 
 

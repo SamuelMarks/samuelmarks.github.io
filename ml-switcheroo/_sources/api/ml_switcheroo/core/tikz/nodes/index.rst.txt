@@ -9,7 +9,7 @@ ml_switcheroo.core.tikz.nodes
 
    This module defines the data structures for representing TikZ source code.
    It follows a similar philosophy to LibCST, where nodes own their
-   string representation via a `to_text()` method, allowing for precise control
+   string representation via a ``to_text()`` method, allowing for precise control
    over formatting (whitespace, indentation) during code generation.
 
 
@@ -62,6 +62,8 @@ Module Contents
    .. py:attribute:: content
       :type:  str
 
+      The raw whitespace content.
+
 
    .. py:method:: to_text() -> str
 
@@ -74,18 +76,22 @@ Module Contents
    Bases: :py:obj:`TikzBaseNode`
 
 
-   Represents a LaTeX comment (e.g. `% My Comment`).
+   Represents a LaTeX comment (e.g. ``% My Comment``).
    Includes the percent sign in the content or adds it during export.
 
 
    .. py:attribute:: text
       :type:  str
 
+      The comment text.
+
 
    .. py:attribute:: trailing_newline
       :type:  bool
       :value: True
 
+
+      Whether to append a newline after the comment.
 
 
    .. py:method:: to_text() -> str
@@ -99,11 +105,13 @@ Module Contents
    Bases: :py:obj:`TikzBaseNode`
 
 
-   Represents a TikZ option like `[draw=black]` or `[circle]`.
+   Represents a TikZ option like ``[draw=black]`` or ``[circle]``.
 
 
    .. py:attribute:: key
       :type:  str
+
+      Option key.
 
 
    .. py:attribute:: value
@@ -111,10 +119,12 @@ Module Contents
       :value: None
 
 
+      Optional value for key-value pairs.
+
 
    .. py:method:: to_text() -> str
 
-      Returns `key=value` or just `key`.
+      Returns ``key=value`` or just ``key``.
 
 
 
@@ -126,12 +136,12 @@ Module Contents
    Represents an HTML-like table structure used inside TikZ Node labels.
    Uses LaTeX tabular environment syntax.
 
-   .. rubric:: Example
+   Example::
 
-   \begin{tabular}{c}
-       \textbf{LayerName} \\
-       param: val
-   \end{tabular}
+       \begin{tabular}{c}
+           \textbf{LayerName} \\
+           param: val
+       \end{tabular}
 
 
    .. py:attribute:: rows
@@ -139,11 +149,15 @@ Module Contents
       :value: []
 
 
+      List of rows, where each row is a list of cell strings.
+
 
    .. py:attribute:: align
       :type:  str
       :value: 'c'
 
+
+      Column alignment (c=center, l=left, r=right).
 
 
    .. py:method:: to_text() -> str
@@ -157,26 +171,35 @@ Module Contents
    Bases: :py:obj:`TikzBaseNode`
 
 
-   Represents a `\node` command.
+   Represents a ``\node`` command.
 
-   Structure:
+   Structure::
+
        \node [options] (id) at (x, y) {label_content};
 
 
    .. py:attribute:: node_id
       :type:  str
 
+      Unique identifier for the node (used for edges).
+
 
    .. py:attribute:: x
       :type:  float
+
+      X Coordinate.
 
 
    .. py:attribute:: y
       :type:  float
 
+      Y Coordinate.
+
 
    .. py:attribute:: content
       :type:  Union[str, TikzTable]
+
+      Inner content (Text or Table).
 
 
    .. py:attribute:: options
@@ -184,11 +207,15 @@ Module Contents
       :value: []
 
 
+      List of TikZ options.
+
 
    .. py:attribute:: leading_trivia
       :type:  List[TriviaNode]
       :value: []
 
+
+      Whitespace/Comments before the node command.
 
 
    .. py:method:: to_text() -> str
@@ -202,18 +229,23 @@ Module Contents
    Bases: :py:obj:`TikzBaseNode`
 
 
-   Represents a `\draw` command connecting two nodes.
+   Represents a ``\draw`` command connecting two nodes.
 
-   Structure:
+   Structure::
+
        \draw [options] (src) -- (tgt);
 
 
    .. py:attribute:: source_id
       :type:  str
 
+      Source node ID.
+
 
    .. py:attribute:: target_id
       :type:  str
+
+      Target node ID.
 
 
    .. py:attribute:: options
@@ -221,17 +253,23 @@ Module Contents
       :value: []
 
 
+      List of styling options.
+
 
    .. py:attribute:: connector
       :type:  str
       :value: '--'
 
 
+      Connector style (e.g. ``--`` or ``->``).
+
 
    .. py:attribute:: leading_trivia
       :type:  List[TriviaNode]
       :value: []
 
+
+      Whitespace before the draw command.
 
 
    .. py:method:: to_text() -> str
@@ -245,9 +283,10 @@ Module Contents
    Bases: :py:obj:`TikzBaseNode`
 
 
-   The root container representing the `tikzpicture` environment.
+   The root container representing the ``tikzpicture`` environment.
 
-   Structure:
+   Structure::
+
        \begin{tikzpicture}
            ... children ...
        \end{tikzpicture}
@@ -258,11 +297,15 @@ Module Contents
       :value: []
 
 
+      List of nodes, edges, comments, and trivia.
+
 
    .. py:attribute:: options
       :type:  List[TikzOption]
       :value: []
 
+
+      Global environment options.
 
 
    .. py:method:: to_text() -> str

@@ -32,15 +32,39 @@ Module Contents
    2. Strips parameter argument (Arg 0).
    3. Renames `lr` -> `learning_rate`.
 
+   :param node: Original CST call.
+   :type node: cst.Call
+   :param ctx: Hook execution context.
+   :type ctx: HookContext
+
+   :returns: Transformed optimizer initialization.
+   :rtype: cst.Call
+
 
 .. py:function:: transform_mlx_optimizer_step(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> Union[libcst.Call, libcst.FlattenSentinel]
 
    Hook: Transforms `optimizer.step()` into an EscapeHatch pattern.
    Functional optimizers (like MLX/Optax) require explicit update calls `opt.update(model, state)`.
 
+   :param node: Original CST call.
+   :type node: cst.Call
+   :param ctx: Hook execution context.
+   :type ctx: HookContext
+
+   :returns: The node wrapped in an EscapeHatch.
+   :rtype: Union[cst.Call, cst.FlattenSentinel]
+
 
 .. py:function:: transform_mlx_zero_grad(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
 
    Hook: Transforms `optimizer.zero_grad()` into `None` (No-Op).
+
+   :param node: Original CST call.
+   :type node: cst.Call
+   :param ctx: Non-used hook context.
+   :type ctx: HookContext
+
+   :returns: A 'None' node execution.
+   :rtype: cst.CSTNode
 
 

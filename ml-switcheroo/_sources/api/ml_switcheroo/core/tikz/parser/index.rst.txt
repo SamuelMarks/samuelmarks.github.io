@@ -13,7 +13,7 @@ ml_switcheroo.core.tikz.parser
 
    Capabilities:
    1.  **Tokenization**: Regex-based lexer for LaTeX commands, groups, and options.
-   2.  **Structural Parsing**: Identifies nodes, edges, and environments.
+   2.  **Structural Parsing**: Identifies nodes, edges, and environments via recursive descent.
    3.  **Metadata Extraction**: Parses HTML-like tabular environments embedded in
        node labels to recover layer hyperparameters (e.g., kernel size, stride).
    4.  **Graph Reconstruction**: Builds a `LogicalGraph` object compatible with
@@ -87,7 +87,7 @@ Module Contents
 
 .. py:class:: Token
 
-   A lexical unit.
+   A lexical unit with position info.
 
 
    .. py:attribute:: kind
@@ -109,6 +109,9 @@ Module Contents
 .. py:class:: TikzLexer(text: str)
 
    Regex-based tokenizer for TikZ source code.
+
+   Splits raw LaTeX strings into a stream of typed Tokens, handling
+   symbols, commands, strings, and whitespace.
 
 
    .. py:attribute:: PATTERNS
@@ -134,7 +137,13 @@ Module Contents
 
    .. py:method:: tokenize() -> List[Token]
 
-      Converts the full string into a list of Tokens, filtering whitespace/comments.
+      Converts the full string into a list of Tokens.
+
+      :returns:
+
+                Sequence of tokens, excluding comments and whitespace.
+                             Ends with an EOF token.
+      :rtype: List[Token]
 
 
 
@@ -165,7 +174,7 @@ Module Contents
 
    .. py:method:: parse() -> ml_switcheroo.core.tikz.analyser.LogicalGraph
 
-      Main entry point.
+      Main entry point. Iterates top-level commands.
 
       :returns: The reconstructed graph extracted from the visual definition.
       :rtype: LogicalGraph

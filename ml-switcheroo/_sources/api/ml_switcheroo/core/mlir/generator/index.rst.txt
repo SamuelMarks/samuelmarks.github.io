@@ -11,6 +11,7 @@ ml_switcheroo.core.mlir.generator
    MLIR CST object model and reconstructs valid Python code via LibCST.
 
    It performs the inverse operation of the Emitter:
+
    1.  **Dialect Interpretation**: Maps `sw.*` ops back to Python constructs.
    2.  **SSA Resolution**: Converts `%id` references into readable Python variable names.
    3.  **Trivia Restoration**: Transforms `// comment` back to `# comment`.
@@ -18,16 +19,14 @@ ml_switcheroo.core.mlir.generator
        produce Pythonic code (e.g. `f(x)` instead of `_1=x; _2=f(_1);`) *if enabled*.
 
    Feature Hardening:
-   - Robustly handles `sw.op` "type" attributes for deep class hierarchies (e.g. `torch.nn.Conv2d`).
-   - Distinguishes between static operation calls (`sw.op`) and dynamic calls (`sw.call`).
+   - Robustly handles `sw.op` "type" attributes for deep class hierarchies.
+   - Distinguishes between static operation calls and dynamic calls.
    - Ensures valid assignment generation for results.
-   - **Naming Heuristics**: Preserves variable names based on SSA IDs or Type Hints, prioritizing stability.
-   - **Type Reconstruction**: Restores Python type hints from MLIR `!sw.type` annotations.
-   - **Void Assignment Suppression**: Strips assignments like `_0 = super().__init__()` if unused or void-like.
-   - **Explicit Re-rolling**: Defaults to sequential statements (SSA form) for clarity unless inlining is requested.
-   - **Smart Heuristics**: Forces inlining of `super()` and `getattr` to prevent verbose `_0 = super()` assignments.
-   - **Statement Fusion**: fuses operations into `setattr` and `return` to restore idiomatic syntax (`self.x = y`).
-   - **Semantic Naming**: Extracts readable variable names from operation types (e.g., `_flatten` from `torch.flatten`).
+   - **Naming Heuristics**: Preserves variable names based on SSA IDs or Type Hints.
+   - **Type Reconstruction**: Restores Python type hints from MLIR.
+   - **Void Assignment Suppression**: Strips unused assignments.
+   - **Explicit Re-rolling**: Defaults to sequential statements.
+   - **Statement Fusion**: fuses operations into `setattr` and `return`.
 
 
 
@@ -36,49 +35,19 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.mlir.generator.NamingContext
    ml_switcheroo.core.mlir.generator.MlirToPythonGenerator
 
 
 Module Contents
 ---------------
 
-.. py:class:: NamingContext
-
-   Tracks mapping between MLIR SSA IDs and Python variable names.
-   Ensures generated names are valid identifiers.
-
-
-   .. py:method:: register(ssa_name: str, hint: Optional[str] = None) -> str
-
-      Assigns a valid Python name to an SSA value.
-
-      Naming Strategy:
-      1. If hint provided: Use hint (cleaned).
-      2. If SSA ID (e.g. %res): Use prefix + ID body (e.g. _res).
-      3. Heuristic: Strip trailing numeric counters from SSA hints if base is unique.
-         (e.g., %self0 -> self, %x5 -> x).
-
-      :param ssa_name: The MLIR variable name (e.g. "%0", "%arg0").
-      :param hint: Optional string to guide naming (e.g. "flatten" from torch.flatten).
-
-      :returns: The resolved Python identifier string.
-
-
-
-   .. py:method:: lookup(ssa_name: str) -> str
-
-      Retrieves Python name for SSA ID.
-
-      :param ssa_name: The MLIR variable name.
-
-      :returns: The mapped Python name, or safe fallback if not registered.
-
-
-
 .. py:class:: MlirToPythonGenerator(inline_expressions: bool = False)
 
+   Bases: :py:obj:`ml_switcheroo.core.mlir.gen_expressions.ExpressionGeneratorMixin`, :py:obj:`ml_switcheroo.core.mlir.gen_statements.StatementGeneratorMixin`, :py:obj:`ml_switcheroo.core.mlir.gen_base.BaseGeneratorMixin`
+
+
    Transpiler back-end: MLIR CST -> Python LibCST.
+   Integrates expression and statement generation logic.
 
 
    .. py:attribute:: ctx

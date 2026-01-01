@@ -1,0 +1,64 @@
+ml_switcheroo.core.mlir.naming
+==============================
+
+.. py:module:: ml_switcheroo.core.mlir.naming
+
+.. autoapi-nested-parse::
+
+   Naming Context for MLIR Generator.
+
+   This module provides the `NamingContext` class, which manages variable name
+   resolution during MLIR-to-Python translation. It handles:
+   - Mapping SSA IDs (e.g. `%0`) to valid Python identifiers (e.g. `_0`).
+   - Avoiding reserved Python keywords.
+   - Handling hint-based naming (e.g. `%flat` -> `_flat`).
+   - Collision resolution for duplicate names in the same scope.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.mlir.naming.NamingContext
+
+
+Module Contents
+---------------
+
+.. py:class:: NamingContext
+
+   Tracks mapping between MLIR SSA IDs and Python variable names.
+   Ensures generated names are valid identifiers and do not collide.
+
+
+   .. py:method:: register(ssa_name: str, hint: Optional[str] = None) -> str
+
+      Assigns a valid Python name to an SSA value.
+
+      Naming Strategy:
+
+      1. If hint provided: Use hint (cleaned).
+      2. If SSA ID (e.g. %res): Use prefix + ID body (e.g. _res).
+      3. Heuristic: Strip trailing numeric counters from SSA hints if base is unique
+         (e.g., %self0 -> self, %x5 -> x).
+
+      :param ssa_name: The MLIR variable name (e.g. "%0", "%arg0").
+      :param hint: Optional string to guide naming (e.g. "flatten" from torch.flatten).
+
+      :returns: The resolved Python identifier string.
+      :rtype: str
+
+
+
+   .. py:method:: lookup(ssa_name: str) -> str
+
+      Retrieves Python name for SSA ID.
+
+      :param ssa_name: The MLIR variable name.
+
+      :returns: The mapped Python name, or safe fallback if not registered.
+
+
+

@@ -124,25 +124,51 @@ Module Contents
 
       Ensures the framework is registered in the system.
 
+      :param v: The framework key to validate.
+      :type v: str
+
+      :returns: The normalized framework key.
+      :rtype: str
+
+      :raises ValueError: If the framework is not registered and not a placeholder.
+
 
 
    .. py:property:: effective_source
       :type: str
 
 
-      Returns source flavour if present, else source framework.
+      Returns the resolved source framework key.
+
+      Prioritizes `source_flavour` if present, otherwise returns `source_framework`.
+
+      :returns: The active source framework key.
+      :rtype: str
 
 
    .. py:property:: effective_target
       :type: str
 
 
-      Returns target flavour if present, else target framework.
+      Returns the resolved target framework key.
+
+      Prioritizes `target_flavour` if present, otherwise returns `target_framework`.
+
+      :returns: The active target framework key.
+      :rtype: str
 
 
    .. py:method:: parse_plugin_settings(schema: Type[T]) -> T
 
       Validates plugin settings against a Pydantic model.
+
+      :param schema: The Pydantic model class defining the settings schema.
+      :type schema: Type[T]
+
+      :returns: An instance of the schema populated with validated settings.
+      :rtype: T
+
+      :raises ValueError: If validation against the schema fails.
 
 
 
@@ -153,10 +179,36 @@ Module Contents
       Loads configuration from pyproject.toml, overriding with CLI arguments.
       Defaults are calculated dynamically via factory methods if not found.
 
+      :param source: Override source framework.
+      :type source: Optional[str]
+      :param target: Override target framework.
+      :type target: Optional[str]
+      :param source_flavour: Override source flavour.
+      :type source_flavour: Optional[str]
+      :param target_flavour: Override target flavour.
+      :type target_flavour: Optional[str]
+      :param strict_mode: Override strict mode setting.
+      :type strict_mode: Optional[bool]
+      :param plugin_settings: Additional plugin settings.
+      :type plugin_settings: Optional[Dict]
+      :param validation_report: Override validation report path.
+      :type validation_report: Optional[Path]
+      :param search_path: Directory path to search for config file.
+      :type search_path: Optional[Path]
+
+      :returns: The fully resolved configuration object.
+      :rtype: RuntimeConfig
+
 
 
 .. py:function:: parse_cli_key_values(items: Optional[List[str]]) -> Dict[str, Any]
 
    Parses a list of 'key=value' strings into a dictionary with type inference.
+
+   :param items: List of strings in "key=value" format.
+   :type items: Optional[List[str]]
+
+   :returns: Dictionary with parsed values (bool, int, float, or str).
+   :rtype: Dict[str, Any]
 
 

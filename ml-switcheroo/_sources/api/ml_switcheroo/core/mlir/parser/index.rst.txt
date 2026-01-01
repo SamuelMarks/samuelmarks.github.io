@@ -28,6 +28,9 @@ Module Contents
 
 .. py:class:: Token
 
+   Represents a lexical token extracted from the source string.
+
+
    .. py:attribute:: kind
       :type:  str
 
@@ -46,6 +49,11 @@ Module Contents
 
 .. py:class:: Tokenizer(text: str)
 
+   Lexical analyzer for MLIR syntax.
+
+   Splits the input string into a stream of typed Tokens based on regex patterns.
+
+
    .. py:attribute:: PATTERN_DEFS
 
 
@@ -54,8 +62,21 @@ Module Contents
 
    .. py:method:: tokenize() -> Generator[Token, None, None]
 
+      Yields tokens from the source text one by one.
+
+      :Yields: *Token* -- The next lexical token.
+
+      :raises ValueError: If an unrecognized character sequence is encountered.
+
+
 
 .. py:class:: MlirParser(text: str)
+
+   Parses a stream of MLIR tokens into a Concrete Syntax Tree.
+
+   Implements recursive descent logic to handle Modules, Blocks, Operations,
+   and Regions while preserving whitespace and comments (trivia) for accurate reproduction.
+
 
    .. py:attribute:: tokenizer
 
@@ -76,25 +97,99 @@ Module Contents
 
    .. py:method:: peek(offset: int = 0) -> Token
 
+      Look ahead at a token without consuming it.
+
+      :param offset: Number of tokens to look ahead. Defaults to 0 (current).
+      :type offset: int
+
+      :returns: The token at the lookahead position.
+      :rtype: Token
+
+
 
    .. py:method:: consume() -> Token
+
+      Consumes and returns the current token, advancing the pointer.
+
+      :returns: The consumed token.
+      :rtype: Token
+
 
 
    .. py:method:: match(kind: str) -> bool
 
+      Checks if the current token matches the specified kind or text.
+
+      :param kind: The token kind (e.g. TokenKind.VAL_ID) or specific symbol text (e.g. '{').
+      :type kind: str
+
+      :returns: True if the current token matches.
+      :rtype: bool
+
+
 
    .. py:method:: expect(kind: str) -> Token
+
+      Consumes the current token if it matches, otherwise raises SyntaxError.
+
+      :param kind: The expected token kind or text.
+      :type kind: str
+
+      :returns: The consumed token.
+      :rtype: Token
+
+      :raises SyntaxError: If the current token does not match the expectation.
+
 
 
    .. py:method:: parse() -> ml_switcheroo.core.mlir.nodes.ModuleNode
 
+      Top-level parsing entry point.
+
+      :returns: The root of the MLIR CST.
+      :rtype: ModuleNode
+
+
 
    .. py:method:: parse_block(is_top_level: bool = False) -> ml_switcheroo.core.mlir.nodes.BlockNode
+
+      Parses a Basic Block.
+
+      A block consists of an optional label (with arguments) and a list of operations.
+
+      :param is_top_level: If True, treats the input as an implicit top-level module block
+                           which may not have a label or braces.
+      :type is_top_level: bool
+
+      :returns: The parsed block structure.
+      :rtype: BlockNode
+
+      :raises SyntaxError: If invalid tokens are encountered where an operation was expected.
+
 
 
    .. py:method:: parse_operation() -> Optional[ml_switcheroo.core.mlir.nodes.OperationNode]
 
+      Parses a single MLIR Operation.
+
+      Structure:
+      `%results = "op.name"(%operands) {attributes} ({regions}) : type`
+
+      :returns: The parsed operation, or None if no valid op start found.
+      :rtype: Optional[OperationNode]
+
+      :raises SyntaxError: If structural expectations (e.g. closing parens) are unmet.
+
+
 
    .. py:method:: parse_region() -> ml_switcheroo.core.mlir.nodes.RegionNode
+
+      Parses a Region containing nested Blocks.
+
+      Enclosed in curly braces `{ ... }`.
+
+      :returns: The parsed region.
+      :rtype: RegionNode
+
 
 

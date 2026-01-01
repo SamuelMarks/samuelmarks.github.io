@@ -15,6 +15,7 @@ ml_switcheroo.plugins.schedulers
    **Transformation**
 
    1.  **Instantiation**:
+
        -   Detects specific Scheduler constructors via `scheduler_rewire`.
        -   Removes the `optimizer` argument (Arg 0).
        -   Maps hyperparameters to target equivalents using keys defined in the semantic map
@@ -23,6 +24,7 @@ ml_switcheroo.plugins.schedulers
        -   Injects `init_value=1.0` (as partial schedule) or tries to preserve semantics.
 
    2.  **Stepping**:
+
        -   Detects `scheduler.step()` via `scheduler_step_noop`.
        -   Replaces `scheduler.step()` with a no-op placeholder `None`.
 
@@ -46,6 +48,11 @@ Module Contents
 
    Logic routes based on detected Operation ID in context (StepLR vs Cosine).
    Now fully decoupled: reads target API and argument names from `ctx`.
+
+   :param node: Original CST call.
+   :param ctx: Hook context containing operation ID.
+
+   :returns: Transformed CST call.
 
 
 .. py:function:: transform_scheduler_step(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode

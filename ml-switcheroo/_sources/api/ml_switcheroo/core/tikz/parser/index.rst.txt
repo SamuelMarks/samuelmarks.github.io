@@ -1,0 +1,174 @@
+ml_switcheroo.core.tikz.parser
+==============================
+
+.. py:module:: ml_switcheroo.core.tikz.parser
+
+.. autoapi-nested-parse::
+
+   TikZ Parser (Lexer & Logical Reconstruction).
+
+   This module provides the `TikzParser` which consumes raw LaTeX/TikZ source code
+   and reconstructs the `LogicalGraph` representation. It effectively reverses
+   the operation of the `TikzEmitter`.
+
+   Capabilities:
+   1.  **Tokenization**: Regex-based lexer for LaTeX commands, groups, and options.
+   2.  **Structural Parsing**: Identifies nodes, edges, and environments.
+   3.  **Metadata Extraction**: Parses HTML-like tabular environments embedded in
+       node labels to recover layer hyperparameters (e.g., kernel size, stride).
+   4.  **Graph Reconstruction**: Builds a `LogicalGraph` object compatible with
+       the rest of the transpiler pipeline.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.tikz.parser.TokenKind
+   ml_switcheroo.core.tikz.parser.Token
+   ml_switcheroo.core.tikz.parser.TikzLexer
+   ml_switcheroo.core.tikz.parser.TikzParser
+
+
+Module Contents
+---------------
+
+.. py:class:: TokenKind(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Enumeration of LaTeX/TikZ token types.
+
+
+   .. py:attribute:: COMMAND
+
+
+   .. py:attribute:: LBRACE
+
+
+   .. py:attribute:: RBRACE
+
+
+   .. py:attribute:: LBRACKET
+
+
+   .. py:attribute:: RBRACKET
+
+
+   .. py:attribute:: LPAREN
+
+
+   .. py:attribute:: RPAREN
+
+
+   .. py:attribute:: SEMICOLON
+
+
+   .. py:attribute:: ARROW
+
+
+   .. py:attribute:: WORD
+
+
+   .. py:attribute:: NUMBER
+
+
+   .. py:attribute:: COMMENT
+
+
+   .. py:attribute:: WHITESPACE
+
+
+   .. py:attribute:: EOF
+
+
+.. py:class:: Token
+
+   A lexical unit.
+
+
+   .. py:attribute:: kind
+      :type:  TokenKind
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+   .. py:attribute:: line
+      :type:  int
+
+
+   .. py:attribute:: col
+      :type:  int
+
+
+.. py:class:: TikzLexer(text: str)
+
+   Regex-based tokenizer for TikZ source code.
+
+
+   .. py:attribute:: PATTERNS
+
+
+   .. py:attribute:: text
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:attribute:: line
+      :value: 1
+
+
+
+   .. py:attribute:: col
+      :value: 1
+
+
+
+   .. py:method:: tokenize() -> List[Token]
+
+      Converts the full string into a list of Tokens, filtering whitespace/comments.
+
+
+
+.. py:class:: TikzParser(text: str)
+
+   Parses tokenized TikZ code into a LogicalGraph.
+
+   This parser implements a recursive descent strategy tailored to the specific
+   TikZ subset produced by the `TikzEmitter`. It is not a general-purpose
+   TeX parser.
+
+
+   .. py:attribute:: lexer
+
+
+   .. py:attribute:: tokens
+      :value: []
+
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:attribute:: graph
+
+
+   .. py:method:: parse() -> ml_switcheroo.core.tikz.analyser.LogicalGraph
+
+      Main entry point.
+
+      :returns: The reconstructed graph extracted from the visual definition.
+      :rtype: LogicalGraph
+
+
+

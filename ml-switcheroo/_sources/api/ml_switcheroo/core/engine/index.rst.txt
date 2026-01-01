@@ -11,34 +11,10 @@ ml_switcheroo.core.engine
    It coordinates the various analysis and transformation passes required to convert code
    from a source framework to a target framework.
 
-   The Engine pipeline consists of:
-
-   1.  **Ingestion Phase**:
-       - If `source="mlir"`, parses MLIR text and hydrates a Python AST.
-       - Otherwise, parses Python source code into a LibCST tree.
-
-   2.  **MLIR Emission (Target="mlir")**:
-       - If the target is "mlir", the pipeline short-circuits here.
-       - The AST is converted to MLIR IR text and returned immediately.
-
-   3.  **Safety Analysis (Standard)**:
-       - **Purity**: Checking for side effects if targeting functional frameworks (JAX).
-       - **Lifecycle**: Verifying variable initialization.
-       - **Dependencies**: Scanning for unmapped 3rd-party imports.
-
-   4.  **Semantic Pivoting**: Executing the `PivotRewriter` to map API calls and structure.
-       *Creates AST Snapshots for visualization before and after this phase using Mermaid.*
-
-   5.  **Intermediate Representation (MLIR) Roundtrip** (Optional):
-       - If `intermediate="mlir"`, the pivot result is converted to MLIR text,
-         parsed back, and regenerated into Python to verify fidelity.
-
-   6.  **Post-processing**:
-       - **Import Fixer**: Injecting necessary imports and removing unused source imports.
-       - **Structural Linting**: Verifying no artifacts from the source framework remain.
-
-   The engine relies on `RuntimeConfig` to resolve 'Flavours' (e.g., distinguishing
-   `flax_nnx` from generic `jax`) to load the correct structural traits.
+   Pipeline:
+   1.  **Ingestion**: Adapter Hooks (LaTeX) or Standard Parsing (Python/MLIR/TikZ).
+   2.  **Emission**: Adapter Hooks (LaTeX) or Standard Emission (Python/MLIR/TikZ).
+   3.  **Transformation**: Purity, Lifecycle, Dependency checks, Rewriting, Import Fixing.
 
 
 
@@ -59,7 +35,85 @@ Module Contents
    Bases: :py:obj:`pydantic.BaseModel`
 
 
-   Structured result of a single file conversion.
+   !!! abstract "Usage Documentation"
+       [Models](../concepts/models.md)
+
+   A base class for creating Pydantic models.
+
+   .. attribute:: __class_vars__
+
+      The names of the class variables defined on the model.
+
+   .. attribute:: __private_attributes__
+
+      Metadata about the private attributes of the model.
+
+   .. attribute:: __signature__
+
+      The synthesized `__init__` [`Signature`][inspect.Signature] of the model.
+
+   .. attribute:: __pydantic_complete__
+
+      Whether model building is completed, or if there are still undefined fields.
+
+   .. attribute:: __pydantic_core_schema__
+
+      The core schema of the model.
+
+   .. attribute:: __pydantic_custom_init__
+
+      Whether the model has a custom `__init__` function.
+
+   .. attribute:: __pydantic_decorators__
+
+      Metadata containing the decorators defined on the model.
+      This replaces `Model.__validators__` and `Model.__root_validators__` from Pydantic V1.
+
+   .. attribute:: __pydantic_generic_metadata__
+
+      Metadata for generic models; contains data used for a similar purpose to
+      __args__, __origin__, __parameters__ in typing-module generics. May eventually be replaced by these.
+
+   .. attribute:: __pydantic_parent_namespace__
+
+      Parent namespace of the model, used for automatic rebuilding of models.
+
+   .. attribute:: __pydantic_post_init__
+
+      The name of the post-init method for the model, if defined.
+
+   .. attribute:: __pydantic_root_model__
+
+      Whether the model is a [`RootModel`][pydantic.root_model.RootModel].
+
+   .. attribute:: __pydantic_serializer__
+
+      The `pydantic-core` `SchemaSerializer` used to dump instances of the model.
+
+   .. attribute:: __pydantic_validator__
+
+      The `pydantic-core` `SchemaValidator` used to validate instances of the model.
+
+   .. attribute:: __pydantic_fields__
+
+      A dictionary of field names and their corresponding [`FieldInfo`][pydantic.fields.FieldInfo] objects.
+
+   .. attribute:: __pydantic_computed_fields__
+
+      A dictionary of computed field names and their corresponding [`ComputedFieldInfo`][pydantic.fields.ComputedFieldInfo] objects.
+
+   .. attribute:: __pydantic_extra__
+
+      A dictionary containing extra values, if [`extra`][pydantic.config.ConfigDict.extra]
+      is set to `'allow'`.
+
+   .. attribute:: __pydantic_fields_set__
+
+      The names of fields explicitly set during instantiation.
+
+   .. attribute:: __pydantic_private__
+
+      Values of private attributes set on the model instance.
 
 
    .. py:attribute:: code
@@ -90,18 +144,10 @@ Module Contents
       :type: bool
 
 
-      Returns True if any errors or warnings were recorded during conversion.
-
-      :returns: True if errors list is non-empty.
-      :rtype: bool
-
 
 .. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
 
    The main compilation unit.
-
-   This class encapsulates the state and logic required to transpile a single unit of code.
-   It manages the lifecycle of the LibCST tree and the invocation of visitor passes.
 
 
    .. py:attribute:: semantics
@@ -121,41 +167,18 @@ Module Contents
 
 
 
+   .. py:attribute:: source_adapter
+
+
+   .. py:attribute:: target_adapter
+
+
    .. py:method:: parse(code: str) -> libcst.Module
-
-      Parses source string into a LibCST Module.
-
-      :param code: Python source code.
-      :type code: str
-
-      :returns: The parsed Abstract Syntax Tree.
-      :rtype: cst.Module
-
-      :raises libcst.ParserSyntaxError: If the input code is invalid Python.
-
 
 
    .. py:method:: to_source(tree: libcst.Module) -> str
 
-      Converts CST back to source string.
-
-      :param tree: The modified syntax tree.
-      :type tree: cst.Module
-
-      :returns: Generated Python code.
-      :rtype: str
-
-
 
    .. py:method:: run(code: str) -> ConversionResult
-
-      Executes the full transpilation pipeline.
-
-      :param code: The input source string.
-      :type code: str
-
-      :returns: Object containing transformed code and error logs.
-      :rtype: ConversionResult
-
 
 

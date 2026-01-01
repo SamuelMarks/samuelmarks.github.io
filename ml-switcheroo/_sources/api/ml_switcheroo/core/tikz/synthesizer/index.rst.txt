@@ -1,0 +1,55 @@
+ml_switcheroo.core.tikz.synthesizer
+===================================
+
+.. py:module:: ml_switcheroo.core.tikz.synthesizer
+
+.. autoapi-nested-parse::
+
+   TikZ-to-Python Synthesizer.
+
+   This module consumes a ``LogicalGraph`` (representing the layout and metadata
+   of a neural network extracted from TikZ) and generates valid, executable
+   Python source code using LibCST.
+
+   It performs the inverse of the ``analyser.py``:
+   1.  **Topological Sort**: Determines the execution order of the graph.
+   2.  **Init Generation**: Constructs layer definitions (e.g., ``self.conv = ...``)
+       based on the target framework's API conventions.
+   3.  **Forward Generation**: Reconstructs the data flow of the ``forward`` method,
+       handling variable assignment and return values.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.tikz.synthesizer.GraphSynthesizer
+
+
+Module Contents
+---------------
+
+.. py:class:: GraphSynthesizer(framework: str = 'torch')
+
+   Converts a LogicalGraph into a Python Class definition.
+
+
+   .. py:attribute:: framework
+      :value: 'torch'
+
+
+
+   .. py:method:: generate(graph: ml_switcheroo.core.tikz.analyser.LogicalGraph, class_name: str = 'GeneratedNet') -> str
+
+      Generates the full Python source code for the graph.
+
+      :param graph: The logical representation of the network.
+      :param class_name: The name of the generated class.
+
+      :returns: Python source code.
+      :rtype: str
+
+
+

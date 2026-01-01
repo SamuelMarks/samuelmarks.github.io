@@ -1,0 +1,287 @@
+ml_switcheroo.core.tikz
+=======================
+
+.. py:module:: ml_switcheroo.core.tikz
+
+.. autoapi-nested-parse::
+
+   TikZ Concrete Syntax Tree (CST) Data Structures.
+
+   This package provides a pure Python representation of TikZ/PGF code designed to
+   represent neural network graphs with high fidelity. It supports:
+   - Nodes with HTML-like label tables for layer metadata.
+   - Edges representing data flow.
+   - Trivia preservation (comments/whitespace) for round-trip stability.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/core/tikz/analyser/index
+   /api/ml_switcheroo/core/tikz/emitter/index
+   /api/ml_switcheroo/core/tikz/nodes/index
+   /api/ml_switcheroo/core/tikz/parser/index
+   /api/ml_switcheroo/core/tikz/synthesizer/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.tikz.TikzBaseNode
+   ml_switcheroo.core.tikz.TriviaNode
+   ml_switcheroo.core.tikz.TikzComment
+   ml_switcheroo.core.tikz.TikzOption
+   ml_switcheroo.core.tikz.TikzTable
+   ml_switcheroo.core.tikz.TikzNode
+   ml_switcheroo.core.tikz.TikzEdge
+   ml_switcheroo.core.tikz.TikzGraph
+
+
+Package Contents
+----------------
+
+.. py:class:: TikzBaseNode
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for all TikZ CST nodes.
+
+
+   .. py:method:: to_text() -> str
+      :abstractmethod:
+
+
+      Render this node to its string representation.
+
+      :returns: The TikZ/LaTeX source code for this construct.
+      :rtype: str
+
+
+
+.. py:class:: TriviaNode
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   Represents non-semantic textual elements (whitespace, newlines).
+
+
+   .. py:attribute:: content
+      :type:  str
+
+
+   .. py:method:: to_text() -> str
+
+      Returns the raw whitespace content.
+
+
+
+.. py:class:: TikzComment
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   Represents a LaTeX comment (e.g. `% My Comment`).
+   Includes the percent sign in the content or adds it during export.
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+   .. py:attribute:: trailing_newline
+      :type:  bool
+      :value: True
+
+
+
+   .. py:method:: to_text() -> str
+
+      Formats the comment with a leading percent sign.
+
+
+
+.. py:class:: TikzOption
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   Represents a TikZ option like `[draw=black]` or `[circle]`.
+
+
+   .. py:attribute:: key
+      :type:  str
+
+
+   .. py:attribute:: value
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:method:: to_text() -> str
+
+      Returns `key=value` or just `key`.
+
+
+
+.. py:class:: TikzTable
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   Represents an HTML-like table structure used inside TikZ Node labels.
+   Uses LaTeX tabular environment syntax.
+
+   .. rubric:: Example
+
+   \begin{tabular}{c}
+       \textbf{LayerName} \\
+       param: val
+   \end{tabular}
+
+
+   .. py:attribute:: rows
+      :type:  List[List[str]]
+      :value: []
+
+
+
+   .. py:attribute:: align
+      :type:  str
+      :value: 'c'
+
+
+
+   .. py:method:: to_text() -> str
+
+      Renders the tabular environment string.
+
+
+
+.. py:class:: TikzNode
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   Represents a `\node` command.
+
+   Structure:
+       \node [options] (id) at (x, y) {label_content};
+
+
+   .. py:attribute:: node_id
+      :type:  str
+
+
+   .. py:attribute:: x
+      :type:  float
+
+
+   .. py:attribute:: y
+      :type:  float
+
+
+   .. py:attribute:: content
+      :type:  Union[str, TikzTable]
+
+
+   .. py:attribute:: options
+      :type:  List[TikzOption]
+      :value: []
+
+
+
+   .. py:attribute:: leading_trivia
+      :type:  List[TriviaNode]
+      :value: []
+
+
+
+   .. py:method:: to_text() -> str
+
+      Constructs the full node command string.
+
+
+
+.. py:class:: TikzEdge
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   Represents a `\draw` command connecting two nodes.
+
+   Structure:
+       \draw [options] (src) -- (tgt);
+
+
+   .. py:attribute:: source_id
+      :type:  str
+
+
+   .. py:attribute:: target_id
+      :type:  str
+
+
+   .. py:attribute:: options
+      :type:  List[TikzOption]
+      :value: []
+
+
+
+   .. py:attribute:: connector
+      :type:  str
+      :value: '--'
+
+
+
+   .. py:attribute:: leading_trivia
+      :type:  List[TriviaNode]
+      :value: []
+
+
+
+   .. py:method:: to_text() -> str
+
+      Constructs the draw command string.
+
+
+
+.. py:class:: TikzGraph
+
+   Bases: :py:obj:`TikzBaseNode`
+
+
+   The root container representing the `tikzpicture` environment.
+
+   Structure:
+       \begin{tikzpicture}
+           ... children ...
+       \end{tikzpicture}
+
+
+   .. py:attribute:: children
+      :type:  List[TikzBaseNode]
+      :value: []
+
+
+
+   .. py:attribute:: options
+      :type:  List[TikzOption]
+      :value: []
+
+
+
+   .. py:method:: to_text() -> str
+
+      Constructs the complete environment string.
+
+
+

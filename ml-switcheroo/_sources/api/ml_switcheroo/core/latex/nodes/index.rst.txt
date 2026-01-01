@@ -1,0 +1,245 @@
+ml_switcheroo.core.latex.nodes
+==============================
+
+.. py:module:: ml_switcheroo.core.latex.nodes
+
+.. autoapi-nested-parse::
+
+   MIDL Semantic Nodes.
+
+   This module defines the data structures representing the primitives of the
+   LaTeX DSL. These nodes act as an intermediate representation between
+   raw LaTeX macros and the compiler's logical graph.
+
+   Classes match the DSL macros:
+       - ModelContainer -> \begin{DefModel}
+       - MemoryNode     -> \Attribute
+       - InputNode      -> \Input
+       - ComputeNode    -> \Op
+       - StateOpNode    -> \StateOp
+       - ReturnNode     -> \Return
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.latex.nodes.LatexNode
+   ml_switcheroo.core.latex.nodes.MemoryNode
+   ml_switcheroo.core.latex.nodes.InputNode
+   ml_switcheroo.core.latex.nodes.ComputeNode
+   ml_switcheroo.core.latex.nodes.StateOpNode
+   ml_switcheroo.core.latex.nodes.ReturnNode
+   ml_switcheroo.core.latex.nodes.ModelContainer
+
+
+Module Contents
+---------------
+
+.. py:class:: LatexNode
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for all MIDL nodes.
+
+   Enforces a `to_latex()` method for serialization support.
+
+
+   .. py:method:: to_latex() -> str
+      :abstractmethod:
+
+
+      Serializes the node object back into its LaTeX macro representation.
+
+      :returns: Valid LaTeX code string.
+      :rtype: str
+
+
+
+.. py:class:: MemoryNode
+
+   Bases: :py:obj:`LatexNode`
+
+
+   Represents stateful memory allocation (e.g., Weights/Layers).
+   Maps to the `\Attribute` macro.
+
+   .. rubric:: Example
+
+   \Attribute{conv}{Conv2d}{in=1, out=32, k=3}
+
+
+   .. py:attribute:: node_id
+      :type:  str
+
+
+   .. py:attribute:: op_type
+      :type:  str
+
+
+   .. py:attribute:: config
+      :type:  Dict[str, str]
+
+
+   .. py:method:: to_latex() -> str
+
+      Render to \Attribute macro.
+
+
+
+.. py:class:: InputNode
+
+   Bases: :py:obj:`LatexNode`
+
+
+   Represents the model input definition.
+   Maps to the `\Input` macro.
+
+   .. rubric:: Example
+
+   \Input{x}{[B, 1, 28, 28]}
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: shape
+      :type:  str
+
+
+   .. py:method:: to_latex() -> str
+
+      Render to \Input macro.
+
+
+
+.. py:class:: ComputeNode
+
+   Bases: :py:obj:`LatexNode`
+
+
+   Represents a stateless operation call.
+   Maps to the `\Op` macro.
+
+   .. rubric:: Example
+
+   \Op{s2}{Flatten}{s1, start=1}{[B, 21632]}
+
+
+   .. py:attribute:: node_id
+      :type:  str
+
+
+   .. py:attribute:: op_type
+      :type:  str
+
+
+   .. py:attribute:: args
+      :type:  List[str]
+
+
+   .. py:attribute:: shape
+      :type:  str
+
+
+   .. py:method:: to_latex() -> str
+
+      Render to \Op macro.
+
+
+
+.. py:class:: StateOpNode
+
+   Bases: :py:obj:`LatexNode`
+
+
+   Represents a call to a stateful layer defined in Memory.
+   Maps to the `\StateOp` macro.
+
+   .. rubric:: Example
+
+   \StateOp{s1}{conv}{x}{[B, 32, 26, 26]}
+
+
+   .. py:attribute:: node_id
+      :type:  str
+
+
+   .. py:attribute:: attribute_id
+      :type:  str
+
+
+   .. py:attribute:: args
+      :type:  List[str]
+
+
+   .. py:attribute:: shape
+      :type:  str
+
+
+   .. py:method:: to_latex() -> str
+
+      Render to \StateOp macro.
+
+
+
+.. py:class:: ReturnNode
+
+   Bases: :py:obj:`LatexNode`
+
+
+   Represents the output return statement.
+   Maps to the `\Return` macro.
+
+   .. rubric:: Example
+
+   \Return{s3}
+
+
+   .. py:attribute:: target_id
+      :type:  str
+
+
+   .. py:method:: to_latex() -> str
+
+      Render to \Return macro.
+
+
+
+.. py:class:: ModelContainer
+
+   Bases: :py:obj:`LatexNode`
+
+
+   Root container representing the Model definition block.
+   Maps to the `DefModel` environment.
+
+   .. attribute:: name
+
+      The model class name.
+
+   .. attribute:: children
+
+      List of body statements (Memory, Input, Ops, Return).
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: children
+      :type:  List[LatexNode]
+      :value: []
+
+
+
+   .. py:method:: to_latex() -> str
+
+      Render the full \begin{DefModel}...\end{DefModel} block.
+
+
+

@@ -1,0 +1,47 @@
+ml_switcheroo.cli.handlers.suggest
+==================================
+
+.. py:module:: ml_switcheroo.cli.handlers.suggest
+
+.. autoapi-nested-parse::
+
+   Suggest Command Handlers.
+
+   This module implements the `suggest` command, which generates a context-rich
+   prompt for Large Language Models (LLMs). The prompt includes:
+   1.  Introspection data for the requested API (signatures, docstrings).
+   2.  The ODL JSON Schema structure.
+   3.  A Few-Shot example of a correct ODL definition.
+
+   This output is designed to be piped directly to an LLM to generate valid
+   Operation Definition Language (YAML) for missing operations.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.cli.handlers.suggest.handle_suggest
+
+
+Module Contents
+---------------
+
+.. py:function:: handle_suggest(api_path: str) -> int
+
+   Generates an LLM prompt for defining a new operation.
+
+   Steps:
+   1.  Inspects the live Python object at `api_path` to get signatures and docs.
+   2.  Retrieves the JSON Schema for `OperationDef`.
+   3.  Constructs a structured prompt text.
+   4.  Prints the prompt to stdout.
+
+   :param api_path: The fully qualified name of the python object (e.g. 'torch.nn.Linear').
+
+   :returns: Exit code (0 for success, 1 for failure).
+   :rtype: int
+
+

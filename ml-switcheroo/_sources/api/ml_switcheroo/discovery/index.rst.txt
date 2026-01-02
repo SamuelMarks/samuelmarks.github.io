@@ -57,6 +57,7 @@ Package Contents
    1.  **Clustering**: Groups APIs like `HuberLoss`, `huber_loss`, and `Huber` together.
    2.  **Normalization**: Strips common noise (prefixes/suffixes) to find the semantic root.
    3.  **Signature Alignment**: Builds a translation map for arguments (e.g., `keepdims` <-> `keep_dims`).
+   4.  **Type Consensus**: Aggregates type hints found in source candidates to enrich the standard signature.
 
 
    .. py:attribute:: IGNORED_SUFFIXES
@@ -137,10 +138,12 @@ Package Contents
 
    .. py:method:: align_signatures(candidates: List[CandidateStandard], consensus_threshold: float = 0.5) -> None
 
-      Analyses the arguments of all variants in a candidate to determine Standard Arguments.
+      Analyses the arguments of all variants in a candidate to determine Standard Arguments and Types.
 
-      It populates `std_args` on the candidate by voting: if an argument (normalized)
-      appears in >50% of the implementations, it becomes part of the standard signature.
+      It populates `std_args` on the candidate by voting:
+      1.  If an argument (normalized) appears in >50% of the implementations, it becomes part of the standard.
+      2.  If type hints are available across the variants, it determines the consensus type and
+          populates a rich argument definition (e.g. `{'name': 'x', 'type': 'int'}`) instead of a simple string.
 
       It also populates `arg_mappings` to translate between the Standard name and
       the specific framework name (e.g. Standard 'dim' -> Torch 'dim', Jax 'axis').

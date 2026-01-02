@@ -50,11 +50,13 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=75810a84" />
     <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=ae056a50" />
     <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -70,6 +72,7 @@
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="_static/trace_render.js?v=4ddbab91"></script>
     <script src="_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Maintenance" href="MAINTENANCE.html" />
@@ -245,6 +248,20 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#extending-with-dsl--page-root" class="md-nav__link">Extending with DSL</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#llm-assisted-workflow-the-fast-cycle" class="md-nav__link">🤖 LLM-Assisted Workflow (The Fast Cycle)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#find-missing-ops-audit" class="md-nav__link">1. Find Missing Ops (<code class="docutils literal notranslate"><span class="pre">audit</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#generate-context-suggest" class="md-nav__link">2. Generate Context (<code class="docutils literal notranslate"><span class="pre">suggest</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#validate-safety-dry-run" class="md-nav__link">3. Validate Safety (<code class="docutils literal notranslate"><span class="pre">dry-run</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#inject-verify" class="md-nav__link">4. Inject & Verify</a>
+        </li>
+        <li class="md-nav__item"><a href="#schema-export-schema" class="md-nav__link">5. Schema Export (<code class="docutils literal notranslate"><span class="pre">schema</span></code>)</a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#the-schema-at-a-glance" class="md-nav__link">📚 The Schema at a Glance</a>
         </li>
         <li class="md-nav__item"><a href="#feature-reference" class="md-nav__link">🧬 Feature Reference</a><nav class="md-nav">
@@ -287,6 +304,13 @@
   </ul>
 </nav>
       <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#llm-assisted-workflow-the-fast-cycle" class="md-nav__link">🤖 LLM-Assisted Workflow (The Fast Cycle)</a>
+      
+    
+    </li>
     <li class="md-nav__item">
     
     
@@ -343,6 +367,13 @@
       
     
     </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ops/index.html" class="md-nav__link">Operation Reference</a>
+      
+    
+    </li>
   </ul>
   
 
@@ -359,6 +390,20 @@
   <ul class="md-nav__list" data-md-scrollfix="">
         <li class="md-nav__item"><a href="#extending-with-dsl--page-root" class="md-nav__link">Extending with DSL</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#llm-assisted-workflow-the-fast-cycle" class="md-nav__link">🤖 LLM-Assisted Workflow (The Fast Cycle)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#find-missing-ops-audit" class="md-nav__link">1. Find Missing Ops (<code class="docutils literal notranslate"><span class="pre">audit</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#generate-context-suggest" class="md-nav__link">2. Generate Context (<code class="docutils literal notranslate"><span class="pre">suggest</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#validate-safety-dry-run" class="md-nav__link">3. Validate Safety (<code class="docutils literal notranslate"><span class="pre">dry-run</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#inject-verify" class="md-nav__link">4. Inject & Verify</a>
+        </li>
+        <li class="md-nav__item"><a href="#schema-export-schema" class="md-nav__link">5. Schema Export (<code class="docutils literal notranslate"><span class="pre">schema</span></code>)</a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#the-schema-at-a-glance" class="md-nav__link">📚 The Schema at a Glance</a>
         </li>
         <li class="md-nav__item"><a href="#feature-reference" class="md-nav__link">🧬 Feature Reference</a><nav class="md-nav">
@@ -411,13 +456,69 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="extending-with-dsl">
 <h1 id="extending-with-dsl--page-root">Extending with DSL<a class="headerlink" href="#extending-with-dsl--page-root" title="Link to this heading">¶</a></h1>
-<p>The <strong>Operation Definition Language (ODL)</strong> is a declarative YAML schema used to teach <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> new mathematical operations. It serves as the “DNA” of the transpiler, defining:</p>
+<p>The <strong>Operation Definition Language (ODL)</strong> is a declarative YAML schema used to teach <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> new mathematical
+operations. It serves as the “DNA” of the transpiler, defining:</p>
 <ol class="arabic simple">
 <li><p><strong>Semantic Interface</strong>: Arguments, Types, Shapes, and Constraints.</p></li>
 <li><p><strong>Implementation logic</strong>: How to map the operation to specific backends (Torch, JAX, TF, etc.).</p></li>
 <li><p><strong>Verification Data</strong>: Hints for the automated fuzzer to prove correctness.</p></li>
 </ol>
 <p>ODL allows you to inject logic into the <strong>Knowledge Base</strong> without writing Python AST transformation code.</p>
+<hr class="docutils"/>
+<section id="llm-assisted-workflow-the-fast-cycle">
+<h2 id="llm-assisted-workflow-the-fast-cycle">🤖 LLM-Assisted Workflow (The Fast Cycle)<a class="headerlink" href="#llm-assisted-workflow-the-fast-cycle" title="Link to this heading">¶</a></h2>
+<p>Writing YAML manually is slow. <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> includes a suite of CLI tools designed to put an LLM “in the loop” for
+rapid API coverage.</p>
+<section id="find-missing-ops-audit">
+<h3 id="find-missing-ops-audit">1. Find Missing Ops (<code class="docutils literal notranslate"><span class="pre">audit</span></code>)<a class="headerlink" href="#find-missing-ops-audit" title="Link to this heading">¶</a></h3>
+<p>Identify API calls in your codebase that are not yet mapped. usage of <code class="docutils literal notranslate"><span class="pre">--json</span></code> allows piping to automation scripts.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check coverage</span>
+ml_switcheroo<span class="w"> </span>audit<span class="w"> </span>./my_project<span class="w"> </span>--roots<span class="w"> </span>torch
+
+<span class="c1"># Output JSON for tooling</span>
+ml_switcheroo<span class="w"> </span>audit<span class="w"> </span>./my_project<span class="w"> </span>--roots<span class="w"> </span>torch<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[].api'</span><span class="w"> </span>
+</pre></div>
+</div>
+</section>
+<section id="generate-context-suggest">
+<h3 id="generate-context-suggest">2. Generate Context (<code class="docutils literal notranslate"><span class="pre">suggest</span></code>)<a class="headerlink" href="#generate-context-suggest" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">suggest</span></code> command introspects the installed source library (live!) and generates a pre-filled prompt for an LLM.
+This prompt includes:</p>
+<ul class="simple">
+<li><p><strong>Signatures &amp; Docstrings</strong>: Extracted via runtime introspection.</p></li>
+<li><p><strong>ODL Schema</strong>: The rigid ODL JSON schema required by the parser.</p></li>
+<li><p><strong>One-Shot Example</strong>: A valid baseline mapping.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate prompt for a specific API</span>
+ml_switcheroo<span class="w"> </span>suggest<span class="w"> </span>torch.nn.functional.grid_sample<span class="w"> </span>&gt;<span class="w"> </span>prompt.txt
+
+<span class="c1"># Copy prompt.txt to ChatGPT / Claude / Local LLM to get valid YAML. </span>
+</pre></div>
+</div>
+</section>
+<section id="validate-safety-dry-run">
+<h3 id="validate-safety-dry-run">3. Validate Safety (<code class="docutils literal notranslate"><span class="pre">dry-run</span></code>)<a class="headerlink" href="#validate-safety-dry-run" title="Link to this heading">¶</a></h3>
+<p>LLMs can hallucinate. Always preview the changes before injecting code.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># View Unified Diff of standards.py and framework adapters</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>generated_op.yaml<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+</section>
+<section id="inject-verify">
+<h3 id="inject-verify">4. Inject &amp; Verify<a class="headerlink" href="#inject-verify" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Apply the definition and generate tests</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>generated_op.yaml
+</pre></div>
+</div>
+</section>
+<section id="schema-export-schema">
+<h3 id="schema-export-schema">5. Schema Export (<code class="docutils literal notranslate"><span class="pre">schema</span></code>)<a class="headerlink" href="#schema-export-schema" title="Link to this heading">¶</a></h3>
+<p>If building custom agents, you can export the raw JSON schema for function calling.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ml_switcheroo<span class="w"> </span>schema<span class="w"> </span>&gt;<span class="w"> </span>odl_schema.json
+</pre></div>
+</div>
+</section>
+</section>
 <hr class="docutils"/>
 <section id="the-schema-at-a-glance">
 <h2 id="the-schema-at-a-glance">📚 The Schema at a Glance<a class="headerlink" href="#the-schema-at-a-glance" title="Link to this heading">¶</a></h2>
@@ -426,11 +527,11 @@
 <span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Applies</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">LogSoftmax</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">n-dimensional</span><span class="nv"> </span><span class="s">input</span><span class="nv"> </span><span class="s">Tensor."</span>
 <span class="nt">op_type</span><span class="p">:</span><span class="w"> </span><span class="s">"function"</span><span class="w"> </span><span class="c1"># function | context | decorator</span>
 
-<span class="c1"># 1. Standard Arguments (The Abstract Signature)</span>
+<span class="c1"># 1. Standard Arguments (The Abstract Signature) </span>
 <span class="nt">std_args</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
 <span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
-<span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">                 </span><span class="c1"># Constraint: Must be 4D (e.g. NCHW)</span>
+<span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">                 </span><span class="c1"># Constraint: Must be 4D (e.g. NCHW) </span>
 <span class="w">    </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="s">"float32"</span><span class="w">        </span><span class="c1"># Constraint: Input must be float check</span>
 <span class="w">    </span><span class="nt">shape_spec</span><span class="p">:</span><span class="w"> </span><span class="s">"[B,</span><span class="nv"> </span><span class="s">C,</span><span class="nv"> </span><span class="s">...]"</span><span class="w"> </span><span class="c1"># Symbolic shape hint for Fuzzer</span>
 
@@ -448,18 +549,21 @@
 <span class="nt">variants</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.log_softmax"</span>
-<span class="w">  </span>
+
 <span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.nn.log_softmax"</span>
 <span class="w">    </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span><span class="w">           </span><span class="c1"># Rename 'dim' -&gt; 'axis'</span>
+<span class="w">      </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span><span class="w">           </span><span class="c1"># Rename 'dim' -&gt; 'axis' </span>
 <span class="w">    </span><span class="nt">min_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.4.0"</span><span class="w">    </span><span class="c1"># Version constraints</span>
 <span class="w">    </span><span class="nt">required_imports</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">jax"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">jax"</span><span class="w"> </span>
 </pre></div>
 </div>
 <p>To apply this file:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ml_switcheroo<span class="w"> </span>define<span class="w"> </span>my_op.yaml
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Preview</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>my_op.yaml<span class="w"> </span>--dry-run
+<span class="c1"># Apply</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>my_op.yaml
 </pre></div>
 </div>
 </section>
@@ -469,12 +573,12 @@
 <section id="argument-normalization">
 <h3 id="argument-normalization">1. Argument Normalization<a class="headerlink" href="#argument-normalization" title="Link to this heading">¶</a></h3>
 <p>The core job of ODL is pivoting arguments from <strong>Source Names</strong> to <strong>Standard Names</strong>, and then to <strong>Target Names</strong>.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"x"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"axis"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"keepdims"</span><span class="p p-Indicator">]</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"axis"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"keepdims"</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">variants</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.sum"</span>
 <span class="w">    </span><span class="nt">args</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">axis</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span><span class="w">          </span><span class="c1"># Map Spec 'axis' -&gt; Torch 'dim'</span>
+<span class="w">      </span><span class="nt">axis</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span><span class="w">          </span><span class="c1"># Map Spec 'axis' -&gt; Torch 'dim' </span>
 <span class="w">      </span><span class="nt">keepdims</span><span class="p">:</span><span class="w"> </span><span class="s">"keepdim"</span>
 <span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.sum"</span>
@@ -484,7 +588,8 @@
 </section>
 <section id="rich-parameter-constraints-fuzzer-control">
 <h3 id="rich-parameter-constraints-fuzzer-control">2. Rich Parameter Constraints (Fuzzer Control)<a class="headerlink" href="#rich-parameter-constraints-fuzzer-control" title="Link to this heading">¶</a></h3>
-<p>You can attach metadata to <code class="docutils literal notranslate"><span class="pre">std_args</span></code> to constrain the inputs generated during verification (CI) or strict mode checking.</p>
+<p>You can attach metadata to <code class="docutils literal notranslate"><span class="pre">std_args</span></code> to constrain the inputs generated during verification (CI) or strict mode
+checking.</p>
 <table>
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Field</p></th>
@@ -534,10 +639,11 @@
 </section>
 <section id="conditional-dispatch-rules">
 <h3 id="conditional-dispatch-rules">3. Conditional Dispatch (Rules)<a class="headerlink" href="#conditional-dispatch-rules" title="Link to this heading">¶</a></h3>
-<p>Sometimes a single API mapping isn’t enough. You can use <strong>Dispatch Rules</strong> to switch the target API based on the <em>value</em> or <em>type</em> of an argument at runtime.</p>
+<p>Sometimes a single API mapping isn’t enough. You can use <strong>Dispatch Rules</strong> to switch the target API based on the
+<em>value</em> or <em>type</em> of an argument at runtime.</p>
 <p><strong>Supported Operators:</strong> <code class="docutils literal notranslate"><span class="pre">eq</span></code>, <code class="docutils literal notranslate"><span class="pre">neq</span></code>, <code class="docutils literal notranslate"><span class="pre">gt</span></code>, <code class="docutils literal notranslate"><span class="pre">lt</span></code>, <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">not_in</span></code>, <code class="docutils literal notranslate"><span class="pre">is_type</span></code>.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Resize"</span>
-<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"image"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"mode"</span><span class="p p-Indicator">]</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"image"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"mode"</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">variants</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize"</span><span class="w"> </span><span class="c1"># Default</span>
@@ -547,12 +653,12 @@
 <span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
 <span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
 <span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_nearest"</span>
-<span class="w">      </span>
+
 <span class="w">      </span><span class="c1"># If input is a List, use batch processor</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"image"</span>
 <span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"is_type"</span>
 <span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"list"</span>
-<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_batch"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_batch"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -560,15 +666,15 @@
 <h3 id="argument-value-mapping-enum-translation">4. Argument Value Mapping (Enum Translation)<a class="headerlink" href="#argument-value-mapping-enum-translation" title="Link to this heading">¶</a></h3>
 <p>Map string literals or integers between frameworks.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Reduce"</span>
-<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"x"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"reduction"</span><span class="p p-Indicator">]</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"reduction"</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">variants</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.reduce"</span>
-<span class="w">    </span><span class="c1"># Logic: Source 'mean' -&gt; Target 'avg'</span>
+<span class="w">    </span><span class="c1"># Logic: Source 'mean' -&gt; Target 'avg' </span>
 <span class="w">    </span><span class="nt">arg_values</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">reduction</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">mean</span><span class="p">:</span><span class="w"> </span><span class="s">"'avg'"</span>
-<span class="w">        </span><span class="nt">sum</span><span class="p">:</span><span class="w"> </span><span class="s">"'add'"</span>
+<span class="w">        </span><span class="nt">sum</span><span class="p">:</span><span class="w"> </span><span class="s">"'add'"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -585,7 +691,7 @@
 <span class="w">    </span><span class="c1"># Select index 0 from result tuple</span>
 <span class="w">    </span><span class="nt">output_select_index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 <span class="w">    </span><span class="c1"># Cast result to int64</span>
-<span class="w">    </span><span class="nt">output_cast</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.int64"</span>
+<span class="w">    </span><span class="nt">output_cast</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.int64"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -600,7 +706,7 @@
 <span class="w">    </span><span class="nt">layout_map</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="s">"NCHW-&gt;NHWC"</span>
 <span class="w">      </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="s">"OIHW-&gt;HWIO"</span>
-<span class="w">      </span><span class="nt">return</span><span class="p">:</span><span class="w"> </span><span class="s">"NHWC-&gt;NCHW"</span>
+<span class="w">      </span><span class="nt">return</span><span class="p">:</span><span class="w"> </span><span class="s">"NHWC-&gt;NCHW"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -613,7 +719,7 @@
 <span class="nt">variants</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">keras</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"keras.layers.Add"</span>
-<span class="w">    </span><span class="c1"># Packs *tensors into a list and passes to 'inputs' argument (implicit pos 0)</span>
+<span class="w">    </span><span class="c1"># Packs *tensors into a list and passes to 'inputs' argument (implicit pos 0) </span>
 <span class="w">    </span><span class="nt">pack_as</span><span class="p">:</span><span class="w"> </span><span class="s">"List"</span><span class="w"> </span>
 </pre></div>
 </div>
@@ -624,7 +730,7 @@
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Add_"</span>
 <span class="nt">is_inplace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">   </span><span class="c1"># Triggers 'unroll_inplace_ops' plugin automatically</span>
 <span class="nt">variants</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">torch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.add_"</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.add_"</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -639,7 +745,7 @@
 <span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.scipy.special.logits"</span>
 <span class="w">    </span><span class="nt">min_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.4.0"</span>
-<span class="w">    </span><span class="nt">max_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.5.0"</span>
+<span class="w">    </span><span class="nt">max_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.5.0"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -653,13 +759,14 @@
 <span class="w">    </span><span class="nt">required_imports</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">numpy</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">np"</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="s">"scipy.special"</span>
-<span class="w">        </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="s">"sp"</span>
+<span class="w">        </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="s">"sp"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
 <section id="plugin-scaffolding">
 <h3 id="plugin-scaffolding">Plugin Scaffolding<a class="headerlink" href="#plugin-scaffolding" title="Link to this heading">¶</a></h3>
-<p>If ODL is not expressive enough, define a stub for a Python plugin loop. The CLI will generate the file <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/{name}.py</span></code> for you to fill in.</p>
+<p>If ODL is not expressive enough, define a stub for a Python plugin loop. The CLI will generate the file
+<code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/{name}.py</span></code> for you to fill in.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"ComplexOp"</span>
 <span class="nt">variants</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
@@ -675,7 +782,7 @@
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"x"</span>
 <span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
 <span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
-<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.zeros_like"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.zeros_like"</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
@@ -689,7 +796,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">nondeterministic</span></code>: Set to <code class="docutils literal notranslate"><span class="pre">true</span></code> to relax checks for RNG ops.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">output_shape_calc</span></code>: A Python lambda string to verify output shape rigorously.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Checks that output shape is input shape with last dim removed</span>
-<span class="nt">output_shape_calc</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">input,</span><span class="nv"> </span><span class="s">dim:</span><span class="nv"> </span><span class="s">input.shape[:-1]"</span>
+<span class="nt">output_shape_calc</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">input,</span><span class="nv"> </span><span class="s">dim:</span><span class="nv"> </span><span class="s">input.shape[:-1]"</span><span class="w"> </span>
 </pre></div>
 </div>
 </li>

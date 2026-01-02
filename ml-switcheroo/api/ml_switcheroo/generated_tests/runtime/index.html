@@ -50,11 +50,13 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=75810a84" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/material.css?v=79c92029" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -70,6 +72,7 @@
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
     <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.generated_tests.runtime_builder" href="../runtime_builder/index.html" />
@@ -301,6 +304,13 @@
     </li></ul>
     
     </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../ops/index.html" class="md-nav__link">Operation Reference</a>
+      
+    
+    </li>
   </ul>
   
 
@@ -346,17 +356,20 @@
   <section id="module-ml_switcheroo.generated_tests.runtime">
 <span id="ml-switcheroo-generated-tests-runtime"></span><h1 id="api-ml-switcheroo-generated-tests-runtime-index--page-root">ml_switcheroo.generated_tests.runtime<a class="headerlink" href="#api-ml-switcheroo-generated-tests-runtime-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Runtime helpers for generated verification tests.</p>
-<p>This module contains the reference implementation of <cite>verify_results</cite>,
-which provides a robust, recursive comparison between arbitrary data structures.</p>
-<p>It also provides the <cite>ensure_determinism</cite> fixture to seed RNGs across frameworks.</p>
+<p>This module contains the reference implementation of <code class="docutils literal notranslate"><span class="pre">verify_results</span></code>,
+a robust recursive comparison utility for validating equivalence between
+arbitrary data structures (Arrays, Lists, Dicts) across different frameworks.</p>
+<p>It also defines the <code class="docutils literal notranslate"><span class="pre">ensure_determinism</span></code> fixture, which is injected into
+generated tests to enforce reproducibility by seeding RNGs for Torch, JAX,
+TensorFlow, Numpy, and Python.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.generated_tests.runtime.ensure_determinism" title="ml_switcheroo.generated_tests.runtime.ensure_determinism"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_determinism</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.generated_tests.runtime.ensure_determinism" title="ml_switcheroo.generated_tests.runtime.ensure_determinism"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ensure_determinism</span></code></a>(→ None)</p></td>
 <td><p>Auto-injects fixed seeds for reproducibility at the start of every test.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.generated_tests.runtime.verify_results" title="ml_switcheroo.generated_tests.runtime.verify_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_results</span></code></a>(ref, val[, rtol, atol, exact])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.generated_tests.runtime.verify_results" title="ml_switcheroo.generated_tests.runtime.verify_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_results</span></code></a>(→ bool)</p></td>
 <td><p>Cross-framework comparison helper.</p></td>
 </tr>
 </tbody>
@@ -366,17 +379,40 @@ which provides a robust, recursive comparison between arbitrary data structures.
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.runtime.ensure_determinism">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.runtime.</span></span><span class="sig-name descname"><span class="pre">ensure_determinism</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.generated_tests.runtime.ensure_determinism" title="Link to this definition">¶</a></dt>
-<dd><p>Auto-injects fixed seeds for reproducibility at the start of every test.
-Covers Python random, NumPy, Torch, TensorFlow, and MLX.</p>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.runtime.</span></span><span class="sig-name descname"><span class="pre">ensure_determinism</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.runtime.ensure_determinism" title="Link to this definition">¶</a></dt>
+<dd><p>Auto-injects fixed seeds for reproducibility at the start of every test.</p>
+<p>Covers:
+- Python <cite>random</cite>
+- NumPy <cite>np.random</cite>
+- PyTorch <cite>torch.manual_seed</cite> (CPU &amp; CUDA)
+- TensorFlow <cite>tf.random.set_seed</cite>
+- MLX <cite>mlx.core.random.seed</cite></p>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.runtime.verify_results">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.runtime.</span></span><span class="sig-name descname"><span class="pre">verify_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.generated_tests.runtime.verify_results" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.runtime.</span></span><span class="sig-name descname"><span class="pre">verify_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exact</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.runtime.verify_results" title="Link to this definition">¶</a></dt>
 <dd><p>Cross-framework comparison helper.</p>
-<p>Recursively compares data structures (Lists, Dicts, Tuples).
-If ‘exact’ is True, enforces strict equality for all types (np.array_equal).
-If ‘exact’ is False (default), applies fuzzy matching (np.allclose) for floats/complex.</p>
+<p>Recursively compares data structures (Lists, Dicts, Tuples, Arrays).</p>
+<p>Modes:
+- <strong>Fuzzy (Default)</strong>: Uses <cite>np.allclose</cite> with tolerances for floats.
+- <strong>Exact</strong>: Enforces strict equality (ids for None, <cite>np.array_equal</cite> for arrays).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref</strong> (<em>Any</em>) – The reference value (e.g. from Source Framework).</p></li>
+<li><p><strong>val</strong> (<em>Any</em>) – The candidate value (e.g. from Target Framework).</p></li>
+<li><p><strong>rtol</strong> (<em>float</em>) – Relative tolerance for floating point comparison.</p></li>
+<li><p><strong>atol</strong> (<em>float</em>) – Absolute tolerance for floating point comparison.</p></li>
+<li><p><strong>exact</strong> (<em>bool</em>) – If True, disables fuzzy matching.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if values are considered equivalent.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 </section>
 </section>

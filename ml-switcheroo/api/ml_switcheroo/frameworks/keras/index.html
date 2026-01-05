@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -381,6 +381,14 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_serialization_syntax()</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_conversion_imports" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_weight_conversion_imports()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_load_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_weight_load_code()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_tensor_to_numpy_expr" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_tensor_to_numpy_expr()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_save_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_weight_save_code()</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_device_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_device_syntax()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_device_check_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KerasAdapter.get_device_check_syntax()</span></code></a>
@@ -424,7 +432,8 @@ multi-backend translation (JAX/Torch/TensorFlow).</p>
 1.  <strong>Math</strong>: Mapping <cite>keras.ops.*</cite> (backend-agnostic math).
 2.  <strong>Layers</strong>: Mapping <cite>keras.layers.*</cite>.
 3.  <strong>Discovery</strong>: Runtime introspection of the Keras API surface.
-4.  <strong>Ghost Mode</strong>: Silent fallback when Keras is not installed.</p>
+4.  <strong>Ghost Mode</strong>: Silent fallback when Keras is not installed.
+5.  <strong>Weight Migration</strong>: Loading/saving .h5 or .keras files (stubs provided).</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -453,7 +462,7 @@ multi-backend translation (JAX/Torch/TensorFlow).</p>
 <dd></dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.keras.</span></span><span class="sig-name descname"><span class="pre">KerasAdapter</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L45-L386"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.keras.</span></span><span class="sig-name descname"><span class="pre">KerasAdapter</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L45-L530"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Adapter for Keras v3 (Multi-backend).</p>
 <p>Provides definitions for Keras Core Ops, Layers, and Models.</p>
 <dl class="py attribute">
@@ -474,131 +483,380 @@ multi-backend translation (JAX/Torch/TensorFlow).</p>
 <dd><p>Returns list of search modules.</p>
 <p>If in Ghost Mode, returns empty list to prevent Scaffolder
 from attempting to import missing modules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Module names.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.unsafe_submodules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unsafe_submodules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.unsafe_submodules" title="Link to this definition">¶</a></dt>
 <dd><p>Submodules to exclude from recursive scans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty set for Keras properly scoped imports.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Set[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.import_alias" title="Link to this definition">¶</a></dt>
 <dd><p>Default import alias.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(“keras”, “keras”).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[str, str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.import_namespaces">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.ImportConfig" title="ml_switcheroo.frameworks.base.ImportConfig"><span class="pre">ml_switcheroo.frameworks.base.ImportConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
 <dd><p>Namespace mapping for import fixer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Configuration for import injection.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.ImportConfig" title="ml_switcheroo.frameworks.base.ImportConfig">ImportConfig</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
 <dd><p>Regex patterns for scaffold categorization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Patterns mapping tiers to paths.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, List[str]]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.test_config">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.test_config" title="Link to this definition">¶</a></dt>
 <dd><p>Templates for test code generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Test Harness values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.harness_imports">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harness_imports</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.harness_imports" title="Link to this definition">¶</a></dt>
 <dd><p>Imports for verification harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty list.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_harness_init_code">
-<span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L129-L131"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L162-L169"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
 <dd><p>Init code for verification harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_to_numpy_code">
-<span class="sig-name descname"><span class="pre">get_to_numpy_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L133-L137"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_to_numpy_code" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_to_numpy_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L171-L178"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_to_numpy_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns code to convert Keras tensors to NumPy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Conversion logic checking for <cite>numpy</cite> property.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.supported_tiers">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
 <dd><p>Supported semantic tiers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[ARRAY_API, NEURAL, EXTRAS].</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier">SemanticTier</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.declared_magic_args">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">declared_magic_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.declared_magic_args" title="Link to this definition">¶</a></dt>
 <dd><p>List of framework-specific magic arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty list as Keras handles state implicitly.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.structural_traits" title="Link to this definition">¶</a></dt>
 <dd><p>Structural transformation rules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Configuration object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.StructuralTraits" title="ml_switcheroo.semantics.schema.StructuralTraits">StructuralTraits</a></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.plugin_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plugin_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.plugin_traits" title="Link to this definition">¶</a></dt>
 <dd><p>Plugin behavior flags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Object defining capabilities.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../../semantics/schema/index.html#ml_switcheroo.semantics.schema.PluginTraits" title="ml_switcheroo.semantics.schema.PluginTraits">PluginTraits</a></p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.definitions" title="Link to this definition">¶</a></dt>
-<dd><p>Static mappings for Keras.</p>
+<dd><p>Static mappings for Keras.
+Loaded dynamically from <cite>frameworks/definitions/keras.json</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Definitions.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, <a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap">StandardMap</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.rng_seed_methods">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng_seed_methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.rng_seed_methods" title="Link to this definition">¶</a></dt>
 <dd><p>Global seed methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Names like “set_random_seed”.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.collect_api">
-<span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L264-L270"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.collect_api" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L257-L269"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.collect_api" title="Link to this definition">¶</a></dt>
 <dd><p>Collects API definitions via introspection or snapshot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>category</strong> (<a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><em>StandardCategory</em></a>) – Category to scan.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Found items.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef">GhostRef</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L331-L338"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.convert" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L357-L372"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.convert" title="Link to this definition">¶</a></dt>
 <dd><p>Converts input data to Keras Tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>Any</em>) – Input data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Keras Tensor or original data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_imports">
-<span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L340-L342"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L374-L381"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
 <dd><p>Imports for saving/loading.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Imports.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_syntax">
-<span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L344-L350"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L383-L399"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Syntax for saving/loading models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> (<em>str</em>) – ‘save’ or ‘load’.</p></li>
+<li><p><strong>file_arg</strong> (<em>str</em>) – Path string.</p></li>
+<li><p><strong>object_arg</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Object name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generated python code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_conversion_imports">
+<span class="sig-name descname"><span class="pre">get_weight_conversion_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L403-L407"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_conversion_imports" title="Link to this definition">¶</a></dt>
+<dd><p>Returns imports required for the generated weight migration script.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_load_code">
+<span class="sig-name descname"><span class="pre">get_weight_load_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L409-L436"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_load_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns python code to load a checkpoint.
+Stub implemented as Keras models contain structure + weights, making raw dict handling tricky.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_tensor_to_numpy_expr">
+<span class="sig-name descname"><span class="pre">get_tensor_to_numpy_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L438-L442"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_tensor_to_numpy_expr" title="Link to this definition">¶</a></dt>
+<dd><p>Returns python expression string that converts <cite>tensor_var</cite> from Keras tensor to numpy array.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_save_code">
+<span class="sig-name descname"><span class="pre">get_weight_save_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L444-L454"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_weight_save_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns warning that saving raw dictionary to Keras checkpoint is complex without model definition.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_device_syntax">
-<span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L352-L355"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L456-L468"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Syntax for device scoping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>device_type</strong> (<em>str</em>) – ‘cuda’, ‘cpu’.</p></li>
+<li><p><strong>device_index</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Generated code.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_device_check_syntax">
-<span class="sig-name descname"><span class="pre">get_device_check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L357-L359"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_device_check_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_device_check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L470-L477"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_device_check_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Syntax for checking GPU availability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logic expression.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_rng_split_syntax">
-<span class="sig-name descname"><span class="pre">get_rng_split_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L361-L363"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_rng_split_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_rng_split_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L479-L486"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_rng_split_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Keras handles RNG state internally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>“pass”.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.apply_wiring">
-<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L365-L367"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L488-L495"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
 <dd><p>Applies configuration wiring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>snapshot</strong> – Snapshot dict.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_doc_url">
-<span class="sig-name descname"><span class="pre">get_doc_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L369-L373"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_doc_url" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_doc_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L497-L507"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_doc_url" title="Link to this definition">¶</a></dt>
 <dd><p>Provides a search URL for Keras documentation as direct API mapping is non-trivial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>api_name</strong> (<em>str</em>) – API path.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>URL.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[str]</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_example_code">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L375-L378"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_example_code" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L509-L517"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_example_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns example code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Source code.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.keras.KerasAdapter.get_tiered_examples">
-<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L380-L386"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/keras.py#L519-L530"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.keras.KerasAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
 <dd><p>Returns tiered examples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Map of tiers to examples.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, str]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>

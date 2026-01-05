@@ -8,6 +8,7 @@ ml_switcheroo.plugins.loss_wrapper
    Plugin for Loss Reduction Semantics.
 
    Addresses the mismatch between:
+
    1. PyTorch: `loss = F.cross_entropy(..., reduction='mean')` (Scalar output by default).
    2. Functional Frameworks (JAX/Optax): `loss = optax.softmax_cross_entropy(x, y)`
       (Vector output per batch element).
@@ -18,13 +19,10 @@ ml_switcheroo.plugins.loss_wrapper
    Transformation:
 
    1. Detects `reduction` keyword argument.
-
    2. Strips the argument (as Optax/JAX funcs don't usually accept it).
-
    3. Wraps the function call in `Mean(x)` or `Sum(x)`. This step dynamically looks up
       the "Mean" or "Sum" API from the Semantic Knowledge Base, supporting any target
       framework definition (e.g. `tf.reduce_mean`, `jnp.mean`, `mx.mean`).
-
    4. If `reduction='none'`, leaves the vector output alone.
 
 

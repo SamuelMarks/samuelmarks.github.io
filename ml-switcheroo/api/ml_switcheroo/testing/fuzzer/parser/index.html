@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,11 +71,11 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
-    <link rel="next" title="ml_switcheroo.testing.fuzzer.utils" href="../utils/index.html" />
+    <link rel="next" title="ml_switcheroo.testing.fuzzer.strategies" href="../strategies/index.html" />
     <link rel="prev" title="ml_switcheroo.testing.fuzzer.heuristics" href="../heuristics/index.html" />
   
    
@@ -358,9 +358,12 @@
 <span id="ml-switcheroo-testing-fuzzer-parser"></span><h1 id="api-ml-switcheroo-testing-fuzzer-parser-index--page-root">ml_switcheroo.testing.fuzzer.parser<a class="headerlink" href="#api-ml-switcheroo-testing-fuzzer-parser-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Type Hint Parser and Recursive Generation Logic.</p>
 <p>This module processes string type hints (e.g. <cite>List[Array[‘N’]]</cite>) and
-generates conforming data structures.</p>
-<p>Updates:
-- Enforces shape consistency for <code class="docutils literal notranslate"><span class="pre">List[Tensor]</span></code> generation to support <code class="docutils literal notranslate"><span class="pre">stack</span></code>/<code class="docutils literal notranslate"><span class="pre">concat</span></code>.</p>
+generates conforming data structures for runtime fuzzing.</p>
+<p>It includes logic to:
+1.  Parse nested generic types.
+2.  Resolve symbolic shape constraints.
+3.  Respect semantic constraints (<cite>min</cite>, <cite>max</cite>, <cite>options</cite>).
+4.  <strong>Infer generation strategy from default values</strong> when explicit hints are erased.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -380,29 +383,37 @@ generates conforming data structures.</p>
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.parser.get_fallback_base_value">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.parser.</span></span><span class="sig-name descname"><span class="pre">get_fallback_base_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.parser.get_fallback_base_value" title="Link to this definition">¶</a></dt>
 <dd><p>Returns a minimal valid value to terminate recursion when depth limit is reached.</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.parser.generate_from_hint">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.parser.</span></span><span class="sig-name descname"><span class="pre">generate_from_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.parser.generate_from_hint" title="Link to this definition">¶</a></dt>
-<dd><p>Recursively parses a type string and generates conforming data.</p>
-<p>Handles structural types (List, Tuple, Dict, Union, Optional) and
-content types (Array, int, float, dtype, Callable).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>type_str</strong> (<em>str</em>) – The type hint string to parse.</p></li>
-<li><p><strong>base_shape</strong> (<em>Tuple</em><em>[</em><em>int</em><em>]</em>) – Default shape helper.</p></li>
-<li><p><strong>depth</strong> (<em>int</em>) – Current recursion depth.</p></li>
-<li><p><strong>max_depth</strong> (<em>int</em>) – Limit for recursion.</p></li>
-<li><p><strong>symbol_map</strong> (<em>Dict</em>) – Shared context for dimension symbols (‘N’).</p></li>
-<li><p><strong>constraints</strong> (<em>Dict</em>) – Semantic constraints (min, max, options).</p></li>
+<li><p><strong>type_str</strong> – The target type hint.</p></li>
+<li><p><strong>base_shape</strong> – Default shape for array fallbacks.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Safe fallback value (0, empty list, etc).</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.parser.generate_from_hint">
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.parser.</span></span><span class="sig-name descname"><span class="pre">generate_from_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.parser.generate_from_hint" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively parses a type string and generates conforming data.</p>
+<p>If type hints are generic (“Any”), it attempts to infer the type logic
+from the <cite>default</cite> value provided in constraints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type_str</strong> – The type hint string to parse.</p></li>
+<li><p><strong>base_shape</strong> – Default shape helper.</p></li>
+<li><p><strong>depth</strong> – Current recursion depth.</p></li>
+<li><p><strong>max_depth</strong> – Limit for recursion.</p></li>
+<li><p><strong>symbol_map</strong> – Shared context for dimension symbols (‘N’).</p></li>
+<li><p><strong>constraints</strong> – Semantic constraints (min, max, options, default).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Generated data structure.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Any</p>
 </dd>
 </dl>
 </dd></dl>
@@ -433,12 +444,12 @@ content types (Array, int, float, dtype, Callable).</p>
             </a>
           
           
-            <a href="../utils/index.html" title="ml_switcheroo.testing.fuzzer.utils"
+            <a href="../strategies/index.html" title="ml_switcheroo.testing.fuzzer.strategies"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.testing.fuzzer.utils </span>
+                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.testing.fuzzer.strategies </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -357,6 +357,8 @@
   <section id="module-ml_switcheroo.cli.handlers.audit">
 <span id="ml-switcheroo-cli-handlers-audit"></span><h1 id="api-ml-switcheroo-cli-handlers-audit-index--page-root">ml_switcheroo.cli.handlers.audit<a class="headerlink" href="#api-ml-switcheroo-cli-handlers-audit-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Audit Command Handler.</p>
+<p>Performs static analysis on source files to identify unsupported operations
+and generate coverage reports.</p>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -375,8 +377,17 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.cli.handlers.audit.resolve_roots">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.cli.handlers.audit.</span></span><span class="sig-name descname"><span class="pre">resolve_roots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.cli.handlers.audit.resolve_roots" title="Link to this definition">¶</a></dt>
-<dd><p>Expands framework keys (e.g. ‘flax_nnx’) to python module roots (e.g. ‘flax’, ‘jax’).
-This ensures that querying for ‘flax_nnx’ correctly finds ‘import flax’.</p>
+<dd><p>Expands framework keys (e.g. ‘flax_nnx’) to python module roots (e.g. ‘flax’, ‘jax’).</p>
+<p>This ensures that querying for ‘flax_nnx’ correctly finds ‘import flax’.
+It consults the Adapter metadata for import aliases and search modules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>framework_keys</strong> – List of requested framework identifiers.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A set of root module names (e.g. {‘torch’, ‘jax’, ‘flax’}).</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.cli.handlers.audit.handle_audit">
@@ -385,10 +396,20 @@ This ensures that querying for ‘flax_nnx’ correctly finds ‘import flax’.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – Input source.</p></li>
+<li><p><strong>path</strong> – Input source file or directory.</p></li>
 <li><p><strong>source_frameworks</strong> – List of framework keys to scan for.</p></li>
 <li><p><strong>json_mode</strong> – If True, output JSON to stdout and suppress Rich logs.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Exit code (0 if audit reveals full coverage, 1 if missing ops).</dt><dd><p>Note: In audit mode, missing ops might be considered a ‘failure’.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 </dd></dl>

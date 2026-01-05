@@ -8,7 +8,8 @@ ml_switcheroo.cli.commands
    CLI Command Handlers Facade.
 
    This module primarily re-exports handlers from `ml_switcheroo.cli.handlers`
-   to maintain backward compatibility with existing tests and imports.
+   to maintain backward compatibility with existing tests and imports. Must remain
+   synced with handler modules.
 
 
 
@@ -32,6 +33,7 @@ Functions
    ml_switcheroo.cli.commands.handle_gen_tests
    ml_switcheroo.cli.commands.resolve_semantics_dir
    ml_switcheroo.cli.commands.resolve_snapshots_dir
+   ml_switcheroo.cli.commands.handle_gen_weight_script
 
 
 Module Contents
@@ -41,9 +43,15 @@ Module Contents
 
    Scans a directory/file to determine coverage against the Knowledge Base.
 
-   :param path: Input source.
+   :param path: Input source file or directory.
    :param source_frameworks: List of framework keys to scan for.
    :param json_mode: If True, output JSON to stdout and suppress Rich logs.
+
+   :returns:
+
+             Exit code (0 if audit reveals full coverage, 1 if missing ops).
+                  Note: In audit mode, missing ops might be considered a 'failure'.
+   :rtype: int
 
 
 .. py:function:: handle_convert(input_path: pathlib.Path, output_path: Optional[pathlib.Path], source: Optional[str], target: Optional[str], verify: bool, strict: Optional[bool], intermediate: Optional[str], plugin_settings: Dict[str, Any], json_trace_path: Optional[pathlib.Path] = None) -> int
@@ -130,8 +138,7 @@ Module Contents
 
    :param out_dir: Optional custom output directory. Defaults to package/snapshots.
 
-   :returns: Exit code.
-   :rtype: int
+   :returns: Exit code (0 for success, 1 for failure).
 
 
 .. py:function:: handle_sync(framework: str) -> int
@@ -140,17 +147,16 @@ Module Contents
 
    Links the Abstract Standards (Hub) to the concrete implementation in a
    specific framework. This process involves:
-   1.  Reading the Specs from `semantics/`.
+   1.  Reading the Specs from ``semantics/``.
    2.  Introspecting the installed framework to find matching APIs.
    3.  **Merging Static Definitions** from the Adapter (for Ghost support).
    4.  Applying Adapter-specific manual wiring (plugins, templates).
    5.  **Persisting Test Configuration templates**.
-   6.  Writing the results to the Snapshot Overlay (`snapshots/{fw}_mappings.json`).
+   6.  Writing the results to the Snapshot Overlay (``snapshots/{fw}_mappings.json``).
 
    :param framework: The framework key to sync (e.g. 'torch', 'jax').
 
-   :returns: Exit code.
-   :rtype: int
+   :returns: Exit code (0 for success, 1 for failure).
 
 
 .. py:function:: handle_wizard(package: str) -> int
@@ -183,16 +189,34 @@ Module Contents
 .. py:function:: handle_matrix() -> int
 
    Handles 'matrix' command.
+   Prints the compatibility table to stdout.
+
+   :returns: 0 on success.
+   :rtype: int
 
 
 .. py:function:: handle_docs(source: str, target: str, out_path: pathlib.Path) -> int
 
    Handles 'gen-docs' command.
+   Generates a migration guide Markdown file.
+
+   :param source: Source framework key.
+   :param target: Target framework key.
+   :param out_path: Output file path.
+
+   :returns: 0 on success.
+   :rtype: int
 
 
 .. py:function:: handle_gen_tests(out: pathlib.Path) -> int
 
    Handles 'gen-tests' command.
+   Generates physical test files for known APIs.
+
+   :param out: Output file path.
+
+   :returns: 0 on success.
+   :rtype: int
 
 
 .. py:function:: resolve_semantics_dir() -> pathlib.Path
@@ -214,5 +238,20 @@ Module Contents
 
    :returns: The absolute path to the 'snapshots' directory.
    :rtype: Path
+
+
+.. py:function:: handle_gen_weight_script(source_file: pathlib.Path, out_script: pathlib.Path, source_fw: Optional[str] = None, target_fw: Optional[str] = None) -> int
+
+   Handler for generating weight migration script.
+
+   Delegates to the `WeightScriptGenerator` class.
+
+   :param source_file: Path to the model source code.
+   :param out_script: Path to write the output script.
+   :param source_fw: Source framework key (optional).
+   :param target_fw: Target framework key (optional).
+
+   :returns: Exit Code (0 for success, 1 for failure).
+   :rtype: int
 
 

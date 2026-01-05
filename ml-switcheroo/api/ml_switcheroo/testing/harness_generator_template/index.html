@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -513,12 +513,26 @@ skeleton for running <cite>source_func(x) == target_func(x)</cite> checks.</p>
 <span class="sd">            val_tgt = to_numpy(res_tgt)</span>
 
 <span class="sd">            def deep_compare(a, b):</span>
+<span class="sd">                # 1. Null check</span>
+<span class="sd">                if a is None or b is None:</span>
+<span class="sd">                    return a is b</span>
+
+<span class="sd">                # 2. Numpy Logic with Shape &amp; NaN check</span>
 <span class="sd">                if hasattr(a, "shape") and hasattr(b, "shape"):</span>
-<span class="sd">                     # Numpy like</span>
-<span class="sd">                     return np.allclose(a, b, rtol=1e-3, atol=1e-4)</span>
+<span class="sd">                    a_arr = np.asanyarray(a)</span>
+<span class="sd">                    b_arr = np.asanyarray(b)</span>
+<span class="sd">                    if a_arr.shape != b_arr.shape:</span>
+<span class="sd">                        return False</span>
+<span class="sd">                    # Allow fuzzy match with NaNs treated as equal</span>
+<span class="sd">                    if a_arr.dtype.kind in ['f', 'c']:</span>
+<span class="sd">                        return np.allclose(a_arr, b_arr, rtol=1e-3, atol=1e-4, equal_nan=True)</span>
+<span class="sd">                    return np.array_equal(a_arr, b_arr)</span>
+
+<span class="sd">                # 3. Recursion</span>
 <span class="sd">                if isinstance(a, (list, tuple)) and isinstance(b, (list, tuple)):</span>
 <span class="sd">                    if len(a) != len(b): return False</span>
 <span class="sd">                    return all(deep_compare(x, y) for x, y in zip(a, b))</span>
+
 <span class="sd">                return a == b</span>
 
 <span class="sd">            if deep_compare(val_src, val_tgt):</span>

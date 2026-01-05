@@ -79,6 +79,19 @@ Module Contents
 
       Scans only core math and optimization libraries (no neural layers).
 
+      :returns: List of module names.
+      :rtype: List[str]
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Returns a set of submodule names to exclude from recursive introspection.
+
+      :returns: Explicitly empty set (safe to scan default paths).
+      :rtype: Set[str]
+
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
@@ -93,12 +106,18 @@ Module Contents
 
       Self-declared namespace roles.
 
+      :returns: Map of paths to configuration.
+      :rtype: Dict[str, ImportConfig]
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
       Regex patterns for identifying API categories.
+
+      :returns: Tier to regex patterns mapping.
+      :rtype: Dict[str, List[str]]
 
 
    .. py:property:: test_config
@@ -135,6 +154,9 @@ Module Contents
       Defines JAX structural behavior (Transformation rules).
       Specifies JIT static arguments for compilation safety.
 
+      :returns: Configuration object.
+      :rtype: StructuralTraits
+
 
    .. py:property:: plugin_traits
       :type: ml_switcheroo.frameworks.base.PluginTraits
@@ -144,6 +166,9 @@ Module Contents
       Enables NumPy compatibility and explicit RNG threading.
 
       IMPORTANT: Enforces Purity Analysis to catch side-effects unsafe for functional trace.
+
+      :returns: Configuration flags.
+      :rtype: PluginTraits
 
 
    .. py:property:: rng_seed_methods
@@ -158,7 +183,10 @@ Module Contents
 
 
       Static Definitions for JAX Core, Optax, Orbax, and Types.
-      Moved from `standards_internal.py` for decoupling.
+      Loaded dynamically from `frameworks/definitions/jax.json`.
+
+      :returns: Mapping of definitions.
+      :rtype: Dict[str, StandardMap]
 
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.frameworks.base.GhostRef]
@@ -166,11 +194,23 @@ Module Contents
       Collects API signatures for discovering new Standards.
       Supports both Live introspection and Ghost Mode snapshots.
 
+      :param category: Category to scan.
+      :type category: StandardCategory
+
+      :returns: Found API references.
+      :rtype: List[GhostRef]
+
 
 
    .. py:method:: convert(data: Any) -> Any
 
       Converts input data to a JAX array for verification.
+
+      :param data: Input data.
+      :type data: Any
+
+      :returns: JAX Array.
+      :rtype: Any
 
 
 
@@ -178,6 +218,9 @@ Module Contents
 
       Applies Level 0/1 Stack wiring.
       Populates the JSON snapshot with manually wired logic.
+
+      :param snapshot: The snapshot to modify.
+      :type snapshot: Dict[str, Any]
 
 
 
@@ -187,17 +230,29 @@ Module Contents
 
       Returns a generic JAX example.
 
+      :returns: Source code.
+      :rtype: str
+
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
 
       Provides default tiered examples for the base adapter.
 
+      :returns: Mapping of tier name to source code.
+      :rtype: Dict[str, str]
+
 
 
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
       Generates JAX core documentation URL.
+
+      :param api_name: API path.
+      :type api_name: str
+
+      :returns: URL string.
+      :rtype: Optional[str]
 
 
 

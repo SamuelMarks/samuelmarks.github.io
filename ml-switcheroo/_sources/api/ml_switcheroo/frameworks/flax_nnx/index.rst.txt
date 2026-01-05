@@ -163,6 +163,8 @@ Module Contents
       :type: List[str]
 
 
+      Returns list of argument names that represent injected state ('rngs').
+
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.frameworks.base.StructuralTraits
@@ -191,6 +193,7 @@ Module Contents
 
 
       Static standard operation definitions specific to Flax NNX.
+      Loaded dynamically from `frameworks/definitions/flax_nnx.json`.
 
       :returns: Mapping of standard op names to framework implementations.
       :rtype: Dict[str, StandardMap]
@@ -199,6 +202,11 @@ Module Contents
    .. py:method:: convert(data: Any) -> Any
 
       Converts generic data to framework-specific Pytree/arrays.
+      Contains self-contained logic to ensure safe extraction by the Harness Generator which
+      does not preserve external dependencies like 'JaxCoreAdapter' class references.
+
+      :param data: Input data (numpy/list).
+      :type data: Any
 
       :returns: Converted data tailored to JAX/Flax ecosystem.
 
@@ -208,9 +216,10 @@ Module Contents
 
       Applies manual wiring and modifies the snapshot to alias 'flax.nnx.' to 'nnx.'.
 
-      Adds plugin wiring for key interface methods.
+      Adds plugin wiring for key interface methods ensuring correctness during
+      Ghost Mode synchronization.
 
-      :param snapshot: The mapping snapshot dictionary.
+      :param snapshot: The mapping snapshot dictionary to mutate.
       :type snapshot: Dict[str, Any]
 
 

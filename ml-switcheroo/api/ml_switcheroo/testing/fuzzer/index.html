@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,12 +71,12 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="ml_switcheroo.testing.fuzzer.core" href="core/index.html" />
-    <link rel="prev" title="ml_switcheroo.testing.batch_runner" href="../batch_runner/index.html" />
+    <link rel="prev" title="ml_switcheroo.testing.bisector" href="../bisector/index.html" />
   
    
 
@@ -337,7 +337,7 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.InputFuzzer.MAX_RECURSION_DEPTH" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">InputFuzzer.MAX_RECURSION_DEPTH</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.InputFuzzer.max_depth" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">InputFuzzer.max_depth</span></code></a>
+        <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.InputFuzzer.build_strategies" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">InputFuzzer.build_strategies()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">InputFuzzer.generate_inputs()</span></code></a>
         </li>
@@ -378,6 +378,7 @@ and constraints.</p>
 <li class="toctree-l1"><a class="reference internal" href="generators/index.html">ml_switcheroo.testing.fuzzer.generators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="heuristics/index.html">ml_switcheroo.testing.fuzzer.heuristics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parser/index.html">ml_switcheroo.testing.fuzzer.parser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="strategies/index.html">ml_switcheroo.testing.fuzzer.strategies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils/index.html">ml_switcheroo.testing.fuzzer.utils</a></li>
 </ul>
 </div>
@@ -387,7 +388,7 @@ and constraints.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.testing.fuzzer.InputFuzzer" title="ml_switcheroo.testing.fuzzer.InputFuzzer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InputFuzzer</span></code></a></p></td>
-<td><p>Generates dummy inputs (Arrays, Scalars, Containers) for equivalence testing.</p></td>
+<td><p>Facade for creating Hypothesis strategies based on Semantic Spec.</p></td>
 </tr>
 </tbody>
 </table>
@@ -396,37 +397,49 @@ and constraints.</p>
 <h2 id="package-contents">Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.</span></span><span class="sig-name descname"><span class="pre">InputFuzzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Ellipsis</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer" title="Link to this definition">¶</a></dt>
-<dd><p>Generates dummy inputs (Arrays, Scalars, Containers) for equivalence testing.</p>
-<p>Orchestrates:
-1.  Resolution of Explicit Type Hints via Parser.
-2.  Resolution of Implicit Heuristics via Heuristics engine.
-3.  Framework adaptation via Adapters.</p>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.testing.fuzzer.</span></span><span class="sig-name descname"><span class="pre">InputFuzzer</span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer" title="Link to this definition">¶</a></dt>
+<dd><p>Facade for creating Hypothesis strategies based on Semantic Spec.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.MAX_RECURSION_DEPTH">
 <span class="sig-name descname"><span class="pre">MAX_RECURSION_DEPTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.MAX_RECURSION_DEPTH" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.max_depth">
-<span class="sig-name descname"><span class="pre">max_depth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.max_depth" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs">
-<span class="sig-name descname"><span class="pre">generate_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs" title="Link to this definition">¶</a></dt>
-<dd><p>Creates a dictionary of <cite>{arg_name: value}</cite>.</p>
-<p>Resolves symbolic dimensions across the entire parameter set. For example,
-if hints are <cite>{‘x’: “Array[‘N’]”, ‘y’: “Array[‘N’]”}</cite>, both arrays will
-have matching lengths.</p>
+<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.build_strategies">
+<span class="sig-name descname"><span class="pre">build_strategies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">hypothesis.strategies.SearchStrategy</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.build_strategies" title="Link to this definition">¶</a></dt>
+<dd><p>Constructs a dictionary of Hypothesis strategies for the given parameters.
+Automatically handles shared symbolic dimensions (e.g. Array[‘N’]).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>params</strong> – List of argument names to generate (e.g. <cite>[‘x’, ‘axis’]</cite>).</p></li>
-<li><p><strong>hints</strong> – Dictionary of <cite>{arg_name: type_string}</cite> derived from Spec.</p></li>
-<li><p><strong>constraints</strong> – Dictionary of <cite>{arg_name: {min, max, options, dtype}}</cite>.</p></li>
+<li><p><strong>params</strong> – List of argument names.</p></li>
+<li><p><strong>hints</strong> – Mapping of name -&gt; type string.</p></li>
+<li><p><strong>constraints</strong> – Mapping of name -&gt; dict constraints (min, max, etc).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Randomized inputs ready for Framework adaptation.</p>
+<dd class="field-even"><p>Strategies ready to be fed into @given.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Strategy]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs">
+<span class="sig-name descname"><span class="pre">generate_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.generate_inputs" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a SINGLE set of inputs. Valid for simple legacy tests and harnesses.</p>
+<p>Under the hood, this builds a Hypothesis strategy and draws one example.
+This replaces the old ad-hoc random generation logic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – List of argument names.</p></li>
+<li><p><strong>hints</strong> – Type hints.</p></li>
+<li><p><strong>constraints</strong> – Constraints.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary of generated input values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[str, Any]</p>
@@ -436,17 +449,16 @@ have matching lengths.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.testing.fuzzer.InputFuzzer.adapt_to_framework">
 <span class="sig-name descname"><span class="pre">adapt_to_framework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">framework</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.testing.fuzzer.InputFuzzer.adapt_to_framework" title="Link to this definition">¶</a></dt>
-<dd><p>Converts Numpy inputs to framework-specific tensor types.</p>
-<p>Delegates to registered adapters (e.g., <cite>TorchAdapter</cite>, <cite>JaxAdapter</cite>).</p>
+<dd><p>Delegates to Framework Adapter to convert Numpy/Native inputs to Tensors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>kwargs</strong> – Input dictionary with Numpy values.</p></li>
-<li><p><strong>framework</strong> – Key of the framework (e.g., “torch”, “jax”).</p></li>
+<li><p><strong>kwargs</strong> – Dictionary of input values.</p></li>
+<li><p><strong>framework</strong> – Target framework key (e.g. ‘torch’).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict with framework-specific tensors.</p>
+<dd class="field-even"><p>Dict with converted values.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -464,7 +476,7 @@ have matching lengths.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../batch_runner/index.html" title="ml_switcheroo.testing.batch_runner"
+            <a href="../bisector/index.html" title="ml_switcheroo.testing.bisector"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -473,7 +485,7 @@ have matching lengths.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.testing.batch_runner </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.testing.bisector </span>
               </div>
             </a>
           

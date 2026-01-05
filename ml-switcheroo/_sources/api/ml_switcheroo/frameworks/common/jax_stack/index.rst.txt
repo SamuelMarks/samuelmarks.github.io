@@ -47,6 +47,7 @@ Module Contents
    - Device Management (Torch Device -> JAX Devices).
    - **Test Configuration** (Gen-Tests templates).
    - **Verification Normalization** (JAX Array -> NumPy).
+   - **Weight Migration** (Loading/Saving checkpoints via Orbax).
 
 
    .. py:property:: jax_test_config
@@ -113,6 +114,32 @@ Module Contents
       :param object_arg: The PyTree to save (required for save).
 
       :returns: Python code string.
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+      Returns imports required for the generated weight migration script.
+
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Returns python code to load a checkpoint from `path_var` into a variable named `raw_state`.
+      The `raw_state` is a flat dictionary where keys are dot-separated strings (e.g. 'layer.weight').
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+      Returns a python expression string that converts `tensor_var` from JAX array to numpy array.
+
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Returns python code to save the dictionary `state_var` (mapping flat keys to numpy arrays)
+      to `path_var`. It unstricts flat keys back to PyTree structure using `unflatten_dict` and saves via Orbax.
 
 
 

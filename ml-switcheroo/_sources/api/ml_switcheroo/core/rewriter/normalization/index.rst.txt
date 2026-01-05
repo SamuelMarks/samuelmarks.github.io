@@ -10,13 +10,13 @@ ml_switcheroo.core.rewriter.normalization
    This module provides the `NormalizationMixin`, a component of the `PivotRewriter`
    responsible for reshaping function arguments and call structures during translation.
 
-   Updates:
-
-   -   Supports argument value mapping (Enums) via `arg_values`.
-   -   Supports variadic argument packing via `pack_to_tuple`.
-   -   **Feature Update (Configurable Packing)**: Supports `pack_as="List"` for list-based APIs.
-   -   **Feature Update**: Injects ODL `default` values if argument missing in source.
-   -   **Feature Update**: Handles dynamic module aliasing checks.
+   Handles:
+   -   **Argument Renaming**: Maps source keywords to target keywords (e.g. `dim` -> `axis`).
+   -   **Method-to-Function Pivot**: Injects the receiver object `x.add()` -> `add(x)` if needed.
+   -   **Default Value Injection**: Injects values defined in ODL `default` field if arguments are missing.
+   -   **Value Normalization**: Transforms primitives and nested containers defined in ODL defaults into CST nodes.
+   -   **Argument Values Enum Mapping**: Maps string/int literals (e.g. `reduction='mean'` -> `mode='avg'`).
+   -   **Packing**: Handles variadic argument packing into containers (List/Tuple).
 
 
 
@@ -31,7 +31,7 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 

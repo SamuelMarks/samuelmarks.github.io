@@ -1,0 +1,45 @@
+ml_switcheroo.testing.fuzzer.strategies
+=======================================
+
+.. py:module:: ml_switcheroo.testing.fuzzer.strategies
+
+.. autoapi-nested-parse::
+
+   Hypothesis Strategies for ODL Types.
+
+   This module maps Operation Definition Language (ODL) type strings (e.g., ``Array['N']``,
+   ``List[int]``) into executable Hypothesis search strategies. It handles:
+
+   1.  **Primitives**: Constraints-aware generation for ints, floats, bools.
+   2.  **Tensors**: Numpy array generation with specific dtypes, ranks, and symbolic shapes.
+   3.  **Containers**: Recursive generation of Lists, Tuples, and Dictionaries.
+   4.  **Symbolic Consistency**: Ensuring named dimensions (e.g., 'N') resolve consistently
+       across different arguments using a shared context.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.testing.fuzzer.strategies.strategies_from_spec
+
+
+Module Contents
+---------------
+
+.. py:function:: strategies_from_spec(type_str: str, constraints: Dict[str, Any], shared_dims: Optional[Dict[str, Any]] = None) -> hypothesis.strategies.SearchStrategy
+
+   Constructs a Hypothesis strategy from a type string and constraints.
+
+   Recursively parses complex types (e.g., ``List[int]``) and delegates
+   array creation to `_array_strategy`.
+
+   :param type_str: The ODL type hint (e.g. "int", "Array['N']").
+   :param constraints: Dictionary of constraints (min, max, options).
+   :param shared_dims: Mutable dictionary mapping symbol names to shared integer strategies.
+
+   :returns: A valid Hypothesis SearchStrategy.
+
+

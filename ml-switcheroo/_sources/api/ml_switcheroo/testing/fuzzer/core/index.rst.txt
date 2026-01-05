@@ -5,10 +5,10 @@ ml_switcheroo.testing.fuzzer.core
 
 .. autoapi-nested-parse::
 
-   Core Engine of the Input Fuzzer.
+   Core Engine of the Input Fuzzer (Hypothesis Integration).
 
-   Defines the `InputFuzzer` class which acts as the high-level API
-   for generating test inputs and adapting them to target frameworks.
+   This module provides the `InputFuzzer` facade which now delegates generation logic
+   to Hypothesis Strategies. It maintains backward compatibility for casual usage via `generate_inputs`.
 
 
 
@@ -23,14 +23,9 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: InputFuzzer(seed_shape: Optional[Tuple[int, Ellipsis]] = None)
+.. py:class:: InputFuzzer
 
-   Generates dummy inputs (Arrays, Scalars, Containers) for equivalence testing.
-
-   Orchestrates:
-   1.  Resolution of Explicit Type Hints via Parser.
-   2.  Resolution of Implicit Heuristics via Heuristics engine.
-   3.  Framework adaptation via Adapters.
+   Facade for creating Hypothesis strategies based on Semantic Spec.
 
 
    .. py:attribute:: MAX_RECURSION_DEPTH
@@ -38,38 +33,44 @@ Module Contents
 
 
 
-   .. py:attribute:: max_depth
-      :value: 3
+   .. py:method:: build_strategies(params: List[str], hints: Optional[Dict[str, str]] = None, constraints: Optional[Dict[str, Dict]] = None) -> Dict[str, hypothesis.strategies.SearchStrategy]
+
+      Constructs a dictionary of Hypothesis strategies for the given parameters.
+      Automatically handles shared symbolic dimensions (e.g. Array['N']).
+
+      :param params: List of argument names.
+      :param hints: Mapping of name -> type string.
+      :param constraints: Mapping of name -> dict constraints (min, max, etc).
+
+      :returns: Strategies ready to be fed into @given.
+      :rtype: Dict[str, Strategy]
 
 
 
    .. py:method:: generate_inputs(params: List[str], hints: Optional[Dict[str, str]] = None, constraints: Optional[Dict[str, Dict]] = None) -> Dict[str, Any]
 
-      Creates a dictionary of `{arg_name: value}`.
+      Generates a SINGLE set of inputs. Valid for simple legacy tests and harnesses.
 
-      Resolves symbolic dimensions across the entire parameter set. For example,
-      if hints are `{'x': "Array['N']", 'y': "Array['N']"}`, both arrays will
-      have matching lengths.
+      Under the hood, this builds a Hypothesis strategy and draws one example.
+      This replaces the old ad-hoc random generation logic.
 
-      :param params: List of argument names to generate (e.g. `['x', 'axis']`).
-      :param hints: Dictionary of `{arg_name: type_string}` derived from Spec.
-      :param constraints: Dictionary of `{arg_name: {min, max, options, dtype}}`.
+      :param params: List of argument names.
+      :param hints: Type hints.
+      :param constraints: Constraints.
 
-      :returns: Randomized inputs ready for Framework adaptation.
+      :returns: A dictionary of generated input values.
       :rtype: Dict[str, Any]
 
 
 
    .. py:method:: adapt_to_framework(kwargs: Dict[str, Any], framework: str) -> Dict[str, Any]
 
-      Converts Numpy inputs to framework-specific tensor types.
+      Delegates to Framework Adapter to convert Numpy/Native inputs to Tensors.
 
-      Delegates to registered adapters (e.g., `TorchAdapter`, `JaxAdapter`).
+      :param kwargs: Dictionary of input values.
+      :param framework: Target framework key (e.g. 'torch').
 
-      :param kwargs: Input dictionary with Numpy values.
-      :param framework: Key of the framework (e.g., "torch", "jax").
-
-      :returns: Dict with framework-specific tensors.
+      :returns: Dict with converted values.
 
 
 

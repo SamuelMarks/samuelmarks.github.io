@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="_static/trace_render.js?v=4ddbab91"></script>
-    <script src="_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="_static/op_tabs.js?v=cd874ca5"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -613,11 +613,13 @@ window.addEventListener("load", load);
         </li>
         <li class="md-nav__item"><a href="#the-transpilation-engine" class="md-nav__link">⚡ 2. The Transpilation Engine</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#analysis-phase" class="md-nav__link">1. Analysis Phase</a>
+        <li class="md-nav__item"><a href="#ingestion-analysis" class="md-nav__link">1. Ingestion & Analysis</a>
         </li>
-        <li class="md-nav__item"><a href="#rewriting-phase-pivotrewriter" class="md-nav__link">2. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        <li class="md-nav__item"><a href="#optimization-phase-graphoptimizer" class="md-nav__link">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)</a>
         </li>
-        <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">3. Refinement Phase</a>
+        <li class="md-nav__item"><a href="#rewriting-phase-pivotrewriter" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">4. Refinement Phase</a>
         </li></ul>
             </nav>
         </li>
@@ -757,11 +759,13 @@ window.addEventListener("load", load);
         </li>
         <li class="md-nav__item"><a href="#the-transpilation-engine" class="md-nav__link">⚡ 2. The Transpilation Engine</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#analysis-phase" class="md-nav__link">1. Analysis Phase</a>
+        <li class="md-nav__item"><a href="#ingestion-analysis" class="md-nav__link">1. Ingestion & Analysis</a>
         </li>
-        <li class="md-nav__item"><a href="#rewriting-phase-pivotrewriter" class="md-nav__link">2. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        <li class="md-nav__item"><a href="#optimization-phase-graphoptimizer" class="md-nav__link">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)</a>
         </li>
-        <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">3. Refinement Phase</a>
+        <li class="md-nav__item"><a href="#rewriting-phase-pivotrewriter" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">4. Refinement Phase</a>
         </li></ul>
             </nav>
         </li>
@@ -799,22 +803,31 @@ window.addEventListener("load", load);
             
   <section class="tex2jax_ignore mathjax_ignore" id="architecture">
 <h1 id="architecture--page-root">Architecture<a class="headerlink" href="#architecture--page-root" title="Link to this heading">¶</a></h1>
-<p><strong>ml-switcheroo</strong> is a deterministic, specification-driven transpiler designed to convert Deep Learning code between frameworks (e.g., PyTorch to JAX/Flax, Keras 3 to TensorFlow) with mathematical rigor.</p>
-<p>It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem by decoupling <strong>Specification</strong> (the Abstract Operation) from <strong>Implementation</strong> (the Framework API) using a <strong>Hub-and-Spoke</strong> architecture. Rather than writing translators for every pair of frameworks, we map every framework to a central “Abstract Standard.”</p>
+<p><strong>ml-switcheroo</strong> is a deterministic, specification-driven transpiler designed to convert Deep Learning code between
+frameworks (e.g., PyTorch to JAX/Flax, Keras 3 to TensorFlow) with mathematical rigor.</p>
+<p>It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem by decoupling <strong>Specification</strong> (the Abstract Operation) from
+<strong>Implementation</strong> (the Framework API) using a <strong>Hub-and-Spoke</strong> architecture. Rather than writing translators for every
+pair of frameworks, we map every framework to a central “Abstract Standard.”</p>
 <hr class="docutils"/>
 <section id="the-semantic-pivot-strategy">
 <h2 id="the-semantic-pivot-strategy">🏗️ The Semantic Pivot Strategy<a class="headerlink" href="#the-semantic-pivot-strategy" title="Link to this heading">¶</a></h2>
 <p>The conversion process is a three-step movement through an abstract intermediate state:</p>
 <ol class="arabic simple">
-<li><p><strong>Ingest (Source <span class="math notranslate nohighlight">\(\to\)</span> Hub):</strong> The system identifies a framework call (e.g., <code class="docutils literal notranslate"><span class="pre">torch.permute</span></code>) and maps it to an <strong>Abstract Operation</strong> (e.g., <code class="docutils literal notranslate"><span class="pre">permute_dims</span></code>) using the source framework’s snapshot or adapter definition.</p></li>
-<li><p><strong>Pivot (Normalization):</strong> Arguments are reordered, renamed, unpacked, and validated to match the Abstract Standard (The “Hub” signature).</p></li>
-<li><p><strong>Project (Hub <span class="math notranslate nohighlight">\(\to\)</span> Target):</strong> The system looks up the implementation for the target framework (e.g., <code class="docutils literal notranslate"><span class="pre">jax.numpy.transpose</span></code>) and generates the corresponding AST, applying any necessary DSL logic (Layout Permutation, Macros) or Plugin hooks.</p></li>
+<li><p><strong>Ingest (Source <span class="math notranslate nohighlight">\(\to\)</span> Hub):</strong> The system identifies a framework call (e.g., <code class="docutils literal notranslate"><span class="pre">torch.permute</span></code>) and maps it to an *
+<em>Abstract Operation</em>* (e.g., <code class="docutils literal notranslate"><span class="pre">permute_dims</span></code>) using the source framework’s snapshot or adapter definition. It also
+normalizes input formats (assignments, attributes) into a unified AST.</p></li>
+<li><p><strong>Pivot (Normalization):</strong> Arguments are reordered, renamed, unpacked, and validated to match the Abstract Standard (
+The “Hub” signature).</p></li>
+<li><p><strong>Project (Hub <span class="math notranslate nohighlight">\(\to\)</span> Target):</strong> The system looks up the implementation for the target framework (e.g.,
+<code class="docutils literal notranslate"><span class="pre">jax.numpy.transpose</span></code>) and generates the corresponding AST, applying any necessary DSL logic (Layout Permutation,
+Macros) or Plugin hooks.</p></li>
 </ol>
 </section>
 <hr class="docutils"/>
 <section id="the-knowledge-base-hub-spoke">
 <h2 id="the-knowledge-base-hub-spoke">🧩 1. The Knowledge Base (Hub &amp; Spoke)<a class="headerlink" href="#the-knowledge-base-hub-spoke" title="Link to this heading">¶</a></h2>
-<p>The core dataset driving the transpiler is distributed across two layers. This separation allows the “What” (Standard) to evolve independently of the “How” (Implementation).</p>
+<p>The core dataset driving the transpiler is distributed across two layers. This separation allows the “What” (Standard)
+to evolve independently of the “How” (Implementation).</p>
 <pre class="mermaid">
         graph TD
     %% --- STYLE DEFINITIONS ---
@@ -839,7 +852,7 @@ window.addEventListener("load", load);
     %% --- PHASE 2: STORAGE ---
     subgraph P2 ["2. Semantics Manager"]
         direction TB
-        HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;standards_internal.py&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
+        HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
         SPOKE[("&lt;b&gt;The Spokes (Variants)&lt;/b&gt;&lt;br/&gt;snapshots/*.json&lt;br/&gt;&lt;i&gt;Framework Implementations&lt;/i&gt;")]:::spoke
         
         %% Internal Context Link
@@ -861,7 +874,7 @@ window.addEventListener("load", load);
     SPOKE -.-&gt;|"Read Variants"| TESTER
     </pre><section id="the-hub-semantic-specifications">
 <h3 id="the-hub-semantic-specifications">The Hub: Semantic Specifications<a class="headerlink" href="#the-hub-semantic-specifications" title="Link to this heading">¶</a></h3>
-<p>Defines <strong>WHAT</strong> an operation is. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code> and JSON files.</p>
+<p>Defines <strong>WHAT</strong> an operation is. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/*.json</span></code> and internal defaults.</p>
 <ul class="simple">
 <li><p><strong>Tier A (Math):</strong> <code class="docutils literal notranslate"><span class="pre">k_array_api.json</span></code> — Array API Standard (NumPy-like).</p></li>
 <li><p><strong>Tier B (Neural):</strong> <code class="docutils literal notranslate"><span class="pre">k_neural_net.json</span></code> — ONNX Operators (Layers, Activations).</p></li>
@@ -870,25 +883,29 @@ window.addEventListener("load", load);
 </section>
 <section id="the-spokes-framework-overlays">
 <h3 id="the-spokes-framework-overlays">The Spokes: Framework Overlays<a class="headerlink" href="#the-spokes-framework-overlays" title="Link to this heading">¶</a></h3>
-<p>Defines <strong>HOW</strong> a specific framework implements the standard. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (Live) or <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code> (Ghost).</p>
+<p>Defines <strong>HOW</strong> a specific framework implements the standard. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (Live)
+or <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code> (Ghost).</p>
 <ul class="simple">
 <li><p><strong>API Path:</strong> E.g., <code class="docutils literal notranslate"><span class="pre">torch.abs</span></code>, <code class="docutils literal notranslate"><span class="pre">jax.numpy.abs</span></code>.</p></li>
 <li><p><strong>Argument Map:</strong> E.g., <code class="docutils literal notranslate"><span class="pre">{"input":</span> <span class="pre">"x",</span> <span class="pre">"dim":</span> <span class="pre">"axis"}</span></code>.</p></li>
 <li><p><strong>DSL Config:</strong> Layout maps, Macros, Type Casting rules.</p></li>
 </ul>
-<p>This architecture supports <strong>Ghost Mode</strong>: The engine can transpile code even if the source or target framework libraries are not installed locally, because the API signatures are captured in JSON snapshots.</p>
+<p>This supports <strong>Ghost Mode</strong>, allowing the engine to transpile code even if source/target libraries are not installed
+locally.</p>
 </section>
 </section>
 <hr class="docutils"/>
 <section id="the-transpilation-engine">
 <h2 id="the-transpilation-engine">⚡ 2. The Transpilation Engine<a class="headerlink" href="#the-transpilation-engine" title="Link to this heading">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">ASTEngine</span></code> orchestrates the conversion pipeline. It parses source code into a detailed Abstract Syntax Tree (LibCST), performs safety analysis, transforms the tree, and handles output refinement.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ASTEngine</span></code> orchestrates the conversion pipeline. It handles parsing, deep analysis, optimization, and
+transformation.</p>
 <pre class="mermaid">
         graph TD
     %% --- STYLE DEFINITIONS ---
     classDef default font-family:'Google Sans',color:#20344b,stroke:#20344b;
     classDef artifact fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono',stroke-dasharray: 0;
     classDef process fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
+    classDef optimization fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
     classDef kb fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
     classDef plugin fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
     classDef output fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
@@ -898,58 +915,82 @@ window.addEventListener("load", load);
     
     subgraph ENGINE ["AST Engine"]
         direction TB
-        ANALYSIS("1. Safety Analysis&lt;br/&gt;(Purity/Deps Check)"):::process
+        INGEST("1. Ingestion&lt;br/&gt;(Python/MLIR/TikZ)"):::process
         
+        subgraph ANALYSIS_BLOCK [" Analysis Phase "]
+            SYMBOLS("Symbol Table"):::process
+            PURITY("Purity &amp; Safety"):::process
+        end
+
         SERVER[("Semantics&lt;br/&gt;Manager")]:::kb
         
-        REWRITER("2. Pivot Rewriter"):::process
+        GRAPH_OPT("2. Graph Optimizer&lt;br/&gt;(Fusion)"):::optimization
+        
+        REWRITER("3. Pivot Rewriter"):::process
         PLUGINS{{Plugin &amp; DSL System}}:::plugin
         
-        FIXER("3. Refinement&lt;br/&gt;(Import Fixer)"):::process
+        FIXER("4. Refinement&lt;br/&gt;(Import Fixer)"):::process
     end
     
     TGT("Target Code"):::output
 
     %% --- EDGES ---
-    SRC --&gt; ANALYSIS
-    ANALYSIS --&gt; REWRITER
+    SRC --&gt; INGEST
+    INGEST --&gt; SYMBOLS
+    SYMBOLS --&gt; PURITY
+    PURITY --&gt; GRAPH_OPT
     
+    GRAPH_OPT --&gt; REWRITER
     SERVER -.-&gt;|"Lookup API"| REWRITER
     REWRITER &lt;--&gt;|"Complex Logic"| PLUGINS
     
     REWRITER --&gt; FIXER
     FIXER --&gt; TGT
-    </pre><section id="analysis-phase">
-<h3 id="analysis-phase">1. Analysis Phase<a class="headerlink" href="#analysis-phase" title="Link to this heading">¶</a></h3>
-<p>Before touching the code, the engine scans for safety violations.</p>
+    </pre><section id="ingestion-analysis">
+<h3 id="ingestion-analysis">1. Ingestion &amp; Analysis<a class="headerlink" href="#ingestion-analysis" title="Link to this heading">¶</a></h3>
+<p>Before touching the code, the engine parses and scans for context.</p>
 <ul class="simple">
-<li><p><strong>PurityScanner:</strong> Detects side effects (IO, Globals, in-place list mutation) unsafe for JAX/XLA.</p></li>
-<li><p><strong>LifecycleTracker:</strong> Ensures all class attributes used in <code class="docutils literal notranslate"><span class="pre">forward</span></code> are initialized in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p></li>
-<li><p><strong>DependencyScanner:</strong> Checks for unmapped 3rd-party imports (e.g., <code class="docutils literal notranslate"><span class="pre">pandas/cv2</span></code>).</p></li>
+<li><p><strong>Parsers:</strong> Supports Python (LibCST), MLIR Text, and TikZ/Latex sources via Adapters.</p></li>
+<li><p><strong>SymbolTableAnalyzer:</strong> Infers variable types (e.g., “is <code class="docutils literal notranslate"><span class="pre">x</span></code> a Tensor or a Module?”) and scopes to drive intelligent
+rewriting.</p></li>
+<li><p><strong>PurityScanner:</strong> Detects side effects (IO, Globals, in-place mutation) unsafe for JAX/XLA targets (Enabled via
+<code class="docutils literal notranslate"><span class="pre">PluginTraits</span></code>).</p></li>
+<li><p><strong>LifecycleTracker:</strong> Verification pass ensuring all class attributes used in <code class="docutils literal notranslate"><span class="pre">forward</span></code> are initialized in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p></li>
+</ul>
+</section>
+<section id="optimization-phase-graphoptimizer">
+<h3 id="optimization-phase-graphoptimizer">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)<a class="headerlink" href="#optimization-phase-graphoptimizer" title="Link to this heading">¶</a></h3>
+<p>An optional pass that builds a <code class="docutils literal notranslate"><span class="pre">LogicalGraph</span></code> from the AST and applies fusion patterns.</p>
+<ul class="simple">
+<li><p>Matches sequences like <code class="docutils literal notranslate"><span class="pre">Conv2d</span> <span class="pre">-&gt;</span> <span class="pre">BatchNorm</span> <span class="pre">-&gt;</span> <span class="pre">ReLU</span></code>.</p></li>
+<li><p>Replaces them with fused macro operations (e.g., <code class="docutils literal notranslate"><span class="pre">FusedCBR</span></code>) based on <code class="docutils literal notranslate"><span class="pre">PatternDef</span></code> in Semantics.</p></li>
 </ul>
 </section>
 <section id="rewriting-phase-pivotrewriter">
-<h3 id="rewriting-phase-pivotrewriter">2. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#rewriting-phase-pivotrewriter" title="Link to this heading">¶</a></h3>
+<h3 id="rewriting-phase-pivotrewriter">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#rewriting-phase-pivotrewriter" title="Link to this heading">¶</a></h3>
 <p>The core transformer is built on a Mixin architecture:</p>
 <ul class="simple">
-<li><p><strong>StructureMixin:</strong> Handles Class/Function definitions. Converts <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> to <code class="docutils literal notranslate"><span class="pre">flax.nnx.Module</span></code>, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code>, and injects state arguments (<code class="docutils literal notranslate"><span class="pre">rngs</span></code>) into constructors.</p></li>
-<li><p><strong>CallMixin:</strong> Handles function invocations. Resolves the source call to an Abstract ID, looks up the target implementation, creates argument pivots, applies functional unwrapping, and dispatches plugins.</p></li>
-<li><p><strong>NormalizationMixin:</strong> Handles argument type alignment (keyword vs positional), defaults injection, and variadic packing.</p></li>
-<li><p><strong>AttributesMixin:</strong> Handles constant renaming (e.g., <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">jnp.float32</span></code>).</p></li>
+<li><p><strong>StructureMixin:</strong> Handles Class/Function definitions (swaps Base classes, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code>, injects <code class="docutils literal notranslate"><span class="pre">rngs</span></code> args).</p></li>
+<li><p><strong>CallMixin:</strong> The workhorse. Resolves calls to Abstract IDs, applies Layout Permutation, Argument Normalization, and
+dispatches to Plugins.</p></li>
+<li><p><strong>AttributeMixin:</strong> Handles constant renaming (e.g., <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">jnp.float32</span></code>) and stateful assignment
+tracking.</p></li>
 </ul>
 </section>
 <section id="refinement-phase">
-<h3 id="refinement-phase">3. Refinement Phase<a class="headerlink" href="#refinement-phase" title="Link to this heading">¶</a></h3>
+<h3 id="refinement-phase">4. Refinement Phase<a class="headerlink" href="#refinement-phase" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>ImportFixer:</strong> An intelligent pass that scans the <em>generated</em> AST. It injects required imports (e.g., <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) only if used and prunes unused source imports. It handles alias conflicts defined in <code class="docutils literal notranslate"><span class="pre">SemanticsManager</span></code>.</p></li>
-<li><p><strong>StructuralLinter:</strong> A final sanity check that flags any residual artifacts from the source framework that failed conversion.</p></li>
+<li><p><strong>ImportFixer:</strong> An intelligent pass that post-processes the AST. It injects required imports (e.g.,
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) only if used and prunes unused source imports.</p></li>
+<li><p><strong>StructuralLinter:</strong> A final sanity verification that flags any residual artifacts from the source framework.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils"/>
 <section id="framework-adapters-traits-hierarchy">
 <h2 id="framework-adapters-traits-hierarchy">🔌 3. Framework Adapters (Traits &amp; Hierarchy)<a class="headerlink" href="#framework-adapters-traits-hierarchy" title="Link to this heading">¶</a></h2>
-<p>Support for specific libraries resides in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>. Adapters provide <strong>Traits</strong> to the engine rather than hardcoded logic.</p>
+<p>Support for specific libraries resides in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>. Adapters provide <strong>Traits</strong> to the engine
+rather than hardcoded logic.</p>
 <section id="structural-traits">
 <h3 id="structural-traits">Structural Traits<a class="headerlink" href="#structural-traits" title="Link to this heading">¶</a></h3>
 <p>Adapters define a <code class="docutils literal notranslate"><span class="pre">StructuralTraits</span></code> configuration object that controls syntax generation:</p>
@@ -973,25 +1014,31 @@ window.addEventListener("load", load);
 <hr class="docutils"/>
 <section id="dsl-plugin-system">
 <h2 id="dsl-plugin-system">🧠 4. DSL &amp; Plugin System<a class="headerlink" href="#dsl-plugin-system" title="Link to this heading">¶</a></h2>
-<p>The system favors declarative logic in the ODL (Operation Definition Language) over python code, but falls back to Python Hooks for complex structural changes.</p>
+<p>The system favors declarative logic in the ODL (Operation Definition Language) over python code, but falls back to
+Python Hooks for complex structural changes.</p>
 <section id="core-dsl-logic-in-pivotrewriter">
 <h3 id="core-dsl-logic-in-pivotrewriter">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#core-dsl-logic-in-pivotrewriter" title="Link to this heading">¶</a></h3>
 <p>Common patterns are handled directly by the engine using the ODL schema:</p>
 <ul class="simple">
 <li><p><strong>Variadic Packing:</strong> <code class="docutils literal notranslate"><span class="pre">pack_to_tuple="axes"</span></code> converts <code class="docutils literal notranslate"><span class="pre">permute(x,</span> <span class="pre">0,</span> <span class="pre">1)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">transpose(x,</span> <span class="pre">axes=(0,</span> <span class="pre">1))</span></code>.</p></li>
-<li><p><strong>Layout Mapping:</strong> <code class="docutils literal notranslate"><span class="pre">layout_map={"input":</span> <span class="pre">"NCHW-&gt;NHWC"}</span></code> injects permutation calls automatically.</p></li>
+<li><p><strong>Layout Mapping:</strong> <code class="docutils literal notranslate"><span class="pre">layout_map={"input":</span> <span class="pre">"NCHW-&gt;NHWC"}</span></code> injects permutation calls via <code class="docutils literal notranslate"><span class="pre">inject_permute_call</span></code>.</p></li>
 <li><p><strong>Macros:</strong> <code class="docutils literal notranslate"><span class="pre">macro_template="{x}</span> <span class="pre">*</span> <span class="pre">sigmoid({x})"</span></code> expands composite ops inline.</p></li>
-<li><p><strong>Dispatch Rules:</strong> <code class="docutils literal notranslate"><span class="pre">dispatch_rules</span></code> switch APIs based on argument values (e.g. <code class="docutils literal notranslate"><span class="pre">mode="nearest"</span></code> uses a different function).</p></li>
+<li><p><strong>Dispatch Rules:</strong> <code class="docutils literal notranslate"><span class="pre">dispatch_rules</span></code> switch APIs based on argument values at runtime (e.g. <code class="docutils literal notranslate"><span class="pre">mode="nearest"</span></code> uses a
+different function).</p></li>
 </ul>
 </section>
 <section id="plugin-hooks-in-src-ml-switcheroo-plugins">
 <h3 id="plugin-hooks-in-src-ml-switcheroo-plugins">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)<a class="headerlink" href="#plugin-hooks-in-src-ml-switcheroo-plugins" title="Link to this heading">¶</a></h3>
 <p>Complex architectural mismatches are handled by Python functions registered via <code class="docutils literal notranslate"><span class="pre">@register_hook</span></code>.</p>
 <ul class="simple">
-<li><p><strong>RNG Threading (<code class="docutils literal notranslate"><span class="pre">rng_threading</span></code>):</strong> Transforms global seeds to explicit JAX keys. Injects <code class="docutils literal notranslate"><span class="pre">rng,</span> <span class="pre">key</span> <span class="pre">=</span> <span class="pre">split(rng)</span></code> preambles and adds <code class="docutils literal notranslate"><span class="pre">key</span></code> arguments.</p></li>
-<li><p><strong>Context Wrappers (<code class="docutils literal notranslate"><span class="pre">context_to_function_wrap</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> to <code class="docutils literal notranslate"><span class="pre">contextlib.nullcontext()</span></code> for JAX, stripping the global state semantics while preserving the block.</p></li>
-<li><p><strong>State Containers (<code class="docutils literal notranslate"><span class="pre">state_container</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">register_buffer</span></code>/<code class="docutils literal notranslate"><span class="pre">Parameter</span></code> calls into framework-specific object wrappers (e.g., <code class="docutils literal notranslate"><span class="pre">nnx.BatchStat</span></code>, <code class="docutils literal notranslate"><span class="pre">nnx.Param</span></code>).</p></li>
-<li><p><strong>IO Handlers (<code class="docutils literal notranslate"><span class="pre">io_handler</span></code>):</strong> Maps <code class="docutils literal notranslate"><span class="pre">torch.save</span></code> to <code class="docutils literal notranslate"><span class="pre">orbax.checkpoint</span></code> or <code class="docutils literal notranslate"><span class="pre">tf.io.write_file</span></code> depending on the target adapter’s I/O configuration.</p></li>
+<li><p><strong>RNG Threading (<code class="docutils literal notranslate"><span class="pre">rng_threading</span></code>):</strong> Transforms global seeds to explicit JAX keys. Injects <code class="docutils literal notranslate"><span class="pre">rng,</span> <span class="pre">key</span> <span class="pre">=</span> <span class="pre">split(rng)</span></code>
+preambles.</p></li>
+<li><p><strong>Context Wrappers (<code class="docutils literal notranslate"><span class="pre">context_to_function_wrap</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> to <code class="docutils literal notranslate"><span class="pre">contextlib.nullcontext()</span></code> for JAX.</p></li>
+<li><p><strong>State Containers (<code class="docutils literal notranslate"><span class="pre">state_container</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">register_buffer</span></code>/<code class="docutils literal notranslate"><span class="pre">Parameter</span></code> calls into framework-specific object
+wrappers (e.g., <code class="docutils literal notranslate"><span class="pre">nnx.BatchStat</span></code>, <code class="docutils literal notranslate"><span class="pre">nnx.Param</span></code>).</p></li>
+<li><p><strong>IO Handlers (<code class="docutils literal notranslate"><span class="pre">io_handler</span></code>):</strong> Maps <code class="docutils literal notranslate"><span class="pre">torch.save</span></code> to <code class="docutils literal notranslate"><span class="pre">orbax.checkpoint</span></code> or <code class="docutils literal notranslate"><span class="pre">tf.io.write_file</span></code> depending on the target
+adapter’s I/O configuration.</p></li>
+<li><p><strong>Data Loaders (<code class="docutils literal notranslate"><span class="pre">convert_dataloader</span></code>):</strong> Injects a generic Shim class to replace <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code>.</p></li>
 </ul>
 </section>
 </section>

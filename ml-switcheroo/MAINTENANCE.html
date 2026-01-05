@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="_static/trace_render.js?v=4ddbab91"></script>
-    <script src="_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="_static/op_tabs.js?v=cd874ca5"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
@@ -842,42 +842,46 @@ window.addEventListener("load", load);
             
   <section class="tex2jax_ignore mathjax_ignore" id="maintenance">
 <h1 id="maintenance--page-root">Maintenance<a class="headerlink" href="#maintenance--page-root" title="Link to this heading">¶</a></h1>
-<p><strong>ml-switcheroo</strong> is a data-driven transpiler. Its intelligence relies on a distributed <strong>Knowledge Base</strong> separating <em>Abstract Specifications</em> (The Hub) from <em>Framework Implementations</em> (The Spokes).</p>
-<p>Maintenance primarily involves synchronizing this knowledge base with the ecosystem of Machine Learning libraries and upstream standards.</p>
+<p><strong>ml-switcheroo</strong> is a data-driven transpiler. Its intelligence relies on a distributed <strong>Knowledge Base</strong> separating
+<em>Abstract Specifications</em> (The Hub) from <em>Framework Implementations</em> (The Spokes).</p>
+<p>Maintenance primarily involves synchronizing this knowledge base with the ecosystem of Machine Learning libraries and
+upstream standards.</p>
 <p>This guide covers the full lifecycle: <strong>Ingestion</strong>, <strong>Discovery</strong>, <strong>Mapping</strong>, <strong>Verification</strong>, and <strong>Release</strong>.</p>
 <hr class="docutils"/>
 <section id="the-maintenance-lifecycle">
 <h2 id="the-maintenance-lifecycle">🔄 The Maintenance Lifecycle<a class="headerlink" href="#the-maintenance-lifecycle" title="Link to this heading">¶</a></h2>
-<p>Data flows from external authoritative sources (Standards Bodies, Library APIs) into our semantic storage tiers, and finally into verification reports.</p>
+<p>Data flows from external authoritative sources (Standards Bodies, Library APIs) into our semantic storage tiers, and
+finally into verification reports.</p>
 <pre class="mermaid">
         graph TD
-    %% Style definitions
-    classDef external fill:#ea4335,stroke:#20344b,color:#ffffff,rx:5px;
-    classDef hub fill:#f9ab00,stroke:#20344b,color:#20344b,rx:5px;
-    classDef spoke fill:#fff4c7,stroke:#f9ab00,stroke-dasharray: 5 5,color:#20344b,rx:5px;
-    classDef action fill:#4285f4,stroke:#20344b,color:#ffffff,rx:5px;
+    %% --- STYLE DEFINITIONS ---
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef external fill:#ea4335,stroke:#20344b,color:#ffffff,rx:5px,font-family:'Google Sans Medium';
+    classDef hub fill:#f9ab00,stroke:#20344b,color:#20344b,rx:5px,font-family:'Google Sans Medium';
+    classDef spoke fill:#ffd427,stroke:#f9ab00,stroke-dasharray:5,5,color:#20344b,rx:5px,font-family:'Google Sans Medium';
+    classDef action fill:#4285f4,stroke:#20344b,color:#ffffff,rx:5px,font-family:'Google Sans Medium';
 
-    subgraph Sources [1. Upstream Sources]
+    subgraph Sources ["1. Upstream Sources"]
         direction TB
         STD_A("Array API Standard&lt;br/&gt;(Python Consortium)"):::external
         STD_B("ONNX Operators&lt;br/&gt;(Linux Foundation)"):::external
         LIBS("Installed Libraries&lt;br/&gt;(Torch, JAX, TF)"):::external
     end
 
-    subgraph Ingestion [2. Ingestion &amp; Discovery]
+    subgraph Ingestion ["2. Ingestion &amp; Discovery"]
         IMPORT("import-spec"):::action
         SCAFFOLD("scaffold / sync"):::action
         CONSENSUS("sync-standards&lt;br/&gt;(Consensus Engine)"):::action
         HARVEST("harvest&lt;br/&gt;(Learn from Tests)"):::action
     end
 
-    subgraph Storage [3. Knowledge Base]
+    subgraph Storage ["3. Knowledge Base"]
         direction TB
         HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Definitions &amp; Types&lt;/i&gt;")]:::hub
         SPOKE[("&lt;b&gt;The Spokes (Maps)&lt;/b&gt;&lt;br/&gt;snapshots/*_mappings.json&lt;br/&gt;&lt;i&gt;API Links &amp; Plugins&lt;/i&gt;")]:::spoke
     end
     
-    subgraph Verify [4. Verification]
+    subgraph Verify ["4. Verification"]
         CI("CI Fuzzer &amp;&lt;br/&gt;Gen-Tests"):::action
         LOCK("Verified Lockfile&lt;br/&gt;README Matrix"):::spoke
     end
@@ -899,14 +903,15 @@ window.addEventListener("load", load);
 <hr class="docutils"/>
 <section id="quick-start-the-bootstrap-script">
 <h2 id="quick-start-the-bootstrap-script">⚡ Quick Start: The Bootstrap Script<a class="headerlink" href="#quick-start-the-bootstrap-script" title="Link to this heading">¶</a></h2>
-<p>The entire Knowledge Base can be hydrated from scratch using the bootstrap utility. This script sequentially runs ingestion, consensus discovery, scaffolding, ghost snapshotting, and synchronization for all supported frameworks.</p>
+<p>The entire Knowledge Base can be hydrated from scratch using the bootstrap utility. This script sequentially runs
+ingestion, consensus discovery, scaffolding, ghost snapshotting, and synchronization for all supported frameworks.</p>
 <p><strong>Run this when:</strong></p>
 <ul class="simple">
 <li><p>You have added a new framework adapter.</p></li>
 <li><p>You want to update mappings for newer versions of PyTorch/JAX/TF.</p></li>
 <li><p>You want to reset the semantic definitions to their upstream defaults.</p></li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Full hydration cycle (Warning: Overwrites existing JSONs)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Full hydration cycle (Warning: Overwrites existing JSONs) </span>
 ./scripts/bootstrap.sh
 </pre></div>
 </div>
@@ -939,7 +944,9 @@ ml_switcheroo<span class="w"> </span>import-spec<span class="w"> </span>./_tmp/o
 </section>
 <section id="discovery-consensus-engine">
 <h3 id="discovery-consensus-engine">Discovery (Consensus Engine)<a class="headerlink" href="#discovery-consensus-engine" title="Link to this heading">¶</a></h3>
-<p>For operations not covered by official bodies (e.g., Optimizers, proprietary Layers), we use the <strong>Consensus Engine</strong>. It scans all installed frameworks, clusters compatible API signatures (e.g., <code class="docutils literal notranslate"><span class="pre">Torch.Adam</span></code> vs <code class="docutils literal notranslate"><span class="pre">Flax.Adam</span></code>), and proposes a unified standard.</p>
+<p>For operations not covered by official bodies (e.g., Optimizers, proprietary Layers), we use the <strong>Consensus Engine</strong>.
+It scans all installed frameworks, clusters compatible API signatures (e.g., <code class="docutils literal notranslate"><span class="pre">Torch.Adam</span></code> vs <code class="docutils literal notranslate"><span class="pre">Flax.Adam</span></code>), and proposes
+a unified standard.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Scan installed libs and generate k_discovered.json</span>
 ml_switcheroo<span class="w"> </span>sync-standards<span class="w"> </span>--categories<span class="w"> </span>layer<span class="w"> </span>activation<span class="w"> </span>loss<span class="w"> </span>optimizer
 </pre></div>
@@ -949,7 +956,8 @@ ml_switcheroo<span class="w"> </span>sync-standards<span class="w"> </span>--cat
 <hr class="docutils"/>
 <section id="phase-2-mapping-the-spokes">
 <h2 id="phase-2-mapping-the-spokes">🔗 Phase 2: Mapping (The Spokes)<a class="headerlink" href="#phase-2-mapping-the-spokes" title="Link to this heading">¶</a></h2>
-<p>Once the Hub (Specs) is populated, we link specific frameworks to it defining <strong>HOW</strong> operations are implemented. These mappings live in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code>.</p>
+<p>Once the Hub (Specs) is populated, we link specific frameworks to it defining <strong>HOW</strong> operations are implemented. These
+mappings live in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code>.</p>
 <section id="mapping-a-framework-sync">
 <h3 id="mapping-a-framework-sync">Mapping a Framework (<code class="docutils literal notranslate"><span class="pre">sync</span></code>)<a class="headerlink" href="#mapping-a-framework-sync" title="Link to this heading">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">sync</span></code> command introspects a library (e.g., <code class="docutils literal notranslate"><span class="pre">torch</span></code>) and matches its API surface against the known Spec.</p>
@@ -963,7 +971,8 @@ ml_switcheroo<span class="w"> </span>sync<span class="w"> </span>jax
 </section>
 <section id="heuristic-scaffolding-scaffold">
 <h3 id="heuristic-scaffolding-scaffold">Heuristic Scaffolding (<code class="docutils literal notranslate"><span class="pre">scaffold</span></code>)<a class="headerlink" href="#heuristic-scaffolding-scaffold" title="Link to this heading">¶</a></h3>
-<p>For frameworks with non-standard naming conventions (e.g., <code class="docutils literal notranslate"><span class="pre">tensorflow</span></code>), use the <code class="docutils literal notranslate"><span class="pre">scaffold</span></code> command. It utilizes regex patterns defined in the Framework Adapter’s <code class="docutils literal notranslate"><span class="pre">discovery_heuristics</span></code> property to fuzzy-match APIs.</p>
+<p>For frameworks with non-standard naming conventions (e.g., <code class="docutils literal notranslate"><span class="pre">tensorflow</span></code>), use the <code class="docutils literal notranslate"><span class="pre">scaffold</span></code> command. It utilizes regex
+patterns defined in the Framework Adapter’s <code class="docutils literal notranslate"><span class="pre">discovery_heuristics</span></code> property to fuzzy-match APIs.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Scan and populate mappings via regex heuristics</span>
 ml_switcheroo<span class="w"> </span>scaffold<span class="w"> </span>--frameworks<span class="w"> </span>tensorflow<span class="w"> </span>mlx
 </pre></div>
@@ -971,12 +980,13 @@ ml_switcheroo<span class="w"> </span>scaffold<span class="w"> </span>--framework
 </section>
 <section id="semantic-harvesting-harvest">
 <h3 id="semantic-harvesting-harvest">Semantic Harvesting (<code class="docutils literal notranslate"><span class="pre">harvest</span></code>)<a class="headerlink" href="#semantic-harvesting-harvest" title="Link to this heading">¶</a></h3>
-<p>The most robust way to maintain mappings is to “Learn from Humans.” If you write a manual test case fixing a translation error, the Harvester can extract the rule back into the JSONs.</p>
+<p>The most robust way to maintain mappings is to “Learn from Humans.” If you write a manual test case fixing a translation
+error, the Harvester can extract the rule back into the JSONs.</p>
 <ol class="arabic">
 <li><p><strong>Write/Fix a test</strong> in <code class="docutils literal notranslate"><span class="pre">tests/examples/</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_custom_add</span><span class="p">():</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">test_custom_add</span><span class="p">():</span> 
     <span class="c1"># You manually fixed arguments: alpha -&gt; scale</span>
-    <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span> 
 </pre></div>
 </div>
 </li>
@@ -991,10 +1001,12 @@ ml_switcheroo<span class="w"> </span>scaffold<span class="w"> </span>--framework
 <hr class="docutils"/>
 <section id="phase-3-ghost-mode-support">
 <h2 id="phase-3-ghost-mode-support">👻 Phase 3: Ghost Mode Support<a class="headerlink" href="#phase-3-ghost-mode-support" title="Link to this heading">¶</a></h2>
-<p>ml-switcheroo can run in browser environments (WebAssembly) where heavy libraries like PyTorch cannot be installed. To support this, we must capture raw API signatures.</p>
+<p>ml-switcheroo can run in browser environments (WebAssembly) where heavy libraries like PyTorch cannot be installed. To
+support this, we must capture raw API signatures.</p>
 <section id="capturing-snapshots">
 <h3 id="capturing-snapshots">Capturing Snapshots<a class="headerlink" href="#capturing-snapshots" title="Link to this heading">¶</a></h3>
-<p>This command dumps the raw introspection data (signatures, docstrings, class hierarchies) of installed libraries into JSON files. This data allows the <code class="docutils literal notranslate"><span class="pre">GhostInspector</span></code> to simulate the presence of the library during transpilation.</p>
+<p>This command dumps the raw introspection data (signatures, docstrings, class hierarchies) of installed libraries into
+JSON files. This data allows the <code class="docutils literal notranslate"><span class="pre">GhostInspector</span></code> to simulate the presence of the library during transpilation.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generates files like snapshots/torch_v2.1.0.json</span>
 ml_switcheroo<span class="w"> </span>snapshot<span class="w"> </span>--out-dir<span class="w"> </span>src/ml_switcheroo/snapshots
 </pre></div>
@@ -1005,11 +1017,12 @@ ml_switcheroo<span class="w"> </span>snapshot<span class="w"> </span>--out-dir<s
 <hr class="docutils"/>
 <section id="phase-4-verification-ci-loop">
 <h2 id="phase-4-verification-ci-loop">✅ Phase 4: Verification (CI Loop)<a class="headerlink" href="#phase-4-verification-ci-loop" title="Link to this heading">¶</a></h2>
-<p>We validate the mathematical correctness of mappings using a robotic fuzzer. It generates random inputs based on Type Hints in the Spec, executes the operation in both Source and Target frameworks, and asserts equivalence.</p>
+<p>We validate the mathematical correctness of mappings using a robotic fuzzer. It generates random inputs based on Type
+Hints in the Spec, executes the operation in both Source and Target frameworks, and asserts equivalence.</p>
 <section id="running-the-fuzzer">
 <h3 id="running-the-fuzzer">Running the Fuzzer<a class="headerlink" href="#running-the-fuzzer" title="Link to this heading">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Install all backends</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[test]"</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[test]"</span><span class="w"> </span>
 pip<span class="w"> </span>install<span class="w"> </span>torch<span class="w"> </span>jax<span class="w"> </span>flax<span class="w"> </span>tensorflow<span class="w"> </span>mlx<span class="w"> </span>numpy
 
 <span class="c1"># 2. Run Verification Suite</span>
@@ -1038,7 +1051,8 @@ ml_switcheroo<span class="w"> </span>ci
 <p>The project documentation (Sphinx) includes a client-side WebAssembly (WASM) demo powered by Pyodide.</p>
 <section id="building-docs-wheel">
 <h3 id="building-docs-wheel">Building Docs &amp; Wheel<a class="headerlink" href="#building-docs-wheel" title="Link to this heading">¶</a></h3>
-<p>The documentation build script automatically packages the current source into a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> and injects it into the static site assets.</p>
+<p>The documentation build script automatically packages the current source into a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> and injects it into the static
+site assets.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/build_docs.py
 </pre></div>
 </div>
@@ -1064,7 +1078,7 @@ ml_switcheroo<span class="w"> </span>ci
 </tr>
 <tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">semantics/k_neural_net.json</span></code></p></td>
 <td class="text-left"><p><strong>Hub (Spec)</strong></p></td>
-<td class="text-left"><p><strong>Tier B (Neural):</strong> Stateful layers (Conv2d, LSTM) derived from ONNX Operators.</p></td>
+<td class="text-left"><p><strong>Tier B (Neural):</strong> stateful layers (Conv2d, LSTM) derived from ONNX Operators.</p></td>
 <td class="text-left"><p><strong>Import</strong> via <code class="docutils literal notranslate"><span class="pre">import-spec</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">semantics/k_framework_extras.json</span></code></p></td>

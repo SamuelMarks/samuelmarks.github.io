@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -357,8 +357,16 @@
 <span id="ml-switcheroo-generated-tests-inputs"></span><h1 id="api-ml-switcheroo-generated-tests-inputs-index--page-root">ml_switcheroo.generated_tests.inputs<a class="headerlink" href="#api-ml-switcheroo-generated-tests-inputs-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Input Value Code Generation.</p>
 <p>This module handles the logic for generating Python <em>source code strings</em> that
-instantiate test data. It parses argument definitions and emits code like
-<cite>random.randint(1, 5)</cite> or <cite>np.random.randn(…)</cite>.</p>
+instantiate test data explicitly in the generated verification scripts.
+It parses argument definitions and emits code like <cite>random.randint(1, 5)</cite>
+or <cite>np.random.randn(…)</cite>.</p>
+<p>Features:</p>
+<ul class="simple">
+<li><p>Infers generation logic from explicit types.</p></li>
+<li><p><strong>Default Value Inference</strong>: Uses default values to guess types when explicit
+hints are missing (e.g. <cite>default=True</cite> implies boolean generation).</p></li>
+<li><p><strong>Constraint Inference</strong>: Uses <cite>min</cite>/<cite>max</cite> to govern random ranges.</p></li>
+</ul>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -378,16 +386,16 @@ instantiate test data. It parses argument definitions and emits code like
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.inputs.parse_arg_def">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.inputs.</span></span><span class="sig-name descname"><span class="pre">parse_arg_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.inputs.parse_arg_def" title="Link to this definition">¶</a></dt>
 <dd><p>Normalizes a heterogeneous argument definition into a standard dictionary.</p>
+<p>Extracts <cite>default</cite>, <cite>min</cite>, <cite>max</cite> to help downstream inference.
+Defaults un-typed arguments to ‘Array’ to ensure gradient checks in
+test generators correctly identify implicit tensors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>arg</strong> – An argument definition. Can be a string (“x”), a tuple (“x”, “int”),
 or a dictionary (ODL schema).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Normalized dict with keys ‘name’, ‘type’, and optional constraints.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict</p>
+<dd class="field-even"><p>Normalized dict with keys ‘name’, ‘type’, ‘default’, and constraints.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -395,6 +403,14 @@ or a dictionary (ODL schema).</p>
 <dt class="sig sig-object py" id="ml_switcheroo.generated_tests.inputs.generate_input_value_code">
 <span class="sig-prename descclassname"><span class="pre">ml_switcheroo.generated_tests.inputs.</span></span><span class="sig-name descname"><span class="pre">generate_input_value_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ml_switcheroo.generated_tests.inputs.generate_input_value_code" title="Link to this definition">¶</a></dt>
 <dd><p>Generates Python code string to instantiate inputs based on type/constraints.</p>
+<p>Prioritizes:</p>
+<ol class="arabic simple">
+<li><p>Explicit <cite>options</cite> list.</p></li>
+<li><p>Explicit <cite>type</cite> hint.</p></li>
+<li><p>Inference from <cite>default</cite> value if type is Any.</p></li>
+<li><p>Inference from <cite>min</cite>/<cite>max</cite> constraints.</p></li>
+<li><p>Heuristics based on argument name.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -404,9 +420,6 @@ or a dictionary (ODL schema).</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Valid Python source code expression (e.g., “random.randint(0, 5)”).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>

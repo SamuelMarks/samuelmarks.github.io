@@ -12,9 +12,18 @@ ml_switcheroo.semantics.schema
 
    Updated to support:
    - `PluginTraits`: Capability flags for decoupling plugins from framework identifiers.
-   - Rich Argument Definitions in `std_args`.
+   - Rich Argument Definitions in `std_args` with Typed Defaults (Any).
    - Conditional Dispatch Rules.
+   - **PatternDef**: Graph fusion patterns.
 
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.semantics.schema.Variant
 
 
 Classes
@@ -26,9 +35,6 @@ Classes
    ml_switcheroo.semantics.schema.StructuralTraits
    ml_switcheroo.semantics.schema.FrameworkAlias
    ml_switcheroo.semantics.schema.FrameworkTraits
-   ml_switcheroo.semantics.schema.Rule
-   ml_switcheroo.semantics.schema.Variant
-   ml_switcheroo.semantics.schema.ParameterDef
    ml_switcheroo.semantics.schema.OpDefinition
    ml_switcheroo.semantics.schema.SemanticsFile
 
@@ -42,8 +48,6 @@ Module Contents
 
 
    Defines capability flags for a framework to guide plugin logic.
-   This decouples plugins from hardcoded framework names (e.g., checking "if jax"
-   becomes "if traits.has_numpy_compatible_arrays").
 
 
    .. py:attribute:: model_config
@@ -93,7 +97,6 @@ Module Contents
 
 
    Defines structural patterns for a framework to guide generic rewriters.
-   This allows adding new frameworks (like MLX, TinyGrad) without editing python code.
 
 
    .. py:attribute:: model_config
@@ -250,370 +253,14 @@ Module Contents
 
 
 
-.. py:class:: Rule(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Declarative rule for conditional logic within a variant.
-   Evaluated at runtime to dynamically switch APIs.
-
-
-   .. py:attribute:: model_config
-
-      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
-
-
-   .. py:attribute:: if_arg
-      :type:  str
-      :value: None
-
-
-
-   .. py:attribute:: op
-      :type:  ml_switcheroo.enums.LogicOp
-      :value: None
-
-
-
-   .. py:attribute:: is_val
-      :type:  Union[str, int, float, bool, List[Union[str, int, float]]]
-      :value: None
-
-
-
-   .. py:attribute:: use_api
-      :type:  str
-      :value: None
-
-
-
-.. py:class:: Variant(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Defines how a specific framework implements an abstract operation.
-
-
-   .. py:attribute:: model_config
-
-      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
-
-
-   .. py:attribute:: api
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: args
-      :type:  Optional[Dict[str, str]]
-      :value: None
-
-
-
-   .. py:attribute:: arg_values
-      :type:  Optional[Dict[str, Dict[str, str]]]
-      :value: None
-
-
-
-   .. py:attribute:: kwargs_map
-      :type:  Optional[Dict[str, str]]
-      :value: None
-
-
-
-   .. py:attribute:: inject_args
-      :type:  Optional[Dict[str, Union[str, int, float, bool]]]
-      :value: None
-
-
-
-   .. py:attribute:: casts
-      :type:  Optional[Dict[str, str]]
-      :value: None
-
-
-
-   .. py:attribute:: requires_plugin
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: dispatch_rules
-      :type:  List[Rule]
-      :value: None
-
-
-
-   .. py:attribute:: pack_to_tuple
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: layout_map
-      :type:  Optional[Dict[str, str]]
-      :value: None
-
-
-
-   .. py:attribute:: transformation_type
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: operator
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: macro_template
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: output_select_index
-      :type:  Optional[int]
-      :value: None
-
-
-
-   .. py:attribute:: output_adapter
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: output_cast
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: min_version
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: max_version
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: required_imports
-      :type:  List[Union[str, Any]]
-      :value: None
-
-
-
-   .. py:attribute:: missing_message
-      :type:  Optional[str]
-      :value: None
-
-
-
-.. py:class:: ParameterDef(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Definition of a single argument in an abstract operation signature.
-
-
-   .. py:attribute:: name
-      :type:  str
-      :value: None
-
-
-
-   .. py:attribute:: type
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: doc
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: default
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: min
-      :type:  Optional[float]
-      :value: None
-
-
-
-   .. py:attribute:: max
-      :type:  Optional[float]
-      :value: None
-
-
-
-   .. py:attribute:: options
-      :type:  Optional[List[Union[str, int, float, bool]]]
-      :value: None
-
-
-
-   .. py:attribute:: rank
-      :type:  Optional[int]
-      :value: None
-
-
-
-   .. py:attribute:: dtype
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: shape_spec
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: is_variadic
-      :type:  bool
-      :value: None
-
-
-
-   .. py:attribute:: kind
-      :type:  str
-      :value: None
-
-
+.. py:data:: Variant
 
 .. py:class:: OpDefinition(/, **data: Any)
 
-   Bases: :py:obj:`pydantic.BaseModel`
+   Bases: :py:obj:`ml_switcheroo.core.dsl.OperationDef`
 
 
-   Definition of an Abstract Operation standard.
-
-
-   .. py:attribute:: model_config
-
-      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
-
-
-   .. py:attribute:: operation
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: description
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: from_file
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: std_args
-      :type:  List[Union[str, Tuple[str, str], ParameterDef, Dict[str, Any]]]
-      :value: None
-
-
-
-   .. py:attribute:: variants
-      :type:  Dict[str, Optional[Variant]]
-      :value: None
-
-
-
-   .. py:attribute:: scaffold_plugins
-      :type:  List[Any]
-      :value: None
-
-
-
-   .. py:attribute:: op_type
-      :type:  Any
-      :value: 'function'
-
-
-
-   .. py:attribute:: return_type
-      :type:  Optional[str]
-      :value: 'Any'
-
-
-
-   .. py:attribute:: is_inplace
-      :type:  bool
-      :value: False
-
-
-
-   .. py:attribute:: test_rtol
-      :type:  float
-      :value: 0.001
-
-
-
-   .. py:attribute:: test_atol
-      :type:  float
-      :value: 0.0001
-
-
-
-   .. py:attribute:: skip_fuzzing
-      :type:  bool
-      :value: False
-
-
-
-   .. py:attribute:: nondeterministic
-      :type:  bool
-      :value: False
-
-
-
-   .. py:attribute:: differentiable
-      :type:  bool
-      :value: True
-
-
-
-   .. py:attribute:: deprecated
-      :type:  bool
-      :value: False
-
-
-
-   .. py:attribute:: output_shape_calc
-      :type:  Optional[str]
-      :value: None
-
-
-
-   .. py:attribute:: complexity
-      :type:  Optional[str]
-      :value: None
-
+   Compat alias for OperationDef to match existing codebase usage.
 
 
 .. py:class:: SemanticsFile(/, **data: Any)
@@ -637,6 +284,12 @@ Module Contents
 
    .. py:attribute:: imports
       :type:  Optional[Dict[str, Any]]
+      :value: None
+
+
+
+   .. py:attribute:: patterns
+      :type:  Optional[List[ml_switcheroo.core.dsl.PatternDef]]
       :value: None
 
 

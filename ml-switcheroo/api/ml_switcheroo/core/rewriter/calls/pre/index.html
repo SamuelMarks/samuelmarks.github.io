@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../../search.html" />
@@ -358,12 +358,15 @@
   <section id="module-ml_switcheroo.core.rewriter.calls.pre">
 <span id="ml-switcheroo-core-rewriter-calls-pre"></span><h1 id="api-ml-switcheroo-core-rewriter-calls-pre-index--page-root">ml_switcheroo.core.rewriter.calls.pre<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-calls-pre-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Pre-processing Phase for Call Rewriting.</p>
-<p>Handles logic that must occur before the core semantic lookup:
-1.  <strong>Functional Unwrapping</strong>: Converting <cite>apply</cite> patterns if converting from functional frameworks.
-2.  <strong>Plugin Claims</strong>: Heuristic execution of plugins (like in-place unrolling).
-3.  <strong>Lifecycle Management</strong>: Stripping methods like <cite>.cuda()</cite> or <cite>.eval()</cite>.
-4.  <strong>Stateful Calls</strong>: Rewriting calls that require state injection.
-5.  <strong>Implicit Resolution</strong>: Guessing API paths for method calls on objects.</p>
+<p>Handles logic that must occur before the core semantic lookup:</p>
+<ol class="arabic simple">
+<li><p><strong>Functional Unwrapping</strong>: Converting <code class="docutils literal notranslate"><span class="pre">apply</span></code> patterns if converting from functional frameworks.</p></li>
+<li><p><strong>Plugin Claims</strong>: Heuristic execution of plugins (like in-place unrolling).</p></li>
+<li><p><strong>Lifecycle Management</strong>: Stripping methods like <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code> or <code class="docutils literal notranslate"><span class="pre">.eval()</span></code>.</p></li>
+<li><p><strong>Stateful Calls</strong>: Rewriting calls that require state injection.</p></li>
+<li><p><strong>Implicit Resolution</strong>: Guessing API paths for method calls on objects, using
+Symbol Table inference or heuristic fallbacks.</p></li>
+</ol>
 <section id="functions">
 <h2 id="functions">Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -381,33 +384,51 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.pre.handle_pre_checks">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.pre.</span></span><span class="sig-name descname"><span class="pre">handle_pre_checks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rewriter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/calls/pre.py#L24-L117"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.pre.handle_pre_checks" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.pre.</span></span><span class="sig-name descname"><span class="pre">handle_pre_checks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rewriter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/calls/pre.py#L26-L130"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.pre.handle_pre_checks" title="Link to this definition">¶</a></dt>
 <dd><p>Executes pre-lookup checks and transformations.</p>
+<p>These checks handle framework-specific idioms that don’t map cleanly via
+simple API renaming (e.g., in-place operations, lifecycle management,
+functional state patterns).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><cite>handled (bool)</cite>: If True, the transformation is complete and should return early.</p></li>
-<li><p><cite>node (cst.CSTNode)</cite>: The result node (or updated node if not handled).</p></li>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rewriter</strong> – The parent Rewriter instance containing context and config.</p></li>
+<li><p><strong>original</strong> – The original CST node (before traversal).</p></li>
+<li><p><strong>updated</strong> – The updated CST node (after children handling).</p></li>
+<li><p><strong>func_name</strong> – The resolved fully qualified name of the function, or None if unresolved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A tuple containing:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">handled</span> <span class="pre">(bool)</span></code>: If True, the transformation is complete and should return early.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">node</span> <span class="pre">(cst.CSTNode)</span></code>: The result node (or updated node if not handled).</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Tuple[bool, cst.CSTNode]</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[bool, cst.CSTNode]</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.calls.pre.resolve_implicit_method">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.pre.</span></span><span class="sig-name descname"><span class="pre">resolve_implicit_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rewriter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/calls/pre.py#L120-L157"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.pre.resolve_implicit_method" title="Link to this definition">¶</a></dt>
-<dd><p>Attempts to resolve method calls on objects to full API paths.
-E.g. <cite>x.float()</cite> -&gt; <cite>torch.Tensor.float</cite>.</p>
-<p>This function attempts to find a match in the Semantic Knowledge Base
-by checking implicit root classes (e.g. <cite>torch.Tensor</cite>) defined in source traits.</p>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.calls.pre.</span></span><span class="sig-name descname"><span class="pre">resolve_implicit_method</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rewriter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/calls/pre.py#L133-L195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.calls.pre.resolve_implicit_method" title="Link to this definition">¶</a></dt>
+<dd><p>Attempts to resolve method calls on objects to full API paths.</p>
+<p class="rubric">Example</p>
+<p><code class="docutils literal notranslate"><span class="pre">x.view()</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">torch.Tensor.view</span></code></p>
+<p>Logic:</p>
+<ol class="arabic simple">
+<li><p><strong>Type Inference</strong>: Consults the Symbol Table (if available) to determine
+the type of the receiver object (e.g., it is a Tensor).</p></li>
+<li><p><strong>Heuristic Fallback</strong>: Checks implicit root classes (e.g. <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code>)
+defined in the source traits to guess if the method belongs to them.</p></li>
+</ol>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rewriter</strong> – The calling rewriter.</p></li>
-<li><p><strong>original</strong> – The original CST node.</p></li>
+<li><p><strong>rewriter</strong> – The calling rewriter instance.</p></li>
+<li><p><strong>original</strong> – The original CST node structure.</p></li>
 <li><p><strong>func_name</strong> – The currently resolved name (usually None or the failed name).</p></li>
 </ul>
 </dd>
@@ -415,7 +436,7 @@ by checking implicit root classes (e.g. <cite>torch.Tensor</cite>) defined in so
 <dd class="field-even"><p>Resolved fully qualified name, or None if no match found.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>Optional[str]</p>
 </dd>
 </dl>
 </dd></dl>

@@ -9,13 +9,14 @@ ml_switcheroo.semantics.merging
 
    This module handles the aggregation of disparate knowledge sources (Specs, Snapshots)
    into the central SemanticsManager. It resolves conflicts based on Tier Precedence
-   and merges framework-specific configurations.
+   and merging framework-specific configurations.
 
    Handles:
    - Merging Specification Tiers (Math, Neural, Extras).
    - Merging Snapshot Overlays (Framework mappings).
    - Conflict resolution and prioritization (Warning vs Silencing).
    - Merging Framework Traits and Import Maps.
+   - **Merging Patterns**.
 
 
 
@@ -35,6 +36,7 @@ Functions
    ml_switcheroo.semantics.merging.infer_tier_from_priority
    ml_switcheroo.semantics.merging.merge_imports
    ml_switcheroo.semantics.merging.merge_frameworks
+   ml_switcheroo.semantics.merging.merge_patterns
    ml_switcheroo.semantics.merging.merge_tier_data
    ml_switcheroo.semantics.merging.merge_overlay_data
 
@@ -73,7 +75,12 @@ Module Contents
    :param new_configs: Dictionary of framework traits to merge.
 
 
-.. py:function:: merge_tier_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], new_content: Dict[str, Any], tier: ml_switcheroo.enums.SemanticTier) -> None
+.. py:function:: merge_patterns(master_patterns: List[ml_switcheroo.semantics.schema.PatternDef], new_patterns: List[Any]) -> None
+
+   Append new patterns to the master list, avoiding duplicates by name.
+
+
+.. py:function:: merge_tier_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], new_content: Dict[str, Any], tier: ml_switcheroo.enums.SemanticTier, patterns: Optional[List[ml_switcheroo.semantics.schema.PatternDef]] = None) -> None
 
    Merges content from a Specification file (hub) into the manager state.
 
@@ -87,6 +94,7 @@ Module Contents
    :param framework_configs: Master dictionary of framework traits.
    :param new_content: The JSON content being loaded.
    :param tier: The Semantic Tier of the file being loaded.
+   :param patterns: Master list of fusion patterns (optional).
 
 
 .. py:function:: merge_overlay_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], test_templates: Dict[str, Dict], content: Dict[str, Any], filename: str) -> None

@@ -11,8 +11,10 @@ injector_spec
    by locating the `INTERNAL_OPS` dictionary and appending a new operation definition
    derived from an ODL (Operation Definition Language) model.
 
-   Update: Now supports persisting semantic constraints (min, max, options) into
-   the dictionary structure.
+   Updates:
+   - Supports persistent semantic constraints (min, max, options).
+   - Checks for duplicate keys to prevent overwriting existing definitions.
+   - Uses robust string literal generation.
 
 
 
@@ -51,10 +53,11 @@ Module Contents
 
       Visits assignment statements to find `INTERNAL_OPS`.
 
-      If found, modifies the dictionary value to include the new key-value pair.
+      If found, modifies the dictionary value to include the new key-value pair,
+      UNLESS the key already exists.
 
       :param original_node: The node before transformation.
-      :param updated_node: The node after transformation (containing any recursive changes).
+      :param updated_node: The node after transformation.
 
       :returns: The modified assignment node.
       :rtype: cst.Assign

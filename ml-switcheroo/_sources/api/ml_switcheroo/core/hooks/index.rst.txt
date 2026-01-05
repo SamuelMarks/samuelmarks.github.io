@@ -15,6 +15,7 @@ ml_switcheroo.core.hooks
        - Added `auto_wire` support to the `register_hook` decorator.
        - Plugins can now declare their own Semantic definitions.
        - HookContext now exposes `plugin_traits` and `current_variant` for data-driven logic.
+       - **New**: `resolve_type` method to query Symbol Table.
 
 
 
@@ -23,6 +24,7 @@ Attributes
 
 .. autoapisummary::
 
+   ml_switcheroo.core.hooks.SymbolTableType
    ml_switcheroo.core.hooks.SemanticsManagerType
    ml_switcheroo.core.hooks.T
    ml_switcheroo.core.hooks.ArgInjectorType
@@ -54,6 +56,8 @@ Functions
 Module Contents
 ---------------
 
+.. py:data:: SymbolTableType
+
 .. py:data:: SemanticsManagerType
 
 .. py:data:: T
@@ -82,7 +86,7 @@ Module Contents
 
 
 
-.. py:class:: HookContext(semantics: SemanticsManagerType, config: ml_switcheroo.config.RuntimeConfig, arg_injector: Optional[ArgInjectorType] = None, preamble_injector: Optional[PreambleInjectorType] = None)
+.. py:class:: HookContext(semantics: SemanticsManagerType, config: ml_switcheroo.config.RuntimeConfig, arg_injector: Optional[ArgInjectorType] = None, preamble_injector: Optional[PreambleInjectorType] = None, symbol_table: Optional[SymbolTableType] = None)
 
    Context object passed to every plugin hook during transcoding.
 
@@ -107,6 +111,17 @@ Module Contents
    .. py:attribute:: current_op_id
       :type:  Optional[str]
       :value: None
+
+
+
+   .. py:method:: resolve_type(node: Any) -> Optional[str]
+
+      Queries the Symbol Table for the inferred type of a node.
+
+      :param node: The LibCST node to inspect.
+
+      :returns: "Tensor" if it's a tensor, "Module" if module, or None.
+      :rtype: str
 
 
 

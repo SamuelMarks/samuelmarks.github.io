@@ -15,7 +15,9 @@ ml_switcheroo.core.engine
 
    1.  **Ingestion**: Adapter Hooks (LaTeX) or Standard Parsing (Python/MLIR/TikZ).
    2.  **Emission**: Adapter Hooks (LaTeX) or Standard Emission (Python/MLIR/TikZ).
-   3.  **Transformation**: Purity, Lifecycle, Dependency checks, Rewriting, Import Fixing.
+   3.  **Analysis**: Symbol Table Inference, Purity, Lifecycle, Dependency checks.
+   4.  **Transformation**: Rewriting via PivotRewriter.
+   5.  **Refinement**: Import Fixing and Linting.
 
 
 
@@ -24,53 +26,13 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.engine.ConversionResult
    ml_switcheroo.core.engine.ASTEngine
 
 
 Module Contents
 ---------------
 
-.. py:class:: ConversionResult(/, **data: Any)
-
-   Bases: :py:obj:`pydantic.BaseModel`
-
-
-   Container for the results of a transpilation job.
-
-
-   .. py:attribute:: code
-      :type:  str
-      :value: None
-
-
-
-   .. py:attribute:: errors
-      :type:  List[str]
-      :value: None
-
-
-
-   .. py:attribute:: success
-      :type:  bool
-      :value: None
-
-
-
-   .. py:attribute:: trace_events
-      :type:  List[Dict[str, Any]]
-      :value: None
-
-
-
-   .. py:property:: has_errors
-      :type: bool
-
-
-      Check if the result contains any error messages.
-
-
-.. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
+.. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, enable_fusion: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
 
    The main compilation unit.
 
@@ -118,7 +80,7 @@ Module Contents
 
 
 
-   .. py:method:: run(code: str) -> ConversionResult
+   .. py:method:: run(code: str) -> ml_switcheroo.core.conversion_result.ConversionResult
 
       Executes the full transpilation pipeline.
 
@@ -126,8 +88,10 @@ Module Contents
 
       1.  **Ingestion**: Parse source (Python/MLIR/LaTeX) to AST.
       2.  **Short-Circuit**: If target is non-Python (MLIR/TikZ/Latex), emit immediately.
-      3.  **Analysis**: Run Purity, Lifecycle, and Dependency checks.
-      4.  **Rewriting**: Execute `PivotRewriter` to transform the AST.
+      3.  **Analysis**:
+          - Run Symbol Table Analyzer for type inference.
+          - Run Purity, Lifecycle, and Dependency checks.
+      4.  **Transformation**: Rewriting via PivotRewriter.
       5.  **Refinement**: Run `ImportFixer` and `StructuralLinter` to clean results.
 
       :param code: The source code string to transpile.

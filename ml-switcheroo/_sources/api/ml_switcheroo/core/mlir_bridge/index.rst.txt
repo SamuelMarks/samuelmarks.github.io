@@ -1,0 +1,42 @@
+ml_switcheroo.core.mlir_bridge
+==============================
+
+.. py:module:: ml_switcheroo.core.mlir_bridge
+
+.. autoapi-nested-parse::
+
+   MLIR Round-trip Verification Logic.
+
+   This module provides utilities to verify structural integrity by converting
+   Python ASTs to MLIR and back. These functions are separated to keep the main
+   engine logic focused on high-level orchestration.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.mlir_bridge.run_mlir_roundtrip
+
+
+Module Contents
+---------------
+
+.. py:function:: run_mlir_roundtrip(tree: libcst.Module, tracer: Any) -> libcst.Module
+
+   Executes CST -> MLIR Text -> CST pipeline for verification.
+
+   Used when intermediate="mlir" is selected to verify the structural integrity
+   of the MLIR bridge. Captures and logs exceptions to the tracer without
+   crashing the pipeline.
+
+   :param tree: The Python CST to verify.
+   :param tracer: The active trace logger for recording the phases and any mutations
+                  or warnings.
+
+   :returns: A reconstructed Python CST if successful, or the original tree if the
+             roundtrip fails (ensuring fail-safe behavior).
+
+

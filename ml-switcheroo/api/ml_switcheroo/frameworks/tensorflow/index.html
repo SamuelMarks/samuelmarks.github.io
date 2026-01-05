@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -391,6 +391,14 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_serialization_syntax()</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_conversion_imports" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_weight_conversion_imports()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_load_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_weight_load_code()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tensor_to_numpy_expr" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_tensor_to_numpy_expr()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_save_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_weight_save_code()</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.convert" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.convert()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_doc_url" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TensorFlowAdapter.get_doc_url()</span></code></a>
@@ -424,7 +432,8 @@ between abstract operations and <code class="docutils literal notranslate"><span
 <p>It supports:
 1.  <strong>Live Inspection</strong>: Scanning installed TensorFlow modules for new operations.
 2.  <strong>Ghost Mode</strong>: Loading API signatures from JSON snapshots when TF is not installed.
-3.  <strong>Semantic Definitions</strong>: Static mappings for standard Math, NN, and Optimization ops.</p>
+3.  <strong>Semantic Definitions</strong>: Static mappings for standard Math, NN, and Optimization ops.
+4.  <strong>Weight Migration</strong>: Loading checkpoints via <code class="docutils literal notranslate"><span class="pre">tf.train.load_checkpoint</span></code>.</p>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -453,7 +462,7 @@ between abstract operations and <code class="docutils literal notranslate"><span
 <dd></dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.tensorflow.</span></span><span class="sig-name descname"><span class="pre">TensorFlowAdapter</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L34-L576"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.tensorflow.</span></span><span class="sig-name descname"><span class="pre">TensorFlowAdapter</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L38-L598"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Adapter for TensorFlow (Core &amp; Keras).</p>
 <p>Handles the specific idioms of TensorFlow 2.x, including:
 -   mapping <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> to <code class="docutils literal notranslate"><span class="pre">keras.Layer</span></code>.
@@ -575,7 +584,7 @@ TensorFlow requires no special initialization imports beyond the standard test c
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_harness_init_code">
-<span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L184-L192"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L188-L196"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns initialization logic for the verification harness.
 TensorFlow handles state implicitly, so no RNG setup code is needed.</p>
 <dl class="field-list simple">
@@ -589,8 +598,16 @@ TensorFlow handles state implicitly, so no RNG setup code is needed.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_to_numpy_code">
-<span class="sig-name descname"><span class="pre">get_to_numpy_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L194-L198"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_to_numpy_code" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_to_numpy_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L198-L205"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_to_numpy_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns code to convert TF tensors to NumPy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Code string using safe attribute check.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.declared_magic_args">
@@ -652,9 +669,8 @@ but lack of functional state requirements.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.definitions" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the static dictionary of Operation Mappings.</p>
-<p>This mapping defines how Abstract Operations (e.g. ‘Abs’, ‘Conv2d’) are
-implemented in TensorFlow.</p>
+<dd><p>Returns the static dictionary of Operation Mappings.
+Loaded dynamically from <cite>frameworks/definitions/tensorflow.json</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The mapping dictionary.</p>
@@ -680,7 +696,7 @@ Used by the PurityScanner to detect side-effects.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.collect_api">
-<span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L337-L352"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.collect_api" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/ghost/index.html#ml_switcheroo.core.ghost.GhostRef" title="ml_switcheroo.core.ghost.GhostRef"><span class="pre">ml_switcheroo.core.ghost.GhostRef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L286-L301"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.collect_api" title="Link to this definition">¶</a></dt>
 <dd><p>Collects API definitions for the discovery process.</p>
 <p>Delegates to <code class="docutils literal notranslate"><span class="pre">_collect_ghost</span></code> if in Ghost Mode, otherwise runs
 <code class="docutils literal notranslate"><span class="pre">_collect_live</span></code> to inspect the installed library.</p>
@@ -698,7 +714,7 @@ Used by the PurityScanner to detect side-effects.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.apply_wiring">
-<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L413-L421"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L362-L370"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
 <dd><p>Applies manual wiring patches to the generated snapshot.
 TensorFlow currently requires no manual wiring corrections.</p>
 <dl class="field-list simple">
@@ -709,7 +725,7 @@ TensorFlow currently requires no manual wiring corrections.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_example_code">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L423-L431"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_example_code" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L372-L380"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_example_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the primary example code used for documentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -722,7 +738,7 @@ TensorFlow currently requires no manual wiring corrections.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tiered_examples">
-<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L433-L473"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L382-L420"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
 <dd><p>Returns example snippets for each semantic tier.</p>
 <p>Used by the interactive web demo and documentation generator.</p>
 <dl class="field-list simple">
@@ -736,7 +752,7 @@ TensorFlow currently requires no manual wiring corrections.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_syntax">
-<span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L475-L500"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L424-L449"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Generates Python code for defining a device context in TensorFlow.</p>
 <p>Example: <code class="docutils literal notranslate"><span class="pre">tf.device('GPU:0')</span></code></p>
 <dl class="field-list simple">
@@ -756,7 +772,7 @@ TensorFlow currently requires no manual wiring corrections.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_check_syntax">
-<span class="sig-name descname"><span class="pre">get_device_check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L502-L509"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_check_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_device_check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L451-L458"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_device_check_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Returns Python code to check for GPU availability.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -769,7 +785,7 @@ TensorFlow currently requires no manual wiring corrections.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_rng_split_syntax">
-<span class="sig-name descname"><span class="pre">get_rng_split_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L511-L523"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_rng_split_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_rng_split_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L460-L472"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_rng_split_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Returns syntax for splitting RNG state.
 Since TF uses internal state, this returns ‘pass’ (no-op).</p>
 <dl class="field-list simple">
@@ -789,7 +805,7 @@ Since TF uses internal state, this returns ‘pass’ (no-op).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_imports">
-<span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L525-L532"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L474-L481"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
 <dd><p>Returns imports required for IO operations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -802,7 +818,7 @@ Since TF uses internal state, this returns ‘pass’ (no-op).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_syntax">
-<span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L534-L550"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L483-L499"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Generates code for saving or loading artifacts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -821,8 +837,66 @@ Since TF uses internal state, this returns ‘pass’ (no-op).</p>
 </dl>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_conversion_imports">
+<span class="sig-name descname"><span class="pre">get_weight_conversion_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L503-L510"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_conversion_imports" title="Link to this definition">¶</a></dt>
+<dd><p>Returns imports required for the generated weight migration script.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of import statements.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_load_code">
+<span class="sig-name descname"><span class="pre">get_weight_load_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L512-L533"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_load_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns Python code to load a TF checkpoint into a raw dict found in <cite>raw_state</cite>.
+Attempt to load variable map if available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_var</strong> – Variable name containing file path.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Code block string.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tensor_to_numpy_expr">
+<span class="sig-name descname"><span class="pre">get_tensor_to_numpy_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L535-L545"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_tensor_to_numpy_expr" title="Link to this definition">¶</a></dt>
+<dd><p>Returns expression to convert a TF tensor to a NumPy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tensor_var</strong> – Variable name of the tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Conversion expression string.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_save_code">
+<span class="sig-name descname"><span class="pre">get_weight_save_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L547-L566"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_weight_save_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns logic (stubbed with warning) for saving weights.
+TensorFlow checkpoint saving generally requires a model instance structure,
+so raw dictionary saving is not supported in the standalone migration script.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_var</strong> – Unused state variable name.</p></li>
+<li><p><strong>path_var</strong> – Unused path variable name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Warning print code.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L552-L568"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.convert" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L568-L584"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.convert" title="Link to this definition">¶</a></dt>
 <dd><p>Converts input data (NumPy/List) into TensorFlow Tensors.
 Used by the Fuzzer for validation.</p>
 <dl class="field-list simple">
@@ -839,9 +913,20 @@ Used by the Fuzzer for validation.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_doc_url">
-<span class="sig-name descname"><span class="pre">get_doc_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L570-L576"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_doc_url" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_doc_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/tensorflow.py#L586-L598"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.tensorflow.TensorFlowAdapter.get_doc_url" title="Link to this definition">¶</a></dt>
 <dd><p>Generates TensorFlow API documentation URL.
 Corrects internal <cite>tensorflow</cite> path to <cite>tf</cite> for doc references.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>api_name</strong> (<em>str</em>) – API Path.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>URL.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[str]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>

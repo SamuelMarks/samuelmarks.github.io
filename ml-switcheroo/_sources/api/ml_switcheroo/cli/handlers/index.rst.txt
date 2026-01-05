@@ -7,6 +7,8 @@ ml_switcheroo.cli.handlers
 
    CLI handlers module.
 
+   Exposes individual command handler functions aggregated by domain.
+
 
 
 Submodules
@@ -17,6 +19,7 @@ Submodules
 
    /api/ml_switcheroo/cli/handlers/audit/index
    /api/ml_switcheroo/cli/handlers/convert/index
+   /api/ml_switcheroo/cli/handlers/convert_weights/index
    /api/ml_switcheroo/cli/handlers/define/index
    /api/ml_switcheroo/cli/handlers/dev/index
    /api/ml_switcheroo/cli/handlers/discovery/index
@@ -111,8 +114,7 @@ Package Contents
 
    :param out_dir: Optional custom output directory. Defaults to package/snapshots.
 
-   :returns: Exit code.
-   :rtype: int
+   :returns: Exit code (0 for success, 1 for failure).
 
 
 .. py:function:: handle_sync(framework: str) -> int
@@ -121,17 +123,16 @@ Package Contents
 
    Links the Abstract Standards (Hub) to the concrete implementation in a
    specific framework. This process involves:
-   1.  Reading the Specs from `semantics/`.
+   1.  Reading the Specs from ``semantics/``.
    2.  Introspecting the installed framework to find matching APIs.
    3.  **Merging Static Definitions** from the Adapter (for Ghost support).
    4.  Applying Adapter-specific manual wiring (plugins, templates).
    5.  **Persisting Test Configuration templates**.
-   6.  Writing the results to the Snapshot Overlay (`snapshots/{fw}_mappings.json`).
+   6.  Writing the results to the Snapshot Overlay (``snapshots/{fw}_mappings.json``).
 
    :param framework: The framework key to sync (e.g. 'torch', 'jax').
 
-   :returns: Exit code.
-   :rtype: int
+   :returns: Exit code (0 for success, 1 for failure).
 
 
 .. py:function:: handle_wizard(package: str) -> int
@@ -164,15 +165,33 @@ Package Contents
 .. py:function:: handle_matrix() -> int
 
    Handles 'matrix' command.
+   Prints the compatibility table to stdout.
+
+   :returns: 0 on success.
+   :rtype: int
 
 
 .. py:function:: handle_docs(source: str, target: str, out_path: pathlib.Path) -> int
 
    Handles 'gen-docs' command.
+   Generates a migration guide Markdown file.
+
+   :param source: Source framework key.
+   :param target: Target framework key.
+   :param out_path: Output file path.
+
+   :returns: 0 on success.
+   :rtype: int
 
 
 .. py:function:: handle_gen_tests(out: pathlib.Path) -> int
 
    Handles 'gen-tests' command.
+   Generates physical test files for known APIs.
+
+   :param out: Output file path.
+
+   :returns: 0 on success.
+   :rtype: int
 
 

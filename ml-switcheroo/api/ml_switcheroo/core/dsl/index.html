@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -467,6 +467,18 @@
         </li></ul>
             </nav>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.PatternDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PatternDef</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.PatternDef.name" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PatternDef.name</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.PatternDef.sequence" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PatternDef.sequence</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.PatternDef.replace_with" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PatternDef.replace_with</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.PatternDef.allow_partial" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">PatternDef.allow_partial</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.OperationDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">OperationDef</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.core.dsl.OperationDef.operation" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">OperationDef.operation</span></code></a>
@@ -536,11 +548,14 @@
 for defining new operations. It represents the source of truth for generating
 new operation definitions in the codebase, enforcing schema validity before
 AST injection occurs.</p>
-<p>It defines the structure for:
-- Parameters (types, constraints, shapes, dtypes).
-- Variants (framework implementations).
-- Plugins (scaffolding logic).
-- Operations (abstract definitions).</p>
+<p>It defines the structure for:</p>
+<ul class="simple">
+<li><p>Parameters (types, constraints, shapes, dtypes).</p></li>
+<li><p>Variants (framework implementations).</p></li>
+<li><p>Plugins (scaffolding logic).</p></li>
+<li><p>Operations (abstract definitions).</p></li>
+<li><p><strong>Patterns</strong>: Graph fusion rules.</p></li>
+</ul>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -569,7 +584,10 @@ AST injection occurs.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.dsl.PluginScaffoldDef" title="ml_switcheroo.core.dsl.PluginScaffoldDef"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PluginScaffoldDef</span></code></a></p></td>
 <td><p>Metadata for generating a new Python plugin file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.dsl.OperationDef" title="ml_switcheroo.core.dsl.OperationDef"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationDef</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.dsl.PatternDef" title="ml_switcheroo.core.dsl.PatternDef"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatternDef</span></code></a></p></td>
+<td><p>Definition of a subgraph pattern for Graph Fusion.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.dsl.OperationDef" title="ml_switcheroo.core.dsl.OperationDef"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationDef</span></code></a></p></td>
 <td><p>Top-level definition of a new Abstract Operation.</p></td>
 </tr>
 </tbody>
@@ -579,7 +597,7 @@ AST injection occurs.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.OpType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">OpType</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L22-L29"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.OpType" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">OpType</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L24-L31"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.OpType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>Classification of the operation’s syntactic usage.</p>
 <dl class="py attribute">
@@ -597,7 +615,7 @@ AST injection occurs.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.ContainerType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">ContainerType</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L32-L38"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.ContainerType" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">ContainerType</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L34-L40"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.ContainerType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>Supported container types for argument packing.</p>
 <dl class="py attribute">
@@ -611,7 +629,7 @@ AST injection occurs.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.ParameterDef">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">ParameterDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L41-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.ParameterDef" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">ParameterDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L43-L93"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.ParameterDef" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Definition of a single argument in an abstract operation signature.</p>
 <p>Updated to support semantic constraints (min, max, options), tensor properties
@@ -631,7 +649,7 @@ guide fuzzing and validation logic.</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.ParameterDef.default">
-<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.ParameterDef.default" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.ParameterDef.default" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.ParameterDef.min">
@@ -668,7 +686,7 @@ guide fuzzing and validation logic.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.Rule">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L89-L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.Rule" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L96-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.Rule" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Declarative rule for conditional logic within a variant or plugin.
 Evaluated at runtime to dynamically switch APIs.</p>
@@ -687,7 +705,7 @@ Evaluated at runtime to dynamically switch APIs.</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.Rule.is_val">
-<span class="sig-name descname"><span class="pre">is_val</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.Rule.is_val" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_val</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.Rule.is_val" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.Rule.use_api">
@@ -696,7 +714,7 @@ Evaluated at runtime to dynamically switch APIs.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.ImportReq">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">ImportReq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L107-L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.ImportReq" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">ImportReq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L114-L120"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.ImportReq" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Structured definition for a required import, supporting aliasing.</p>
 <dl class="py attribute">
@@ -710,7 +728,7 @@ Evaluated at runtime to dynamically switch APIs.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.FrameworkVariant">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">FrameworkVariant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L116-L208"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.FrameworkVariant" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">FrameworkVariant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L123-L215"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.FrameworkVariant" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Configuration for how a specific framework implements an operation.</p>
 <p>Defines the API endpoint, argument mappings, required imports, and versioning constraints.</p>
@@ -732,7 +750,7 @@ Evaluated at runtime to dynamically switch APIs.</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.FrameworkVariant.inject_args">
-<span class="sig-name descname"><span class="pre">inject_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.FrameworkVariant.inject_args" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">inject_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.FrameworkVariant.inject_args" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.FrameworkVariant.casts">
@@ -801,7 +819,7 @@ Evaluated at runtime to dynamically switch APIs.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PluginType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">PluginType</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L211-L217"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.PluginType" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">PluginType</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L218-L224"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.PluginType" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
 <p>Enumeration of supported plugin structures to generate.</p>
 <dl class="py attribute">
@@ -815,7 +833,7 @@ Evaluated at runtime to dynamically switch APIs.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PluginScaffoldDef">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">PluginScaffoldDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L220-L238"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.PluginScaffoldDef" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">PluginScaffoldDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L227-L244"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.PluginScaffoldDef" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Metadata for generating a new Python plugin file.</p>
 <dl class="py attribute">
@@ -840,8 +858,30 @@ Evaluated at runtime to dynamically switch APIs.</p>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py class">
+<dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PatternDef">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">PatternDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L247-L255"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.PatternDef" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
+<p>Definition of a subgraph pattern for Graph Fusion.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PatternDef.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.PatternDef.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PatternDef.sequence">
+<span class="sig-name descname"><span class="pre">sequence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.PatternDef.sequence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PatternDef.replace_with">
+<span class="sig-name descname"><span class="pre">replace_with</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.PatternDef.replace_with" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.dsl.PatternDef.allow_partial">
+<span class="sig-name descname"><span class="pre">allow_partial</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ml_switcheroo.core.dsl.PatternDef.allow_partial" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.dsl.OperationDef">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">OperationDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L241-L295"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.OperationDef" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.dsl.</span></span><span class="sig-name descname"><span class="pre">OperationDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**data:</span> <span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/dsl.py#L258-L312"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.dsl.OperationDef" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pydantic.BaseModel</span></code></p>
 <p>Top-level definition of a new Abstract Operation.</p>
 <p>Contains the semantic signature, documentation, framework implementations,

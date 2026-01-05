@@ -15,6 +15,7 @@ ml_switcheroo.frameworks.keras
    2.  **Layers**: Mapping `keras.layers.*`.
    3.  **Discovery**: Runtime introspection of the Keras API surface.
    4.  **Ghost Mode**: Silent fallback when Keras is not installed.
+   5.  **Weight Migration**: Loading/saving .h5 or .keras files (stubs provided).
 
 
 
@@ -75,12 +76,18 @@ Module Contents
       If in Ghost Mode, returns empty list to prevent Scaffolder
       from attempting to import missing modules.
 
+      :returns: Module names.
+      :rtype: List[str]
+
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
 
       Submodules to exclude from recursive scans.
+
+      :returns: Empty set for Keras properly scoped imports.
+      :rtype: Set[str]
 
 
    .. py:property:: import_alias
@@ -89,12 +96,18 @@ Module Contents
 
       Default import alias.
 
+      :returns: ("keras", "keras").
+      :rtype: Tuple[str, str]
+
 
    .. py:property:: import_namespaces
       :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
       Namespace mapping for import fixer.
+
+      :returns: Configuration for import injection.
+      :rtype: Dict[str, ImportConfig]
 
 
    .. py:property:: discovery_heuristics
@@ -103,12 +116,18 @@ Module Contents
 
       Regex patterns for scaffold categorization.
 
+      :returns: Patterns mapping tiers to paths.
+      :rtype: Dict[str, List[str]]
+
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
       Templates for test code generation.
+
+      :returns: Test Harness values.
+      :rtype: Dict[str, str]
 
 
    .. py:property:: harness_imports
@@ -117,16 +136,25 @@ Module Contents
 
       Imports for verification harness.
 
+      :returns: Empty list.
+      :rtype: List[str]
+
 
    .. py:method:: get_harness_init_code() -> str
 
       Init code for verification harness.
+
+      :returns: Empty string.
+      :rtype: str
 
 
 
    .. py:method:: get_to_numpy_code() -> str
 
       Returns code to convert Keras tensors to NumPy.
+
+      :returns: Conversion logic checking for `numpy` property.
+      :rtype: str
 
 
 
@@ -136,12 +164,18 @@ Module Contents
 
       Supported semantic tiers.
 
+      :returns: [ARRAY_API, NEURAL, EXTRAS].
+      :rtype: List[SemanticTier]
+
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
 
       List of framework-specific magic arguments.
+
+      :returns: Empty list as Keras handles state implicitly.
+      :rtype: List[str]
 
 
    .. py:property:: structural_traits
@@ -150,6 +184,9 @@ Module Contents
 
       Structural transformation rules.
 
+      :returns: Configuration object.
+      :rtype: StructuralTraits
+
 
    .. py:property:: plugin_traits
       :type: Any
@@ -157,12 +194,19 @@ Module Contents
 
       Plugin behavior flags.
 
+      :returns: Object defining capabilities.
+      :rtype: PluginTraits
+
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
       Static mappings for Keras.
+      Loaded dynamically from `frameworks/definitions/keras.json`.
+
+      :returns: Definitions.
+      :rtype: Dict[str, StandardMap]
 
 
    .. py:property:: rng_seed_methods
@@ -171,10 +215,19 @@ Module Contents
 
       Global seed methods.
 
+      :returns: Names like "set_random_seed".
+      :rtype: List[str]
+
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
       Collects API definitions via introspection or snapshot.
+
+      :param category: Category to scan.
+      :type category: StandardCategory
+
+      :returns: Found items.
+      :rtype: List[GhostRef]
 
 
 
@@ -182,11 +235,20 @@ Module Contents
 
       Converts input data to Keras Tensor.
 
+      :param data: Input data.
+      :type data: Any
+
+      :returns: Keras Tensor or original data.
+      :rtype: Any
+
 
 
    .. py:method:: get_serialization_imports() -> List[str]
 
       Imports for saving/loading.
+
+      :returns: Imports.
+      :rtype: List[str]
 
 
 
@@ -194,11 +256,54 @@ Module Contents
 
       Syntax for saving/loading models.
 
+      :param op: 'save' or 'load'.
+      :type op: str
+      :param file_arg: Path string.
+      :type file_arg: str
+      :param object_arg: Object name.
+      :type object_arg: Optional[str]
+
+      :returns: Generated python code.
+      :rtype: str
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+      Returns imports required for the generated weight migration script.
+
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Returns python code to load a checkpoint.
+      Stub implemented as Keras models contain structure + weights, making raw dict handling tricky.
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+      Returns python expression string that converts `tensor_var` from Keras tensor to numpy array.
+
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Returns warning that saving raw dictionary to Keras checkpoint is complex without model definition.
+
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
       Syntax for device scoping.
+
+      :param device_type: 'cuda', 'cpu'.
+      :type device_type: str
+      :param device_index: Index.
+      :type device_index: Optional[str]
+
+      :returns: Generated code.
+      :rtype: str
 
 
 
@@ -206,11 +311,17 @@ Module Contents
 
       Syntax for checking GPU availability.
 
+      :returns: Logic expression.
+      :rtype: str
+
 
 
    .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
 
       Keras handles RNG state internally.
+
+      :returns: "pass".
+      :rtype: str
 
 
 
@@ -218,11 +329,19 @@ Module Contents
 
       Applies configuration wiring.
 
+      :param snapshot: Snapshot dict.
+
 
 
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
       Provides a search URL for Keras documentation as direct API mapping is non-trivial.
+
+      :param api_name: API path.
+      :type api_name: str
+
+      :returns: URL.
+      :rtype: Optional[str]
 
 
 
@@ -232,11 +351,17 @@ Module Contents
 
       Returns example code.
 
+      :returns: Source code.
+      :rtype: str
+
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
 
       Returns tiered examples.
+
+      :returns: Map of tiers to examples.
+      :rtype: Dict[str, str]
 
 
 

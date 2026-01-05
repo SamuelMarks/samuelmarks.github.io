@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -354,12 +354,12 @@
   <section id="module-ml_switcheroo.plugins.loss_wrapper">
 <span id="ml-switcheroo-plugins-loss-wrapper"></span><h1 id="api-ml-switcheroo-plugins-loss-wrapper-index--page-root">ml_switcheroo.plugins.loss_wrapper<a class="headerlink" href="#api-ml-switcheroo-plugins-loss-wrapper-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Plugin for Loss Reduction Semantics.</p>
-<p>Addresses the mismatch between:
-1. PyTorch: <cite>loss = F.cross_entropy(…, reduction=’mean’)</cite> (Scalar output by default).
-2. Functional Frameworks (JAX/Optax): <cite>loss = optax.softmax_cross_entropy(x, y)</cite></p>
-<blockquote>
-<div><p>(Vector output per batch element).</p>
-</div></blockquote>
+<p>Addresses the mismatch between:</p>
+<ol class="arabic simple">
+<li><p>PyTorch: <cite>loss = F.cross_entropy(…, reduction=’mean’)</cite> (Scalar output by default).</p></li>
+<li><p>Functional Frameworks (JAX/Optax): <cite>loss = optax.softmax_cross_entropy(x, y)</cite>
+(Vector output per batch element).</p></li>
+</ol>
 <p>JAX libraries typically return the loss <em>per sample</em> to support vmap/pmap flexibility.
 PyTorch defaults to averaging (<cite>mean</cite>) immediately.</p>
 <p>Transformation:</p>
@@ -385,7 +385,7 @@ framework definition (e.g. <cite>tf.reduce_mean</cite>, <cite>jnp.mean</cite>, <
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="ml_switcheroo.plugins.loss_wrapper.transform_loss_reduction">
-<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loss_wrapper.</span></span><span class="sig-name descname"><span class="pre">transform_loss_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/plugins/loss_wrapper.py#L40-L130"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.plugins.loss_wrapper.transform_loss_reduction" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ml_switcheroo.plugins.loss_wrapper.</span></span><span class="sig-name descname"><span class="pre">transform_loss_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/hooks/index.html#ml_switcheroo.core.hooks.HookContext" title="ml_switcheroo.core.hooks.HookContext"><span class="pre">ml_switcheroo.core.hooks.HookContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.CSTNode</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/plugins/loss_wrapper.py#L37-L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.plugins.loss_wrapper.transform_loss_reduction" title="Link to this definition">¶</a></dt>
 <dd><p>Hook: Wraps loss functions to apply reduction.</p>
 <p>Trigger: Operations mapped with <cite>requires_plugin: “loss_reduction”</cite>.
 Target: Frameworks requiring explicit reduction (JAX, Flax).</p>

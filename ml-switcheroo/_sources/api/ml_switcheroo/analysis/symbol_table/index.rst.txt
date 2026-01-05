@@ -1,0 +1,251 @@
+ml_switcheroo.analysis.symbol_table
+===================================
+
+.. py:module:: ml_switcheroo.analysis.symbol_table
+
+.. autoapi-nested-parse::
+
+   Symbol Table and Type Inference Analysis.
+
+   This module provides a static analysis pass to infer variable types and scopes
+   before rewriting occurs. It builds a mapping of AST nodes to inferred type objects,
+   allowing the rewriter to make decisions based on the semantic type of a variable
+   (e.g., "is this a Tensor?") rather than just its lexical name.
+
+   The `SymbolTableAnalyzer` visitor populates a `SymbolTable` by tracking:
+   1.  **Imports**: Mapping module aliases to `ModuleType`.
+   2.  **Assignments**: Propagating types from RHS to LHS.
+   3.  **Scopes**: Handling nested function/class definitions.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.analysis.symbol_table.SymbolType
+   ml_switcheroo.analysis.symbol_table.TensorType
+   ml_switcheroo.analysis.symbol_table.ModuleType
+   ml_switcheroo.analysis.symbol_table.Scope
+   ml_switcheroo.analysis.symbol_table.SymbolTable
+   ml_switcheroo.analysis.symbol_table.SymbolTableAnalyzer
+
+
+Module Contents
+---------------
+
+.. py:class:: SymbolType
+
+   Base class for inferred types.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+      A string representation of the type (e.g., 'Tensor').
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the type name.
+
+
+
+.. py:class:: TensorType
+
+   Bases: :py:obj:`SymbolType`
+
+
+   Represents a Tensor object from a specific framework.
+
+
+   .. py:attribute:: framework
+      :type:  str
+
+      The framework key (e.g. "torch" or "jax") responsible for this tensor.
+
+
+.. py:class:: ModuleType
+
+   Bases: :py:obj:`SymbolType`
+
+
+   Represents an imported module or sub-module.
+
+
+   .. py:attribute:: path
+      :type:  str
+
+      Fully qualified path string (e.g. "torch.nn").
+
+
+.. py:class:: Scope(parent: Optional[Scope] = None, name: str = '<root>')
+
+   Represents a variable scope (Global, Class, or Function).
+
+
+   .. py:attribute:: parent
+      :value: None
+
+
+
+   .. py:attribute:: name
+      :value: '<root>'
+
+
+
+   .. py:attribute:: symbols
+      :type:  Dict[str, SymbolType]
+
+
+   .. py:method:: set(name: str, sym_type: SymbolType) -> None
+
+      Register a symbol in the current scope.
+
+      :param name: Variable identifier.
+      :param sym_type: Inferred Type object.
+
+
+
+   .. py:method:: get(name: str) -> Optional[SymbolType]
+
+      Resolve a symbol, traversing parent scopes.
+
+      :param name: Variable identifier to lookup.
+
+      :returns: The SymbolType if found, else None.
+
+
+
+.. py:class:: SymbolTable
+
+   Container for analysis results. Maps CST Nodes (by identity) to inferred Types.
+
+
+   .. py:method:: record_type(node: libcst.CSTNode, sym_type: SymbolType) -> None
+
+      Associates a CST node with a type.
+
+      :param node: The CST node.
+      :param sym_type: The determined type.
+
+
+
+   .. py:method:: get_type(node: libcst.CSTNode) -> Optional[SymbolType]
+
+      Retrieves the inferred type for a CST node.
+
+      :param node: The CST node to inspect.
+
+      :returns: The stored SymbolType or None.
+
+
+
+.. py:class:: SymbolTableAnalyzer(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Bases: :py:obj:`libcst.CSTVisitor`
+
+
+   Static Analysis pass to populate the SymbolTable.
+   Runs post-order traversal logic (via leave methods) to propagate types bottom-up.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: table
+
+
+   .. py:attribute:: root_scope
+
+
+   .. py:attribute:: current_scope
+
+
+   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> None
+
+      Enter class scope.
+
+      :param node: Class definition node.
+
+
+
+   .. py:method:: leave_ClassDef(node: libcst.ClassDef) -> None
+
+      Exit class scope.
+
+      :param node: Class definition node.
+
+
+
+   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> None
+
+      Enter function scope.
+
+      :param node: Function definition node.
+
+
+
+   .. py:method:: leave_FunctionDef(node: libcst.FunctionDef) -> None
+
+      Exit function scope.
+
+      :param node: Function definition node.
+
+
+
+   .. py:method:: leave_Import(node: libcst.Import) -> None
+
+      Track imports.
+      e.g. `import torch` -> symbols['torch'] = ModuleType(name='Module', path='torch')
+
+      :param node: Import statement node.
+
+
+
+   .. py:method:: leave_ImportFrom(node: libcst.ImportFrom) -> None
+
+      Track from-imports.
+      e.g. `from torch import nn` -> symbols['nn'] = ModuleType(name='Module', path='torch.nn')
+
+      :param node: ImportFrom statement.
+
+
+
+   .. py:method:: leave_Assign(node: libcst.Assign) -> None
+
+      Propagate type from RHS to LHS.
+      x = torch.randn() -> x is Tensor.
+
+      :param node: Assignment node.
+
+
+
+   .. py:method:: leave_Name(node: libcst.Name) -> None
+
+      Look up variable in scope.
+
+      :param node: Name node usage.
+
+
+
+   .. py:method:: leave_Attribute(node: libcst.Attribute) -> None
+
+      Resolve attributes.
+      If `x` is Module('torch'), `x.nn` is Module('torch.nn').
+
+      :param node: Attribute access node.
+
+
+
+   .. py:method:: leave_Call(node: libcst.Call) -> None
+
+      Infer return type of a call.
+      1. Resolve function fully qualified name.
+      2. Check SemanticsManager for return type.
+
+      :param node: Function call node.
+
+
+

@@ -5,18 +5,10 @@ ml_switcheroo.testing.runner
 
 .. autoapi-nested-parse::
 
-   Execution Engine for Semantics Verification.
+   Execution Engine for Semantics Verification (Hypothesis Integration).
 
-   This module provides the ``EquivalenceRunner``, which executes operations across
-   multiple frameworks (PyTorch, JAX, etc.) to verify behavioral equivalence.
-   It handles input generation, type adaptation, and crucially, **argument mapping**
-   to ensure that standard inputs are passed to frameworks using their specific
-   parameter names (e.g., mapping ``axis`` to ``dim``).
-
-   Updates:
-       - Added support for ``shape_calc`` lambda verification (Feature 20).
-       - Uses central registry for output normalization.
-       - **Dynamic Tolerances**: Supports per-operation ``rtol`` / ``atol`` thresholds (Feature 028).
+   Uses ``hypothesis`` to generate property-based test cases for operations.
+   Maps ODL definitions to Strategies and executes cross-framework comparison.
 
 
 
@@ -33,43 +25,12 @@ Module Contents
 
 .. py:class:: EquivalenceRunner
 
-   Executes and compares operations across different Deep Learning frameworks.
-
-
    .. py:attribute:: fuzzer
 
 
    .. py:method:: verify(variants: Dict[str, Any], params: List[str], hints: Optional[Dict[str, str]] = None, constraints: Optional[Dict[str, Dict]] = None, shape_calc: Optional[str] = None, rtol: float = 0.001, atol: float = 0.0001) -> Tuple[bool, str]
 
-      Runs the operation across all defined variants and compares results.
-
-      This process includes:
-
-      1. Fuzzing: Generates standard NumPy inputs based on ``params``, ``hints`` and ``constraints``.
-      2. Renaming: Maps standard argument names to framework-specific names
-         defined in the Semantics (e.g., ``axis`` -> ``dim``).
-      3. Adaptation: Converts NumPy arrays to framework Tensors.
-      4. Execution: Runs the functions via dynamic import.
-      5. Normalization: Converts results back to NumPy.
-      6. **Shape Check**: Verifies result shape using ``shape_calc`` lambda if provided.
-      7. Comparison: Asserts numeric closeness between frameworks using ``rtol``/``atol``.
-
-      :param variants: Dictionary of framework implementations from the Semantic
-                       Knowledge Base.
-      :param params: List of standard argument names (e.g. ``['x', 'axis']``).
-      :param hints: Dictionary of type hints (e.g. ``{'axis': 'int'}``) to guide
-                    the fuzzer. Uses explicit types over heuristics.
-      :param constraints: Dictionary of constraint maps (min, max, options) to bound fuzzer.
-      :param shape_calc: Optional python lambda string (e.g. ``lambda x: x.shape``) to verify output shape.
-      :param rtol: Relative tolerance for numeric comparison (default 1e-3).
-      :param atol: Absolute tolerance for numeric comparison (default 1e-4).
-
-      :returns:
-
-                A pair containing:
-                    - bool: True if the verification passed (or skipped).
-                    - str: A human-readable status message or error log.
-      :rtype: Tuple[bool, str]
+      Runs property-based verification using Hypothesis.
 
 
 

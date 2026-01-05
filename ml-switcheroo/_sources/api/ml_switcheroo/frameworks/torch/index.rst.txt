@@ -10,12 +10,12 @@ ml_switcheroo.frameworks.torch
    This module implements the `FrameworkAdapter` protocol for PyTorch.
    It provides:
 
-   1.  **Import Abstraction**: Self-declared namespace mappings (e.g. `torch.nn` is `NEURAL`).
-   2.  **Semantic Definitions**: A comprehensive mapping of Abstract Operations to `torch.*` APIs.
-       This moves the "Golden Set" logic out of the central hub and into this file.
-   3.  **Discovery**: Heuristics and logic for scanning the installed `torch` library
-       to discover new operations dynamically.
-   4.  **IO & Device Support**: Wires up serialization (`save`/`load`) and device allocation logic.
+   1.  **Import Abstraction**: Self-declared namespace mappings (e.g., `torch.nn` is `NEURAL`).
+   2.  **Semantic Definitions**: Mappings loaded from `definitions/torch.json` via helper.
+   3.  **Discovery**: Heuristics and logic for scanning the installed `torch` library.
+   4.  **IO & Device Support**: Wires up serialization and device allocation.
+   5.  **Weight Migration**: Implements logic to generate scripts for converting .pth checkpoints
+       to/from NumPy format for interoperability.
 
 
 
@@ -74,13 +74,16 @@ Module Contents
 
       Returns the primary root import alias ('torch', 'torch').
 
+      :returns: The module name and default alias.
+
 
    .. py:property:: import_namespaces
       :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
       Defines the semantic roles of PyTorch namespaces.
-      Used by the SemanticsManager to link Source imports to Target imports.
+
+      :returns: Mapping of dot-path strings to configuration objects.
 
 
    .. py:property:: search_modules
@@ -89,20 +92,25 @@ Module Contents
 
       Modules to scan during `scaffold` or `sync` operations.
 
+      :returns: List of module names.
+
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
 
-      Submodules that cause recursion depth errors or C-Extension crashes
-      during dynamic introspection.
+      Submodules that cause recursion depth errors or C-Extension crashes.
+
+      :returns: Set of module names to exclude from recursive scanning.
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      Regex patterns (strings) to categorize discovered APIs.
+      Regex patterns to categorize discovered APIs.
+
+      :returns: Dictionary mapping category names to list of regex patterns.
 
 
    .. py:property:: supported_tiers
@@ -111,6 +119,8 @@ Module Contents
 
       Returns the semantic tiers fully supported by this adapter.
 
+      :returns: List of supported tiers.
+
 
    .. py:property:: test_config
       :type: Dict[str, str]
@@ -118,23 +128,31 @@ Module Contents
 
       Templates used by `gen-tests` to create physical verification files.
 
+      :returns: Dictionary of code templates.
+
 
    .. py:property:: harness_imports
       :type: List[str]
 
 
-      No special imports needed for harness initialization.
+      Imports required for harness initialization.
+
+      :returns: List of import statements.
 
 
    .. py:method:: get_harness_init_code() -> str
 
-      No special initialization helpers needed.
+      Returns helper code for initializing the harness.
+
+      :returns: Python source code string.
 
 
 
    .. py:method:: get_to_numpy_code() -> str
 
       Returns code to convert Torch tensors to NumPy (detach/cpu check).
+
+      :returns: Python statement string.
 
 
 
@@ -144,12 +162,16 @@ Module Contents
 
       Defines how classes and functions are rewritten when targeting PyTorch.
 
+      :returns: Configuration object for structural rewriting.
+
 
    .. py:property:: plugin_traits
       :type: ml_switcheroo.frameworks.base.PluginTraits
 
 
       Capabilities flags. PyTorch uses imperative state and eager execution.
+
+      :returns: Configuration object for plugin logic.
 
 
    .. py:property:: rng_seed_methods
@@ -158,12 +180,17 @@ Module Contents
 
       Global seed setting methods detected as impure side-effects.
 
+      :returns: List of method names.
+
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
 
-      Torch emits no magic args, all state is implicit.
+      Returns list of framework-specific magic arguments.
+      Torch emits no magic args; all state is implicit.
+
+      :returns: Empty list.
 
 
    .. py:property:: definitions
@@ -171,13 +198,19 @@ Module Contents
 
 
       The definitive mapping of Abstract Operations to PyTorch APIs.
-      Moved from `standards_internal.py` to decouple the Core from Frameworks.
+      Loaded dynamically from `frameworks/definitions/torch.json`.
+
+      :returns: Dictionary mapping operation abstract IDs to implementation details.
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
       Generates code for device creation.
-      Example: "torch.device('cuda', 0)"
+
+      :param device_type: The device type string (e.g. 'cuda', 'cpu').
+      :param device_index: The optional device index.
+
+      :returns: Code string for device creation.
 
 
 
@@ -185,12 +218,19 @@ Module Contents
 
       Returns PyTorch syntax for checking CUDA availability.
 
+      :returns: Python expression string.
+
 
 
    .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
 
+      Returns syntax for splitting RNG state.
       PyTorch uses global state-based randomness, so explicit splitting is a no-op.
-      Returns 'pass' to maintain valid block syntax if injected blindly.
+
+      :param rng_var: Variable name holding random state.
+      :param key_var: Variable name for the new key.
+
+      :returns: 'pass' string (No-op).
 
 
 
@@ -198,11 +238,61 @@ Module Contents
 
       Returns imports required for IO operations.
 
+      :returns: List of import statements.
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
       Generates save/load syntax.
+
+      :param op: Operation name ('save' or 'load').
+      :param file_arg: Code string representing the file path.
+      :param object_arg: Code string representing the object to save (optional).
+
+      :returns: Python code string for the operation.
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+      Returns imports required for the generated weight migration script logic.
+
+      :returns: List of import strings.
+
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Returns Python code to load a .pth file into a raw state dictionary.
+      Handles both bare state dicts and Lightning-style checkpoints.
+
+      :param path_var: Variable name containing the file path string.
+
+      :returns: Block of python code setting 'raw_state'.
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+      Returns expression to convert a Torch tensor variable to a NumPy array.
+      Includes detach and cpu calls for safety.
+
+      :param tensor_var: Name of variable holding the torch tensor.
+
+      :returns: Expression string.
+
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Returns Python code to save the converted state dictionary back to .pth format.
+      Converts NumPy arrays back to Torch tensors before saving.
+
+      :param state_var: Variable name of the flat dictionary {key: numpy_array}.
+      :param path_var: Variable name of the output path.
+
+      :returns: Block of python code.
 
 
 
@@ -210,10 +300,9 @@ Module Contents
 
       Returns the official PyTorch documentation URL.
 
-      Handles namespaces:
-      - `torch.nn.init.*` -> `https://pytorch.org/docs/stable/nn.init.html#{name}`
-      - `torch.optim.*` -> `https://pytorch.org/docs/stable/optim.html#{name}` (Often grouped)
-      - Default -> `https://pytorch.org/docs/stable/generated/{name}.html`
+      :param api_name: The fully qualified API name.
+
+      :returns: URL string or None.
 
 
 
@@ -223,17 +312,25 @@ Module Contents
 
       Default example for documentation.
 
+      :returns: Source code string.
+
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
 
       Provides code snippets for "Wizard" or "Demo" usage.
 
+      :returns: Dictionary mapping tier IDs to code snippets.
+
 
 
    .. py:method:: convert(data: Any) -> Any
 
       Converts input data (numpy, lists) into PyTorch Tensors for verification runners.
+
+      :param data: Input data structure.
+
+      :returns: Converted PyTorch Tensor or original data if conversion fails.
 
 
 
@@ -243,11 +340,18 @@ Module Contents
       Scans the locally installed PyTorch library for API definitions corresponding
       to the requested category (Loss, Layer, etc.).
 
+      :param category: The standard category to search for.
+
+      :returns: List of discovered API references.
+
 
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
 
       Apply manual patches to the standard mappings if necessary.
+      Used to inject complex behaviors not captured by simple API scanning.
+
+      :param snapshot: The snapshot dictionary to update in-place.
 
 
 

@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="_static/trace_render.js?v=4ddbab91"></script>
-    <script src="_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="_static/op_tabs.js?v=cd874ca5"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -823,9 +823,9 @@ window.addEventListener("load", load);
 <p><strong>A Deterministic, Specification-Driven Transpiler for Deep Learning Frameworks.</strong></p>
 <p><a class="reference external" href="https://opensource.org/license/apache-2-0"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue"/></a>
 <a class="reference external" href="https://www.python.org/downloads/"><img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10+-blue.svg"/></a>
-<a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000.svg"/></a></p>
-<p><strong>ml-switcheroo</strong> is a rigorous AST-based transpiler designed to convert Deep Learning code between frameworks (e.g., *
-<em>PyTorch</em>* <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <strong>JAX</strong>, <strong>Keras</strong> <span class="math notranslate nohighlight">\(\to\)</span> <strong>TensorFlow</strong>) without hallucination.</p>
+<a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000.svg"/></a>
+<a class="reference external" href="https://samuelmarks.github.io/ml-switcheroo/"><img alt="Interactive docs" src="https://img.shields.io/badge/interactive-docs-orange"/></a></p>
+<p><strong>ml-switcheroo</strong> is a rigorous AST-based transpiler designed to convert Deep Learning code between frameworks (e.g., <strong>PyTorch</strong> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <strong>JAX</strong>, <strong>Keras</strong> <span class="math notranslate nohighlight">\(\to\)</span> <strong>TensorFlow</strong>) without hallucination.</p>
 <p>It uses a <strong>Hub-and-Spoke</strong> architecture to solve the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem. Instead of writing translators for
 every pair of frameworks, <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> maps all frameworks to a central <strong>Abstract Standard</strong> (Hub). This allows
 for “Zero-Edit” support for new frameworks via isolated JSON snapshots (Spokes).</p>
@@ -852,46 +852,140 @@ snapshots.</p></li>
 <h2 id="architecture">🏗️ Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
 <p>Code is parsed into an Abstract Syntax Tree (AST), analyzed for safety, pivoted through the Abstract Standard, and
 reconstructed for the target framework.</p>
-<!-- prettier-ignore -->
 <pre class="mermaid">
         graph TD
-%% Theme
-    classDef default font-family: 'Google Sans Normal', color: #20344b, stroke: #20344b, stroke-width: 1px;
-    classDef source fill: #ea4335, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px;
-    classDef engine fill: #4285f4, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px;
-    classDef hub fill: #f9ab00, stroke: #20344b, stroke-width: 2px, color: #20344b, font-family: 'Google Sans Medium', rx: 5px;
-    classDef spoke fill: #fff4c7, stroke: #f9ab00, stroke-width: 2px, stroke-dasharray: 5 5, color: #20344b, font-family: 'Google Sans Medium', rx: 5px;
-    classDef target fill: #34a853, stroke: #20344b, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Medium', rx: 5px;
-    classDef codeBlock fill: #ffffff, stroke: #20344b, stroke-width: 1px, font-family: 'Roboto Mono Normal', text-align: left, font-size: 12px;
-    SRC_HEADER("&lt;b&gt;0. Source Code&lt;/b&gt;&lt;br/&gt;(e.g., PyTorch)"):::source
-    PARSER("&lt;b&gt;1. Analysis Phase&lt;/b&gt;&lt;br/&gt;Parsing, Purity Check,&lt;br/&gt;Lifecycle Scans"):::engine
-    SRC_HEADER --&gt; PARSER
-%% The Knowledge Base
-    subgraph KB [Distributed Knowledge Base]
+    %% =========================================================================
+    %%  DESIGN SYSTEM &amp; PALETTE
+    %% =========================================================================
+    
+    %% Colors
+    %% Blue 500: #4285f4 | Green 500: #34a853 | Yellow 600: #f9ab00 | Red 500: #ea4335
+    %% Navy: #20344b | White: #ffffff 
+    %% Halftone Blue: #57caff | Halftone Green: #5cdb6d 
+    %% Halftone Yellow: #ffd427 | Halftone Red: #ff7daf
+
+    %% Fonts
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b,stroke-width:1px;
+    classDef title font-family:'Google Sans Medium',font-size:12px,color:#ffffff,stroke-width:0px,rx:4px;
+    classDef code font-family:'Roboto Mono Normal',font-size:11px,text-align:left,fill:#ffffff,color:#20344b,stroke:#20344b,stroke-dasharray: 2 2,rx:0;
+    classDef db font-family:'Google Sans Normal',font-size:11px,fill:#fff4c7,stroke:#f9ab00,stroke-width:1px,rx:2px;
+
+    %% Node Types
+    classDef src fill:#ea4335,color:#ffffff;
+    classDef eng fill:#4285f4,color:#ffffff;
+    classDef hub fill:#f9ab00,color:#20344b;
+    classDef plug fill:#57caff,color:#20344b;
+    classDef tgt fill:#34a853,color:#ffffff;
+    classDef ghost fill:#20344b,color:#ffffff,stroke-dasharray: 2 2;
+
+    %% =========================================================================
+    %%  1. SOURCE INPUT
+    %% =========================================================================
+    
+    S_HEAD("&lt;b&gt;1. Source Code (PyTorch)&lt;/b&gt;"):::src
+    S_HEAD:::title
+
+    %% Syntax Highlighted HTML Label
+    S_CODE("
+    &lt;span style='color:#4285f4'&gt;import&lt;/span&gt; torch.nn &lt;span style='color:#4285f4'&gt;as&lt;/span&gt; nn&lt;br/&gt;
+    &lt;span style='color:#4285f4'&gt;class&lt;/span&gt; &lt;span style='color:#ea4335'&gt;Net&lt;/span&gt;(nn.Module):&lt;br/&gt;
+    &amp;nbsp;&amp;nbsp;&lt;span style='color:#4285f4'&gt;def&lt;/span&gt; &lt;span style='color:#f9ab00'&gt;__init__&lt;/span&gt;(&lt;span style='color:#57caff'&gt;self&lt;/span&gt;):&lt;br/&gt;
+    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#57caff'&gt;self&lt;/span&gt;.fc = nn.Linear(&lt;span style='color:#34a853'&gt;20&lt;/span&gt;, &lt;span style='color:#34a853'&gt;30&lt;/span&gt;)&lt;br/&gt;
+    "):::code
+
+    S_HEAD --- S_CODE
+
+    %% =========================================================================
+    %%  2. INGESTION &amp; ANALYSIS
+    %% =========================================================================
+
+    P_LIBCST("&lt;b&gt;LibCST Parser&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Generates AST&lt;/i&gt;"):::eng
+    P_LIBCST:::title
+    
+    S_CODE --&gt; P_LIBCST
+
+    %% Ghost / Live Context
+    subgraph CONTEXT ["Reflection Context"]
         direction TB
-        SPECS[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
-        MAPS[("&lt;b&gt;The Spokes (Overlays)&lt;/b&gt;&lt;br/&gt;snapshots/*_mappings.json&lt;br/&gt;&lt;i&gt;Framework Variants&lt;/i&gt;")]:::spoke
-        MAPS -.-&gt;|" Hydrates "| SPECS
+        GHOST("&lt;b&gt;Ghost Snapshot&lt;/b&gt;&lt;br/&gt;&lt;i&gt;torch_v2.1.json&lt;/i&gt;"):::ghost
+        LIVE("&lt;b&gt;Live Library&lt;/b&gt;&lt;br/&gt;&lt;i&gt;import torch&lt;/i&gt;"):::ghost
     end
 
-    REWRITER("&lt;b&gt;2. Pivot Rewriter&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Semantic Translation&lt;/i&gt;"):::engine
-    KB -.-&gt;|" Lookup API "| REWRITER
-    PARSER --&gt; REWRITER
-    PIVOT_LOGIC("&lt;b&gt;1. Ingest:&lt;/b&gt; torch.abs(x)&lt;br/&gt;&lt;b&gt;2. Pivot:&lt;/b&gt; Abs(x) [Standard]&lt;br/&gt;&lt;b&gt;3. Project:&lt;/b&gt; jnp.abs(x)"):::codeBlock
-    REWRITER --- PIVOT_LOGIC
-    FIXER("&lt;b&gt;3. Refinement&lt;/b&gt;&lt;br/&gt;Import Injection &amp; Pruning"):::engine
-    PIVOT_LOGIC --&gt; FIXER
-    TGT_HEADER("&lt;b&gt;4. Target Code&lt;/b&gt;&lt;br/&gt;(e.g., JAX/Flax)"):::target
-    FIXER --&gt; TGT_HEADER
+    GHOST -.-&gt;|" API Signatures "| P_LIBCST
+    LIVE -.-&gt; |" Introspection "| P_LIBCST
+
+    %% =========================================================================
+    %%  3. SEMANTIC PIVOT (The Hub)
+    %% =========================================================================
+
+    HUB_HEAD("&lt;b&gt;Semantics Manager&lt;/b&gt;"):::hub
+    HUB_HEAD:::title
+    P_LIBCST --&gt; HUB_HEAD
+
+    %% The Knowledge Base (JSONs)
+    JSON_DB[("&lt;b&gt;Knowledge Base&lt;/b&gt;&lt;br/&gt;&lt;i&gt;semantics/k_neural.json&lt;/i&gt;&lt;br/&gt;&lt;i&gt;snapshots/jax_map.json&lt;/i&gt;")]:::db
+    JSON_DB -.-&gt;|" 1. Lookup 'Linear'&lt;br/&gt;2. Read Constraints "| HUB_HEAD
+
+    %% Intermediate Representation
+    ABS_NODE("
+    &lt;b&gt;Abstract Operation found:&lt;/b&gt;&lt;br/&gt;
+    Op: &lt;span style='color:#f9ab00'&gt;Linear&lt;/span&gt;&lt;br/&gt;
+    Tier: &lt;span style='color:#ea4335'&gt;Neural&lt;/span&gt; (Stateful)&lt;br/&gt;
+    Args: {in: 20, out: 30}&lt;br/&gt;
+    "):::code
+    HUB_HEAD --- ABS_NODE
+
+    %% =========================================================================
+    %%  4. REWRITING &amp; PLUGINS
+    %% =========================================================================
+
+    REWRITE("&lt;b&gt;Pivot Rewriter&lt;/b&gt;"):::eng
+    REWRITE:::title
+    ABS_NODE --&gt; REWRITE
+
+    %% Plugin Logic
+    subgraph PLUGINS ["Extension System"]
+        target_trait("&lt;b&gt;Target Traits (JAX)&lt;/b&gt;&lt;br/&gt;requires_explicit_rng: &lt;span style='color:#34a853'&gt;True&lt;/span&gt;"):::db
+        
+        HOOK_DEF("&lt;b&gt;Plugin: rng_threading&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Injects 'rngs' arg into&lt;br/&gt;stateful layer calls&lt;/i&gt;"):::plug
+        HOOK_DEF:::title
+        
+        target_trait -.-&gt; HOOK_DEF
+    end
+
+    REWRITE &lt;--&gt;|" AST Transformation "| HOOK_DEF
+
+    %% =========================================================================
+    %%  5. OUTPUT GENERATION
+    %% =========================================================================
+
+    FIXER("&lt;b&gt;Import Fixer&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Resolves 'nnx' alias&lt;/i&gt;"):::plug
+    FIXER:::title
+    REWRITE --&gt; FIXER
+
+    T_HEAD("&lt;b&gt;Target Code (Flax NNX)&lt;/b&gt;"):::tgt
+    T_HEAD:::title
+    FIXER --&gt; T_HEAD
+
+    %% Final Code
+    T_CODE("
+    &lt;span style='color:#4285f4'&gt;from&lt;/span&gt; flax &lt;span style='color:#4285f4'&gt;import&lt;/span&gt; nnx&lt;br/&gt;
+    &lt;span style='color:#4285f4'&gt;class&lt;/span&gt; &lt;span style='color:#34a853'&gt;Net&lt;/span&gt;(nnx.Module):&lt;br/&gt;
+    &amp;nbsp;&amp;nbsp;&lt;span style='color:#4285f4'&gt;def&lt;/span&gt; &lt;span style='color:#f9ab00'&gt;__init__&lt;/span&gt;(&lt;span style='color:#57caff'&gt;self&lt;/span&gt;, &lt;span style='color:#ea4335'&gt;rngs&lt;/span&gt;: nnx.Rngs):&lt;br/&gt;
+    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#90a4ae'&gt;# Hook injected 'rngs'&lt;/span&gt;&lt;br/&gt;
+    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#57caff'&gt;self&lt;/span&gt;.fc = nnx.Linear(&lt;span style='color:#34a853'&gt;20&lt;/span&gt;, &lt;span style='color:#34a853'&gt;30&lt;/span&gt;, &lt;span style='color:#ea4335'&gt;rngs=rngs&lt;/span&gt;)&lt;br/&gt;
+    "):::code
+
+    T_HEAD --- T_CODE
     </pre></section>
 <hr class="docutils"/>
 <section id="installation">
 <h2 id="installation">📦 Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install form source</span>
-pip<span class="w"> </span>install<span class="w"> </span>.<span class="w"> </span>
+pip<span class="w"> </span>install<span class="w"> </span>.
 
-<span class="c1"># Install with testing dependencies (for running the fuzzer/verification) </span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[test]"</span><span class="w"> </span>
+<span class="c1"># Install with testing dependencies (for running the fuzzer/verification)</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[test]"</span>
 </pre></div>
 </div>
 </section>
@@ -902,14 +996,14 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">".[te
 <section id="transpilation-convert">
 <h3 id="transpilation-convert">1. Transpilation (<code class="docutils literal notranslate"><span class="pre">convert</span></code>)<a class="headerlink" href="#transpilation-convert" title="Link to this heading">¶</a></h3>
 <p>Convert a file or directory from one framework to another.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert a PyTorch model to JAX (Flax NNX) </span>
-ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./models/resnet.py<span class="w"> </span><span class="se">\ </span>
-<span class="w">    </span>--source<span class="w"> </span>torch<span class="w"> </span><span class="se">\ </span>
-<span class="w">    </span>--target<span class="w"> </span>jax<span class="w"> </span><span class="se">\ </span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert a PyTorch model to JAX (Flax NNX)</span>
+ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./models/resnet.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--source<span class="w"> </span>torch<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span>jax<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--out<span class="w"> </span>./resnet_jax.py
 
 <span class="c1"># Convert an entire directory, enabling strict mode</span>
-<span class="c1"># Strict mode fails if an API mapping is missing, rather than passing it through. </span>
+<span class="c1"># Strict mode fails if an API mapping is missing, rather than passing it through.</span>
 ml_switcheroo<span class="w"> </span>convert<span class="w"> </span>./src/<span class="w"> </span>--out<span class="w"> </span>./dst/<span class="w"> </span>--strict
 </pre></div>
 </div>
@@ -1037,17 +1131,18 @@ When converting <strong>Flax NNX</strong> (functional) to <strong>Torch</strong>
 <ol class="arabic">
 <li><p><strong>Add Operations (ODL)</strong>: Use the <strong>Operation Definition Language (YAML)</strong> to define math/neural ops. This is the
 recommended way to add missing functionality.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Erf"</span><span class="w"> </span>
-<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"input"</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span>
-<span class="nt">variants</span><span class="p">:</span><span class="w"> </span>
-<span class="w">  </span><span class="nt">torch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.erf"</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span>
-<span class="w">  </span><span class="nt">jax</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.lax.erf"</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Erf"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"input"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.erf"</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.lax.erf"</span><span class="w"> </span><span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<p>See <a class="reference internal" href="EXTENDING_WITH_DSL.html"><span class="std std-doc">EXTENDING_WITH_DSL.md</span></a> for the full guide. Alternative to the YAML DSL you can manually update:</p>
+<p>See <a class="reference internal" href="EXTENDING_WITH_DSL.html"><span class="std std-doc">EXTENDING_WITH_DSL.md</span></a> for the full guide. Alternative to the YAML DSL you can manually
+update:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code> and</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (for torch, mlx, tensorflow, jax, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/definitions/*.json</span></code> (for torch, mlx, tensorflow, jax, etc.)</p></li>
 </ul>
 </li>
 <li><p><strong>Add a Framework</strong>: Create a class inheriting <code class="docutils literal notranslate"><span class="pre">FrameworkAdapter</span></code> in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>.</p></li>

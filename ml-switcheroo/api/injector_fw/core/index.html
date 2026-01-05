@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -338,23 +338,11 @@
         </li>
         <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.variant" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.variant</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.json_path" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.json_path</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.found" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.found</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.visit_Import" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.visit_Import()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.visit_ImportFrom" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.visit_ImportFrom()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.visit_ClassDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.visit_ClassDef()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.leave_ClassDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.leave_ClassDef()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.visit_FunctionDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.visit_FunctionDef()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.leave_FunctionDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.leave_FunctionDef()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.leave_Return" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.leave_Return()</span></code></a>
-        </li>
-        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.leave_Module" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.leave_Module()</span></code></a>
+        <li class="md-nav__item"><a href="#injector_fw.core.FrameworkInjector.inject" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">FrameworkInjector.inject()</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -378,15 +366,17 @@
             
   <section id="module-injector_fw.core">
 <span id="injector-fw-core"></span><h1 id="api-injector-fw-core-index--page-root">injector_fw.core<a class="headerlink" href="#api-injector-fw-core-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Core Logic for Framework Adapter AST Transformer.</p>
-<p>This module defines the <cite>FrameworkInjector</cite> class, which handles the localized
-insertion of new Semantic Operations into existing Python framework adapter files.</p>
+<p>Core Logic for Framework Definition Injection (JSON).</p>
+<p>This module provides the <cite>FrameworkInjector</cite> class, which handles the insertion
+or updating of Semantic Operations in the JSON definition files located in
+<cite>src/ml_switcheroo/frameworks/definitions/</cite>.</p>
+<p>It replaces the legacy LibCST-based injector that modified Python source code.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#injector_fw.core.FrameworkInjector" title="injector_fw.core.FrameworkInjector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrameworkInjector</span></code></a></p></td>
-<td><p>Injects a <cite>StandardMap</cite> entry into a Framework Adapter's definitions.</p></td>
+<td><p>Injects a <cite>FrameworkVariant</cite> entry into the framework's JSON definitions.</p></td>
 </tr>
 </tbody>
 </table>
@@ -396,16 +386,11 @@ insertion of new Semantic Operations into existing Python framework adapter file
 <dl class="py class">
 <dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">injector_fw.core.</span></span><span class="sig-name descname"><span class="pre">FrameworkInjector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../ml_switcheroo/core/dsl/index.html#ml_switcheroo.core.dsl.FrameworkVariant" title="ml_switcheroo.core.dsl.FrameworkVariant"><span class="pre">ml_switcheroo.core.dsl.FrameworkVariant</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#injector_fw.core.FrameworkInjector" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
-<p>Injects a <cite>StandardMap</cite> entry into a Framework Adapter’s definitions.</p>
-<p>It performs a targeted search for:</p>
-<ol class="arabic simple">
-<li><p>A class decorated with <cite>@register_framework(“target_fw”)</cite>.</p></li>
-<li><p>A method named <cite>definitions</cite> decorated with <cite>@property</cite>.</p></li>
-<li><p>A <cite>return</cite> statement returning a <cite>Dict</cite>.</p></li>
-</ol>
-<p>Additionally, it scans the module for existing imports and injects missing
-dependencies explicitly required by the definition (e.g. <cite>required_imports</cite>).</p>
+<dd><p>Injects a <cite>FrameworkVariant</cite> entry into the framework’s JSON definitions.</p>
+<p>It handles:
+1. Loading the existing JSON mapping.
+2. Merging the new variant data.
+3. Writing the updated JSON back to disk.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.target_fw">
 <span class="sig-name descname"><span class="pre">target_fw</span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.target_fw" title="Link to this definition">¶</a></dt>
@@ -419,49 +404,28 @@ dependencies explicitly required by the definition (e.g. <cite>required_imports<
 <span class="sig-name descname"><span class="pre">variant</span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.variant" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.json_path">
+<span class="sig-name descname"><span class="pre">json_path</span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.json_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.found">
 <span class="sig-name descname"><span class="pre">found</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#injector_fw.core.FrameworkInjector.found" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.visit_Import">
-<span class="sig-name descname"><span class="pre">visit_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.visit_Import" title="Link to this definition">¶</a></dt>
-<dd><p>Tracks existing top-level imports.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.visit_ImportFrom">
-<span class="sig-name descname"><span class="pre">visit_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.visit_ImportFrom" title="Link to this definition">¶</a></dt>
-<dd><p>Tracks existing from-imports.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.visit_ClassDef">
-<span class="sig-name descname"><span class="pre">visit_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.visit_ClassDef" title="Link to this definition">¶</a></dt>
-<dd><p>Checks if the class matches the target framework via decorator.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.leave_ClassDef">
-<span class="sig-name descname"><span class="pre">leave_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.ClassDef</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.leave_ClassDef" title="Link to this definition">¶</a></dt>
-<dd><p>Exit class scope.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.visit_FunctionDef">
-<span class="sig-name descname"><span class="pre">visit_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.visit_FunctionDef" title="Link to this definition">¶</a></dt>
-<dd><p>Enters functions. Only interested if inside target class and named ‘definitions’.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.leave_FunctionDef">
-<span class="sig-name descname"><span class="pre">leave_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.FunctionDef</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.leave_FunctionDef" title="Link to this definition">¶</a></dt>
-<dd><p>Exit function scope.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.leave_Return">
-<span class="sig-name descname"><span class="pre">leave_Return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Return</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Return</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Return</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.leave_Return" title="Link to this definition">¶</a></dt>
-<dd><p>Intercepts the return statement of the definitions property.
-Injects the new key-value into the dictionary.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.leave_Module">
-<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.leave_Module" title="Link to this definition">¶</a></dt>
-<dd><p>Post-process module to inject missing top-level imports.</p>
+<dt class="sig sig-object py" id="injector_fw.core.FrameworkInjector.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#injector_fw.core.FrameworkInjector.inject" title="Link to this definition">¶</a></dt>
+<dd><p>Executes the injection process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dry_run</strong> – If True, prints changes to console instead of writing file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the operation was successful.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>

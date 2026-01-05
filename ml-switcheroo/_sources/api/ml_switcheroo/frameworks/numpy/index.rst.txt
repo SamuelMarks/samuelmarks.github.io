@@ -11,6 +11,11 @@ ml_switcheroo.frameworks.numpy
    It maps abstract operations for Math and Extras to ``numpy.*`` functions
    and defines type mappings for data-driven casting logic.
 
+   Capabilities:
+   1.  **Math**: `np.abs`, `np.mean`.
+   2.  **IO**: `np.save`, `np.load` for persistence.
+   3.  **Weight Migration**: Handling dict-based `.npz` archives via `get_weight_*` hooks.
+
 
 
 Classes
@@ -58,17 +63,28 @@ Module Contents
 
       Returns list of numpy submodules to scan.
 
+      :returns: Modules.
+      :rtype: List[str]
+
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
+
+      Returns unsafe modules.
+
+      :returns: Empty.
+      :rtype: Set[str]
 
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
-      Returns ('numpy', 'np').
+      Returns import tuple.
+
+      :returns: ("numpy", "np").
+      :rtype: Tuple[str, str]
 
 
    .. py:property:: import_namespaces
@@ -77,12 +93,18 @@ Module Contents
 
       Remaps imports to 'np' alias.
 
+      :returns: Mappings.
+      :rtype: Dict[str, ImportConfig]
+
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
       Regex patterns for IO and Randomness.
+
+      :returns: Patterns.
+      :rtype: Dict[str, List[str]]
 
 
    .. py:property:: test_config
@@ -91,18 +113,35 @@ Module Contents
 
       Test templates for NumPy.
 
+      :returns: Templates.
+      :rtype: Dict[str, str]
+
 
    .. py:property:: harness_imports
       :type: List[str]
 
 
+      Imports for harness.
+
+      :returns: Empty.
+      :rtype: List[str]
+
 
    .. py:method:: get_harness_init_code() -> str
+
+      Init code.
+
+      :returns: Empty.
+      :rtype: str
+
 
 
    .. py:method:: get_to_numpy_code() -> str
 
       Returns identity code for NumPy arrays.
+
+      :returns: Code string.
+      :rtype: str
 
 
 
@@ -113,10 +152,18 @@ Module Contents
       NumPy supports Arrays (Math) and Extras (IO).
       It does NOT support Neural layers structurally.
 
+      :returns: Supported tiers.
+      :rtype: List[SemanticTier]
+
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
+
+      Returns list of magic args.
+
+      :returns: Empty.
+      :rtype: List[str]
 
 
    .. py:property:: structural_traits
@@ -125,6 +172,9 @@ Module Contents
 
       Returns default structural traits (no class rewriting).
 
+      :returns: Traits.
+      :rtype: StructuralTraits
+
 
    .. py:property:: plugin_traits
       :type: ml_switcheroo.frameworks.base.PluginTraits
@@ -132,13 +182,19 @@ Module Contents
 
       Plugin capabilities.
 
+      :returns: Capabilities.
+      :rtype: PluginTraits
+
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
       Static definitions for NumPy mappings.
-      Includes Math, Extras, Types, and Casting logic.
+      Loaded dynamically from `frameworks/definitions/numpy.json`.
+
+      :returns: Definitions.
+      :rtype: Dict[str, StandardMap]
 
 
    .. py:property:: rng_seed_methods
@@ -147,10 +203,18 @@ Module Contents
 
       Returns seed methods.
 
+      :returns: Methods list.
+      :rtype: List[str]
+
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
 
       NumPy doesn't implement Layers/Losses structurally.
+
+      :param category: Category.
+
+      :returns: Empty list.
+      :rtype: List[GhostRef]
 
 
 
@@ -158,11 +222,20 @@ Module Contents
 
       Returns CPU syntax ignoring device requests (NumPy is CPU-only).
 
+      :param device_type: Device.
+      :param device_index: Index.
+
+      :returns: "'cpu'".
+      :rtype: str
+
 
 
    .. py:method:: get_device_check_syntax() -> str
 
       NumPy does not support GPUs.
+
+      :returns: "False".
+      :rtype: str
 
 
 
@@ -170,17 +243,51 @@ Module Contents
 
       No-op for NumPy.
 
+      :param rng_var: RNG variable.
+      :param key_var: Key variable.
+
+      :returns: "pass".
+      :rtype: str
+
 
 
    .. py:method:: get_serialization_imports() -> List[str]
 
       Returns imports for IO.
 
+      :returns: Imports.
+      :rtype: List[str]
+
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
       Returns np.save/load syntax.
+
+      :param op: 'save' or 'load'.
+      :param file_arg: Path.
+      :param object_arg: Obj.
+
+      :returns: Code.
+      :rtype: str
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Loads .npz files into a dictionary.
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Saves dictionary to compressed .npz.
 
 
 
@@ -193,13 +300,23 @@ Module Contents
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
       Generates NumPy documentation URL.
-      Example: https://numpy.org/doc/stable/reference/generated/numpy.mean.html
+
+      :param api_name: API Path.
+
+      :returns: URL.
+      :rtype: Optional[str]
 
 
 
    .. py:method:: convert(data: Any) -> Any
 
       Attempts to convert input data to a NumPy array.
+
+      :param data: Input.
+      :type data: Any
+
+      :returns: Numpy array or original.
+      :rtype: Any
 
 
 
@@ -209,11 +326,17 @@ Module Contents
 
       Returns the primary example code used for instant demos.
 
+      :returns: Math example.
+      :rtype: str
+
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
 
       Returns NumPy idiomatic examples.
+
+      :returns: Examples.
+      :rtype: Dict[str, str]
 
 
 

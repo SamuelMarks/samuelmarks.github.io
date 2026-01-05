@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -383,6 +383,14 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_syntax" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_serialization_syntax()</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_conversion_imports" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_weight_conversion_imports()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_load_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_weight_load_code()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_tensor_to_numpy_expr" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_tensor_to_numpy_expr()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_save_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_weight_save_code()</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_doc_url" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_doc_url()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_example_code" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">TorchAdapter.get_example_code()</span></code></a>
@@ -421,12 +429,12 @@
 <p>This module implements the <cite>FrameworkAdapter</cite> protocol for PyTorch.
 It provides:</p>
 <ol class="arabic simple">
-<li><p><strong>Import Abstraction</strong>: Self-declared namespace mappings (e.g. <cite>torch.nn</cite> is <cite>NEURAL</cite>).</p></li>
-<li><p><strong>Semantic Definitions</strong>: A comprehensive mapping of Abstract Operations to <cite>torch.*</cite> APIs.
-This moves the “Golden Set” logic out of the central hub and into this file.</p></li>
-<li><p><strong>Discovery</strong>: Heuristics and logic for scanning the installed <cite>torch</cite> library
-to discover new operations dynamically.</p></li>
-<li><p><strong>IO &amp; Device Support</strong>: Wires up serialization (<cite>save</cite>/<cite>load</cite>) and device allocation logic.</p></li>
+<li><p><strong>Import Abstraction</strong>: Self-declared namespace mappings (e.g., <cite>torch.nn</cite> is <cite>NEURAL</cite>).</p></li>
+<li><p><strong>Semantic Definitions</strong>: Mappings loaded from <cite>definitions/torch.json</cite> via helper.</p></li>
+<li><p><strong>Discovery</strong>: Heuristics and logic for scanning the installed <cite>torch</cite> library.</p></li>
+<li><p><strong>IO &amp; Device Support</strong>: Wires up serialization and device allocation.</p></li>
+<li><p><strong>Weight Migration</strong>: Implements logic to generate scripts for converting .pth checkpoints
+to/from NumPy format for interoperability.</p></li>
 </ol>
 <section id="attributes">
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
@@ -456,7 +464,7 @@ to discover new operations dynamically.</p></li>
 <dd></dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.torch.</span></span><span class="sig-name descname"><span class="pre">TorchAdapter</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L43-L594"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.frameworks.torch.</span></span><span class="sig-name descname"><span class="pre">TorchAdapter</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L45-L693"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter" title="Link to this definition">¶</a></dt>
 <dd><p>Adapter for PyTorch (Meta).</p>
 <p>Handles Source and Target translation rules for PyTorch, including
 <cite>torch.nn</cite>, <cite>torch.optim</cite>, and <cite>torch.func</cite> (vmap/grad).</p>
@@ -476,142 +484,350 @@ to discover new operations dynamically.</p></li>
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.import_alias">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.import_alias" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the primary root import alias (‘torch’, ‘torch’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The module name and default alias.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.import_namespaces">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">import_namespaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.ImportConfig" title="ml_switcheroo.frameworks.base.ImportConfig"><span class="pre">ml_switcheroo.frameworks.base.ImportConfig</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.import_namespaces" title="Link to this definition">¶</a></dt>
-<dd><p>Defines the semantic roles of PyTorch namespaces.
-Used by the SemanticsManager to link Source imports to Target imports.</p>
+<dd><p>Defines the semantic roles of PyTorch namespaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mapping of dot-path strings to configuration objects.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.search_modules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.search_modules" title="Link to this definition">¶</a></dt>
 <dd><p>Modules to scan during <cite>scaffold</cite> or <cite>sync</cite> operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of module names.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.unsafe_submodules">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unsafe_submodules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.unsafe_submodules" title="Link to this definition">¶</a></dt>
-<dd><p>Submodules that cause recursion depth errors or C-Extension crashes
-during dynamic introspection.</p>
+<dd><p>Submodules that cause recursion depth errors or C-Extension crashes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Set of module names to exclude from recursive scanning.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.discovery_heuristics">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discovery_heuristics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.discovery_heuristics" title="Link to this definition">¶</a></dt>
-<dd><p>Regex patterns (strings) to categorize discovered APIs.</p>
+<dd><p>Regex patterns to categorize discovered APIs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary mapping category names to list of regex patterns.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.supported_tiers">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_tiers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.supported_tiers" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the semantic tiers fully supported by this adapter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of supported tiers.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.test_config">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.test_config" title="Link to this definition">¶</a></dt>
 <dd><p>Templates used by <cite>gen-tests</cite> to create physical verification files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary of code templates.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.harness_imports">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">harness_imports</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.harness_imports" title="Link to this definition">¶</a></dt>
-<dd><p>No special imports needed for harness initialization.</p>
+<dd><p>Imports required for harness initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of import statements.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_harness_init_code">
-<span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L172-L174"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
-<dd><p>No special initialization helpers needed.</p>
+<span class="sig-name descname"><span class="pre">get_harness_init_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L209-L216"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_harness_init_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns helper code for initializing the harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Python source code string.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_to_numpy_code">
-<span class="sig-name descname"><span class="pre">get_to_numpy_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L176-L180"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_to_numpy_code" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_to_numpy_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L218-L225"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_to_numpy_code" title="Link to this definition">¶</a></dt>
 <dd><p>Returns code to convert Torch tensors to NumPy (detach/cpu check).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Python statement string.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.structural_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structural_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.StructuralTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.structural_traits" title="Link to this definition">¶</a></dt>
 <dd><p>Defines how classes and functions are rewritten when targeting PyTorch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Configuration object for structural rewriting.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.plugin_traits">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">plugin_traits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ml_switcheroo.frameworks.base.PluginTraits</span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.plugin_traits" title="Link to this definition">¶</a></dt>
 <dd><p>Capabilities flags. PyTorch uses imperative state and eager execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Configuration object for plugin logic.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.rng_seed_methods">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rng_seed_methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.rng_seed_methods" title="Link to this definition">¶</a></dt>
 <dd><p>Global seed setting methods detected as impure side-effects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of method names.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.declared_magic_args">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">declared_magic_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.declared_magic_args" title="Link to this definition">¶</a></dt>
-<dd><p>Torch emits no magic args, all state is implicit.</p>
+<dd><p>Returns list of framework-specific magic arguments.
+Torch emits no magic args; all state is implicit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Empty list.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.definitions">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardMap" title="ml_switcheroo.frameworks.base.StandardMap"><span class="pre">ml_switcheroo.frameworks.base.StandardMap</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.definitions" title="Link to this definition">¶</a></dt>
 <dd><p>The definitive mapping of Abstract Operations to PyTorch APIs.
-Moved from <cite>standards_internal.py</cite> to decouple the Core from Frameworks.</p>
+Loaded dynamically from <cite>frameworks/definitions/torch.json</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary mapping operation abstract IDs to implementation details.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_device_syntax">
-<span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L382-L391"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
-<dd><p>Generates code for device creation.
-Example: “torch.device(‘cuda’, 0)”</p>
+<span class="sig-name descname"><span class="pre">get_device_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L315-L330"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_device_syntax" title="Link to this definition">¶</a></dt>
+<dd><p>Generates code for device creation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>device_type</strong> – The device type string (e.g. ‘cuda’, ‘cpu’).</p></li>
+<li><p><strong>device_index</strong> – The optional device index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Code string for device creation.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_device_check_syntax">
-<span class="sig-name descname"><span class="pre">get_device_check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L393-L397"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_device_check_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_device_check_syntax</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L332-L339"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_device_check_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Returns PyTorch syntax for checking CUDA availability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Python expression string.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_rng_split_syntax">
-<span class="sig-name descname"><span class="pre">get_rng_split_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L399-L404"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_rng_split_syntax" title="Link to this definition">¶</a></dt>
-<dd><p>PyTorch uses global state-based randomness, so explicit splitting is a no-op.
-Returns ‘pass’ to maintain valid block syntax if injected blindly.</p>
+<span class="sig-name descname"><span class="pre">get_rng_split_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L341-L353"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_rng_split_syntax" title="Link to this definition">¶</a></dt>
+<dd><p>Returns syntax for splitting RNG state.
+PyTorch uses global state-based randomness, so explicit splitting is a no-op.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rng_var</strong> – Variable name holding random state.</p></li>
+<li><p><strong>key_var</strong> – Variable name for the new key.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>‘pass’ string (No-op).</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_imports">
-<span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L406-L408"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_serialization_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L355-L362"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_imports" title="Link to this definition">¶</a></dt>
 <dd><p>Returns imports required for IO operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of import statements.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_syntax">
-<span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L410-L418"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_serialization_syntax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L364-L380"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_serialization_syntax" title="Link to this definition">¶</a></dt>
 <dd><p>Generates save/load syntax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> – Operation name (‘save’ or ‘load’).</p></li>
+<li><p><strong>file_arg</strong> – Code string representing the file path.</p></li>
+<li><p><strong>object_arg</strong> – Code string representing the object to save (optional).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Python code string for the operation.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_conversion_imports">
+<span class="sig-name descname"><span class="pre">get_weight_conversion_imports</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L384-L391"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_conversion_imports" title="Link to this definition">¶</a></dt>
+<dd><p>Returns imports required for the generated weight migration script logic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of import strings.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_load_code">
+<span class="sig-name descname"><span class="pre">get_weight_load_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L393-L418"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_load_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns Python code to load a .pth file into a raw state dictionary.
+Handles both bare state dicts and Lightning-style checkpoints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_var</strong> – Variable name containing the file path string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Block of python code setting ‘raw_state’.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_tensor_to_numpy_expr">
+<span class="sig-name descname"><span class="pre">get_tensor_to_numpy_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L420-L431"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_tensor_to_numpy_expr" title="Link to this definition">¶</a></dt>
+<dd><p>Returns expression to convert a Torch tensor variable to a NumPy array.
+Includes detach and cpu calls for safety.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tensor_var</strong> – Name of variable holding the torch tensor.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Expression string.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_save_code">
+<span class="sig-name descname"><span class="pre">get_weight_save_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L433-L451"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_weight_save_code" title="Link to this definition">¶</a></dt>
+<dd><p>Returns Python code to save the converted state dictionary back to .pth format.
+Converts NumPy arrays back to Torch tensors before saving.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_var</strong> – Variable name of the flat dictionary {key: numpy_array}.</p></li>
+<li><p><strong>path_var</strong> – Variable name of the output path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Block of python code.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_doc_url">
-<span class="sig-name descname"><span class="pre">get_doc_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L420-L432"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_doc_url" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_doc_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L453-L466"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_doc_url" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the official PyTorch documentation URL.</p>
-<p>Handles namespaces:
-- <cite>torch.nn.init.*</cite> -&gt; <cite>https://pytorch.org/docs/stable/nn.init.html#{name}</cite>
-- <cite>torch.optim.*</cite> -&gt; <cite>https://pytorch.org/docs/stable/optim.html#{name}</cite> (Often grouped)
-- Default -&gt; <cite>https://pytorch.org/docs/stable/generated/{name}.html</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>api_name</strong> – The fully qualified API name.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>URL string or None.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_example_code">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L434-L437"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_example_code" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_example_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L468-L476"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_example_code" title="Link to this definition">¶</a></dt>
 <dd><p>Default example for documentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Source code string.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.get_tiered_examples">
-<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L439-L448"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_tiered_examples</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L478-L490"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.get_tiered_examples" title="Link to this definition">¶</a></dt>
 <dd><p>Provides code snippets for “Wizard” or “Demo” usage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary mapping tier IDs to code snippets.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L450-L471"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.convert" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L492-L519"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.convert" title="Link to this definition">¶</a></dt>
 <dd><p>Converts input data (numpy, lists) into PyTorch Tensors for verification runners.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> – Input data structure.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Converted PyTorch Tensor or original data if conversion fails.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.collect_api">
-<span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ml_switcheroo.frameworks.base.GhostRef</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L473-L481"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.collect_api" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">collect_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../base/index.html#ml_switcheroo.frameworks.base.StandardCategory" title="ml_switcheroo.frameworks.base.StandardCategory"><span class="pre">ml_switcheroo.frameworks.base.StandardCategory</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ml_switcheroo.frameworks.base.GhostRef</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L521-L535"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.collect_api" title="Link to this definition">¶</a></dt>
 <dd><p>Implementation of the Ghost Protocol.
 Scans the locally installed PyTorch library for API definitions corresponding
 to the requested category (Loss, Layer, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>category</strong> – The standard category to search for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of discovered API references.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.frameworks.torch.TorchAdapter.apply_wiring">
-<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L588-L594"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
-<dd><p>Apply manual patches to the standard mappings if necessary.</p>
+<span class="sig-name descname"><span class="pre">apply_wiring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/frameworks/torch.py#L682-L693"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.frameworks.torch.TorchAdapter.apply_wiring" title="Link to this definition">¶</a></dt>
+<dd><p>Apply manual patches to the standard mappings if necessary.
+Used to inject complex behaviors not captured by simple API scanning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>snapshot</strong> – The snapshot dictionary to update in-place.</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>

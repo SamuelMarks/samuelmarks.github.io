@@ -54,7 +54,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/switcheroo_demo.css?v=ae056a50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/switcheroo_demo.css?v=2ca74108" />
     <link rel="stylesheet" type="text/css" href="../../_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
@@ -71,7 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
     <script src="../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../_static/switcheroo_demo.js?v=d42b7eb5"></script>
+    <script src="../../_static/switcheroo_demo.js?v=b9bae12b"></script>
     <script src="../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -396,8 +396,10 @@
 <p>This tool modifies Python source files (specifically <cite>standards_internal.py</cite>)
 by locating the <cite>INTERNAL_OPS</cite> dictionary and appending a new operation definition
 derived from an ODL (Operation Definition Language) model.</p>
-<p>Update: Now supports persisting semantic constraints (min, max, options) into
-the dictionary structure.</p>
+<p>Updates:
+- Supports persistent semantic constraints (min, max, options).
+- Checks for duplicate keys to prevent overwriting existing definitions.
+- Uses robust string literal generation.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -430,12 +432,13 @@ it to the existing dictionary in the source.</p>
 <dt class="sig sig-object py" id="injector_spec.StandardsInjector.leave_Assign">
 <span class="sig-name descname"><span class="pre">leave_Assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Assign</span></span></span><a class="headerlink" href="#injector_spec.StandardsInjector.leave_Assign" title="Link to this definition">¶</a></dt>
 <dd><p>Visits assignment statements to find <cite>INTERNAL_OPS</cite>.</p>
-<p>If found, modifies the dictionary value to include the new key-value pair.</p>
+<p>If found, modifies the dictionary value to include the new key-value pair,
+UNLESS the key already exists.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>original_node</strong> – The node before transformation.</p></li>
-<li><p><strong>updated_node</strong> – The node after transformation (containing any recursive changes).</p></li>
+<li><p><strong>updated_node</strong> – The node after transformation.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

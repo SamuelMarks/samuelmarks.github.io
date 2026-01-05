@@ -5,10 +5,13 @@ injector_fw.core
 
 .. autoapi-nested-parse::
 
-   Core Logic for Framework Adapter AST Transformer.
+   Core Logic for Framework Definition Injection (JSON).
 
-   This module defines the `FrameworkInjector` class, which handles the localized
-   insertion of new Semantic Operations into existing Python framework adapter files.
+   This module provides the `FrameworkInjector` class, which handles the insertion
+   or updating of Semantic Operations in the JSON definition files located in
+   `src/ml_switcheroo/frameworks/definitions/`.
+
+   It replaces the legacy LibCST-based injector that modified Python source code.
 
 
 
@@ -25,19 +28,12 @@ Module Contents
 
 .. py:class:: FrameworkInjector(target_fw: str, op_name: str, variant: ml_switcheroo.core.dsl.FrameworkVariant)
 
-   Bases: :py:obj:`libcst.CSTTransformer`
+   Injects a `FrameworkVariant` entry into the framework's JSON definitions.
 
-
-   Injects a `StandardMap` entry into a Framework Adapter's definitions.
-
-   It performs a targeted search for:
-
-   1. A class decorated with `@register_framework("target_fw")`.
-   2. A method named `definitions` decorated with `@property`.
-   3. A `return` statement returning a `Dict`.
-
-   Additionally, it scans the module for existing imports and injects missing
-   dependencies explicitly required by the definition (e.g. `required_imports`).
+   It handles:
+   1. Loading the existing JSON mapping.
+   2. Merging the new variant data.
+   3. Writing the updated JSON back to disk.
 
 
    .. py:attribute:: target_fw
@@ -49,57 +45,22 @@ Module Contents
    .. py:attribute:: variant
 
 
+   .. py:attribute:: json_path
+
+
    .. py:attribute:: found
       :value: False
 
 
 
-   .. py:method:: visit_Import(node: libcst.Import) -> None
+   .. py:method:: inject(dry_run: bool = False) -> bool
 
-      Tracks existing top-level imports.
+      Executes the injection process.
 
+      :param dry_run: If True, prints changes to console instead of writing file.
 
-
-   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> None
-
-      Tracks existing from-imports.
-
-
-
-   .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> Optional[bool]
-
-      Checks if the class matches the target framework via decorator.
-
-
-
-   .. py:method:: leave_ClassDef(original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
-
-      Exit class scope.
-
-
-
-   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
-
-      Enters functions. Only interested if inside target class and named 'definitions'.
-
-
-
-   .. py:method:: leave_FunctionDef(original_node: libcst.FunctionDef, updated_node: libcst.FunctionDef) -> libcst.FunctionDef
-
-      Exit function scope.
-
-
-
-   .. py:method:: leave_Return(original_node: libcst.Return, updated_node: libcst.Return) -> Union[libcst.Return, libcst.RemovalSentinel]
-
-      Intercepts the return statement of the definitions property.
-      Injects the new key-value into the dictionary.
-
-
-
-   .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
-
-      Post-process module to inject missing top-level imports.
+      :returns: True if the operation was successful.
+      :rtype: bool
 
 
 

@@ -34,6 +34,7 @@ Submodules
    /api/ml_switcheroo/core/rewriter/func_docstring/index
    /api/ml_switcheroo/core/rewriter/func_signature/index
    /api/ml_switcheroo/core/rewriter/normalization/index
+   /api/ml_switcheroo/core/rewriter/normalization_utils/index
    /api/ml_switcheroo/core/rewriter/resolver/index
    /api/ml_switcheroo/core/rewriter/scopes/index
    /api/ml_switcheroo/core/rewriter/structure/index
@@ -62,7 +63,7 @@ Classes
 Package Contents
 ----------------
 
-.. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
@@ -78,7 +79,7 @@ Package Contents
    override specific visitor methods, while `BaseRewriter` provides utilities.
 
 
-.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
@@ -90,7 +91,7 @@ Package Contents
        to be available on the instance (inherited from BaseRewriter).
 
 
-.. py:class:: AttributeMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: AttributeMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
@@ -111,7 +112,7 @@ Package Contents
 
 
 
-.. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_func.FuncStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin`
 
@@ -120,7 +121,7 @@ Package Contents
    Inherits from granular mixins to assemble the full feature set.
 
 
-.. py:class:: DecoratorMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: DecoratorMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
@@ -144,7 +145,7 @@ Package Contents
 
 
 
-.. py:class:: ControlFlowMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: ControlFlowMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
 
@@ -175,18 +176,26 @@ Package Contents
 
 
 
-.. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`libcst.CSTTransformer`
 
 
-   The base class for AST transformation traversal.
+   Mixin for resolving AST nodes to fully qualified names based on imports.
+
+   Assumed attributes on self:
+       _alias_map (Dict[str, str]): Mapping of local aliases to full paths.
 
 
    .. py:attribute:: semantics
 
 
    .. py:attribute:: config
+
+
+   .. py:attribute:: symbol_table
+      :value: None
+
 
 
    .. py:attribute:: source_fw
@@ -211,7 +220,7 @@ Package Contents
 
 
 
-.. py:class:: PivotRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+.. py:class:: PivotRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
 
    Bases: :py:obj:`control_flow.ControlFlowMixin`, :py:obj:`decorators.DecoratorMixin`, :py:obj:`calls.CallMixin`, :py:obj:`normalization.NormalizationMixin`, :py:obj:`attributes.AttributeMixin`, :py:obj:`structure.StructureMixin`, :py:obj:`base.BaseRewriter`
 

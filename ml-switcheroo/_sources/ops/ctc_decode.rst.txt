@@ -1,0 +1,54 @@
+ctc_decode
+==========
+
+Decodes the output of a CTC model.
+
+Args:
+    inputs: A tensor of shape `(batch_size, max_length, num_classes)`
+        containing the logits (the output of the model).
+        They should *not* be normalized via softmax.
+    sequence_lengths: A tensor of shape `(batch_size,)` containing the
+        sequence lengths for the batch.
+    strategy: A string for the decoding strategy. Supported values are
+        `"greedy"` and `"beam_search"`.
+    beam_width: An integer scalar beam width used in beam search.
+        Defaults to 100.
+    top_paths: An integer scalar, the number of top paths to return.
+        Defaults to 1.
+    merge_repeated: A boolean scalar, whether to merge repeated
+        labels in the output. Defaults to `True`.
+    mask_index: An integer scalar, the index of the mask character in
+        the vocabulary. Defaults to `0`.
+
+Returns:
+    A tuple containing:
+    - The tensor representing the list of decoded sequences. If
+        `strategy="greedy"`, the shape is `(1, batch_size, max_length)`. If
+        `strategy="beam_search"`, the shape is
+        `(top_paths, batch_size, max_length)`. Note that: `-1` indicates the
+        blank label.
+    - If `strategy="greedy"`, a tensor of shape `(batch_size, 1)`
+        representing the negative of the sum of the probability logits for
+        each sequence. If `strategy="beam_seatch"`, a tensor of shape
+        `(batch_size, top_paths)` representing the log probability for each
+        sequence.
+
+**Abstract Signature:**
+
+``ctc_decode(inputs, sequence_lengths, strategy, beam_width, top_paths, merge_repeated, mask_index)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'Keras_0')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'TensorFlow_1')">TensorFlow</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="Keras_0" class="op-tab-pane active"><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.nn.ctc_decode</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=keras.ops.nn.ctc_decode" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="TensorFlow_1" class="op-tab-pane "><h4>TensorFlow</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.ctc_decode</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://www.tensorflow.org/api_docs/python/keras/ops/ctc_decode" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

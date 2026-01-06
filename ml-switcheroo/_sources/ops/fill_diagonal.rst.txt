@@ -1,0 +1,86 @@
+fill_diagonal
+=============
+
+Return a copy of the array with the diagonal overwritten.
+
+JAX implementation of :func:`numpy.fill_diagonal`.
+
+The semantics of :func:`numpy.fill_diagonal` are to modify arrays in-place, which
+is not possible for JAX's immutable arrays. The JAX version returns a modified
+copy of the input, and adds the ``inplace`` parameter which must be set to
+`False`` by the user as a reminder of this API difference.
+
+Args:
+  a: input array. Must have ``a.ndim >= 2``. If ``a.ndim >= 3``, then all
+    dimensions must be the same size.
+  val: scalar or array with which to fill the diagonal. If an array, it will
+    be flattened and repeated to fill the diagonal entries.
+  wrap: Not implemented by JAX. Only the default value of ``False`` is supported.
+  inplace: must be set to False to indicate that the input is not modified
+    in-place, but rather a modified copy is returned.
+
+Returns:
+  A copy of ``a`` with the diagonal set to ``val``.
+
+Examples:
+  >>> x = jnp.zeros((3, 3), dtype=int)
+  >>> jnp.fill_diagonal(x, jnp.array([1, 2, 3]), inplace=False)
+  Array([[1, 0, 0],
+         [0, 2, 0],
+         [0, 0, 3]], dtype=int32)
+
+  Unlike :func:`numpy.fill_diagonal`, the input ``x`` is not modified.
+
+  If the diagonal value has too many entries, it will be truncated
+
+  >>> jnp.fill_diagonal(x, jnp.arange(100, 200), inplace=False)
+  Array([[100,   0,   0],
+         [  0, 101,   0],
+         [  0,   0, 102]], dtype=int32)
+
+  If the diagonal has too few entries, it will be repeated:
+
+  >>> x = jnp.zeros((4, 4), dtype=int)
+  >>> jnp.fill_diagonal(x, jnp.array([3, 4]), inplace=False)
+  Array([[3, 0, 0, 0],
+         [0, 4, 0, 0],
+         [0, 0, 3, 0],
+         [0, 0, 0, 4]], dtype=int32)
+
+  For non-square arrays, the diagonal of the leading square slice is filled:
+
+  >>> x = jnp.zeros((3, 5), dtype=int)
+  >>> jnp.fill_diagonal(x, 1, inplace=False)
+  Array([[1, 0, 0, 0, 0],
+         [0, 1, 0, 0, 0],
+         [0, 0, 1, 0, 0]], dtype=int32)
+
+  And for square N-dimensional arrays, the N-dimensional diagonal is filled:
+
+  >>> y = jnp.zeros((2, 2, 2))
+  >>> jnp.fill_diagonal(y, 1, inplace=False)
+  Array([[[1., 0.],
+          [0., 0.]],
+  <BLANKLINE>
+         [[0., 0.],
+          [0., 1.]]], dtype=float32)
+
+**Abstract Signature:**
+
+``fill_diagonal(a, val, wrap, inplace)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_1')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.fill_diagonal</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.fill_diagonal.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_1" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.fill_diagonal</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.fill_diagonal" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

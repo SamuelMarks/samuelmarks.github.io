@@ -1,0 +1,71 @@
+select
+======
+
+Select values based on a series of conditions.
+
+JAX implementation of :func:`numpy.select`, implemented in terms
+of :func:`jax.lax.select_n`
+
+Args:
+  condlist: sequence of array-like conditions. All entries must be mutually
+    broadcast-compatible.
+  choicelist: sequence of array-like values to choose. Must have the same length
+    as ``condlist``, and all entries must be broadcast-compatible with entries
+    of ``condlist``.
+  default: value to return when every condition is False (default: 0).
+
+Returns:
+  Array of selected values from ``choicelist`` corresponding to the first
+  ``True`` entry in ``condlist`` at each location.
+
+See also:
+  - :func:`jax.numpy.where`: select between two values based on a single condition.
+  - :func:`jax.lax.select_n`: select between *N* values based on an index.
+
+Examples:
+  >>> condlist = [
+  ...    jnp.array([False, True, False, False]),
+  ...    jnp.array([True, False, False, False]),
+  ...    jnp.array([False, True, True, False]),
+  ... ]
+  >>> choicelist = [
+  ...    jnp.array([1, 2, 3, 4]),
+  ...    jnp.array([10, 20, 30, 40]),
+  ...    jnp.array([100, 200, 300, 400]),
+  ... ]
+  >>> jnp.select(condlist, choicelist, default=0)
+  Array([ 10,   2, 300,   0], dtype=int32)
+
+  This is logically equivalent to the following nested ``where`` statement:
+
+  >>> default = 0
+  >>> jnp.where(condlist[0],
+  ...   choicelist[0],
+  ...   jnp.where(condlist[1],
+  ...     choicelist[1],
+  ...     jnp.where(condlist[2],
+  ...       choicelist[2],
+  ...       default)))
+  Array([ 10,   2, 300,   0], dtype=int32)
+
+  However, for efficiency it is implemented in terms of :func:`jax.lax.select_n`.
+
+**Abstract Signature:**
+
+``select(condlist, choicelist, default)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'NumPy_1')">NumPy</button><button class="op-tab-btn " onclick="openOpTab(event, 'Keras_2')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'TensorFlow_3')">TensorFlow</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_4')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.select</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.select.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="NumPy_1" class="op-tab-pane "><h4>NumPy</h4><div class="op-detail-row"><span class="label">API:</span> <code>numpy.select</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://numpy.org/doc/stable/reference/generated/numpy.select.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Keras_2" class="op-tab-pane "><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.select</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=keras.ops.select" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="TensorFlow_3" class="op-tab-pane "><h4>TensorFlow</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.select</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://www.tensorflow.org/api_docs/python/keras/ops/select" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_4" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.select</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.select" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

@@ -1,0 +1,64 @@
+InputSpec
+=========
+
+Specifies the rank, dtype and shape of every input to a layer.
+
+Layers can expose (if appropriate) an `input_spec` attribute:
+an instance of `InputSpec`, or a nested structure of `InputSpec` instances
+(one per input tensor). These objects enable the layer to run input
+compatibility checks for input structure, input rank, input shape, and
+input dtype for the first argument of `Layer.__call__`.
+
+A `None` entry in a shape is compatible with any dimension.
+
+Args:
+    dtype: Expected dtype of the input.
+    shape: Shape tuple, expected shape of the input
+        (may include `None` for dynamic axes).
+        Includes the batch size.
+    ndim: Integer, expected rank of the input.
+    max_ndim: Integer, maximum rank of the input.
+    min_ndim: Integer, minimum rank of the input.
+    axes: Dictionary mapping integer axes to
+        a specific dimension value.
+    allow_last_axis_squeeze: If `True`, allow inputs of rank N+1 as long
+        as the last axis of the input is 1, as well as inputs of rank N-1
+        as long as the last axis of the spec is 1.
+    name: Expected key corresponding to this input when passing data as
+        a dictionary.
+    optional: Boolean, whether the input is optional or not.
+        An optional input can accept `None` values.
+
+Example:
+
+```python
+class MyLayer(Layer):
+    def __init__(self):
+        super().__init__()
+        # The layer will accept inputs with
+        # shape (*, 28, 28) & (*, 28, 28, 1)
+        # and raise an appropriate error message otherwise.
+        self.input_spec = InputSpec(
+            shape=(None, 28, 28, 1),
+            allow_last_axis_squeeze=True)
+```
+
+**Abstract Signature:**
+
+``InputSpec(dtype, shape, ndim, max_ndim, min_ndim, axes, allow_last_axis_squeeze, name, optional)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'Keras_0')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'TensorFlow_1')">TensorFlow</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="Keras_0" class="op-tab-pane active"><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.layers.InputSpec</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=keras.layers.InputSpec" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="TensorFlow_1" class="op-tab-pane "><h4>TensorFlow</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.layers.InputSpec</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://www.tensorflow.org/api_docs/python/keras/layers/InputSpec" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

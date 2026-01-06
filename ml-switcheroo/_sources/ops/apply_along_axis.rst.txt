@@ -1,0 +1,85 @@
+apply_along_axis
+================
+
+Apply a function to 1D array slices along an axis.
+
+JAX implementation of :func:`numpy.apply_along_axis`. While NumPy implements
+this iteratively, JAX implements this via :func:`jax.vmap`, and so ``func1d``
+must be compatible with ``vmap``.
+
+Args:
+  func1d: a callable function with signature ``func1d(arr, /, *args, **kwargs)``
+    where ``*args`` and ``**kwargs`` are the additional positional and keyword
+    arguments passed to :func:`apply_along_axis`.
+  axis: integer axis along which to apply the function.
+  arr: the array over which to apply the function.
+  args, kwargs: additional positional and keyword arguments are passed through
+    to ``func1d``.
+
+Returns:
+  The result of ``func1d`` applied along the specified axis.
+
+See also:
+  - :func:`jax.vmap`: a more direct way to create a vectorized version of a function.
+  - :func:`jax.numpy.apply_over_axes`: repeatedly apply a function over multiple axes.
+  - :func:`jax.numpy.vectorize`: create a vectorized version of a function.
+
+Examples:
+  A simple example in two dimensions, where the function is applied either row-wise
+  or column-wise:
+
+  >>> x = jnp.array([[1, 2, 3],
+  ...                [4, 5, 6]])
+  >>> def func1d(x):
+  ...   return jnp.sum(x ** 2)
+  >>> jnp.apply_along_axis(func1d, 0, x)
+  Array([17, 29, 45], dtype=int32)
+  >>> jnp.apply_along_axis(func1d, 1, x)
+  Array([14, 77], dtype=int32)
+
+  For 2D inputs, this can be equivalently expressed using :func:`jax.vmap`,
+  though note that `vmap` specifies the mapped axis rather than the applied axis:
+
+  >>> jax.vmap(func1d, in_axes=1)(x)  # same as applying along axis 0
+  Array([17, 29, 45], dtype=int32)
+  >>> jax.vmap(func1d, in_axes=0)(x)  # same as applying along axis 1
+  Array([14, 77], dtype=int32)
+
+  For 3D inputs, :func:`apply_along_axis` is equivalent to mapping over two
+  dimensions:
+
+  >>> x_3d = jnp.arange(24).reshape(2, 3, 4)
+  >>> jnp.apply_along_axis(func1d, 2, x_3d)
+  Array([[  14,  126,  366],
+         [ 734, 1230, 1854]], dtype=int32)
+  >>> jax.vmap(jax.vmap(func1d))(x_3d)
+  Array([[  14,  126,  366],
+         [ 734, 1230, 1854]], dtype=int32)
+
+  The applied function may also take arbitrary positional or keyword arguments,
+  which should be passed directly as additional arguments to :func:`apply_along_axis`:
+
+  >>> def func1d(x, exponent):
+  ...   return jnp.sum(x ** exponent)
+  >>> jnp.apply_along_axis(func1d, 0, x, exponent=3)
+  Array([ 65, 133, 243], dtype=int32)
+
+**Abstract Signature:**
+
+``apply_along_axis(func1d, axis, arr, args, kwargs)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'NumPy_1')">NumPy</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_2')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.apply_along_axis</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.apply_along_axis.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="NumPy_1" class="op-tab-pane "><h4>NumPy</h4><div class="op-detail-row"><span class="label">API:</span> <code>numpy.ma.extras.apply_along_axis</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://numpy.org/doc/stable/reference/generated/numpy.ma.extras.apply_along_axis.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_2" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.apply_along_axis</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.apply_along_axis" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

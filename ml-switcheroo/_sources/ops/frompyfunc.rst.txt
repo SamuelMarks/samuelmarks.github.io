@@ -1,0 +1,56 @@
+frompyfunc
+==========
+
+Create a JAX ufunc from an arbitrary JAX-compatible scalar function.
+
+Args:
+  func : a callable that takes `nin` scalar arguments and returns `nout` outputs.
+  nin: integer specifying the number of scalar inputs
+  nout: integer specifying the number of scalar outputs
+  identity: (optional) a scalar specifying the identity of the operation, if any.
+
+Returns:
+  wrapped : jax.numpy.ufunc wrapper of func.
+
+Examples:
+  Here is an example of creating a ufunc similar to :obj:`jax.numpy.add`:
+
+  >>> import operator
+  >>> add = frompyfunc(operator.add, nin=2, nout=1, identity=0)
+
+  Now all the standard :class:`jax.numpy.ufunc` methods are available:
+
+  >>> x = jnp.arange(4)
+  >>> add(x, 10)
+  Array([10, 11, 12, 13], dtype=int32)
+  >>> add.outer(x, x)
+  Array([[0, 1, 2, 3],
+         [1, 2, 3, 4],
+         [2, 3, 4, 5],
+         [3, 4, 5, 6]], dtype=int32)
+  >>> add.reduce(x)
+  Array(6, dtype=int32)
+  >>> add.accumulate(x)
+  Array([0, 1, 3, 6], dtype=int32)
+  >>> add.at(x, 1, 10, inplace=False)
+  Array([ 0, 11,  2,  3], dtype=int32)
+
+**Abstract Signature:**
+
+``frompyfunc(func, nin, nout, identity)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_1')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.frompyfunc</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.frompyfunc.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_1" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.frompyfunc</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.frompyfunc" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

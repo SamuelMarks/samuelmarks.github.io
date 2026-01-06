@@ -1,0 +1,348 @@
+ml_switcheroo.core.sass
+=======================
+
+.. py:module:: ml_switcheroo.core.sass
+
+.. autoapi-nested-parse::
+
+   NVIDIA SASS (Streaming Assembler) AST Package.
+
+   This package defines the Concrete Syntax Tree (CST) nodes for representing
+   NVIDIA SASS assembly code. It supports Instructions, Operands (Registers,
+   Predicates, Immediates, Memory), Labels, Directives, and Comments.
+
+   These nodes provide a deterministic string representation matching standard
+   SASS syntax (e.g. `FADD R0, R1, R2;`).
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/core/sass/analysis/index
+   /api/ml_switcheroo/core/sass/emitter/index
+   /api/ml_switcheroo/core/sass/lifter/index
+   /api/ml_switcheroo/core/sass/macros/index
+   /api/ml_switcheroo/core/sass/nodes/index
+   /api/ml_switcheroo/core/sass/parser/index
+   /api/ml_switcheroo/core/sass/synthesizer/index
+   /api/ml_switcheroo/core/sass/tokens/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.sass.Comment
+   ml_switcheroo.core.sass.Directive
+   ml_switcheroo.core.sass.Immediate
+   ml_switcheroo.core.sass.Instruction
+   ml_switcheroo.core.sass.Label
+   ml_switcheroo.core.sass.Memory
+   ml_switcheroo.core.sass.Operand
+   ml_switcheroo.core.sass.Predicate
+   ml_switcheroo.core.sass.Register
+   ml_switcheroo.core.sass.SassNode
+
+
+Package Contents
+----------------
+
+.. py:class:: Comment
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents a line comment.
+
+   Format: `// {text}`
+
+   .. attribute:: text
+
+      The comment content.
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Directive
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents an assembler directive.
+
+   Format: `.{name} {params}`
+
+   .. attribute:: name
+
+      The directive name (e.g., "headerflags").
+
+   .. attribute:: params
+
+      List of string parameters.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: params
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Immediate
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a literal constant value.
+
+   .. attribute:: value
+
+      The numeric value (int or float).
+
+   .. attribute:: is_hex
+
+      If True, renders as hex string (e.g., "0x1").
+
+
+   .. py:attribute:: value
+      :type:  Union[int, float]
+
+
+   .. py:attribute:: is_hex
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Instruction
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents a single SASS operation line.
+
+   Format: `@{predicate} {opcode} {operands};`
+
+   .. attribute:: opcode
+
+      The instruction mnemonic (e.g., "FADD", "MOV").
+
+   .. attribute:: operands
+
+      List of operand nodes.
+
+   .. attribute:: predicate
+
+      Optional predicate guard executed before instruction.
+
+
+   .. py:attribute:: opcode
+      :type:  str
+
+
+   .. py:attribute:: operands
+      :type:  List[Operand]
+      :value: []
+
+
+
+   .. py:attribute:: predicate
+      :type:  Optional[Predicate]
+      :value: None
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Label
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents a jump target label.
+
+   Format: `{name}:`
+
+   .. attribute:: name
+
+      The label identifier.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Memory
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a memory address operand.
+
+   Supports Constant Bank access (e.g., `c[0x0][0x4]`) and Global/Local
+   addressing (e.g., `[R1]`, `[R1 + 0x4]`).
+
+   .. attribute:: base
+
+      The base register (e.g., "R1") or constant bank string (e.g., "c[0x0]").
+
+   .. attribute:: offset
+
+      Optional byte offset to add to the base.
+
+
+   .. py:attribute:: base
+      :type:  Union[str, Register]
+
+
+   .. py:attribute:: offset
+      :type:  Optional[int]
+      :value: None
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Operand
+
+   Bases: :py:obj:`SassNode`
+
+
+   Base class for instruction operands (Registers, Immediates, etc.).
+
+
+.. py:class:: Predicate
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a predicate register (e.g., @P0, !P1).
+
+   Used both as instruction guards (preceding the opcode) and as operands
+   in logical instructions (ISETP).
+
+   .. attribute:: name
+
+      The predicate identifier (e.g., "P0", "PT").
+
+   .. attribute:: negated
+
+      If True, indicates logical NOT (e.g., "!P0").
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: negated
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Register
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a general-purpose register (e.g., R0, RZ).
+
+   .. attribute:: name
+
+      The register identifier (e.g., "R0", "RZ").
+
+   .. attribute:: negated
+
+      If True, prepends a negation sign (e.g., "-R0").
+
+   .. attribute:: absolute
+
+      If True, wraps in absolute value pipes (e.g., "|R0|").
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: negated
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: absolute
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: SassNode
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for all SASS AST nodes.
+
+
+   .. py:method:: __str__() -> str
+      :abstractmethod:
+
+
+      Returns the valid SASS string representation of the node.
+
+
+

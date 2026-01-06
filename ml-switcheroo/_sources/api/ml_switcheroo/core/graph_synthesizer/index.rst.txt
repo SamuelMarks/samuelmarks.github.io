@@ -1,0 +1,59 @@
+ml_switcheroo.core.graph_synthesizer
+====================================
+
+.. py:module:: ml_switcheroo.core.graph_synthesizer
+
+.. autoapi-nested-parse::
+
+   Graph Synthesizer Module.
+
+   This module provides the `GraphSynthesizer` class, which converts a high-level
+   `LogicalGraph` representation back into executable Python source code (specifically
+   PyTorch `nn.Module` definitions).
+
+   It is used in the "Lifting" pipeline (Decompilation) to reconstruct model code
+   from intermediate graph representations extracted from SASS or other IRs.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.graph_synthesizer.GraphSynthesizer
+
+
+Module Contents
+---------------
+
+.. py:class:: GraphSynthesizer(framework: str = 'torch')
+
+   Synthesizes a Python CST Module from a LogicalGraph.
+
+   Primarily targets PyTorch `nn.Module` generation.
+
+
+   .. py:attribute:: framework
+      :value: 'torch'
+
+
+
+   .. py:method:: generate(graph: ml_switcheroo.core.graph.LogicalGraph, class_name: str = 'DecompiledNet') -> str
+
+      Generates Python source code for the given graph.
+
+      Constructs a standard `nn.Module` class with:
+      1. An `__init__` method defining stateful layers.
+      2. A `forward` method sequencing operations.
+
+      :param graph: The input computation graph.
+      :type graph: LogicalGraph
+      :param class_name: The name of the generated class.
+      :type class_name: str
+
+      :returns: The formatted Python source code.
+      :rtype: str
+
+
+

@@ -1,0 +1,77 @@
+Equalization
+============
+
+Preprocessing layer for histogram equalization on image channels.
+
+Histogram equalization is a technique to adjust image intensities to
+enhance contrast by effectively spreading out the most frequent
+intensity values. This layer applies equalization on a channel-wise
+basis, which can improve the visibility of details in images.
+
+This layer works with both grayscale and color images, performing
+equalization independently on each color channel. At inference time,
+the equalization is consistently applied.
+
+**Note:** This layer is safe to use inside a `tf.data` or `grain` pipeline
+(independently of which backend you're using).
+
+Args:
+    value_range: Optional list/tuple of 2 floats specifying the lower
+        and upper limits of the input data values. Defaults to `[0, 255]`.
+        If the input image has been scaled, use the appropriate range
+        (e.g., `[0.0, 1.0]`). The equalization will be scaled to this
+        range, and output values will be clipped accordingly.
+    bins: Integer specifying the number of histogram bins to use for
+        equalization. Defaults to 256, which is suitable for 8-bit images.
+        Larger values can provide more granular intensity redistribution.
+
+Input shape:
+    3D (unbatched) or 4D (batched) tensor with shape:
+    `(..., height, width, channels)`, in `"channels_last"` format,
+    or `(..., channels, height, width)`, in `"channels_first"` format.
+
+Output shape:
+    3D (unbatched) or 4D (batched) tensor with shape:
+    `(..., target_height, target_width, channels)`,
+    or `(..., channels, target_height, target_width)`,
+    in `"channels_first"` format.
+
+Example:
+
+```python
+# Create an equalization layer for standard 8-bit images
+equalizer = keras.layers.Equalization()
+
+# An image with uneven intensity distribution
+image = [...] # your input image
+
+# Apply histogram equalization
+equalized_image = equalizer(image)
+
+# For images with custom value range
+custom_equalizer = keras.layers.Equalization(
+    value_range=[0.0, 1.0],  # for normalized images
+    bins=128  # fewer bins for more subtle equalization
+)
+custom_equalized = custom_equalizer(normalized_image)
+```
+
+**Abstract Signature:**
+
+``Equalization(value_range, bins, data_format, kwargs)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'Keras_0')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'TensorFlow_1')">TensorFlow</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="Keras_0" class="op-tab-pane active"><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.layers.Equalization</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=keras.layers.Equalization" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="TensorFlow_1" class="op-tab-pane "><h4>TensorFlow</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.layers.Equalization</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://www.tensorflow.org/api_docs/python/keras/layers/Equalization" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

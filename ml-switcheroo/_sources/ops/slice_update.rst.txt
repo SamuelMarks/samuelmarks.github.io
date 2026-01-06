@@ -1,0 +1,51 @@
+slice_update
+============
+
+Update an input by slicing in a tensor of updated values.
+
+At a high level, this operation does
+`inputs[start_indices: start_indices + updates.shape] = updates`.
+Assume inputs is a tensor of shape `(D0, D1, ..., Dn)`,
+`start_indices` must be a list/tuple of n integers, specifying the starting
+indices. `updates` must have the same rank as `inputs`, and the size of each
+dim must not exceed `Di - start_indices[i]`. For example, if we have 2D
+inputs `inputs = np.zeros((5, 5))`, and we want to update the intersection
+of last 2 rows and last 2 columns as 1, i.e.,
+`inputs[3:, 3:] = np.ones((2, 2))`, then we can use the code below:
+
+```python
+inputs = np.zeros((5, 5))
+start_indices = [3, 3]
+updates = np.ones((2, 2))
+inputs = keras.ops.slice_update(inputs, start_indices, updates)
+```
+
+Args:
+    inputs: A tensor, the tensor to be updated.
+    start_indices: A list/tuple of shape `(inputs.ndim,)`, specifying
+        the starting indices for updating.
+    updates: A tensor, the new values to be put to `inputs` at `indices`.
+        `updates` must have the same rank as `inputs`.
+
+Returns:
+    A tensor, has the same shape and dtype as `inputs`.
+
+**Abstract Signature:**
+
+``slice_update(inputs, start_indices, updates)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'Keras_0')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'TensorFlow_1')">TensorFlow</button><button class="op-tab-btn " onclick="openOpTab(event, 'Apple MLX_2')">Apple MLX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="Keras_0" class="op-tab-pane active"><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.slice_update</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=keras.ops.slice_update" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="TensorFlow_1" class="op-tab-pane "><h4>TensorFlow</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.slice_update</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://www.tensorflow.org/api_docs/python/keras/ops/slice_update" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Apple MLX_2" class="op-tab-pane "><h4>Apple MLX</h4><div class="op-detail-row"><span class="label">API:</span> <code>mlx.core.slice_update</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.slice_update.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

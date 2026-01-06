@@ -1,0 +1,73 @@
+histogramdd
+===========
+
+Compute an N-dimensional histogram.
+
+JAX implementation of :func:`numpy.histogramdd`.
+
+Args:
+  sample: input array of shape ``(N, D)`` representing ``N`` points in
+    ``D`` dimensions.
+  bins: Specify the number of bins in each dimension of the histogram.
+    (default: 10). May also be a length-D sequence of integers or arrays
+    of bin edges.
+  range: Length-D sequence of pairs specifying the range for each dimension.
+    If not specified, the range is inferred from the data.
+  weights: An optional shape ``(N,)`` array specifying the weights of the
+    data points.
+    Should be the same shape as ``sample``. If not specified, each
+    data point is weighted equally.
+  density: If True, return the normalized histogram in units of counts
+    per unit volume. If False (default) return the (weighted) counts per bin.
+
+Returns:
+  A tuple of arrays ``(histogram, bin_edges)``, where ``histogram`` contains
+  the aggregated data, and ``bin_edges`` specifies the boundaries of the bins.
+
+See Also:
+  - :func:`jax.numpy.histogram`: Compute the histogram of a 1D array.
+  - :func:`jax.numpy.histogram2d`: Compute the histogram of a 2D array.
+  - :func:`jax.numpy.histogram_bin_edges`: Compute the bin edges for a histogram.
+
+Examples:
+  A histogram over 100 points in three dimensions
+
+  >>> key = jax.random.key(42)
+  >>> a = jax.random.normal(key, (100, 3))
+  >>> counts, bin_edges = jnp.histogramdd(a, bins=6,
+  ...                                     range=[(-3, 3), (-3, 3), (-3, 3)])
+  >>> counts.shape
+  (6, 6, 6)
+  >>> bin_edges  # doctest: +SKIP
+  [Array([-3., -2., -1.,  0.,  1.,  2.,  3.], dtype=float32),
+   Array([-3., -2., -1.,  0.,  1.,  2.,  3.], dtype=float32),
+   Array([-3., -2., -1.,  0.,  1.,  2.,  3.], dtype=float32)]
+
+  Using ``density=True`` returns a normalized histogram:
+
+  >>> density, bin_edges = jnp.histogramdd(a, density=True)
+  >>> bin_widths = map(jnp.diff, bin_edges)
+  >>> dx, dy, dz = jnp.meshgrid(*bin_widths, indexing='ij')
+  >>> normed = jnp.sum(density * dx * dy * dz)
+  >>> jnp.allclose(normed, 1.0)
+  Array(True, dtype=bool)
+
+**Abstract Signature:**
+
+``histogramdd(sample, bins, range, weights, density)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'NumPy_1')">NumPy</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_2')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.histogramdd</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.histogramdd.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="NumPy_1" class="op-tab-pane "><h4>NumPy</h4><div class="op-detail-row"><span class="label">API:</span> <code>numpy.histogramdd</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://numpy.org/doc/stable/reference/generated/numpy.histogramdd.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_2" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.histogramdd</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.histogramdd" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

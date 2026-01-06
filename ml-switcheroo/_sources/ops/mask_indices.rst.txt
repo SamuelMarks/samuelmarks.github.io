@@ -1,0 +1,64 @@
+mask_indices
+============
+
+Return indices of a mask of an (n, n) array.
+
+Args:
+  n: static integer array dimension.
+  mask_func: a function that takes a shape ``(n, n)`` array and
+    an optional offset ``k``, and returns a shape ``(n, n)`` mask.
+    Examples of functions with this signature are
+    :func:`~jax.numpy.triu` and :func:`~jax.numpy.tril`.
+  k: a scalar value passed to ``mask_func``.
+  size: optional argument specifying the static size of the output arrays.
+    This is passed to :func:`~jax.numpy.nonzero` when generating the indices
+    from the mask.
+
+Returns:
+  a tuple of indices where ``mask_func`` is nonzero.
+
+See also:
+  - :func:`jax.numpy.triu_indices`: compute ``mask_indices`` for :func:`~jax.numpy.triu`.
+  - :func:`jax.numpy.tril_indices`: compute ``mask_indices`` for :func:`~jax.numpy.tril`.
+
+Examples:
+  Calling ``mask_indices`` on built-in masking functions:
+
+  >>> jnp.mask_indices(3, jnp.triu)
+  (Array([0, 0, 0, 1, 1, 2], dtype=int32), Array([0, 1, 2, 1, 2, 2], dtype=int32))
+
+  >>> jnp.mask_indices(3, jnp.tril)
+  (Array([0, 1, 1, 2, 2, 2], dtype=int32), Array([0, 0, 1, 0, 1, 2], dtype=int32))
+
+  Calling ``mask_indices`` on a custom masking function:
+
+  >>> def mask_func(x, k=0):
+  ...   i = jnp.arange(x.shape[0])[:, None]
+  ...   j = jnp.arange(x.shape[1])
+  ...   return (i + 1) % (j + 1 + k) == 0
+  >>> mask_func(jnp.ones((3, 3)))
+  Array([[ True, False, False],
+         [ True,  True, False],
+         [ True, False,  True]], dtype=bool)
+  >>> jnp.mask_indices(3, mask_func)
+  (Array([0, 1, 1, 2, 2], dtype=int32), Array([0, 0, 1, 0, 2], dtype=int32))
+
+**Abstract Signature:**
+
+``mask_indices(n, mask_func, k, size)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_1')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.mask_indices</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.mask_indices.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_1" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.mask_indices</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.mask_indices" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

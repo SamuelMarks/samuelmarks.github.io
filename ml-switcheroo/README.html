@@ -58,8 +58,8 @@
     <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
     <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
@@ -74,7 +74,7 @@
     <script src="_static/switcheroo_demo.js?v=58a48d39"></script>
     <script src="_static/op_tabs.js?v=cd874ca5"></script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -825,11 +825,95 @@ window.addEventListener("load", load);
 <a class="reference external" href="https://www.python.org/downloads/"><img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10+-blue.svg"/></a>
 <a class="reference external" href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000.svg"/></a>
 <a class="reference external" href="https://samuelmarks.github.io/ml-switcheroo/"><img alt="Interactive docs" src="https://img.shields.io/badge/interactive-docs-orange"/></a></p>
-<p><strong>ml-switcheroo</strong> is a rigorous AST-based transpiler designed to convert Deep Learning code between frameworks (e.g., <strong>PyTorch</strong> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <strong>JAX</strong>, <strong>Keras</strong> <span class="math notranslate nohighlight">\(\to\)</span> <strong>TensorFlow</strong>) without hallucination.</p>
+<p><strong>ml-switcheroo</strong> is a rigorous AST-based transpiler designed to convert Deep Learning code between frameworks (e.g., *
+<em>PyTorch</em>* <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <strong>JAX</strong>; <strong>Keras</strong> <span class="math notranslate nohighlight">\(\leftrightarrow\)</span> <strong>TensorFlow</strong>; etc.) without hallucination.</p>
 <p>It uses a <strong>Hub-and-Spoke</strong> architecture to solve the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem. Instead of writing translators for
 every pair of frameworks, <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> maps all frameworks to a central <strong>Abstract Standard</strong> (Hub). This allows
 for “Zero-Edit” support for new frameworks via isolated JSON snapshots (Spokes).</p>
-<hr class="docutils"/>
+<p>Recently this evolved from a transpiler into a fully-fledged compiler with multiple higher and lower levels of
+abstractions, all of which are almost completely interchangeable (<span class="math notranslate nohighlight">\(\leftrightarrow\)</span> to each other):</p>
+<pre class="mermaid">
+        %%{init: {'flowchart': {'rankSpacing': 50, 'nodeSpacing': 20, 'padding': 35}}}%%
+flowchart TD
+
+%% --- 1. Font &amp; Node Styling ---
+
+%% Level 0: Red (Representations)
+    classDef l0Node fill: #ea4335, stroke: #ff7daf, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Normal', font-size: 16px, rx: 5px, ry: 5px;
+
+%% Level 1: Blue (Frameworks)
+    classDef l1Node fill: #4285f4, stroke: #57caff, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Normal', font-size: 16px, rx: 5px, ry: 5px;
+
+%% Level 2: Green (Numerical)
+    classDef l2Node fill: #34a853, stroke: #5cdb6d, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Normal', font-size: 16px, rx: 5px, ry: 5px;
+
+%% Level 3: Yellow (Intermediate)
+    classDef l3Node fill: #f9ab00, stroke: #ffd427, stroke-width: 2px, color: #ffffff, font-family: 'Google Sans Normal', font-size: 16px, rx: 5px, ry: 5px;
+
+%% Hardware: Navy (SASS) - Roboto Mono
+    classDef sassNode fill: #20344b, stroke: #57caff, stroke-width: 2px, color: #ffffff, font-family: 'Roboto Mono Normal', font-size: 14px, rx: 2px, ry: 2px;
+
+%% --- 2. Subgraph Styling --- 
+%% White backgrounds to ensure text readability + visual grouping
+    classDef containerL0 fill: #ffffff, stroke: #ea4335, stroke-width: 3px, color: #20344b, font-family: 'Google Sans Medium', font-size: 20px;
+    classDef containerL1 fill: #ffffff, stroke: #4285f4, stroke-width: 3px, color: #20344b, font-family: 'Google Sans Medium', font-size: 20px;
+    classDef containerL2 fill: #ffffff, stroke: #34a853, stroke-width: 3px, color: #20344b, font-family: 'Google Sans Medium', font-size: 20px;
+    classDef containerL3 fill: #ffffff, stroke: #f9ab00, stroke-width: 3px, color: #20344b, font-family: 'Google Sans Medium', font-size: 20px;
+    classDef containerHW fill: #ffffff, stroke: #20344b, stroke-width: 3px, color: #20344b, font-family: 'Google Sans Medium', font-size: 20px;
+
+%% --- 3. Diagram Structure ---
+
+    subgraph L0 [Level 0: Representations]
+        direction LR
+        HTML
+        TikZ
+        LaTeX
+    end
+
+    subgraph L1 [Level 1: High-Level]
+        direction LR
+        PyTorch
+        MLX
+        TensorFlow
+        Keras
+        FlaxNNX[Flax NNX]
+        Pax
+    end
+
+    subgraph L2 [Level 2: Numeric only]
+        direction LR
+        JAX
+        NumPy
+    end
+
+    subgraph L3 [Level 3: Standard IR]
+        direction LR
+        StableHLO[Stable HLO]
+        MLIR
+    end
+
+    subgraph LBottom [Level 4: ASM]
+        direction LR
+        SASS[NVIDIA SASS]
+    end
+
+%% --- 4. Connections ---
+    TikZ ~~~ TensorFlow
+    TensorFlow ~~~ JAX
+    JAX ~~~ StableHLO
+    StableHLO ~~~ SASS
+%% --- 5. Apply Styles ---
+    class HTML,TikZ,LaTeX l0Node;
+    class PyTorch,MLX,TensorFlow,Keras,FlaxNNX,Pax l1Node;
+    class JAX,NumPy l2Node;
+    class StableHLO,MLIR l3Node;
+    class SASS sassNode;
+    class L0 containerL0;
+    class L1 containerL1;
+    class L2 containerL2;
+    class L3 containerL3;
+    class LBottom containerHW;
+    </pre><hr class="docutils"/>
 <section id="key-features">
 <h2 id="key-features">🚀 Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
 <ul class="simple">
@@ -854,129 +938,127 @@ snapshots.</p></li>
 reconstructed for the target framework.</p>
 <pre class="mermaid">
         graph TD
-    %% =========================================================================
-    %%  DESIGN SYSTEM &amp; PALETTE
-    %% =========================================================================
-    
-    %% Colors
-    %% Blue 500: #4285f4 | Green 500: #34a853 | Yellow 600: #f9ab00 | Red 500: #ea4335
-    %% Navy: #20344b | White: #ffffff 
-    %% Halftone Blue: #57caff | Halftone Green: #5cdb6d 
-    %% Halftone Yellow: #ffd427 | Halftone Red: #ff7daf
+%% =========================================================================
+%%  DESIGN SYSTEM &amp; PALETTE
+%% =========================================================================
 
-    %% Fonts
-    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b,stroke-width:1px;
-    classDef title font-family:'Google Sans Medium',font-size:12px,color:#ffffff,stroke-width:0px,rx:4px;
-    classDef code font-family:'Roboto Mono Normal',font-size:11px,text-align:left,fill:#ffffff,color:#20344b,stroke:#20344b,stroke-dasharray: 2 2,rx:0;
-    classDef db font-family:'Google Sans Normal',font-size:11px,fill:#fff4c7,stroke:#f9ab00,stroke-width:1px,rx:2px;
+%% Colors
+%% Blue 500: #4285f4 | Green 500: #34a853 | Yellow 600: #f9ab00 | Red 500: #ea4335
+%% Navy: #20344b | White: #ffffff 
+%% Halftone Blue: #57caff | Halftone Green: #5cdb6d 
+%% Halftone Yellow: #ffd427 | Halftone Red: #ff7daf
 
-    %% Node Types
-    classDef src fill:#ea4335,color:#ffffff;
-    classDef eng fill:#4285f4,color:#ffffff;
-    classDef hub fill:#f9ab00,color:#20344b;
-    classDef plug fill:#57caff,color:#20344b;
-    classDef tgt fill:#34a853,color:#ffffff;
-    classDef ghost fill:#20344b,color:#ffffff,stroke-dasharray: 2 2;
+%% Fonts
+    classDef default font-family: 'Google Sans Normal', color: #20344b, stroke: #20344b, stroke-width: 1px;
+    classDef title font-family: 'Google Sans Medium', font-size: 12px, color: #ffffff, stroke-width: 0px, rx: 4px;
+    classDef code font-family: 'Roboto Mono Normal', font-size: 11px, text-align: left, fill: #ffffff, color: #20344b, stroke: #20344b, stroke-dasharray: 2 2, rx: 0;
+    classDef db font-family: 'Google Sans Normal', font-size: 11px, fill: #fff4c7, stroke: #f9ab00, stroke-width: 1px, rx: 2px;
 
-    %% =========================================================================
-    %%  1. SOURCE INPUT
-    %% =========================================================================
-    
+%% Node Types
+    classDef src fill: #ea4335, color: #ffffff;
+    classDef eng fill: #4285f4, color: #ffffff;
+    classDef hub fill: #f9ab00, color: #20344b;
+    classDef plug fill: #57caff, color: #20344b;
+    classDef tgt fill: #34a853, color: #ffffff;
+    classDef ghost fill: #20344b, color: #ffffff, stroke-dasharray: 2 2;
+
+%% =========================================================================
+%%  1. SOURCE INPUT
+%% =========================================================================
     S_HEAD("&lt;b&gt;1. Source Code (PyTorch)&lt;/b&gt;"):::src
     S_HEAD:::title
-
-    %% Syntax Highlighted HTML Label
+%% Syntax Highlighted HTML Label
     S_CODE("
     &lt;span style='color:#4285f4'&gt;import&lt;/span&gt; torch.nn &lt;span style='color:#4285f4'&gt;as&lt;/span&gt; nn&lt;br/&gt;
-    &lt;span style='color:#4285f4'&gt;class&lt;/span&gt; &lt;span style='color:#ea4335'&gt;Net&lt;/span&gt;(nn.Module):&lt;br/&gt;
-    &amp;nbsp;&amp;nbsp;&lt;span style='color:#4285f4'&gt;def&lt;/span&gt; &lt;span style='color:#f9ab00'&gt;__init__&lt;/span&gt;(&lt;span style='color:#57caff'&gt;self&lt;/span&gt;):&lt;br/&gt;
-    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#57caff'&gt;self&lt;/span&gt;.fc = nn.Linear(&lt;span style='color:#34a853'&gt;20&lt;/span&gt;, &lt;span style='color:#34a853'&gt;30&lt;/span&gt;)&lt;br/&gt;
-    "):::code
+&lt;span style='color:#4285f4'&gt;class&lt;/span&gt; &lt;span style='color:#ea4335'&gt;Net&lt;/span&gt;(nn.Module):&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&lt;span style='color:#4285f4'&gt;def&lt;/span&gt; &lt;span style='color:#f9ab00'&gt;__init__&lt;/span&gt;(&lt;span style='color:#57caff'&gt;self&lt;/span&gt;):&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#57caff'&gt;self&lt;/span&gt;.fc = nn.Linear(&lt;span style='color:#34a853'&gt;20&lt;/span&gt;, &lt;span style='color:#34a853'&gt;30&lt;/span&gt;)&lt;br/&gt;
+"):::code
 
-    S_HEAD --- S_CODE
+S_HEAD --- S_CODE
 
-    %% =========================================================================
-    %%  2. INGESTION &amp; ANALYSIS
-    %% =========================================================================
+%% =========================================================================
+%%  2. INGESTION &amp; ANALYSIS
+%% =========================================================================
 
-    P_LIBCST("&lt;b&gt;LibCST Parser&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Generates AST&lt;/i&gt;"):::eng
-    P_LIBCST:::title
-    
-    S_CODE --&gt; P_LIBCST
+P_LIBCST("&lt;b&gt;LibCST Parser&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Generates AST&lt;/i&gt;"):::eng
+P_LIBCST:::title
 
-    %% Ghost / Live Context
-    subgraph CONTEXT ["Reflection Context"]
-        direction TB
-        GHOST("&lt;b&gt;Ghost Snapshot&lt;/b&gt;&lt;br/&gt;&lt;i&gt;torch_v2.1.json&lt;/i&gt;"):::ghost
-        LIVE("&lt;b&gt;Live Library&lt;/b&gt;&lt;br/&gt;&lt;i&gt;import torch&lt;/i&gt;"):::ghost
-    end
+S_CODE --&gt; P_LIBCST
 
-    GHOST -.-&gt;|" API Signatures "| P_LIBCST
-    LIVE -.-&gt; |" Introspection "| P_LIBCST
+%% Ghost / Live Context
+subgraph CONTEXT ["Reflection Context"]
+direction TB
+GHOST("&lt;b&gt;Ghost Snapshot&lt;/b&gt;&lt;br/&gt;&lt;i&gt;torch_v2.1.json&lt;/i&gt;"):::ghost
+LIVE("&lt;b&gt;Live Library&lt;/b&gt;&lt;br/&gt;&lt;i&gt;import torch&lt;/i&gt;"):::ghost
+end
 
-    %% =========================================================================
-    %%  3. SEMANTIC PIVOT (The Hub)
-    %% =========================================================================
+GHOST -.-&gt;|" API Signatures "|P_LIBCST
+LIVE -.-&gt;|" Introspection "|P_LIBCST
 
-    HUB_HEAD("&lt;b&gt;Semantics Manager&lt;/b&gt;"):::hub
-    HUB_HEAD:::title
-    P_LIBCST --&gt; HUB_HEAD
+%% =========================================================================
+%%  3. SEMANTIC PIVOT (The Hub)
+%% =========================================================================
 
-    %% The Knowledge Base (JSONs)
-    JSON_DB[("&lt;b&gt;Knowledge Base&lt;/b&gt;&lt;br/&gt;&lt;i&gt;semantics/k_neural.json&lt;/i&gt;&lt;br/&gt;&lt;i&gt;snapshots/jax_map.json&lt;/i&gt;")]:::db
-    JSON_DB -.-&gt;|" 1. Lookup 'Linear'&lt;br/&gt;2. Read Constraints "| HUB_HEAD
+HUB_HEAD("&lt;b&gt;Semantics Manager&lt;/b&gt;"):::hub
+HUB_HEAD:::title
+P_LIBCST --&gt; HUB_HEAD
 
-    %% Intermediate Representation
-    ABS_NODE("
-    &lt;b&gt;Abstract Operation found:&lt;/b&gt;&lt;br/&gt;
-    Op: &lt;span style='color:#f9ab00'&gt;Linear&lt;/span&gt;&lt;br/&gt;
-    Tier: &lt;span style='color:#ea4335'&gt;Neural&lt;/span&gt; (Stateful)&lt;br/&gt;
-    Args: {in: 20, out: 30}&lt;br/&gt;
-    "):::code
-    HUB_HEAD --- ABS_NODE
+%% The Knowledge Base (JSONs)
+JSON_DB[("&lt;b&gt;Knowledge Base&lt;/b&gt;&lt;br/&gt;&lt;i&gt;semantics/k_neural.json&lt;/i&gt;&lt;br/&gt;&lt;i&gt;snapshots/jax_map.json&lt;/i&gt;")]:::db
+JSON_DB -.-&gt;|" 1. Lookup 'Linear'&lt;br/&gt;2. Read Constraints "|HUB_HEAD
 
-    %% =========================================================================
-    %%  4. REWRITING &amp; PLUGINS
-    %% =========================================================================
+%% Intermediate Representation
+ABS_NODE("
+&lt;b&gt;Abstract Operation found:&lt;/b&gt;&lt;br/&gt;
+Op: &lt;span style='color:#f9ab00'&gt;Linear&lt;/span&gt;&lt;br/&gt;
+Tier: &lt;span style='color:#ea4335'&gt;Neural&lt;/span&gt; (Stateful)&lt;br/&gt;
+Args: {in: 20, out: 30}&lt;br/&gt;
+"):::code
+HUB_HEAD --- ABS_NODE
 
-    REWRITE("&lt;b&gt;Pivot Rewriter&lt;/b&gt;"):::eng
-    REWRITE:::title
-    ABS_NODE --&gt; REWRITE
+%% =========================================================================
+%%  4. REWRITING &amp; PLUGINS
+%% =========================================================================
 
-    %% Plugin Logic
-    subgraph PLUGINS ["Extension System"]
-        target_trait("&lt;b&gt;Target Traits (JAX)&lt;/b&gt;&lt;br/&gt;requires_explicit_rng: &lt;span style='color:#34a853'&gt;True&lt;/span&gt;"):::db
-        
-        HOOK_DEF("&lt;b&gt;Plugin: rng_threading&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Injects 'rngs' arg into&lt;br/&gt;stateful layer calls&lt;/i&gt;"):::plug
-        HOOK_DEF:::title
-        
-        target_trait -.-&gt; HOOK_DEF
-    end
+REWRITE("&lt;b&gt;Pivot Rewriter&lt;/b&gt;"):::eng
+REWRITE:::title
+ABS_NODE --&gt; REWRITE
 
-    REWRITE &lt;--&gt;|" AST Transformation "| HOOK_DEF
+%% Plugin Logic
+subgraph PLUGINS ["Extension System"]
+target_trait("&lt;b&gt;Target Traits (JAX)&lt;/b&gt;&lt;br/&gt;requires_explicit_rng: &lt;span style='color:#34a853'&gt;True&lt;/span&gt;"):::db
 
-    %% =========================================================================
-    %%  5. OUTPUT GENERATION
-    %% =========================================================================
+HOOK_DEF("&lt;b&gt;Plugin: rng_threading&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Injects 'rngs' arg into&lt;br/&gt;stateful layer calls&lt;/i&gt;"):::plug
+HOOK_DEF:::title
 
-    FIXER("&lt;b&gt;Import Fixer&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Resolves 'nnx' alias&lt;/i&gt;"):::plug
-    FIXER:::title
-    REWRITE --&gt; FIXER
+target_trait -.-&gt; HOOK_DEF
+end
 
-    T_HEAD("&lt;b&gt;Target Code (Flax NNX)&lt;/b&gt;"):::tgt
-    T_HEAD:::title
-    FIXER --&gt; T_HEAD
+REWRITE &lt;--&gt;|" AST Transformation "|HOOK_DEF
 
-    %% Final Code
-    T_CODE("
-    &lt;span style='color:#4285f4'&gt;from&lt;/span&gt; flax &lt;span style='color:#4285f4'&gt;import&lt;/span&gt; nnx&lt;br/&gt;
-    &lt;span style='color:#4285f4'&gt;class&lt;/span&gt; &lt;span style='color:#34a853'&gt;Net&lt;/span&gt;(nnx.Module):&lt;br/&gt;
-    &amp;nbsp;&amp;nbsp;&lt;span style='color:#4285f4'&gt;def&lt;/span&gt; &lt;span style='color:#f9ab00'&gt;__init__&lt;/span&gt;(&lt;span style='color:#57caff'&gt;self&lt;/span&gt;, &lt;span style='color:#ea4335'&gt;rngs&lt;/span&gt;: nnx.Rngs):&lt;br/&gt;
-    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#90a4ae'&gt;# Hook injected 'rngs'&lt;/span&gt;&lt;br/&gt;
-    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#57caff'&gt;self&lt;/span&gt;.fc = nnx.Linear(&lt;span style='color:#34a853'&gt;20&lt;/span&gt;, &lt;span style='color:#34a853'&gt;30&lt;/span&gt;, &lt;span style='color:#ea4335'&gt;rngs=rngs&lt;/span&gt;)&lt;br/&gt;
-    "):::code
+%% =========================================================================
+%%  5. OUTPUT GENERATION
+%% =========================================================================
 
-    T_HEAD --- T_CODE
+FIXER("&lt;b&gt;Import Fixer&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Resolves 'nnx' alias&lt;/i&gt;"):::plug
+FIXER:::title
+REWRITE --&gt; FIXER
+
+T_HEAD("&lt;b&gt;Target Code (Flax NNX)&lt;/b&gt;"):::tgt
+T_HEAD:::title
+FIXER --&gt; T_HEAD
+
+%% Final Code
+T_CODE("
+&lt;span style='color:#4285f4'&gt;from&lt;/span&gt; flax &lt;span style='color:#4285f4'&gt;import&lt;/span&gt; nnx&lt;br/&gt;
+&lt;span style='color:#4285f4'&gt;class&lt;/span&gt; &lt;span style='color:#34a853'&gt;Net&lt;/span&gt;(nnx.Module):&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&lt;span style='color:#4285f4'&gt;def&lt;/span&gt; &lt;span style='color:#f9ab00'&gt;__init__&lt;/span&gt;(&lt;span style='color:#57caff'&gt;self&lt;/span&gt;, &lt;span style='color:#ea4335'&gt;rngs&lt;/span&gt;: nnx.Rngs):&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#90a4ae'&gt;# Hook injected 'rngs'&lt;/span&gt;&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style='color:#57caff'&gt;self&lt;/span&gt;.fc = nnx.Linear(&lt;span style='color:#34a853'&gt;20&lt;/span&gt;, &lt;span style='color:#34a853'&gt;30&lt;/span&gt;, &lt;span style='color:#ea4335'&gt;rngs=rngs&lt;/span&gt;)&lt;br/&gt;
+"):::code
+
+T_HEAD --- T_CODE
     </pre></section>
 <hr class="docutils"/>
 <section id="installation">
@@ -1205,7 +1287,7 @@ update:</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

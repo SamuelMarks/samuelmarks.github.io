@@ -1,0 +1,75 @@
+ml_switcheroo.core.sass.parser
+==============================
+
+.. py:module:: ml_switcheroo.core.sass.parser
+
+.. autoapi-nested-parse::
+
+   SASS Parser Implementation.
+
+   This module provides the `SassParser`, a recursive descent parser that converts
+   a stream of tokens (from `SassLexer`) into a Structural AST defined in `nodes.py`.
+
+   Capabilities:
+   - Parses Instructions, Labels, Directives, and Comments.
+   - Handles complex Operands (Memory, Predicates, Negated Registers).
+   - Supports parsing of basic blocks markers.
+   - Ignores potential stray semicolons.
+   - **Update**: Handles Branch targets with trailing colons (e.g. `BRA Label:;`).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.sass.parser.LabelRef
+   ml_switcheroo.core.sass.parser.SassParser
+
+
+Module Contents
+---------------
+
+.. py:class:: LabelRef
+
+   Bases: :py:obj:`ml_switcheroo.core.sass.nodes.Operand`
+
+
+   Base class for instruction operands (Registers, Immediates, etc.).
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: SassParser(code: str)
+
+   Recursive descent parser for NVIDIA SASS.
+
+
+   .. py:attribute:: lexer
+
+
+   .. py:attribute:: tokens
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:method:: parse() -> List[ml_switcheroo.core.sass.nodes.SassNode]
+
+      Parses the entire code block.
+
+      :returns: A list of AST nodes.
+
+
+

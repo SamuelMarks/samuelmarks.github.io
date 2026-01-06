@@ -1,0 +1,79 @@
+histogram
+=========
+
+Compute a 1-dimensional histogram.
+
+JAX implementation of :func:`numpy.histogram`.
+
+Args:
+  a: array of values to be binned. May be any size or dimension.
+  bins: Specify the number of bins in the histogram (default: 10). ``bins``
+    may also be an array specifying the locations of the bin edges.
+  range: tuple of scalars. Specifies the range of the data. If not specified,
+    the range is inferred from the data.
+  weights: An optional array specifying the weights of the data points.
+    Should be broadcast-compatible with ``a``. If not specified, each
+    data point is weighted equally.
+  density: If True, return the normalized histogram in units of counts
+    per unit length. If False (default) return the (weighted) counts per bin.
+
+Returns:
+  A tuple of arrays ``(histogram, bin_edges)``, where ``histogram`` contains
+  the aggregated data, and ``bin_edges`` specifies the boundaries of the bins.
+
+See Also:
+  - :func:`jax.numpy.bincount`: Count the number of occurrences of each value in an array.
+  - :func:`jax.numpy.histogram2d`: Compute the histogram of a 2D array.
+  - :func:`jax.numpy.histogramdd`: Compute the histogram of an N-dimensional array.
+  - :func:`jax.numpy.histogram_bin_edges`: Compute the bin edges for a histogram.
+
+Examples:
+  >>> a = jnp.array([1, 2, 3, 10, 11, 15, 19, 25])
+  >>> counts, bin_edges = jnp.histogram(a, bins=8)
+  >>> print(counts)
+  [3. 0. 0. 2. 1. 0. 1. 1.]
+  >>> print(bin_edges)
+  [ 1.  4.  7. 10. 13. 16. 19. 22. 25.]
+
+  Specifying the bin range:
+
+  >>> counts, bin_edges = jnp.histogram(a, range=(0, 25), bins=5)
+  >>> print(counts)
+  [3. 0. 2. 2. 1.]
+  >>> print(bin_edges)
+  [ 0.  5. 10. 15. 20. 25.]
+
+  Specifying the bin edges explicitly:
+
+  >>> bin_edges = jnp.array([0, 10, 20, 30])
+  >>> counts, _ = jnp.histogram(a, bins=bin_edges)
+  >>> print(counts)
+  [3. 4. 1.]
+
+  Using ``density=True`` returns a normalized histogram:
+
+  >>> density, bin_edges = jnp.histogram(a, density=True)
+  >>> dx = jnp.diff(bin_edges)
+  >>> normed_sum = jnp.sum(density * dx)
+  >>> jnp.allclose(normed_sum, 1.0)
+  Array(True, dtype=bool)
+
+**Abstract Signature:**
+
+``histogram(a, bins, range, weights, density)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'JAX (Core)_0')">JAX (Core)</button><button class="op-tab-btn " onclick="openOpTab(event, 'NumPy_1')">NumPy</button><button class="op-tab-btn " onclick="openOpTab(event, 'Keras_2')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'Flax NNX_3')">Flax NNX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="JAX (Core)_0" class="op-tab-pane active"><h4>JAX (Core)</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.histogram</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://jax.readthedocs.io/en/latest/_autosummary/jax.numpy.histogram.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="NumPy_1" class="op-tab-pane "><h4>NumPy</h4><div class="op-detail-row"><span class="label">API:</span> <code>numpy.histogram</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://numpy.org/doc/stable/reference/generated/numpy.histogram.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Keras_2" class="op-tab-pane "><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>keras.ops.numpy.histogram</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=keras.ops.numpy.histogram" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Flax NNX_3" class="op-tab-pane "><h4>Flax NNX</h4><div class="op-detail-row"><span class="label">API:</span> <code>jax.numpy.histogram</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://flax.readthedocs.io/en/latest/search.html?q=jax.numpy.histogram" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

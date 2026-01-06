@@ -1,0 +1,397 @@
+ml_switcheroo.frameworks.stablehlo
+==================================
+
+.. py:module:: ml_switcheroo.frameworks.stablehlo
+
+.. autoapi-nested-parse::
+
+   StableHLO Framework Adapter.
+
+   This adapter registers `stablehlo` as a valid target for the transpiler.
+   It treats StableHLO as a textual Intermediate Representation (IR), utilizing
+   the `StableHloEmitter` to generate MLIR code from Python AST.
+
+   Capabilities:
+   1.  **Generation**: `create_emitter` hook returns a textual emitter.
+   2.  **Tiers**: Supports Array and Neural tiers (via MLIR generation).
+   3.  **No-Ops**: Runtime hooks (weights, device checks) are stubbed or commented.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.stablehlo.StableHloAdapter
+
+
+Module Contents
+---------------
+
+.. py:class:: StableHloAdapter
+
+   Adapter for generating StableHLO (MLIR) text.
+
+
+   .. py:attribute:: display_name
+      :type:  str
+      :value: 'StableHLO (MLIR)'
+
+
+
+   .. py:attribute:: inherits_from
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: ui_priority
+      :type:  int
+      :value: 95
+
+
+
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+      No modules to search; StableHLO is an IR format.
+
+      :returns: Empty list.
+      :rtype: List[str]
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      No unsafe modules.
+
+      :returns: Empty set.
+      :rtype: Set[str]
+
+
+   .. py:property:: import_alias
+      :type: Tuple[str, str]
+
+
+      Virtual import alias matching standard textual representation.
+
+      :returns: ("stablehlo", "stablehlo").
+      :rtype: Tuple[str, str]
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
+
+
+      No namespaces to verify for import injection.
+
+      :returns: Empty dict.
+      :rtype: Dict[str, ImportConfig]
+
+
+   .. py:property:: discovery_heuristics
+      :type: Dict[str, List[str]]
+
+
+      No discovery possible.
+
+      :returns: Empty dict.
+      :rtype: Dict[str, List[str]]
+
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
+
+
+      Placeholder configuration for test generation.
+      Generates MLIR comments instead of Python logic.
+
+      :returns: Comment templates.
+      :rtype: Dict[str, str]
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Returns empty imports.
+
+      :returns: Empty list.
+      :rtype: List[str]
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Returns empty init code.
+
+      :returns: Empty string.
+      :rtype: str
+
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+      Returns generic stringifier for verification compat.
+
+      :returns: Code returning string representation.
+      :rtype: str
+
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+      Supports Neural and Array tiers for IR generation.
+
+      :returns: [ARRAY_API, NEURAL].
+      :rtype: List[SemanticTier]
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      No magic args.
+
+      :returns: Empty list.
+      :rtype: List[str]
+
+
+   .. py:property:: structural_traits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
+
+
+      Defines default structural traits.
+
+      :returns: Default configuration.
+      :rtype: StructuralTraits
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+      Defines default capabilities.
+
+      :returns: Default traits.
+      :rtype: PluginTraits
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Returns static definitions for StableHLO mappings.
+      Loaded dynamically from `frameworks/definitions/stablehlo.json`.
+
+      :returns: Mappings for translation logic.
+      :rtype: Dict[str, StandardMap]
+
+
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.semantics.schema.OpDefinition]
+
+
+      Returns empty specifications.
+
+      :returns: Empty dict.
+      :rtype: Dict[str, OpDefinition]
+
+
+   .. py:property:: rng_seed_methods
+      :type: List[str]
+
+
+      No RNG logic.
+
+      :returns: Empty list.
+      :rtype: List[str]
+
+
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+      No API to collect.
+
+      :param category: Ignored.
+      :type category: StandardCategory
+
+      :returns: Empty list.
+      :rtype: List[GhostRef]
+
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Returns device comment.
+
+      :param device_type: Device.
+      :type device_type: str
+      :param device_index: Index.
+      :type device_index: Optional[str]
+
+      :returns: MLIR comment.
+      :rtype: str
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Returns generic boolean.
+
+      :returns: "True".
+      :rtype: str
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      Returns RNG comment.
+
+      :param rng_var: Source.
+      :type rng_var: str
+      :param key_var: Destination.
+      :type key_var: str
+
+      :returns: Empty string or comment.
+      :rtype: str
+
+
+
+   .. py:method:: get_serialization_imports() -> List[str]
+
+      Empty imports.
+
+      :returns: Empty list.
+      :rtype: List[str]
+
+
+
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+      Returns empty string for IO.
+
+      :param op: Operation.
+      :type op: str
+      :param file_arg: Filename.
+      :type file_arg: str
+      :param object_arg: Object.
+      :type object_arg: Optional[str]
+
+      :returns: Empty string.
+      :rtype: str
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+      Empty list.
+
+      :returns: Empty.
+      :rtype: List[str]
+
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Returns comment code.
+
+      :param path_var: Path.
+      :type path_var: str
+
+      :returns: Comment.
+      :rtype: str
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+      Identity.
+
+      :param tensor_var: Var name.
+      :type tensor_var: str
+
+      :returns: Var name.
+      :rtype: str
+
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Returns comment code.
+
+      :param state_var: State.
+      :type state_var: str
+      :param path_var: Path.
+      :type path_var: str
+
+      :returns: Comment.
+      :rtype: str
+
+
+
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      No wiring needed.
+
+      :param snapshot: Snapshot dict.
+      :type snapshot: Dict[str, Any]
+
+
+
+   .. py:method:: get_doc_url(api_name: str) -> Optional[str]
+
+      Returns link to OpenXLA spec if applicable.
+
+      :param api_name: API name (e.g. stablehlo.abs).
+      :type api_name: str
+
+      :returns: URL.
+      :rtype: Optional[str]
+
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Returns string representation of data.
+
+      :param data: Input.
+      :type data: Any
+
+      :returns: Stringified input.
+      :rtype: Any
+
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+      Returns example MLIR snippet.
+
+      :returns: MLIR code.
+      :rtype: str
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns example strings.
+
+      :returns: Examples.
+      :rtype: Dict[str, str]
+
+
+
+   .. py:method:: create_emitter() -> Any
+
+      Factory for the output generator.
+
+      :returns: Wrapper to emit string source code.
+      :rtype: _StableHloTextEmitter
+
+
+

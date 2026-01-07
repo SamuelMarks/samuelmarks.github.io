@@ -1,0 +1,139 @@
+ml_switcheroo.core.rdna.macros
+==============================
+
+.. py:module:: ml_switcheroo.core.rdna.macros
+
+.. autoapi-nested-parse::
+
+   RDNA Macro Expansion Logic.
+
+   This module defines procedural generators for complex RDNA kernel logic.
+   Unlike 1:1 opcode mappings, these macros generate full instruction sequences
+   including loops, memory loads, wait counters, and math operations required
+   to implement high-level Neural Network layers like `Conv2d` and `Linear`
+   directly in assembly.
+
+   It adheres to the `RegisterAllocatorProtocol` to manage Scalar (SGPR) and
+   Vector (VGPR) usage separately.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rdna.macros.RegisterAllocatorProtocol
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rdna.macros.expand_conv2d
+   ml_switcheroo.core.rdna.macros.expand_linear
+
+
+Module Contents
+---------------
+
+.. py:class:: RegisterAllocatorProtocol
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol for the Dual-Pool Register Allocator used during expansion.
+
+
+   .. py:method:: get_vector_register(var_name: str) -> ml_switcheroo.core.rdna.nodes.VGPR
+
+      Gets or allocates a VGPR for a symbolic variable.
+
+      :param var_name: The logical identifier.
+      :type var_name: str
+
+      :returns: The physical register.
+      :rtype: VGPR
+
+
+
+   .. py:method:: get_scalar_register(var_name: str) -> ml_switcheroo.core.rdna.nodes.SGPR
+
+      Gets or allocates an SGPR for a symbolic variable.
+
+      :param var_name: The logical identifier.
+      :type var_name: str
+
+      :returns: The physical register.
+      :rtype: SGPR
+
+
+
+   .. py:method:: allocate_vector_temp() -> ml_switcheroo.core.rdna.nodes.VGPR
+
+      Allocates an anonymous temporary VGPR.
+
+      :returns: The physical register.
+      :rtype: VGPR
+
+
+
+   .. py:method:: allocate_scalar_temp() -> ml_switcheroo.core.rdna.nodes.SGPR
+
+      Allocates an anonymous temporary SGPR.
+
+      :returns: The physical register.
+      :rtype: SGPR
+
+
+
+.. py:function:: expand_conv2d(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.core.rdna.nodes.RdnaNode]
+
+   Generates the RDNA assembly kernel for a 2D Convolution loop.
+
+   Logic flow:
+   1.  Initialize Accumulator (VGPR).
+   2.  Setup Loop Counters (SGPR: Ky, Kx).
+   3.  Enter Y Loop -> Enter X Loop.
+   4.  Calculate addresses (v_add_f32 placeholder for indexing).
+   5.  Issue Loads (`global_load_dword`).
+   6.  Wait for memory (`s_waitcnt vmcnt(0)`).
+   7.  Math: Fused Multiply-Accumulate (`v_fmac_f32`).
+   8.  Increment counters and conditional branch (`s_cbranch_scc1`).
+
+   :param allocator: The register manager.
+   :type allocator: RegisterAllocatorProtocol
+   :param node_id: The unique ID of the operation node.
+   :type node_id: str
+   :param metadata: Layer configuration (k=kernel_size).
+   :type metadata: Dict[str, Any]
+
+   :returns: Sequence of RDNA AST nodes.
+   :rtype: List[RdnaNode]
+
+
+.. py:function:: expand_linear(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.core.rdna.nodes.RdnaNode]
+
+   Generates the RDNA assembly kernel for a Linear Layer (Matrix Multiply).
+
+   Structure:
+   1. Zero Accumulator.
+   2. Loop over input features (Dot Product).
+   3. Global Load input/weight.
+   4. Wait for memory.
+   5. Fused Multiply-Accumulate.
+   6. Loop Control.
+   7. Bias addition (optional).
+
+   :param allocator: Registry.
+   :type allocator: RegisterAllocatorProtocol
+   :param node_id: Op ID.
+   :type node_id: str
+   :param metadata: Attributes (in_features, bias).
+   :type metadata: Dict[str, Any]
+
+   :returns: Instructions.
+   :rtype: List[RdnaNode]
+
+

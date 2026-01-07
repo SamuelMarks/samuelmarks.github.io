@@ -1,0 +1,161 @@
+ml_switcheroo.core.rdna.synthesizer
+===================================
+
+.. py:module:: ml_switcheroo.core.rdna.synthesizer
+
+.. autoapi-nested-parse::
+
+   RDNA Synthesizer and Register Allocator.
+
+   This module provides the "Middle-End" logic for the RDNA compiler pipeline.
+   It bridges the gap between high-level Abstract Logic (LogicalGraphs)
+   and low-level Physical Assembly (Instruction nodes/Registers).
+
+   It contains:
+   1.  **RegisterAllocator**: A dual-pool allocator managing Scalar (SGPR) and
+       Vector (VGPR) register files independently.
+   2.  **RdnaSynthesizer**:
+       -   **Target Transformation (`from_graph`)**: Converts topological logical graphs
+           into a linear list of RDNA instructions.
+       -   **Source Transformation (`to_python`)**: Converts RDNA AST nodes back into
+           Python LibCST nodes for high-level analysis or documentation.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rdna.synthesizer.MAX_VGPR
+   ml_switcheroo.core.rdna.synthesizer.MAX_SGPR
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rdna.synthesizer.RegisterAllocator
+   ml_switcheroo.core.rdna.synthesizer.RdnaSynthesizer
+
+
+Module Contents
+---------------
+
+.. py:data:: MAX_VGPR
+   :value: 256
+
+
+.. py:data:: MAX_SGPR
+   :value: 106
+
+
+.. py:class:: RegisterAllocator
+
+   Manages the mapping between symbolic variable names and physical registers.
+   Maintains separate accounting for Scalar (SGPR) and Vector (VGPR) files.
+
+
+   .. py:method:: get_vector_register(var_name: str) -> ml_switcheroo.core.rdna.nodes.VGPR
+
+      Retrieves or allocates a Vector register (VGPR) for a symbolic variable.
+
+      :param var_name: The logical identifier.
+      :type var_name: str
+
+      :returns: The physical register (e.g. v0).
+      :rtype: VGPR
+
+      :raises ValueError: If VGPR limit is exceeded.
+
+
+
+   .. py:method:: get_scalar_register(var_name: str) -> ml_switcheroo.core.rdna.nodes.SGPR
+
+      Retrieves or allocates a Scalar register (SGPR) for a symbolic variable.
+
+      :param var_name: The logical identifier.
+      :type var_name: str
+
+      :returns: The physical register (e.g. s0).
+      :rtype: SGPR
+
+      :raises ValueError: If SGPR limit is exceeded.
+
+
+
+   .. py:method:: allocate_vector_temp() -> ml_switcheroo.core.rdna.nodes.VGPR
+
+      Allocates an anonymous temporary VGPR.
+
+      :returns: A new physical register.
+      :rtype: VGPR
+
+
+
+   .. py:method:: allocate_scalar_temp() -> ml_switcheroo.core.rdna.nodes.SGPR
+
+      Allocates an anonymous temporary SGPR.
+
+      :returns: A new physical register.
+      :rtype: SGPR
+
+
+
+   .. py:method:: reset() -> None
+
+      Resets all allocation state.
+
+
+
+.. py:class:: RdnaSynthesizer(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Bidirectional transpiler component for RDNA ISA.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: allocator
+
+
+   .. py:attribute:: macro_registry
+      :type:  Dict[str, Callable]
+
+
+   .. py:method:: from_graph(graph: ml_switcheroo.core.graph.LogicalGraph) -> List[ml_switcheroo.core.rdna.nodes.RdnaNode]
+
+      Converts a LogicalGraph into a list of RDNA AST nodes.
+
+      Logic:
+      1.  Topological Sort.
+      2.  Build adjacency for input resolution.
+      3.  Iterate Nodes:
+          - Input/Output: Comments + Register Allocation.
+          - Macro: Delegate to expander.
+          - Default: 1:1 Opcode Mapping. Assumes vector processing (VGPRs).
+
+      :param graph: The input computation graph.
+      :type graph: LogicalGraph
+
+      :returns: A structured list of assembly nodes.
+      :rtype: List[RdnaNode]
+
+
+
+   .. py:method:: to_python(rdna_nodes: List[ml_switcheroo.core.rdna.nodes.RdnaNode]) -> libcst.Module
+
+      Converts RDNA AST nodes into a Python source structure representation.
+      Used for analysis or round-trip verification.
+
+      Structure: `v0 = rdna.v_add_f32(v1, v2)`
+
+      :param rdna_nodes: List of parsed RDNA nodes.
+      :type rdna_nodes: List[RdnaNode]
+
+      :returns: A LibCST module containing the Python representation.
+      :rtype: cst.Module
+
+
+

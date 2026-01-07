@@ -1,0 +1,146 @@
+ml_switcheroo.core.rdna.tokens
+==============================
+
+.. py:module:: ml_switcheroo.core.rdna.tokens
+
+.. autoapi-nested-parse::
+
+   RDNA Tokenizer Definition.
+
+   Provides a Regex-based Lexer (`RdnaLexer`) that decomposes raw AMD RDNA assembly
+   strings into a stream of typed `Token` objects. It handles specific assembly
+   constructs like Registers (`s0`, `v[0:3]`), Immediates (`0xFF`),
+   Directives (`.text`), and Modifiers (`glc`).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rdna.tokens.TokenType
+   ml_switcheroo.core.rdna.tokens.Token
+   ml_switcheroo.core.rdna.tokens.RdnaLexer
+
+
+Module Contents
+---------------
+
+.. py:class:: TokenType(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Enumeration of valid RDNA token types.
+
+
+   .. py:attribute:: LABEL_DEF
+
+
+   .. py:attribute:: DIRECTIVE
+
+
+   .. py:attribute:: COMMENT
+
+
+   .. py:attribute:: COMMA
+
+
+   .. py:attribute:: RBRACKET
+
+
+   .. py:attribute:: LBRACKET
+
+
+   .. py:attribute:: COLON
+
+
+   .. py:attribute:: SGPR
+
+
+   .. py:attribute:: VGPR
+
+
+   .. py:attribute:: SPECIAL_REG
+
+
+   .. py:attribute:: IMMEDIATE
+
+
+   .. py:attribute:: MODIFIER
+
+
+   .. py:attribute:: IDENTIFIER
+
+
+.. py:class:: Token
+
+   Represents a lexical unit.
+
+   .. attribute:: kind
+
+      The type of token.
+
+      :type: TokenType
+
+   .. attribute:: value
+
+      The raw string value.
+
+      :type: str
+
+   .. attribute:: line
+
+      Line number in source (1-based).
+
+      :type: int
+
+   .. attribute:: column
+
+      Column number in source (1-based).
+
+      :type: int
+
+
+   .. py:attribute:: kind
+      :type:  TokenType
+
+
+   .. py:attribute:: value
+      :type:  str
+
+
+   .. py:attribute:: line
+      :type:  int
+
+
+   .. py:attribute:: column
+      :type:  int
+
+
+.. py:class:: RdnaLexer
+
+   Regex-based Lexer for AMD RDNA / GCN assembly.
+
+
+   .. py:attribute:: PATTERNS
+      :type:  List[Tuple[TokenType, str]]
+
+
+   .. py:attribute:: regex_pairs
+
+
+   .. py:method:: tokenize(text: str) -> Generator[Token, None, None]
+
+      Tokenizes the input string.
+
+      :param text: Raw RDNA source code.
+      :type text: str
+
+      :Yields: *Token* -- Token objects.
+
+      :raises ValueError: If an unrecognized character sequence is encountered.
+
+
+

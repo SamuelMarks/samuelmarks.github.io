@@ -1,0 +1,384 @@
+ml_switcheroo.frameworks.rdna
+=============================
+
+.. py:module:: ml_switcheroo.frameworks.rdna
+
+.. autoapi-nested-parse::
+
+   AMD RDNA / GCN Framework Adapter.
+
+   This module registers 'rdna' as a valid source and target for the transpiler.
+   It integrates the RDNA compiler toolchain (Nodes, Parser, Emitter, Synthesizer,
+   Lifter, Macros) into the ASTEngine via the FrameworkAdapter protocol hooks.
+
+   This provides a complete compiler pipeline:
+   1.  **Compiler (Python -> RDNA)**: Lowers PyTorch `nn.Module` classes into
+       RDNA assembly code with macro-expanded loops for layers.
+   2.  **Decompiler (RDNA -> Python)**: Lifts RDNA assembly back into high-level
+       Python `nn.Module` code using semantic markers and instruction analysis.
+
+   Capabilities:
+   1.  **Lowering**: Graph Extraction -> Macro Expansion -> Register Allocation -> Assembly.
+   2.  **Lifting**: Assembly Parsing -> Block Analysis -> Graph Reconstruction -> Code Synthesis.
+   3.  **Instruction Mapping**: 1:1 mapping for arithmetic ops via Semantic Knowledge Base.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.rdna.PythonToRdnaEmitter
+   ml_switcheroo.frameworks.rdna.RdnaToPythonParser
+   ml_switcheroo.frameworks.rdna.RdnaAdapter
+
+
+Module Contents
+---------------
+
+.. py:class:: PythonToRdnaEmitter(target_arch: str = 'gfx1030')
+
+   Adapter wrapper handling the conversion pipeline:
+   Python Code -> Graph -> RDNA AST -> RDNA Assembly Text.
+
+   Utilizes `GraphExtractor` to build a LogicalGraph from Python source,
+   and `RdnaSynthesizer` to lower that graph into assembly instructions,
+   injecting Neural Network macros (Conv2d, Linear) where applicable.
+
+
+   .. py:attribute:: target_arch
+      :value: 'gfx1030'
+
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: synth
+
+
+   .. py:attribute:: emitter
+
+
+   .. py:method:: emit(code: str) -> str
+
+      Executes the compilation pipeline.
+
+      1.  **Parse**: Convert Python string to CST.
+      2.  **Extract**: Build a LogicalGraph of layers and data flow.
+      3.  **Synthesize**: Convert Graph nodes to RDNA Instructions (with Register Allocation).
+      4.  **Emit**: Format instructions into Assembly text.
+
+      :param code: Python source code string.
+
+      :returns: Formatted RDNA assembly string with semantic comments.
+      :rtype: str
+
+
+
+.. py:class:: RdnaToPythonParser(code: str)
+
+   Adapter wrapper handling the ingestion pipeline:
+   RDNA Text -> RDNA AST -> Python CST.
+
+   Implements a "Lifting" pipeline to reconstruct high-level Python code
+   from assembly:
+   1.  **Sanitization**: Fixes lexer incompatibilities (e.g., `vmcnt(0)`).
+   2.  **Parsing**: Converts text to RDNA AST.
+   3.  **Lifting**: Detects Semantic Markers to reconstruct the Logical Graph.
+   4.  **Synthesis**: Generates a Python `nn.Module` class from the Graph.
+
+
+   .. py:attribute:: code
+
+
+   .. py:attribute:: parser_core
+
+
+   .. py:method:: parse() -> libcst.Module
+
+      Executes parsing and lifting pipeline.
+
+      Logic:
+      1.  Parse RDNA Text to RDNA AST Nodes.
+      2.  Scan for Semantic Markers (`BEGIN`, `Input`) added by the Compiler.
+      3.  If found -> **Decompile**:
+          a. Run `RdnaLifter` to recover Layer topology and Parameters.
+          b. Run `GraphSynthesizer` to generate PyTorch class structure.
+      4.  Else -> **Translation**:
+          a. Run `RdnaSynthesizer.to_python` to generate low-level checks.
+
+      :returns: LibCST Module representing the reconstructed logic.
+      :rtype: cst.Module
+
+
+
+.. py:class:: RdnaAdapter(target_arch: str = 'gfx1030')
+
+   Bases: :py:obj:`ml_switcheroo.frameworks.base.FrameworkAdapter`
+
+
+   Adapter for AMD RDNA / GCN Assembly Generation.
+
+   Branding:
+   - Source: RDNA Assembly (Text)
+   - Target: RDNA Assembly (Text)
+
+   .. attribute:: target_arch
+
+      The default target microarchitecture (e.g., "gfx1030").
+
+
+   .. py:attribute:: display_name
+      :type:  str
+      :value: 'AMD RDNA'
+
+
+      Human-readable name of the framework.
+
+
+   .. py:attribute:: inherits_from
+      :type:  Optional[str]
+      :value: None
+
+
+      Optional parent framework key to inherit behavior from.
+
+
+   .. py:attribute:: ui_priority
+      :type:  int
+      :value: 151
+
+
+      Sort priority for UI display (lower is earlier).
+
+
+   .. py:attribute:: target_arch
+      :value: 'gfx1030'
+
+
+
+   .. py:method:: create_parser(code: str) -> RdnaToPythonParser
+
+      Factory for the RDNA Ingestion Parser (Source).
+
+      :param code: The input source.
+
+      :returns: The configured parser instance.
+      :rtype: RdnaToPythonParser
+
+
+
+   .. py:method:: create_emitter() -> PythonToRdnaEmitter
+
+      Factory for the RDNA Target Emitter (Target).
+
+      :returns: The configured emitter instance.
+      :rtype: PythonToRdnaEmitter
+
+
+
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+      Returns module search paths (Empty for ISA).
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Returns unsafe modules to skip (Empty).
+
+
+   .. py:property:: import_alias
+      :type: Tuple[str, str]
+
+
+      Defines the virtual alias 'rdna' used in intermediate representations.
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
+
+
+      Returns namespace mappings (Empty).
+
+
+   .. py:property:: discovery_heuristics
+      :type: Dict[str, List[str]]
+
+
+      Patterns for auto-discovery (Empty).
+
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
+
+
+      Returns template for generated tests.
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      No imports for execution.
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      No initialization code.
+
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+      Returns code to normalize output (Stringification).
+
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+      Returns supported semantic tiers ([ARRAY_API]).
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      No magic args.
+
+
+   .. py:property:: structural_traits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
+
+
+      Structural rewriting configuration.
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+      Plugin behavior configuration.
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Returns mappings of Abstract Operations to RDNA Implementations.
+      Loaded dynamically from `frameworks/definitions/rdna.json`.
+
+
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
+
+
+      Returns unique Abstract Operations defined by this framework.
+
+
+   .. py:property:: rng_seed_methods
+      :type: List[str]
+
+
+      No RNG seeding.
+
+
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+      No API collection possible for an ISA.
+
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Emits comment for device selection.
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Always true (virtual).
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      No-op.
+
+
+
+   .. py:method:: get_serialization_imports() -> List[str]
+
+      No imports.
+
+
+
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+      No serialization syntax.
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+      No imports.
+
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Stub.
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+      Identity.
+
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Stub.
+
+
+
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies manual wiring logic.
+
+
+
+   .. py:method:: get_doc_url(api_name: str) -> Optional[str]
+
+      Returns documentation URL for an opcode.
+
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts data to string representation.
+
+
+
+   .. py:method:: get_example_code() -> str
+      :classmethod:
+
+
+      Returns example RDNA.
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns tiered examples dict.
+
+
+

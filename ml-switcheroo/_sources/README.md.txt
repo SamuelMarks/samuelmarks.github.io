@@ -5,18 +5,19 @@ ml-switcheroo 🔄🦘
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](https://opensource.org/license/apache-2-0)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Test and release](https://github.com/SamuelMarks/ml-switcheroo/actions/workflows/test_and_release.yml/badge.svg)](https://github.com/SamuelMarks/ml-switcheroo/actions/workflows/test_and_release.yml)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Interactive docs](https://img.shields.io/badge/interactive-docs-orange)](https://samuelmarks.github.io/ml-switcheroo/)
 
 **ml-switcheroo** is a rigorous AST-based transpiler designed to convert Deep Learning code between frameworks (e.g., *
-*PyTorch** $\leftrightarrow$ **JAX**; **Keras** $\leftrightarrow$ **TensorFlow**; etc.) without hallucination.
+*PyTorch** ↔ **JAX**; **Keras** ↔ **TensorFlow**; etc.) without hallucination.
 
 It uses a **Hub-and-Spoke** architecture to solve the $O(N^2)$ translation problem. Instead of writing translators for
 every pair of frameworks, `ml-switcheroo` maps all frameworks to a central **Abstract Standard** (Hub). This allows
 for "Zero-Edit" support for new frameworks via isolated JSON snapshots (Spokes).
 
 Recently this evolved from a transpiler into a fully-fledged compiler with multiple higher and lower levels of
-abstractions, all of which are almost completely interchangeable ($\leftrightarrow$ to each other):
+abstractions, all of which are almost completely interchangeable (↔ to each other):
 
 ```mermaid
 %%{init: {'flowchart': {'rankSpacing': 50, 'nodeSpacing': 20, 'padding': 35}}}%%
@@ -66,7 +67,7 @@ flowchart TD
         Pax
     end
 
-    subgraph L2 [Level 2: Numeric only]
+    subgraph L2 [Level 2: Numerics]
         direction LR
         JAX
         NumPy
@@ -115,7 +116,7 @@ flowchart TD
   snapshots.
 * **🛡️ Safety Logic**: Automatically detects side-effects (IO, globals) that break functional compilation (JIT) via the
   **Purity Scanner**.
-* **🧬 Structural Rewriting**: Handles complex transformations for class hierarchies (e.g., `nn.Module` $\leftrightarrow$
+* **🧬 Structural Rewriting**: Handles complex transformations for class hierarchies (e.g., `nn.Module` ↔
   `flax.nnx.Module`), random number threading, and state management.
 
 ---

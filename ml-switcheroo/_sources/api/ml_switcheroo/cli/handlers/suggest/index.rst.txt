@@ -29,17 +29,24 @@ Functions
 Module Contents
 ---------------
 
-.. py:function:: handle_suggest(api_path: str) -> int
+.. py:function:: handle_suggest(api_path: str, out_dir: Optional[pathlib.Path] = None, batch_size: int = 50) -> int
 
-   Generates an LLM prompt for defining a new operation.
+   Generates an LLM prompt for defining new operations.
+
+   Supports both single API paths (e.g. ``torch.nn.Linear``) and
+   module wildcards (e.g. ``jax.numpy.*``).
 
    Steps:
-   1.  Inspects the live Python object at `api_path` to get signatures and docs.
-   2.  Retrieves the JSON Schema for `OperationDef`.
-   3.  Constructs a structured prompt text.
-   4.  Prints the prompt to stdout.
+   1.  Resolves target objects (single or list from wildcard).
+   2.  Inspects live Python objects to get signatures and docs.
+   3.  Retrieves the JSON Schema for ``OperationDef``.
+   4.  Constructs structured prompts with Header, Batched Ops, and Footer.
+   5.  Writes output to stdout or files if out_dir specified.
 
-   :param api_path: The fully qualified name of the python object (e.g. 'torch.nn.Linear').
+   :param api_path: The path to inspect. Can be a dotted path to an object
+                    or a module path ending in ``.*``.
+   :param out_dir: Optional directory to save batched .md files.
+   :param batch_size: Number of operations per batch/file.
 
    :returns: Exit code (0 for success, 1 for failure).
    :rtype: int

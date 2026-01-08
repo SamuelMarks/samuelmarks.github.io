@@ -308,9 +308,11 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.op_def" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.op_def</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.tier" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.tier</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.found" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.found</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.leave_Assign" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.leave_Assign()</span></code></a>
+        <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.inject" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.inject()</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -366,9 +368,11 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.op_def" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.op_def</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.tier" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.tier</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.found" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.found</span></code></a>
         </li>
-        <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.leave_Assign" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.leave_Assign()</span></code></a>
+        <li class="md-nav__item"><a href="#injector_spec.StandardsInjector.inject" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">StandardsInjector.inject()</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -392,20 +396,16 @@
             
   <section id="module-injector_spec">
 <span id="injector-spec"></span><h1 id="api-injector-spec-index--page-root">injector_spec<a class="headerlink" href="#api-injector-spec-index--page-root" title="Link to this heading">¶</a></h1>
-<p>LibCST Transformer for Injecting Specifications.</p>
-<p>This tool modifies Python source files (specifically <cite>standards_internal.py</cite>)
-by locating the <cite>INTERNAL_OPS</cite> dictionary and appending a new operation definition
-derived from an ODL (Operation Definition Language) model.</p>
-<p>Updates:
-- Supports persistent semantic constraints (min, max, options).
-- Checks for duplicate keys to prevent overwriting existing definitions.
-- Uses robust string literal generation.</p>
+<p>JSON Injector for Semantic Specifications.</p>
+<p>This module provides the <cite>StandardsInjector</cite>, a utility to update the Semantic
+Knowledge Base JSON files (The Hub) with new operation definitions.</p>
+<p>It replaces the legacy LibCST-based injector that modified <cite>standards_internal.py</cite>.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#injector_spec.StandardsInjector" title="injector_spec.StandardsInjector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StandardsInjector</span></code></a></p></td>
-<td><p>Injects a new operation definition into the INTERNAL_OPS dict.</p></td>
+<td><p>Injects a new operation definition into the Semantic Knowledge Base (JSON).</p></td>
 </tr>
 </tbody>
 </table>
@@ -414,38 +414,35 @@ derived from an ODL (Operation Definition Language) model.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="injector_spec.StandardsInjector">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">injector_spec.</span></span><span class="sig-name descname"><span class="pre">StandardsInjector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ml_switcheroo/core/dsl/index.html#ml_switcheroo.core.dsl.OperationDef" title="ml_switcheroo.core.dsl.OperationDef"><span class="pre">ml_switcheroo.core.dsl.OperationDef</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#injector_spec.StandardsInjector" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
-<p>Injects a new operation definition into the INTERNAL_OPS dict.</p>
-<p>It transforms the abstract <cite>OperationDef</cite> into a concrete LibCST Dictionary
-node structure, including rich parameter metadata (min, max, options) and appends
-it to the existing dictionary in the source.</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">injector_spec.</span></span><span class="sig-name descname"><span class="pre">StandardsInjector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_def</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ml_switcheroo/core/dsl/index.html#ml_switcheroo.core.dsl.OperationDef" title="ml_switcheroo.core.dsl.OperationDef"><span class="pre">ml_switcheroo.core.dsl.OperationDef</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ml_switcheroo/enums/index.html#ml_switcheroo.enums.SemanticTier" title="ml_switcheroo.enums.SemanticTier"><span class="pre">ml_switcheroo.enums.SemanticTier</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">SemanticTier.EXTRAS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#injector_spec.StandardsInjector" title="Link to this definition">¶</a></dt>
+<dd><p>Injects a new operation definition into the Semantic Knowledge Base (JSON).</p>
+<p>It determines the correct JSON file based on naming heuristics or provided tier,
+serializes the <cite>OperationDef</cite> to JSON-compatible dict, and updates the file.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="injector_spec.StandardsInjector.op_def">
 <span class="sig-name descname"><span class="pre">op_def</span></span><a class="headerlink" href="#injector_spec.StandardsInjector.op_def" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="injector_spec.StandardsInjector.tier">
+<span class="sig-name descname"><span class="pre">tier</span></span><a class="headerlink" href="#injector_spec.StandardsInjector.tier" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="injector_spec.StandardsInjector.found">
 <span class="sig-name descname"><span class="pre">found</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#injector_spec.StandardsInjector.found" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="injector_spec.StandardsInjector.leave_Assign">
-<span class="sig-name descname"><span class="pre">leave_Assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Assign</span></span></span><a class="headerlink" href="#injector_spec.StandardsInjector.leave_Assign" title="Link to this definition">¶</a></dt>
-<dd><p>Visits assignment statements to find <cite>INTERNAL_OPS</cite>.</p>
-<p>If found, modifies the dictionary value to include the new key-value pair,
-UNLESS the key already exists.</p>
+<dt class="sig sig-object py" id="injector_spec.StandardsInjector.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#injector_spec.StandardsInjector.inject" title="Link to this definition">¶</a></dt>
+<dd><p>Executes the injection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>original_node</strong> – The node before transformation.</p></li>
-<li><p><strong>updated_node</strong> – The node after transformation.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>dry_run</strong> – If True, prints intended changes without writing to disk.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The modified assignment node.</p>
+<dd class="field-even"><p>True on success.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>cst.Assign</p>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>

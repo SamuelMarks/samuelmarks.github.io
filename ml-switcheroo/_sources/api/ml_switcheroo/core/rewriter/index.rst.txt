@@ -7,14 +7,12 @@ ml_switcheroo.core.rewriter
 
    Rewriter Package.
 
-   This package provides the `PivotRewriter` class, composed of several mixins
-   to handle specific aspects of the AST transformation:
-   - Structure: Class and Function definitions.
-   - Calls: Function invocations.
-   - Attributes: Attribute access.
-   - Normalization: Argument mapping.
-   - ControlFlow: Loop and branching logic.
-   - Decorators: Decorator handling.
+   This package provides the core AST transformation logic defined as a composition
+   of specialized stages (Structure, API, Auxiliary).
+
+   Classes:
+   - `RewriterPipeline`: The modern context-aware orchestrator.
+   - `PivotRewriter`: The backward-compatible class aggregating all stages for existing tests.
 
 
 
@@ -27,6 +25,7 @@ Submodules
    /api/ml_switcheroo/core/rewriter/attributes/index
    /api/ml_switcheroo/core/rewriter/base/index
    /api/ml_switcheroo/core/rewriter/calls/index
+   /api/ml_switcheroo/core/rewriter/context/index
    /api/ml_switcheroo/core/rewriter/control_flow/index
    /api/ml_switcheroo/core/rewriter/decorators/index
    /api/ml_switcheroo/core/rewriter/errors/index
@@ -45,146 +44,42 @@ Submodules
    /api/ml_switcheroo/core/rewriter/ver_check/index
 
 
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.CallMixin
+   ml_switcheroo.core.rewriter.StructureMixin
+   ml_switcheroo.core.rewriter.RewriterPipeline
+
+
 Classes
 -------
 
 .. autoapisummary::
 
-   ml_switcheroo.core.rewriter.CallMixin
-   ml_switcheroo.core.rewriter.NormalizationMixin
+   ml_switcheroo.core.rewriter.RewriterContext
+   ml_switcheroo.core.rewriter.ApiStage
+   ml_switcheroo.core.rewriter.StructureStage
+   ml_switcheroo.core.rewriter.AuxiliaryStage
+   ml_switcheroo.core.rewriter.BaseRewriter
    ml_switcheroo.core.rewriter.AttributeMixin
-   ml_switcheroo.core.rewriter.StructureMixin
+   ml_switcheroo.core.rewriter.NormalizationMixin
    ml_switcheroo.core.rewriter.DecoratorMixin
    ml_switcheroo.core.rewriter.ControlFlowMixin
-   ml_switcheroo.core.rewriter.BaseRewriter
    ml_switcheroo.core.rewriter.PivotRewriter
 
 
 Package Contents
 ----------------
 
-.. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: RewriterContext(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None, arg_injector: Optional[Callable[[str, Optional[str]], None]] = None, preamble_injector: Optional[Callable[[str], None]] = None)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+   Shared state container for the rewriting pipeline.
 
-
-   Composite mixin for transforming Call nodes (`func(...)`) and Assignments (`x = ...`).
-
-   This class aggregates:
-   1.  **Functional Unwrapping**: Handling legacy `apply` patterns (via `AssignmentUnwrapMixin`).
-   2.  **Call Rewriting**: The core engine for remapping APIs, handling plugins, and injecting state (via `InvocationMixin`).
-   3.  **Trait caching**: Performance optimization for framework config lookup (Implicit).
-
-   Inheritance Order is important: `InvocationMixin` and `AssignmentUnwrapMixin`
-   override specific visitor methods, while `BaseRewriter` provides utilities.
-
-
-.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
-
-
-   Mixin class providing argument normalization and operator transformation logic.
-
-   Dependencies:
-       Requires `self.semantics` (SemanticsManager) and `self.config` (RuntimeConfig)
-       to be available on the instance (inherited from BaseRewriter).
-
-
-.. py:class:: AttributeMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
-
-
-   Mixin for transforming attributes and tracking assignments.
-
-
-   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
-
-      Track stateful assignments (e.g. self.layer = Linear(...)) to determine
-      if an object variable requires special handling later.
-
-
-
-   .. py:method:: leave_Attribute(original: libcst.Attribute, updated: libcst.Attribute) -> libcst.BaseExpression
-
-      Visits attributes (e.g. torch.float32).
-
-
-
-.. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_func.FuncStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin`
-
-
-   Composite mixin for all structural rewriting tasks.
-   Inherits from granular mixins to assemble the full feature set.
-
-
-.. py:class:: DecoratorMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
-
-
-   Mixin for transforming Decorator nodes.
-   Part of PivotRewriter.
-
-
-   .. py:method:: leave_Decorator(original_node: libcst.Decorator, updated_node: libcst.Decorator) -> Union[libcst.Decorator, libcst.RemovalSentinel]
-
-      Processes decorators attached to functions or classes.
-
-      Logic:
-
-      1. Identifies the decorator name from `original_node` to ensure we key off the
-         Source Framework API, even if `CallMixin` modified the children in `updated_node`.
-      2. Looks up the semantic definition.
-      3. Checks Target Structural Traits for explicit stripping requirements (e.g. `strip_decorators`).
-      4. If the target variant is explicitly `null` (None), removes the decorator.
-      5. If the target variant specifies a new API, rewrites the name.
-
-
-
-.. py:class:: ControlFlowMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
-
-
-   Mixin for visiting Control Flow nodes (For, While, If).
-
-
-   .. py:method:: leave_For(original_node: libcst.For, updated_node: libcst.For) -> Union[libcst.For, libcst.CSTNode]
-
-      Invokes loop transformation logic.
-
-      Implements a priority chain:
-
-      1.  **Static Unroll**: Checks ``transform_for_loop_static``. If the loop index
-          is constant, unrolls it (Optimization).
-
-      2.  **General Transform**: Checks ``transform_for_loop``. Handles general
-          case logic or applies safety warnings (e.g., Escape Hatch for JAX).
-
-      :param original_node: The node before transformation.
-      :type original_node: cst.For
-      :param updated_node: The node after child visitors have run.
-      :type updated_node: cst.For
-
-      :returns: The transformed node (potentially a
-                FlattenSentinel of unrolled statements) or the original node if untouched.
-      :rtype: Union[cst.For, cst.CSTNode]
-
-
-
-.. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`libcst.CSTTransformer`
-
-
-   Mixin for resolving AST nodes to fully qualified names based on imports.
-
-   Assumed attributes on self:
-       _alias_map (Dict[str, str]): Mapping of local aliases to full paths.
+   Encapsulates all mutable state required during the AST traversal, allowing
+   multiple `RewriterStage` passes to operate on a consistent context.
 
 
    .. py:attribute:: semantics
@@ -198,36 +93,198 @@ Package Contents
 
 
 
-   .. py:attribute:: source_fw
-      :value: ''
+   .. py:attribute:: scope_stack
+      :type:  List[Set[str]]
+
+
+   .. py:attribute:: signature_stack
+      :type:  List[ml_switcheroo.core.rewriter.types.SignatureContext]
+      :value: []
 
 
 
-   .. py:attribute:: target_fw
-      :value: ''
+   .. py:attribute:: alias_map
+      :type:  Dict[str, str]
+
+
+   .. py:attribute:: current_stmt_errors
+      :type:  List[str]
+      :value: []
 
 
 
-   .. py:attribute:: strict_mode
+   .. py:attribute:: current_stmt_warnings
+      :type:  List[str]
+      :value: []
 
 
-   .. py:attribute:: ctx
+
+   .. py:attribute:: module_preamble
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:attribute:: in_module_class
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: hook_context
+
+
+   .. py:property:: source_fw
+      :type: str
+
+
+      Returns effective source framework string.
+
+
+   .. py:property:: target_fw
+      :type: str
+
+
+      Returns effective target framework string.
+
+
+.. py:class:: ApiStage(*args, **kwargs)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.attributes.AttributeMixin`, :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.RewriterStage`
+
+
+   Consolidated Rewriter Stage for API transformations.
+
+   Handles:
+   1.  **Function Calls**: `torch.abs(x)` -> `jax.numpy.abs(x)`.
+   2.  **Attributes**: `torch.float32` -> `jax.numpy.float32`.
+   3.  **Assignments**: Unwrapping functional returns for OOP consistency.
+
+   Inherits property accessors from `RewriterStage` -> `RewriterProxy`.
+
+
+.. py:data:: CallMixin
+
+.. py:class:: StructureStage(context: ml_switcheroo.core.rewriter.context.RewriterContext)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_func.FuncStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.RewriterStage`
+
+
+   Standalone transformer stage for structural rewrites.
+
+   Handles:
+   1. Class Inheritance swapping (e.g. torch.nn.Module -> flax.nnx.Module).
+   2. Function Signature injection (e.g. adding 'rngs').
+   3. Type Hint remapping (e.g. torch.Tensor -> jax.Array).
+
+   Acts as the context-aware bridge for the sub-mixins.
+   Inherits `RewriterProxy` attributes getters/setters via `RewriterStage`.
+
+
+.. py:data:: StructureMixin
+
+.. py:class:: AuxiliaryStage(context: ml_switcheroo.core.rewriter.context.RewriterContext)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.decorators.DecoratorMixin`, :py:obj:`ControlFlowMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.RewriterStage`
+
+
+   Combined Transformer Stage for Auxiliary Logic (Decorators + Control Flow).
+
+   This class is instantiated by the `ASTEngine` during the pipeline Execution.
+   It operates on the shared `RewriterContext`.
+
+
+.. py:class:: BaseRewriter(semantics_or_ctx: Union[ml_switcheroo.semantics.manager.SemanticsManager, ml_switcheroo.core.rewriter.context.RewriterContext], config: Optional[ml_switcheroo.config.RuntimeConfig] = None, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`RewriterStage`
+
+
+   Legacy monolithic base class.
+
+   Acts as a compatibility shim connecting the old Mixin-based architecture
+   to the new Context-based state storage.
 
 
    .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
 
       Injects module-level preambles (e.g. Shim classes) requested by plugins.
+      This handles the root level modification logic.
 
 
 
-.. py:class:: PivotRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: AttributeMixin
 
-   Bases: :py:obj:`control_flow.ControlFlowMixin`, :py:obj:`decorators.DecoratorMixin`, :py:obj:`calls.CallMixin`, :py:obj:`normalization.NormalizationMixin`, :py:obj:`attributes.AttributeMixin`, :py:obj:`structure.StructureMixin`, :py:obj:`base.BaseRewriter`
+   Mixin for transforming attributes and tracking assignments.
+
+   Expects host `ApiStage` to provide `context` via `RewriterProxy`.
+
+
+   .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
+
+      Track stateful assignments (e.g. self.layer = Linear(...)).
+
+
+
+   .. py:method:: leave_Attribute(original: libcst.Attribute, updated: libcst.Attribute) -> libcst.BaseExpression
+
+      Visits attributes (e.g. torch.float32).
+
+
+
+.. py:class:: NormalizationMixin
+
+   Mixin class providing argument normalization logic.
+   Expects `self.context` from ApiStage.
+
+
+.. py:class:: DecoratorMixin
+
+   Mixin for transforming Decorator nodes.
+
+   Expects to be mixed into `AuxiliaryStage` which provides `context`.
+
+
+   .. py:method:: leave_Decorator(original_node: libcst.Decorator, updated_node: libcst.Decorator) -> Union[libcst.Decorator, libcst.RemovalSentinel]
+
+      Processes decorators attached to functions or classes.
+
+      Logic:
+      1. Identifies the decorator name from `original_node` to ensure we key off the
+         Source Framework API.
+      2. Looks up the semantic definition.
+      3. If the target variant is explicitly `null` (None), returns RemovalSentinel.
+      4. If the target variant specifies a new API, rewrites the name.
+
+
+
+.. py:class:: ControlFlowMixin
+
+   Mixin for visiting Control Flow nodes (For, While, If).
+   Expects to be mixed into `AuxiliaryStage` (which inherits RewriterProxy properties).
+
+
+   .. py:method:: leave_For(original_node: libcst.For, updated_node: libcst.For) -> Union[libcst.For, libcst.CSTNode]
+
+      Invokes loop transformation logic.
+
+
+
+.. py:class:: PivotRewriter(semantics: Union[ml_switcheroo.semantics.manager.SemanticsManager, context.RewriterContext], config: Optional[ml_switcheroo.config.RuntimeConfig] = None, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+
+   Bases: :py:obj:`control_flow.AuxiliaryStage`, :py:obj:`calls.mixer.ApiStage`, :py:obj:`structure.StructureStage`, :py:obj:`base.BaseRewriter`
 
 
    The main AST transformer for ml-switcheroo.
 
-   Inherits functionality from component identifiers (Mixins) and the base
-   transformer logic. This class is the entry point for the ASTEngine.
+   This class aggregates the logic from:
+   1.  `AuxiliaryStage`: Decorators and Control Flow.
+   2.  `ApiStage`: Function Calls, Attributes, Assignments.
+   3.  `StructureStage`: Class Inheritance, Function Signatures, Type Hints.
+   4.  `BaseRewriter`: Common helpers, Import/Alias tracking, Error Handling.
 
+   It ensures backward compatibility with the legacy initialization signature:
+   `PivotRewriter(semantics, config, symbol_table)`.
+
+
+.. py:data:: RewriterPipeline
 

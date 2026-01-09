@@ -8,16 +8,12 @@ ml_switcheroo.core.engine
    Orchestration Engine for AST Transformations.
 
    This module provides the ``ASTEngine``, the primary driver for the transpilation process.
-   It coordinates the various analysis and transformation passes required to convert code
-   from a source framework to a target framework.
+   It coordinates the various analysis and transformation passes.
 
-   Pipeline:
-
-   1.  **Ingestion**: Adapter Hooks (LaTeX) or Standard Parsing (Python/MLIR/TikZ).
-   2.  **Emission**: Adapter Hooks (LaTeX) or Standard Emission (Python/MLIR/TikZ).
-   3.  **Analysis**: Symbol Table Inference, Purity, Lifecycle, Dependency checks.
-   4.  **Transformation**: Rewriting via PivotRewriter.
-   5.  **Refinement**: Import Fixing and Linting.
+   Updates:
+   - Integrates Snapshot emission at phase boundaries.
+   - Supports conditional Graph Optimization and Import Fixing logic via RuntimeConfig.
+   - Captures source code alongside AST graphs for "Time Travel" debugging.
 
 
 
@@ -64,39 +60,17 @@ Module Contents
 
       Parses Python source code into a LibCST module.
 
-      :param code: Source code string.
-
-      :returns: A parsed CST object.
-
 
 
    .. py:method:: to_source(tree: libcst.Module) -> str
 
       Converts a LibCST module back to source code string.
 
-      :param tree: The modified CST module.
-
-      :returns: The generated Python code.
-
 
 
    .. py:method:: run(code: str) -> ml_switcheroo.core.conversion_result.ConversionResult
 
       Executes the full transpilation pipeline.
-
-      Steps:
-
-      1.  **Ingestion**: Parse source (Python/MLIR/LaTeX) to AST.
-      2.  **Short-Circuit**: If target is non-Python (MLIR/TikZ/Latex), emit immediately.
-      3.  **Analysis**:
-          - Run Symbol Table Analyzer for type inference.
-          - Run Purity, Lifecycle, and Dependency checks.
-      4.  **Transformation**: Rewriting via PivotRewriter.
-      5.  **Refinement**: Run `ImportFixer` and `StructuralLinter` to clean results.
-
-      :param code: The source code string to transpile.
-
-      :returns: A `ConversionResult` containing the output code, errors, and execution trace.
 
 
 

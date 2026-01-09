@@ -7,16 +7,8 @@ ml_switcheroo.core.rewriter.normalization
 
    Normalization Helpers for AST Rewriting (The Argument Pivot).
 
-   This module provides the `NormalizationMixin`, a component of the `PivotRewriter`
-   responsible for reshaping function arguments and call structures during translation.
-
-   Handles:
-   -   **Argument Renaming**: Maps source keywords to target keywords (e.g. `dim` -> `axis`).
-   -   **Method-to-Function Pivot**: Injects the receiver object `x.add()` -> `add(x)` if needed.
-   -   **Default Value Injection**: Injects values defined in ODL `default` field if arguments are missing.
-   -   **Value Normalization**: Transforms primitives and nested containers defined in ODL defaults into CST nodes.
-   -   **Argument Values Enum Mapping**: Maps string/int literals (e.g. `reduction='mean'` -> `mode='avg'`).
-   -   **Packing**: Handles variadic argument packing into containers (List/Tuple).
+   Provides the `NormalizationMixin`, handling argument pivoting, renaming,
+   and default injection. Uses `ApiStage` context for lookups.
 
 
 
@@ -31,15 +23,9 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: NormalizationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: NormalizationMixin
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
-
-
-   Mixin class providing argument normalization and operator transformation logic.
-
-   Dependencies:
-       Requires `self.semantics` (SemanticsManager) and `self.config` (RuntimeConfig)
-       to be available on the instance (inherited from BaseRewriter).
+   Mixin class providing argument normalization logic.
+   Expects `self.context` from ApiStage.
 
 

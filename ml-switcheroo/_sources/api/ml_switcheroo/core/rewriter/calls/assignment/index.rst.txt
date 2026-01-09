@@ -7,10 +7,8 @@ ml_switcheroo.core.rewriter.calls.assignment
 
    Assignment Unwrapping Logic.
 
-   This module provides the ``AssignmentUnwrapMixin``, which implements the logic for
-   handling assignment statements during the rewriting process. Specifically, it
-   focuses on unwrapping functional patterns (like ``apply((vars, x))``) into
-   cleaner object-oriented calls when targeting frameworks that support it.
+   Handles unwrapping functional patterns (like ``apply((vars, x))``) into
+   cleaner object-oriented calls (like ``layer(x)``).
 
 
 
@@ -25,15 +23,12 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: AssignmentUnwrapMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: AssignmentUnwrapMixin
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin`
 
 
-   Mixin for transforming Assign nodes.
-
-   Responsible for detecting functional assignments (e.g. ``y, state = layer.apply(...)``)
-   and simplifying them based on the source framework's traits (e.g. converting to ``y = layer(...)``).
+   Mixin for transforming Assign nodes inside ApiStage.
 
 
    .. py:method:: leave_Assign(original_node: libcst.Assign, updated_node: libcst.Assign) -> libcst.Assign
@@ -42,8 +37,6 @@ Module Contents
 
       Scenario: ``y, updates = layer.apply(vars, x)``
       Target:   ``y = layer(x)`` (NNX/Torch style)
-
-      Reads ``functional_execution_method`` from Source Traits to detect pattern.
 
       :param original_node: The node before transformation.
       :param updated_node: The node after transformation.

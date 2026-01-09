@@ -55,7 +55,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=2ca74108" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=b0d570c0" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -70,12 +70,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
-    <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=58a48d39"></script>
+    <script src="../../../../../_static/trace_render.js?v=d399b484"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=ec22a231"></script>
     <script src="../../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
-    <link rel="next" title="ml_switcheroo.core.import_fixer.utils" href="../utils/index.html" />
+    <link rel="next" title="ml_switcheroo.core.import_fixer.resolution" href="../resolution/index.html" />
     <link rel="prev" title="ml_switcheroo.core.import_fixer.imports_mixin" href="../imports_mixin/index.html" />
   
    
@@ -359,11 +359,8 @@
   <section id="module-ml_switcheroo.core.import_fixer.injection_mixin">
 <span id="ml-switcheroo-core-import-fixer-injection-mixin"></span><h1 id="api-ml-switcheroo-core-import-fixer-injection-mixin-index--page-root">ml_switcheroo.core.import_fixer.injection_mixin<a class="headerlink" href="#api-ml-switcheroo-core-import-fixer-injection-mixin-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Import Injection Mixin.</p>
-<p>Handles the post-processing of the Module AST to:
-1.  Verify usage of the target framework.
-2.  Inject necessary top-level imports.
-3.  Inject alias definitions.
-4.  Perform final deduplication of import statements.</p>
+<p>Handles the post-processing of the Module AST to inject necessary top-level imports
+determined by the <cite>ResolutionPlan</cite>.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -378,24 +375,13 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.import_fixer.injection_mixin.</span></span><span class="sig-name descname"><span class="pre">InjectionMixin</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/injection_mixin.py#L24-L195"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.import_fixer.injection_mixin.</span></span><span class="sig-name descname"><span class="pre">InjectionMixin</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/injection_mixin.py#L20-L112"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
 <p>Mixin for injecting imports at the Module level.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin.leave_Module">
-<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/injection_mixin.py#L29-L188"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin.leave_Module" title="Link to this definition">¶</a></dt>
-<dd><p>Post-process module to inject imports intelligently and perform final deduplication.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>original_node</strong> – Original module logic.</p></li>
-<li><p><strong>updated_node</strong> – Module after children processing.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Modified module with injected imports.</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/injection_mixin.py#L25-L109"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.injection_mixin.InjectionMixin.leave_Module" title="Link to this definition">¶</a></dt>
+<dd><p>Post-process module to inject imports from the plan.</p>
 </dd></dl>
 </dd></dl>
 </section>
@@ -425,12 +411,12 @@
             </a>
           
           
-            <a href="../utils/index.html" title="ml_switcheroo.core.import_fixer.utils"
+            <a href="../resolution/index.html" title="ml_switcheroo.core.import_fixer.resolution"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.core.import_fixer.utils </span>
+                class="md-footer-nav__direction"> "Next" </span> ml_switcheroo.core.import_fixer.resolution </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

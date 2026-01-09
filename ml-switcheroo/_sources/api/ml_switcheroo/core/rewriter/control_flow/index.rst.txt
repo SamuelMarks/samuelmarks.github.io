@@ -5,20 +5,11 @@ ml_switcheroo.core.rewriter.control_flow
 
 .. autoapi-nested-parse::
 
-   Control Flow Rewriting Logic.
+   Auxiliary Stage: Control Flow Handling.
 
-   Handles structural control flow transformations, specifically ``for`` loops.
-   Unlike API calls which map via Semantics JSON, control flow hooks are
-   dispatched via reserved system triggers (e.g. ``transform_for_loop``).
-
-   This logic enables a prioritization chain for loop handling:
-
-   1.  **Static Unrolling**: Optimization strategy. If a loop is determined to be
-       static (e.g., ``range(5)``), it is unrolled into flat code.
-
-   2.  **Safety Transformation**: Compliance strategy. If the loop remains dynamic
-       and the target framework (like JAX) enforces functional purity, this ensures
-       the loop is flagged or converted to a scan/while construct.
+   This module completes the `AuxiliaryStage` definition by adding loop transformation
+   logic. It aggregates `DecoratorMixin` and `ControlFlowMixin` into the final
+   `AuxiliaryStage` class.
 
 
 
@@ -28,39 +19,32 @@ Classes
 .. autoapisummary::
 
    ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin
+   ml_switcheroo.core.rewriter.control_flow.AuxiliaryStage
 
 
 Module Contents
 ---------------
 
-.. py:class:: ControlFlowMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
-
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
-
+.. py:class:: ControlFlowMixin
 
    Mixin for visiting Control Flow nodes (For, While, If).
+   Expects to be mixed into `AuxiliaryStage` (which inherits RewriterProxy properties).
 
 
    .. py:method:: leave_For(original_node: libcst.For, updated_node: libcst.For) -> Union[libcst.For, libcst.CSTNode]
 
       Invokes loop transformation logic.
 
-      Implements a priority chain:
 
-      1.  **Static Unroll**: Checks ``transform_for_loop_static``. If the loop index
-          is constant, unrolls it (Optimization).
 
-      2.  **General Transform**: Checks ``transform_for_loop``. Handles general
-          case logic or applies safety warnings (e.g., Escape Hatch for JAX).
+.. py:class:: AuxiliaryStage(context: ml_switcheroo.core.rewriter.context.RewriterContext)
 
-      :param original_node: The node before transformation.
-      :type original_node: cst.For
-      :param updated_node: The node after child visitors have run.
-      :type updated_node: cst.For
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.decorators.DecoratorMixin`, :py:obj:`ControlFlowMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.RewriterStage`
 
-      :returns: The transformed node (potentially a
-                FlattenSentinel of unrolled statements) or the original node if untouched.
-      :rtype: Union[cst.For, cst.CSTNode]
 
+   Combined Transformer Stage for Auxiliary Logic (Decorators + Control Flow).
+
+   This class is instantiated by the `ASTEngine` during the pipeline Execution.
+   It operates on the shared `RewriterContext`.
 
 

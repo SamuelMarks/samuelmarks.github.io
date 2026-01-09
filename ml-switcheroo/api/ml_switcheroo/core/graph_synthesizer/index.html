@@ -55,7 +55,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/switcheroo_demo.css?v=2ca74108" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/trace_graph.css?v=b0d570c0" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -70,8 +70,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
-    <script src="../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../_static/switcheroo_demo.js?v=58a48d39"></script>
+    <script src="../../../../_static/trace_render.js?v=d399b484"></script>
+    <script src="../../../../_static/switcheroo_demo.js?v=ec22a231"></script>
     <script src="../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -331,6 +331,28 @@
         </li>
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.target_class" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.target_class</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.new_init" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.new_init</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.new_forward" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.new_forward</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.found" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.found</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.target_class</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id1" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.new_init</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id2" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.new_forward</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id3" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.found</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.leave_ClassDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ClassBodyReplacer.leave_ClassDef()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphSynthesizer</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer.framework" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphSynthesizer.framework</span></code></a>
@@ -361,15 +383,22 @@
 <span id="ml-switcheroo-core-graph-synthesizer"></span><h1 id="api-ml-switcheroo-core-graph-synthesizer-index--page-root">ml_switcheroo.core.graph_synthesizer<a class="headerlink" href="#api-ml-switcheroo-core-graph-synthesizer-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Graph Synthesizer Module.</p>
 <p>This module provides the <cite>GraphSynthesizer</cite> class, which converts a high-level
-<cite>LogicalGraph</cite> representation back into executable Python source code (specifically
-PyTorch <cite>nn.Module</cite> definitions).</p>
-<p>It is used in the “Lifting” pipeline (Decompilation) to reconstruct model code
-from intermediate graph representations extracted from SASS or other IRs.</p>
+<cite>LogicalGraph</cite> representation back into executable Python source code.</p>
+<p>It supports two modes:
+1.  <strong>Fresh Generation</strong>: Creates a new Python module from scratch (for simple decompilation).
+2.  <strong>Context Preservation</strong>: Injects the synthesized graph logic into an existing</p>
+<blockquote>
+<div><p>source tree (AST), replacing only the <cite>__init__</cite> and <cite>forward</cite> methods while
+preserving class definitions, docstrings, decorators, and auxiliary methods.</p>
+</div></blockquote>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer" title="ml_switcheroo.core.graph_synthesizer.GraphSynthesizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GraphSynthesizer</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer" title="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ClassBodyReplacer</span></code></a></p></td>
+<td><p>Transformer to swap __init__ and forward methods in a target class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer" title="ml_switcheroo.core.graph_synthesizer.GraphSynthesizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GraphSynthesizer</span></code></a></p></td>
 <td><p>Synthesizes a Python CST Module from a LogicalGraph.</p></td>
 </tr>
 </tbody>
@@ -378,26 +407,108 @@ from intermediate graph representations extracted from SASS or other IRs.</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.graph_synthesizer.</span></span><span class="sig-name descname"><span class="pre">ClassBodyReplacer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_init</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_forward</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph_synthesizer.py#L22-L108"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
+<p>Transformer to swap __init__ and forward methods in a target class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.target_class">
+<span class="sig-name descname"><span class="pre">target_class</span></span><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.target_class" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the class to update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.new_init">
+<span class="sig-name descname"><span class="pre">new_init</span></span><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.new_init" title="Link to this definition">¶</a></dt>
+<dd><p>The new AST node for __init__.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.FunctionDef</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.new_forward">
+<span class="sig-name descname"><span class="pre">new_forward</span></span><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.new_forward" title="Link to this definition">¶</a></dt>
+<dd><p>The new AST node for forward.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.FunctionDef</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.found">
+<span class="sig-name descname"><span class="pre">found</span></span><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.found" title="Link to this definition">¶</a></dt>
+<dd><p>Flag indicating if the class was found and updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">target_class</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">new_init</span></span><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">new_forward</span></span><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">found</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></span><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.leave_ClassDef">
+<span class="sig-name descname"><span class="pre">leave_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.ClassDef</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph_synthesizer.py#L52-L108"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.ClassBodyReplacer.leave_ClassDef" title="Link to this definition">¶</a></dt>
+<dd><p>Visits the ClassDefinition and replaces methods if name matches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_node</strong> (<em>cst.ClassDef</em>) – The original node.</p></li>
+<li><p><strong>updated_node</strong> (<em>cst.ClassDef</em>) – The node with processed children.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified class definition.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cst.ClassDef</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.GraphSynthesizer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.graph_synthesizer.</span></span><span class="sig-name descname"><span class="pre">GraphSynthesizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'torch'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph_synthesizer.py#L18-L226"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.graph_synthesizer.</span></span><span class="sig-name descname"><span class="pre">GraphSynthesizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'torch'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph_synthesizer.py#L111-L348"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer" title="Link to this definition">¶</a></dt>
 <dd><p>Synthesizes a Python CST Module from a LogicalGraph.</p>
-<p>Primarily targets PyTorch <cite>nn.Module</cite> generation.</p>
+<p>Primarily targets PyTorch <cite>nn.Module</cite> generation structure.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.GraphSynthesizer.framework">
 <span class="sig-name descname"><span class="pre">framework</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'torch'</span></span><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer.framework" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph_synthesizer.GraphSynthesizer.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../graph/index.html#ml_switcheroo.core.graph.LogicalGraph" title="ml_switcheroo.core.graph.LogicalGraph"><span class="pre">ml_switcheroo.core.graph.LogicalGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'DecompiledNet'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph_synthesizer.py#L35-L78"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer.generate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../graph/index.html#ml_switcheroo.core.graph.LogicalGraph" title="ml_switcheroo.core.graph.LogicalGraph"><span class="pre">ml_switcheroo.core.graph.LogicalGraph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'SwitcherooNet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_tree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph_synthesizer.py#L128-L191"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph_synthesizer.GraphSynthesizer.generate" title="Link to this definition">¶</a></dt>
 <dd><p>Generates Python source code for the given graph.</p>
-<p>Constructs a standard <cite>nn.Module</cite> class with:
-1. An <cite>__init__</cite> method defining stateful layers.
-2. A <cite>forward</cite> method sequencing operations.</p>
+<p>If <cite>original_tree</cite> is provided, it attempts to verify and patch the
+existing class definition within that tree, preserving comments and
+auxiliary methods. Otherwise, it generates a fresh file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>graph</strong> (<a class="reference internal" href="../graph/index.html#ml_switcheroo.core.graph.LogicalGraph" title="ml_switcheroo.core.graph.LogicalGraph"><em>LogicalGraph</em></a>) – The input computation graph.</p></li>
 <li><p><strong>class_name</strong> (<em>str</em>) – The name of the generated class.</p></li>
+<li><p><strong>original_tree</strong> (<em>Optional</em><em>[</em><em>cst.Module</em><em>]</em>) – The original AST to patch.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

@@ -55,7 +55,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=2ca74108" />
-    <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=b0d570c0" />
     <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
     <script src="_static/documentation_options.js?v=d45e8c67"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -70,8 +70,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
-    <script src="_static/trace_render.js?v=4ddbab91"></script>
-    <script src="_static/switcheroo_demo.js?v=58a48d39"></script>
+    <script src="_static/trace_render.js?v=d399b484"></script>
+    <script src="_static/switcheroo_demo.js?v=ec22a231"></script>
     <script src="_static/op_tabs.js?v=cd874ca5"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
@@ -788,48 +788,72 @@ class Model(nn.Module):
 <!-- Controls -->
 <div class="controls-bar">
 <button class="icon-btn" id="btn-retro" title="Matrix Mode" type="button">🕶️</button>
-<label class="md-switch" title="Strict Mode: Fail on unknown APIs.">
-<input id="chk-strict-mode" type="checkbox"/>
-<span class="md-switch-track"><span class="md-switch-thumb"></span></span>
-<span class="md-switch-text">Strict Mode</span>
-</label>
 <button class="md-btn md-btn-accent" disabled="" id="btn-convert">Run Translation</button>
 </div>
 <!-- Output Tabs -->
 <div class="output-tabs">
-<!-- Tab 1: Console -->
-<input id="tab-console" name="wm-tabs" type="radio"/>
-<label class="tab-label" for="tab-console"><span class="tab-icon">💻</span> Console</label>
-<!-- Tab 2: Mermaid AST -->
-<input id="tab-mermaid" name="wm-tabs" type="radio"/>
-<label class="tab-label" for="tab-mermaid"><span class="tab-icon">🌳</span> AST Graph</label>
-<!-- Tab 3: Timeline Trace (Default) -->
+<!-- Tab 1: Trace (Timeline) - Default -->
 <input checked="" id="tab-trace" name="wm-tabs" type="radio"/>
-<label class="tab-label" for="tab-trace"><span class="tab-icon">⏱️</span> Timeline</label>
+<label class="tab-label" for="tab-trace"><span class="tab-icon">⏱️</span> Time Travel</label>
+<!-- Tab 2: Console -->
+<input id="tab-console" name="wm-tabs" type="radio"/>
+<label class="tab-label" for="tab-console"><span class="tab-icon">💻</span> Logs</label>
+<!-- Tab 3: Mermaid AST -->
+<input id="tab-mermaid" name="wm-tabs" type="radio"/>
+<label class="tab-label" for="tab-mermaid"><span class="tab-icon">🌳</span> Graph</label>
 <!-- Tab 4: Render (TikZ / HTML) - Hidden by default -->
 <input id="tab-render" name="wm-tabs" type="radio"/>
 <label class="tab-label" for="tab-render" id="label-tab-render" style="display:none;"><span class="tab-icon">📐</span> Render</label>
 <!-- Tab 5: Weight Script (New) -->
 <input id="tab-weights" name="wm-tabs" type="radio"/>
-<!-- Added data-supported attribute hook for JS control -->
 <label class="tab-label" for="tab-weights" id="label-tab-weights" style="display:none;"><span class="tab-icon">🏋️</span> Weight Script</label>
+<!-- Content: Trace & Time Travel -->
+<div class="tab-panel" id="panel-trace">
+<!-- Playback Toolbar -->
+<div class="time-travel-bar">
+<!-- Playback Controls -->
+<div class="tt-controls">
+<button class="icon-btn" disabled="" id="btn-tt-prev" title="Step Back">⏪</button>
+<input class="tt-slider" disabled="" id="tt-slider" max="0" min="0" type="range" value="0"/>
+<button class="icon-btn" disabled="" id="btn-tt-next" title="Step Forward">⏩</button>
+</div>
+<!-- Status Display -->
+<div class="tt-info">
+<span class="tt-phase" id="tt-phase-label">Waiting...</span>
+</div>
+<!-- Pipeline Config Dropdown -->
+<details class="tt-config">
+<summary>Pipeline Config</summary>
+<div class="tt-config-menu">
+<div class="tt-config-item">
+<label title="Enable Strict Mode (Fail on unknown symbols)">
+<input id="chk-strict-mode" type="checkbox"/> Strict Mode
+                                        </label>
+</div>
+<div class="tt-config-item">
+<label title="Enable Import Fixer logic (Pruning/Injection)">
+<input checked="" id="chk-opt-imports" type="checkbox"/> Import Fixer
+                                        </label>
+</div>
+<div class="tt-config-item">
+<label title="Enable Graph Fusion/Optimization (Experimental)">
+<input id="chk-opt-graph" type="checkbox"/> Graph Opt
+                                        </label>
+</div>
+</div>
+</details>
+</div>
+<div class="trace-container" id="trace-visualizer"></div>
+</div>
 <!-- Content: Console -->
 <div class="tab-panel" id="panel-console">
 <pre id="console-output">Waiting for engine...</pre>
 </div>
 <!-- Content: Mermaid -->
 <div class="tab-panel" id="panel-mermaid">
-<div class="ast-toolbar">
-<button class="md-btn md-btn-primary" id="btn-ast-prev" style="padding:4px 10px; font-size:12px;">Before Pivot</button>
-<button class="md-btn md-btn-primary" id="btn-ast-next" style="padding:4px 10px; font-size:12px; opacity:0.6;">After Pivot</button>
-</div>
 <div class="mermaid" id="ast-mermaid-target" style="text-align:center; overflow-x:auto;">
 <em style="color:#999">Run a translation to generate the AST graph.</em>
 </div>
-</div>
-<!-- Content: Trace -->
-<div class="tab-panel" id="panel-trace">
-<div class="trace-container" id="trace-visualizer"></div>
 </div>
 <!-- Content: Render (TikZ) -->
 <div class="tab-panel" id="panel-render">

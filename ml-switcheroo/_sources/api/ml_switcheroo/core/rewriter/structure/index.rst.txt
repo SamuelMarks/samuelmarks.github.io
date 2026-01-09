@@ -5,11 +5,20 @@ ml_switcheroo.core.rewriter.structure
 
 .. autoapi-nested-parse::
 
-   Structure Rewriter Aggregator.
+   Structure Rewriter Aggregator and Stage Definition.
 
-   Combines class, function, and type annotation rewriting logic.
-   Splitting into sub-modules keeps file sizes manageable.
+   This module defines the `StructureStage`, a standalone `RewriterStage` responsible
+   for structural transformations of Python code (classes, functions, and type hints).
+   It aggregates logic from specialized mixins.
 
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.structure.StructureMixin
 
 
 Classes
@@ -17,18 +26,27 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.rewriter.structure.StructureMixin
+   ml_switcheroo.core.rewriter.structure.StructureStage
 
 
 Module Contents
 ---------------
 
-.. py:class:: StructureMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: StructureStage(context: ml_switcheroo.core.rewriter.context.RewriterContext)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_func.FuncStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.structure_class.ClassStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_func.FuncStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.structure_types.TypeStructureMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.RewriterStage`
 
 
-   Composite mixin for all structural rewriting tasks.
-   Inherits from granular mixins to assemble the full feature set.
+   Standalone transformer stage for structural rewrites.
 
+   Handles:
+   1. Class Inheritance swapping (e.g. torch.nn.Module -> flax.nnx.Module).
+   2. Function Signature injection (e.g. adding 'rngs').
+   3. Type Hint remapping (e.g. torch.Tensor -> jax.Array).
+
+   Acts as the context-aware bridge for the sub-mixins.
+   Inherits `RewriterProxy` attributes getters/setters via `RewriterStage`.
+
+
+.. py:data:: StructureMixin
 

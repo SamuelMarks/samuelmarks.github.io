@@ -5,7 +5,7 @@ ml_switcheroo.analysis.symbol_table
 
 .. autoapi-nested-parse::
 
-   Symbol Table and Type Inference Analysis.
+   Symbol Table and Type Inference Analysis with Control Flow Support.
 
    This module provides a static analysis pass to infer variable types and scopes
    before rewriting occurs. It builds a mapping of AST nodes to inferred type objects,
@@ -16,6 +16,7 @@ ml_switcheroo.analysis.symbol_table
    1.  **Imports**: Mapping module aliases to `ModuleType`.
    2.  **Assignments**: Propagating types from RHS to LHS.
    3.  **Scopes**: Handling nested function/class definitions.
+   4.  **Control Flow**: Handling type ambiguity in branches (Phi nodes) via Union types.
 
 
 
@@ -27,6 +28,7 @@ Classes
    ml_switcheroo.analysis.symbol_table.SymbolType
    ml_switcheroo.analysis.symbol_table.TensorType
    ml_switcheroo.analysis.symbol_table.ModuleType
+   ml_switcheroo.analysis.symbol_table.UnionType
    ml_switcheroo.analysis.symbol_table.Scope
    ml_switcheroo.analysis.symbol_table.SymbolTable
    ml_switcheroo.analysis.symbol_table.SymbolTableAnalyzer
@@ -52,6 +54,9 @@ Module Contents
 
 
 
+   .. py:method:: __eq__(other: object) -> bool
+
+
 .. py:class:: TensorType
 
    Bases: :py:obj:`SymbolType`
@@ -66,6 +71,9 @@ Module Contents
       The framework key (e.g. "torch" or "jax") responsible for this tensor.
 
 
+   .. py:method:: __eq__(other: object) -> bool
+
+
 .. py:class:: ModuleType
 
    Bases: :py:obj:`SymbolType`
@@ -78,6 +86,30 @@ Module Contents
       :type:  str
 
       Fully qualified path string (e.g. "torch.nn").
+
+
+   .. py:method:: __eq__(other: object) -> bool
+
+
+.. py:class:: UnionType(types: List[SymbolType])
+
+   Bases: :py:obj:`SymbolType`
+
+
+   Represents a union of potential types resulting from control flow divergence.
+
+
+   .. py:attribute:: types
+      :type:  List[SymbolType]
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the type name.
+
+
+
+   .. py:method:: __eq__(other: object) -> bool
 
 
 .. py:class:: Scope(parent: Optional[Scope] = None, name: str = '<root>')
@@ -118,6 +150,12 @@ Module Contents
 
 
 
+   .. py:method:: snapshot() -> Dict[str, SymbolType]
+
+      Returns a shallow copy of the current symbol table for branching.
+
+
+
 .. py:class:: SymbolTable
 
    Container for analysis results. Maps CST Nodes (by identity) to inferred Types.
@@ -149,6 +187,7 @@ Module Contents
 
    Static Analysis pass to populate the SymbolTable.
    Runs post-order traversal logic (via leave methods) to propagate types bottom-up.
+   Implements shallow control flow inference for If/Else and Loops.
 
 
    .. py:attribute:: semantics
@@ -165,33 +204,56 @@ Module Contents
 
    .. py:method:: visit_ClassDef(node: libcst.ClassDef) -> None
 
-      Enter class scope.
-
-      :param node: Class definition node.
+      Enters class scope.
 
 
 
    .. py:method:: leave_ClassDef(node: libcst.ClassDef) -> None
 
-      Exit class scope.
-
-      :param node: Class definition node.
+      Exits class scope.
 
 
 
    .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> None
 
-      Enter function scope.
-
-      :param node: Function definition node.
+      Enters function scope.
 
 
 
    .. py:method:: leave_FunctionDef(node: libcst.FunctionDef) -> None
 
-      Exit function scope.
+      Exits function scope.
 
-      :param node: Function definition node.
+
+
+   .. py:method:: visit_If(node: libcst.If) -> bool
+
+      Handle branching logic.
+      1. Snapshot state.
+      2. Visit body -> State_Body.
+      3. Revert to Snapshot.
+      4. Visit Else (if any) -> State_Else.
+      5. Merge (State_Body, State_Else).
+
+
+
+   .. py:method:: visit_For(node: libcst.For) -> bool
+
+      Handle loop logic.
+      Loops may execute 0 times or N times, introducing potential ambiguity.
+      We merge the state after loop body with the state before loop.
+
+
+
+   .. py:method:: visit_While(node: libcst.While) -> bool
+
+      Handle while loop logic.
+
+
+
+   .. py:method:: leave_IfExp(node: libcst.IfExp) -> None
+
+      Infers type for ternary expression: `A if C else B`.
 
 
 
@@ -200,16 +262,12 @@ Module Contents
       Track imports.
       e.g. `import torch` -> symbols['torch'] = ModuleType(name='Module', path='torch')
 
-      :param node: Import statement node.
-
 
 
    .. py:method:: leave_ImportFrom(node: libcst.ImportFrom) -> None
 
       Track from-imports.
       e.g. `from torch import nn` -> symbols['nn'] = ModuleType(name='Module', path='torch.nn')
-
-      :param node: ImportFrom statement.
 
 
 
@@ -218,24 +276,19 @@ Module Contents
       Propagate type from RHS to LHS.
       x = torch.randn() -> x is Tensor.
 
-      :param node: Assignment node.
-
 
 
    .. py:method:: leave_Name(node: libcst.Name) -> None
 
       Look up variable in scope.
 
-      :param node: Name node usage.
-
 
 
    .. py:method:: leave_Attribute(node: libcst.Attribute) -> None
 
-      Resolve attributes.
+      Resolve attributes based on their receiver type.
       If `x` is Module('torch'), `x.nn` is Module('torch.nn').
-
-      :param node: Attribute access node.
+      If `x` is Tensor, `x.shape` might be recorded etc.
 
 
 
@@ -244,8 +297,6 @@ Module Contents
       Infer return type of a call.
       1. Resolve function fully qualified name.
       2. Check SemanticsManager for return type.
-
-      :param node: Function call node.
 
 
 

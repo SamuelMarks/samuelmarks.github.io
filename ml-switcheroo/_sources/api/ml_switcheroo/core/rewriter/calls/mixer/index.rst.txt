@@ -5,18 +5,28 @@ ml_switcheroo.core.rewriter.calls.mixer
 
 .. autoapi-nested-parse::
 
-   CallMixin Definition (Aggregator).
+   API Stage Definition (Call & Attribute Mixer).
 
-   Combines various mixins required to handle assignment operations and function
-   invocations in the AST.
+   Combines various mixins required to handle assignment operations, function
+   invocations, and attribute access in the AST.
 
-   It pulls together logic from:
+   This module exports `ApiStage`, which aggregates:
    - :class:`InvocationMixin`: Helper logic for complex Call handling.
    - :class:`AssignmentUnwrapMixin`: Logic for unwrapping functional return tuples.
-   - :class:`BaseRewriter`: Core traversal state management.
+   - :class:`AttributeMixin`: Logic for rewriting attributes (constants/properties).
+   - :class:`ResolverMixin`: Logic for resolving aliases.
+   - :class:`ScopingMixin`: Logic for tracking stateful variables.
 
-   Note: NormalizationMixin and TraitsCachingMixin are inherited implicitly via InvocationMixin.
+   Note: `CallMixin` is provided as an alias for backward compatibility.
 
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.calls.mixer.CallMixin
 
 
 Classes
@@ -24,25 +34,26 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.rewriter.calls.mixer.CallMixin
+   ml_switcheroo.core.rewriter.calls.mixer.ApiStage
 
 
 Module Contents
 ---------------
 
-.. py:class:: CallMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: ApiStage(*args, **kwargs)
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.BaseRewriter`
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.calls.invocation.InvocationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.assignment.AssignmentUnwrapMixin`, :py:obj:`ml_switcheroo.core.rewriter.attributes.AttributeMixin`, :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`ml_switcheroo.core.rewriter.base.RewriterStage`
 
 
-   Composite mixin for transforming Call nodes (`func(...)`) and Assignments (`x = ...`).
+   Consolidated Rewriter Stage for API transformations.
 
-   This class aggregates:
-   1.  **Functional Unwrapping**: Handling legacy `apply` patterns (via `AssignmentUnwrapMixin`).
-   2.  **Call Rewriting**: The core engine for remapping APIs, handling plugins, and injecting state (via `InvocationMixin`).
-   3.  **Trait caching**: Performance optimization for framework config lookup (Implicit).
+   Handles:
+   1.  **Function Calls**: `torch.abs(x)` -> `jax.numpy.abs(x)`.
+   2.  **Attributes**: `torch.float32` -> `jax.numpy.float32`.
+   3.  **Assignments**: Unwrapping functional returns for OOP consistency.
 
-   Inheritance Order is important: `InvocationMixin` and `AssignmentUnwrapMixin`
-   override specific visitor methods, while `BaseRewriter` provides utilities.
+   Inherits property accessors from `RewriterStage` -> `RewriterProxy`.
 
+
+.. py:data:: CallMixin
 

@@ -55,7 +55,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=2ca74108" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=b0d570c0" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -70,8 +70,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
-    <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=58a48d39"></script>
+    <script src="../../../../../_static/trace_render.js?v=d399b484"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=ec22a231"></script>
     <script src="../../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -361,9 +361,8 @@
   <section id="module-ml_switcheroo.core.import_fixer.imports_mixin">
 <span id="ml-switcheroo-core-import-fixer-imports-mixin"></span><h1 id="api-ml-switcheroo-core-import-fixer-imports-mixin-index--page-root">ml_switcheroo.core.import_fixer.imports_mixin<a class="headerlink" href="#api-ml-switcheroo-core-import-fixer-imports-mixin-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Import Logic Mixin.</p>
-<p>Handles visiting, cleaning, and rewriting <cite>Import</cite> and <cite>ImportFrom</cite> nodes.
-Responsible for stripping source framework imports and mapping specific submodules
-to the target framework.</p>
+<p>Handles visiting, cleaning, and rewriting <cite>Import</cite> and <cite>ImportFrom</cite> nodes based
+on the centralized <cite>ResolutionPlan</cite>.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -378,21 +377,17 @@ to the target framework.</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.import_fixer.imports_mixin.</span></span><span class="sig-name descname"><span class="pre">ImportMixin</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/imports_mixin.py#L17-L152"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.import_fixer.imports_mixin.</span></span><span class="sig-name descname"><span class="pre">ImportMixin</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/imports_mixin.py#L17-L135"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTTransformer</span></code></p>
 <p>Mixin for processing Import statements.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin.leave_Import">
-<span class="sig-name descname"><span class="pre">leave_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Import</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/imports_mixin.py#L22-L80"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin.leave_Import" title="Link to this definition">¶</a></dt>
-<dd><p>Inspects <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">...</span></code> statements.
-Checks aliases against submodule_map or prunes matches to source_fw.</p>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">leave_Import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Import</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Import</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/imports_mixin.py#L48-L91"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin.leave_Import" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin.leave_ImportFrom">
-<span class="sig-name descname"><span class="pre">leave_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.ImportFrom</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.Import</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/imports_mixin.py#L82-L152"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin.leave_ImportFrom" title="Link to this definition">¶</a></dt>
-<dd><p>Inspects <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">...</span> <span class="pre">import</span> <span class="pre">...</span></code> statements.
-Handles submodule remapping and root package pruning.</p>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">leave_ImportFrom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ImportFrom</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.ImportFrom</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.Import</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.RemovalSentinel</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/import_fixer/imports_mixin.py#L93-L135"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.import_fixer.imports_mixin.ImportMixin.leave_ImportFrom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 </dd></dl>
 </section>
 </section>

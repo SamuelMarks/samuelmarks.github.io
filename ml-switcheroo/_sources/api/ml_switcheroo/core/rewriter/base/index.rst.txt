@@ -5,20 +5,14 @@ ml_switcheroo.core.rewriter.base
 
 .. autoapi-nested-parse::
 
-   Base Rewriter Implementation.
+   Base Rewriter Implementation and Stage Abstraction.
 
-   The foundation for the ``PivotRewriter``, aggregating mixins for:
+   This module defines the `RewriterStage` base class for pipeline passes and
+   maintains the `BaseRewriter` (shim) for backward compatibility with the
+   legacy monolithic structure.
 
-   - Resolution (Aliases)
-   - Scoping (State Tracking)
-   - Version Checking
-   - Error Handling
-
-   Also provides core infrastructure for:
-
-   - HookContext initialization.
-   - Global Preamble Injection.
-   - Knowledge Base Lookups (``_get_mapping``).
+   It defines `RewriterProxy` to map property accessors from Mixins to the
+   shared `RewriterContext`.
 
 
 
@@ -27,53 +21,96 @@ Classes
 
 .. autoapisummary::
 
+   ml_switcheroo.core.rewriter.base.RewriterProxy
+   ml_switcheroo.core.rewriter.base.RewriterStage
    ml_switcheroo.core.rewriter.base.BaseRewriter
 
 
 Module Contents
 ---------------
 
-.. py:class:: BaseRewriter(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: RewriterProxy
 
-   Bases: :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`libcst.CSTTransformer`
-
-
-   Mixin for resolving AST nodes to fully qualified names based on imports.
-
-   Assumed attributes on self:
-       _alias_map (Dict[str, str]): Mapping of local aliases to full paths.
+   Mixin providing read/write accessors to the shared Context.
+   Ensures mixins can access state via `self._attr` without knowing about `self.context`.
 
 
-   .. py:attribute:: semantics
+   .. py:property:: context
+      :type: ml_switcheroo.core.rewriter.context.RewriterContext
+
+      :abstractmethod:
 
 
-   .. py:attribute:: config
+      Abstract required property.
 
 
-   .. py:attribute:: symbol_table
-      :value: None
+   .. py:property:: semantics
+      :type: ml_switcheroo.semantics.manager.SemanticsManager
 
 
 
-   .. py:attribute:: source_fw
-      :value: ''
+   .. py:property:: config
+      :type: ml_switcheroo.config.RuntimeConfig
 
 
 
-   .. py:attribute:: target_fw
-      :value: ''
+   .. py:property:: symbol_table
+      :type: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable]
 
 
 
-   .. py:attribute:: strict_mode
+   .. py:property:: ctx
+
+      Expose hook context for plugins.
 
 
-   .. py:attribute:: ctx
+   .. py:property:: source_fw
+      :type: str
+
+
+
+   .. py:property:: target_fw
+      :type: str
+
+
+
+   .. py:property:: strict_mode
+      :type: bool
+
+
+
+.. py:class:: RewriterStage(context: ml_switcheroo.core.rewriter.context.RewriterContext)
+
+   Bases: :py:obj:`RewriterProxy`, :py:obj:`libcst.CSTTransformer`
+
+
+   Abstract base class for a discrete rewriting pass.
+
+   Operates on a shared `RewriterContext`.
+
+
+   .. py:property:: context
+      :type: ml_switcheroo.core.rewriter.context.RewriterContext
+
+
+      Abstract required property.
+
+
+.. py:class:: BaseRewriter(semantics_or_ctx: Union[ml_switcheroo.semantics.manager.SemanticsManager, ml_switcheroo.core.rewriter.context.RewriterContext], config: Optional[ml_switcheroo.config.RuntimeConfig] = None, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.resolver.ResolverMixin`, :py:obj:`ml_switcheroo.core.rewriter.scopes.ScopingMixin`, :py:obj:`ml_switcheroo.core.rewriter.errors.ErrorHandlingMixin`, :py:obj:`ml_switcheroo.core.rewriter.ver_check.VersioningMixin`, :py:obj:`RewriterStage`
+
+
+   Legacy monolithic base class.
+
+   Acts as a compatibility shim connecting the old Mixin-based architecture
+   to the new Context-based state storage.
 
 
    .. py:method:: leave_Module(original_node: libcst.Module, updated_node: libcst.Module) -> libcst.Module
 
       Injects module-level preambles (e.g. Shim classes) requested by plugins.
+      This handles the root level modification logic.
 
 
 

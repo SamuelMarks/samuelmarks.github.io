@@ -15,7 +15,7 @@ ml_switcheroo.frameworks.keras
    2.  **Layers**: Mapping `keras.layers.*`.
    3.  **Discovery**: Runtime introspection of the Keras API surface.
    4.  **Ghost Mode**: Silent fallback when Keras is not installed.
-   5.  **Weight Migration**: Loading/saving .h5 or .keras files (stubs provided).
+   5.  **Weight Migration**: Loading/saving .h5 or .keras files via h5py.
 
 
 
@@ -272,6 +272,9 @@ Module Contents
 
       Returns imports required for the generated weight migration script.
 
+      :returns: List of import statements.
+      :rtype: List[str]
+
 
 
    .. py:method:: get_weight_load_code(path_var: str) -> str
@@ -289,7 +292,16 @@ Module Contents
 
    .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
 
-      Returns warning that saving raw dictionary to Keras checkpoint is complex without model definition.
+      Returns Python code to save the dictionary `state_var` (mapping flat keys to numpy arrays)
+      to `path_var` using h5py.
+
+      :param state_var: Variable name of the state dictionary.
+      :type state_var: str
+      :param path_var: Variable name of the output path.
+      :type path_var: str
+
+      :returns: Generated Python code block.
+      :rtype: str
 
 
 

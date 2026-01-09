@@ -7,17 +7,10 @@ ml_switcheroo.core.rewriter.calls.invocation
 
    Function Invocation Rewriter.
 
-   This module provides the :class:`InvocationMixin`, a component of the
-   :class:`PivotRewriter` responsible for transforming function call nodes within
-   the Abstract Syntax Tree (AST).
-
-   It orchestrates three phases of processing:
-
-   1.  **Pre-Processing**: Checks for functional unwrapping, plugin claims, and lifecycle methods.
-   2.  **Strategy Execution**: Switches API calls based on Semantic Definitions, handling
-       infix operators, macros, and standard function renaming. This phase includes compatibility checks
-       and deprecation warnings.
-   3.  **Post-Processing**: Applies output adapters, casting, and state threading logic.
+   Orchestrates the rewrite of a Call node (`func(...)`) via:
+   1.  Pre-checks (Unwrapping, Plugins, Lifecycle).
+   2.  Strategy execution (Infix, Lambda, Standard).
+   3.  Post-processing (Casting, Adapters).
 
 
 
@@ -32,19 +25,19 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: InvocationMixin(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None)
+.. py:class:: InvocationMixin
 
    Bases: :py:obj:`ml_switcheroo.core.rewriter.normalization.NormalizationMixin`, :py:obj:`ml_switcheroo.core.rewriter.calls.traits_cache.TraitsCachingMixin`
 
 
    Mixin for transforming :class:`libcst.Call` nodes.
-   Integrates normalization, trait lookup, and transformation strategies.
+
+   Compatible with `ApiStage`.
 
 
    .. py:method:: leave_Call(original: libcst.Call, updated: libcst.Call) -> Union[libcst.Call, libcst.BinaryOperation, libcst.UnaryOperation, libcst.CSTNode]
 
       Visits and rewrites a function call node.
-      Delegates logic to Pre/Strategy/Post handler modules.
 
 
 

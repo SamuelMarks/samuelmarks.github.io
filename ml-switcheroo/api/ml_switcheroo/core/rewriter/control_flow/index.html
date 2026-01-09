@@ -55,7 +55,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
     <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/switcheroo_demo.css?v=2ca74108" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=76e92d11" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/trace_graph.css?v=b0d570c0" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/op_tabs.css?v=cf6d298f" />
     <script src="../../../../../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -70,13 +70,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
-    <script src="../../../../../_static/trace_render.js?v=4ddbab91"></script>
-    <script src="../../../../../_static/switcheroo_demo.js?v=58a48d39"></script>
+    <script src="../../../../../_static/trace_render.js?v=d399b484"></script>
+    <script src="../../../../../_static/switcheroo_demo.js?v=ec22a231"></script>
     <script src="../../../../../_static/op_tabs.js?v=cd874ca5"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
     <link rel="next" title="ml_switcheroo.core.rewriter.decorators" href="../decorators/index.html" />
-    <link rel="prev" title="ml_switcheroo.core.rewriter.calls.utils" href="../calls/utils/index.html" />
+    <link rel="prev" title="ml_switcheroo.core.rewriter.context" href="../context/index.html" />
   
    
 
@@ -337,6 +337,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin.leave_For" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ControlFlowMixin.leave_For()</span></code></a>
         </li></ul>
             </nav>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.rewriter.control_flow.AuxiliaryStage" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AuxiliaryStage</span></code></a>
         </li></ul>
             </nav>
         </li></ul>
@@ -358,24 +360,19 @@
             
   <section id="module-ml_switcheroo.core.rewriter.control_flow">
 <span id="ml-switcheroo-core-rewriter-control-flow"></span><h1 id="api-ml-switcheroo-core-rewriter-control-flow-index--page-root">ml_switcheroo.core.rewriter.control_flow<a class="headerlink" href="#api-ml-switcheroo-core-rewriter-control-flow-index--page-root" title="Link to this heading">¶</a></h1>
-<p>Control Flow Rewriting Logic.</p>
-<p>Handles structural control flow transformations, specifically <code class="docutils literal notranslate"><span class="pre">for</span></code> loops.
-Unlike API calls which map via Semantics JSON, control flow hooks are
-dispatched via reserved system triggers (e.g. <code class="docutils literal notranslate"><span class="pre">transform_for_loop</span></code>).</p>
-<p>This logic enables a prioritization chain for loop handling:</p>
-<ol class="arabic simple">
-<li><p><strong>Static Unrolling</strong>: Optimization strategy. If a loop is determined to be
-static (e.g., <code class="docutils literal notranslate"><span class="pre">range(5)</span></code>), it is unrolled into flat code.</p></li>
-<li><p><strong>Safety Transformation</strong>: Compliance strategy. If the loop remains dynamic
-and the target framework (like JAX) enforces functional purity, this ensures
-the loop is flagged or converted to a scan/while construct.</p></li>
-</ol>
+<p>Auxiliary Stage: Control Flow Handling.</p>
+<p>This module completes the <cite>AuxiliaryStage</cite> definition by adding loop transformation
+logic. It aggregates <cite>DecoratorMixin</cite> and <cite>ControlFlowMixin</cite> into the final
+<cite>AuxiliaryStage</cite> class.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin" title="ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControlFlowMixin</span></code></a></p></td>
 <td><p>Mixin for visiting Control Flow nodes (For, While, If).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#ml_switcheroo.core.rewriter.control_flow.AuxiliaryStage" title="ml_switcheroo.core.rewriter.control_flow.AuxiliaryStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AuxiliaryStage</span></code></a></p></td>
+<td><p>Combined Transformer Stage for Auxiliary Logic (Decorators + Control Flow).</p></td>
 </tr>
 </tbody>
 </table>
@@ -384,36 +381,22 @@ the loop is flagged or converted to a scan/while construct.</p></li>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.control_flow.</span></span><span class="sig-name descname"><span class="pre">ControlFlowMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../semantics/manager/index.html#ml_switcheroo.semantics.manager.SemanticsManager" title="ml_switcheroo.semantics.manager.SemanticsManager"><span class="pre">ml_switcheroo.semantics.manager.SemanticsManager</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../config/index.html#ml_switcheroo.config.RuntimeConfig" title="ml_switcheroo.config.RuntimeConfig"><span class="pre">ml_switcheroo.config.RuntimeConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../../analysis/symbol_table/index.html#ml_switcheroo.analysis.symbol_table.SymbolTable" title="ml_switcheroo.analysis.symbol_table.SymbolTable"><span class="pre">ml_switcheroo.analysis.symbol_table.SymbolTable</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/control_flow.py#L25-L80"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../base/index.html#ml_switcheroo.core.rewriter.base.BaseRewriter" title="ml_switcheroo.core.rewriter.base.BaseRewriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.BaseRewriter</span></code></a></p>
-<p>Mixin for visiting Control Flow nodes (For, While, If).</p>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.control_flow.</span></span><span class="sig-name descname"><span class="pre">ControlFlowMixin</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/control_flow.py#L19-L63"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin" title="Link to this definition">¶</a></dt>
+<dd><p>Mixin for visiting Control Flow nodes (For, While, If).
+Expects to be mixed into <cite>AuxiliaryStage</cite> (which inherits RewriterProxy properties).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin.leave_For">
-<span class="sig-name descname"><span class="pre">leave_For</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/control_flow.py#L30-L80"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin.leave_For" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">leave_For</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updated_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.For</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.For</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/control_flow.py#L25-L55"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin.leave_For" title="Link to this definition">¶</a></dt>
 <dd><p>Invokes loop transformation logic.</p>
-<p>Implements a priority chain:</p>
-<ol class="arabic simple">
-<li><p><strong>Static Unroll</strong>: Checks <code class="docutils literal notranslate"><span class="pre">transform_for_loop_static</span></code>. If the loop index
-is constant, unrolls it (Optimization).</p></li>
-<li><p><strong>General Transform</strong>: Checks <code class="docutils literal notranslate"><span class="pre">transform_for_loop</span></code>. Handles general
-case logic or applies safety warnings (e.g., Escape Hatch for JAX).</p></li>
-</ol>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>original_node</strong> (<em>cst.For</em>) – The node before transformation.</p></li>
-<li><p><strong>updated_node</strong> (<em>cst.For</em>) – The node after child visitors have run.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The transformed node (potentially a
-FlattenSentinel of unrolled statements) or the original node if untouched.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[cst.For, cst.CSTNode]</p>
-</dd>
-</dl>
 </dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml_switcheroo.core.rewriter.control_flow.AuxiliaryStage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.rewriter.control_flow.</span></span><span class="sig-name descname"><span class="pre">AuxiliaryStage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../context/index.html#ml_switcheroo.core.rewriter.context.RewriterContext" title="ml_switcheroo.core.rewriter.context.RewriterContext"><span class="pre">ml_switcheroo.core.rewriter.context.RewriterContext</span></a></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/rewriter/control_flow.py#L65-L73"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.rewriter.control_flow.AuxiliaryStage" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../decorators/index.html#ml_switcheroo.core.rewriter.decorators.DecoratorMixin" title="ml_switcheroo.core.rewriter.decorators.DecoratorMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.decorators.DecoratorMixin</span></code></a>, <a class="reference internal" href="#ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin" title="ml_switcheroo.core.rewriter.control_flow.ControlFlowMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControlFlowMixin</span></code></a>, <a class="reference internal" href="../base/index.html#ml_switcheroo.core.rewriter.base.RewriterStage" title="ml_switcheroo.core.rewriter.base.RewriterStage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.rewriter.base.RewriterStage</span></code></a></p>
+<p>Combined Transformer Stage for Auxiliary Logic (Decorators + Control Flow).</p>
+<p>This class is instantiated by the <cite>ASTEngine</cite> during the pipeline Execution.
+It operates on the shared <cite>RewriterContext</cite>.</p>
 </dd></dl>
 </section>
 </section>
@@ -428,7 +411,7 @@ FlattenSentinel of unrolled statements) or the original node if untouched.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../calls/utils/index.html" title="ml_switcheroo.core.rewriter.calls.utils"
+            <a href="../context/index.html" title="ml_switcheroo.core.rewriter.context"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -437,7 +420,7 @@ FlattenSentinel of unrolled statements) or the original node if untouched.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.rewriter.calls.utils </span>
+                      class="md-footer-nav__direction"> "Previous" </span> ml_switcheroo.core.rewriter.context </span>
               </div>
             </a>
           

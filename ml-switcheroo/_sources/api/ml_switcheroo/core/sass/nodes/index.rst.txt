@@ -5,11 +5,10 @@ ml_switcheroo.core.sass.nodes
 
 .. autoapi-nested-parse::
 
-   SASS AST Nodes.
+   SASS AST Nodes (Shim).
 
-   Defines the data structures for the NVIDIA SASS syntax tree.
-   Each node corresponds to a syntactic element in SASS assembly and
-   implements `__str__` to emit valid code.
+   This module aliases the unified AST nodes from the compiler frontend package
+   to maintain backward compatibility with previous core tests.
 
 
 
@@ -28,6 +27,7 @@ Classes
    ml_switcheroo.core.sass.nodes.Label
    ml_switcheroo.core.sass.nodes.Directive
    ml_switcheroo.core.sass.nodes.Comment
+   ml_switcheroo.core.sass.nodes.SGPR
 
 
 Module Contents
@@ -67,6 +67,8 @@ Module Contents
    .. attribute:: name
 
       The register identifier (e.g., "R0", "RZ").
+
+      :type: str
 
    .. attribute:: negated
 
@@ -113,9 +115,13 @@ Module Contents
 
       The predicate identifier (e.g., "P0", "PT").
 
+      :type: str
+
    .. attribute:: negated
 
       If True, indicates logical NOT (e.g., "!P0").
+
+      :type: bool
 
 
    .. py:attribute:: name
@@ -143,11 +149,15 @@ Module Contents
 
    .. attribute:: value
 
-      The numeric value (int or float).
+      The numeric value.
+
+      :type: Union[int, float]
 
    .. attribute:: is_hex
 
       If True, renders as hex string (e.g., "0x1").
+
+      :type: bool
 
 
    .. py:attribute:: value
@@ -180,9 +190,13 @@ Module Contents
 
       The base register (e.g., "R1") or constant bank string (e.g., "c[0x0]").
 
+      :type: Union[str, Register]
+
    .. attribute:: offset
 
       Optional byte offset to add to the base.
+
+      :type: Optional[int]
 
 
    .. py:attribute:: base
@@ -214,13 +228,19 @@ Module Contents
 
       The instruction mnemonic (e.g., "FADD", "MOV").
 
+      :type: str
+
    .. attribute:: operands
 
       List of operand nodes.
 
+      :type: List[Operand]
+
    .. attribute:: predicate
 
       Optional predicate guard executed before instruction.
+
+      :type: Optional[Predicate]
 
 
    .. py:attribute:: opcode
@@ -258,6 +278,8 @@ Module Contents
 
       The label identifier.
 
+      :type: str
+
 
    .. py:attribute:: name
       :type:  str
@@ -282,9 +304,13 @@ Module Contents
 
       The directive name (e.g., "headerflags").
 
+      :type: str
+
    .. attribute:: params
 
       List of string parameters.
+
+      :type: List[str]
 
 
    .. py:attribute:: name
@@ -325,5 +351,13 @@ Module Contents
 
       Returns the valid SASS string representation of the node.
 
+
+
+.. py:class:: SGPR
+
+   Bases: :py:obj:`Operand`
+
+
+   Base class for instruction operands (Registers, Immediates, etc.).
 
 

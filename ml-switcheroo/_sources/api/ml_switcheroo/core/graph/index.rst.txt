@@ -5,16 +5,17 @@ ml_switcheroo.core.graph
 
 .. autoapi-nested-parse::
 
-   Shared Graph Intermediate Representation.
+   Graph Extraction Frontend.
 
-   This module provides the language-agnostic data structures and extraction logic
-   used to convert Python ASTs into a logical graph of operations (Layers) and
-   data flow (Edges).
+   This module is responsible for analyzing Python Abstract Syntax Trees (ASTs) using LibCST
+   and extracting a `LogicalGraph` Intermediate Representation.
 
-   Shared by:
+   It re-exports the `LogicalGraph` and related classes from `ml_switcheroo.compiler.ir`
+   to maintain backward compatibility with existing code that imports from `ml_switcheroo.core.graph`.
 
-   - TikZ Backend (Visualizer)
-   - HTML Backend (Grid Layout)
+   Logic:
+       - Init Pass: Extracts `self.layer = ...` assignments.
+       - Forward Pass: Traces data flow `y = self.layer(x)`.
 
 
 
@@ -85,6 +86,14 @@ Module Contents
    Language-agnostic representation of the neural network structure.
 
 
+   .. py:attribute:: name
+      :type:  str
+      :value: 'Model'
+
+
+      Name of the graph model/class.
+
+
    .. py:attribute:: nodes
       :type:  List[LogicalNode]
       :value: []
@@ -105,7 +114,11 @@ Module Contents
 
    Sorts graph nodes by dependency order.
 
-   :param graph: The logical graph.
+   Ensures that for every edge u -> v, u appears before v in the returned list.
+   Handles disconnected components and cycles gracefully by appending
+   unreachable nodes in their original definition order.
+
+   :param graph: The logical graph to sort.
 
    :returns: List of nodes in execution order.
 
@@ -129,7 +142,7 @@ Module Contents
 
 
    .. py:attribute:: layer_registry
-      :type:  Dict[str, LogicalNode]
+      :type:  Dict[str, ml_switcheroo.compiler.ir.LogicalNode]
 
 
    .. py:attribute:: provenance

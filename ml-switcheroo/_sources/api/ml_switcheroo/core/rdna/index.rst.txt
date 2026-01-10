@@ -5,14 +5,9 @@ ml_switcheroo.core.rdna
 
 .. autoapi-nested-parse::
 
-   AMD RDNA / GCN ISA support package.
+   Shim layer for RDNA components.
 
-   This package defines the Concrete Syntax Tree (CST) nodes for representing
-   AMD RDNA / GCN assembly code. It provides structures for Instructions,
-   Scalar/Vector registers, Memory operands, Labels, and Comments.
-
-   These nodes provide deterministic string representation matching standard
-   AMD GCN/RDNA assembler syntax (e.g., `v_add_f32 v0, v1, v2`).
+   Re-exports new compiler components for backward compatibility.
 
 
 
@@ -37,21 +32,26 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.core.rdna.RdnaNode
+   ml_switcheroo.core.rdna.Comment
+   ml_switcheroo.core.rdna.Directive
+   ml_switcheroo.core.rdna.Immediate
    ml_switcheroo.core.rdna.Instruction
    ml_switcheroo.core.rdna.Label
-   ml_switcheroo.core.rdna.Directive
-   ml_switcheroo.core.rdna.Comment
-   ml_switcheroo.core.rdna.Operand
-   ml_switcheroo.core.rdna.SGPR
-   ml_switcheroo.core.rdna.VGPR
-   ml_switcheroo.core.rdna.Immediate
+   ml_switcheroo.core.rdna.LabelRef
    ml_switcheroo.core.rdna.Memory
    ml_switcheroo.core.rdna.Modifier
-   ml_switcheroo.core.rdna.LabelRef
+   ml_switcheroo.core.rdna.Operand
+   ml_switcheroo.core.rdna.RdnaNode
+   ml_switcheroo.core.rdna.SGPR
+   ml_switcheroo.core.rdna.VGPR
+   ml_switcheroo.core.rdna.RdnaParser
    ml_switcheroo.core.rdna.RdnaLexer
    ml_switcheroo.core.rdna.Token
    ml_switcheroo.core.rdna.TokenType
+   ml_switcheroo.core.rdna.RdnaLifter
+   ml_switcheroo.core.rdna.RdnaAnalyzer
+   ml_switcheroo.core.rdna.RdnaEmitter
+   ml_switcheroo.core.rdna.RdnaSynthesizer
 
 
 Functions
@@ -59,24 +59,109 @@ Functions
 
 .. autoapisummary::
 
-   ml_switcheroo.core.rdna.c_SGPR
-   ml_switcheroo.core.rdna.c_VGPR
+   ml_switcheroo.core.rdna.expand_conv2d
+   ml_switcheroo.core.rdna.expand_linear
 
 
 Package Contents
 ----------------
 
-.. py:class:: RdnaNode
+.. py:class:: Comment
 
-   Bases: :py:obj:`abc.ABC`
+   Bases: :py:obj:`RdnaNode`
 
 
-   Abstract base class for all RDNA AST nodes.
+   Represents a line comment.
+   RDNA assembly uses `;` for comments.
+
+   Format: `; {text}`
+
+   .. attribute:: text
+
+      The comment content.
+
+      :type: str
+
+
+   .. py:attribute:: text
+      :type:  str
 
 
    .. py:method:: __str__() -> str
-      :abstractmethod:
 
+      Returns the valid RDNA string representation of the node.
+
+
+
+.. py:class:: Directive
+
+   Bases: :py:obj:`RdnaNode`
+
+
+   Represents an assembler directive.
+
+   Format: `.{name} {params}`
+
+   .. attribute:: name
+
+      The directive name (e.g., "global_base").
+
+      :type: str
+
+   .. attribute:: params
+
+      List of string parameters.
+
+      :type: List[str]
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: params
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid RDNA string representation of the node.
+
+
+
+.. py:class:: Immediate
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a literal constant value.
+
+   .. attribute:: value
+
+      The numeric value.
+
+      :type: Union[int, float]
+
+   .. attribute:: is_hex
+
+      If True, renders as hex string (e.g., 0xff).
+
+      :type: bool
+
+
+   .. py:attribute:: value
+      :type:  Union[int, float]
+
+
+   .. py:attribute:: is_hex
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
 
       Returns the valid RDNA string representation of the node.
 
@@ -147,189 +232,22 @@ Package Contents
 
 
 
-.. py:class:: Directive
+.. py:class:: LabelRef
 
-   Bases: :py:obj:`RdnaNode`
+   Bases: :py:obj:`Operand`
 
 
-   Represents an assembler directive.
-
-   Format: `.{name} {params}`
+   Represents a reference to a label (e.g. as a jump target) or generic identifier operand.
 
    .. attribute:: name
 
-      The directive name (e.g., "global_base").
+      The label identifier.
 
       :type: str
-
-   .. attribute:: params
-
-      List of string parameters.
-
-      :type: List[str]
 
 
    .. py:attribute:: name
       :type:  str
-
-
-   .. py:attribute:: params
-      :type:  List[str]
-      :value: []
-
-
-
-   .. py:method:: __str__() -> str
-
-      Returns the valid RDNA string representation of the node.
-
-
-
-.. py:class:: Comment
-
-   Bases: :py:obj:`RdnaNode`
-
-
-   Represents a line comment.
-   RDNA assembly uses `;` for comments.
-
-   Format: `; {text}`
-
-   .. attribute:: text
-
-      The comment content.
-
-      :type: str
-
-
-   .. py:attribute:: text
-      :type:  str
-
-
-   .. py:method:: __str__() -> str
-
-      Returns the valid RDNA string representation of the node.
-
-
-
-.. py:class:: Operand
-
-   Bases: :py:obj:`RdnaNode`
-
-
-   Base class for instruction operands (Registers, Immediates, etc.).
-
-
-.. py:class:: SGPR
-
-   Bases: :py:obj:`Operand`
-
-
-   Represents a Scalar General Purpose Register (e.g., s0, s10).
-
-   .. attribute:: index
-
-      The register index.
-
-      :type: int
-
-   .. attribute:: count
-
-      If > 1, represents a range/multi-register (e.g., s[0:3]).
-
-      :type: int
-
-
-   .. py:attribute:: index
-      :type:  int
-
-
-   .. py:attribute:: count
-      :type:  int
-      :value: 1
-
-
-
-   .. py:method:: __str__() -> str
-
-      Returns the valid RDNA string representation of the node.
-
-
-
-.. py:class:: VGPR
-
-   Bases: :py:obj:`Operand`
-
-
-   Represents a Vector General Purpose Register (e.g., v0, v255).
-
-   .. attribute:: index
-
-      The register index.
-
-      :type: int
-
-   .. attribute:: count
-
-      If > 1, represents a range/multi-register (e.g., v[0:3]).
-
-      :type: int
-
-
-   .. py:attribute:: index
-      :type:  int
-
-
-   .. py:attribute:: count
-      :type:  int
-      :value: 1
-
-
-
-   .. py:method:: __str__() -> str
-
-      Returns the valid RDNA string representation of the node.
-
-
-
-.. py:function:: c_SGPR(idx: int) -> SGPR
-
-   Helper to create a single SGPR.
-
-
-.. py:function:: c_VGPR(idx: int) -> VGPR
-
-   Helper to create a single VGPR.
-
-
-.. py:class:: Immediate
-
-   Bases: :py:obj:`Operand`
-
-
-   Represents a literal constant value.
-
-   .. attribute:: value
-
-      The numeric value.
-
-      :type: Union[int, float]
-
-   .. attribute:: is_hex
-
-      If True, renders as hex string (e.g., 0xff).
-
-      :type: bool
-
-
-   .. py:attribute:: value
-      :type:  Union[int, float]
-
-
-   .. py:attribute:: is_hex
-      :type:  bool
-      :value: False
-
 
 
    .. py:method:: __str__() -> str
@@ -406,27 +324,127 @@ Package Contents
 
 
 
-.. py:class:: LabelRef
+.. py:class:: Operand
 
-   Bases: :py:obj:`Operand`
-
-
-   Represents a reference to a label (e.g. as a jump target) or generic identifier operand.
-
-   .. attribute:: name
-
-      The label identifier.
-
-      :type: str
+   Bases: :py:obj:`RdnaNode`
 
 
-   .. py:attribute:: name
-      :type:  str
+   Base class for instruction operands (Registers, Immediates, etc.).
 
 
    .. py:method:: __str__() -> str
 
       Returns the valid RDNA string representation of the node.
+
+
+
+.. py:class:: RdnaNode
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for all RDNA AST nodes.
+
+
+   .. py:method:: __str__() -> str
+      :abstractmethod:
+
+
+      Returns the valid RDNA string representation of the node.
+
+
+
+.. py:class:: SGPR
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a Scalar General Purpose Register (e.g., s0, s10).
+
+   .. attribute:: index
+
+      The register index.
+
+      :type: int
+
+   .. attribute:: count
+
+      If > 1, represents a range/multi-register (e.g., s[0:3]).
+
+      :type: int
+
+
+   .. py:attribute:: index
+      :type:  int
+
+
+   .. py:attribute:: count
+      :type:  int
+      :value: 1
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid RDNA string representation of the node.
+
+
+
+.. py:class:: VGPR
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a Vector General Purpose Register (e.g., v0, v255).
+
+   .. attribute:: index
+
+      The register index.
+
+      :type: int
+
+   .. attribute:: count
+
+      If > 1, represents a range/multi-register (e.g., v[0:3]).
+
+      :type: int
+
+
+   .. py:attribute:: index
+      :type:  int
+
+
+   .. py:attribute:: count
+      :type:  int
+      :value: 1
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid RDNA string representation of the node.
+
+
+
+.. py:class:: RdnaParser(code: str)
+
+   Recursive descent parser for AMD RDNA / GCN assembly.
+
+
+   .. py:attribute:: lexer
+
+
+   .. py:attribute:: tokens
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:method:: parse() -> List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]
+
+      Parses the entire code block.
 
 
 
@@ -545,5 +563,85 @@ Package Contents
 
 
    .. py:attribute:: IDENTIFIER
+
+
+.. py:class:: RdnaLifter
+
+   Reconstructs a LogicalGraph from a sequence of RDNA AST nodes.
+
+
+   .. py:method:: lift(nodes: List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]) -> ml_switcheroo.compiler.ir.LogicalGraph
+
+      Parses a list of RDNA nodes to build a LogicalGraph.
+
+
+
+.. py:class:: RdnaAnalyzer
+
+   Analyzes sequences of RDNA instructions to reverse-engineer high-level parameters.
+
+
+   .. py:method:: analyze_block(kind: str, instructions: List[ml_switcheroo.compiler.frontends.rdna.nodes.Instruction]) -> Dict[str, Any]
+      :staticmethod:
+
+
+      Extracts metadata from a block of instructions based on the operation kind.
+
+      :param kind: The operation type (e.g. "Conv2d", "Linear").
+      :type kind: str
+      :param instructions: The assembly lines inside the block.
+      :type instructions: List[Instruction]
+
+      :returns: Extracted parameters (e.g., {"k": 3}).
+      :rtype: Dict[str, Any]
+
+
+
+.. py:class:: RdnaEmitter
+
+   Converts RDNA AST nodes into textual assembly code.
+
+
+   .. py:method:: emit(nodes: List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]) -> str
+
+      Generates the RDNA source string from a list of nodes.
+
+
+
+.. py:class:: RdnaSynthesizer(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Bidirectional transpiler component for RDNA ISA.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: allocator
+
+
+   .. py:attribute:: macro_registry
+      :type:  Dict[str, Callable]
+
+
+   .. py:method:: from_graph(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]
+
+      Converts a LogicalGraph into a list of RDNA AST nodes.
+
+
+
+   .. py:method:: to_python(rdna_nodes: List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]) -> libcst.Module
+
+      Converts RDNA AST nodes into a Python source structure representation.
+
+
+
+.. py:function:: expand_conv2d(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]
+
+   Generates the RDNA assembly kernel for a 2D Convolution loop.
+
+
+.. py:function:: expand_linear(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]
+
+   Generates the RDNA assembly kernel for a Linear Layer.
 
 

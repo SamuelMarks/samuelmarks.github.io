@@ -7,17 +7,8 @@ ml_switcheroo.frameworks.latex_dsl
 
    LaTeX Math DSL Adapter.
 
-   This framework adapter treats standard mathematical notation (LaTeX) as a target "language"
-   for documentation purposes. It allows the system to transpile a model architecture
-   or set of operations into readable mathematical equations.
-
-   As a non-computational framework, most runtime hooks (device management,
-   weight loading, execution) are implemented as no-ops or return LaTeX comments.
-
-   Capabilities:
-   1.  **Format**: Generates LaTeX equation code strings.
-   2.  **Tiers**: Visual/Mathematical representation only.
-   3.  **No-Ops**: Weights, tensors, and runtime checks are explicitly disabled.
+   Provides metadata and hooks for the Machine Intelligence Definition Language (MIDL)
+   LaTeX DSL.
 
 
 
@@ -35,9 +26,6 @@ Module Contents
 .. py:class:: LatexDSLAdapter
 
    Adapter for generating LaTeX Mathematical Expressions.
-
-   Targeting this framework results in the generation of .tex file content
-   describing the model's mathematical formulation (e.g., $y = Wx + b$).
 
 
    .. py:attribute:: display_name
@@ -58,302 +46,138 @@ Module Contents
 
 
 
+   .. py:method:: create_parser(code: str) -> ml_switcheroo.core.latex.parser.LatexParser
+
+      Factory for the LaTeX Parser.
+
+
+
+   .. py:method:: create_emitter() -> ml_switcheroo.core.latex.emitter.LatexEmitter
+
+      Factory for the LaTeX Emitter.
+
+
+
    .. py:property:: search_modules
       :type: List[str]
 
-
-      No modules to search; LaTeX is not a Python library.
-
-      :returns: Empty list.
 
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
 
-      No unsafe modules.
-
-      :returns: Empty set.
-
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
-
-      Import alias for the virtual `midl` package used in intermediate AST.
-
-      :returns: ("midl", "midl").
 
 
    .. py:property:: import_namespaces
       :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
-      Namespace mappings. Defines 'midl' as a valid Neural Tier source.
-
-      :returns: Mapping.
-
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
-
-      No discovery possible.
-
-      :returns: Empty dict.
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
-      Returns placeholder configuration for testing.
-
-      :returns: Comment templates.
-
 
    .. py:property:: harness_imports
       :type: List[str]
 
 
-      Returns empty imports.
-
-      :returns: Empty list.
-
 
    .. py:method:: get_harness_init_code() -> str
 
-      Returns empty init code.
-
-      :returns: Empty string.
-
-
 
    .. py:method:: get_to_numpy_code() -> str
-
-      Returns generic stringifier.
-
-      :returns: Code returning string representation.
-
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Supports Neural and Math tiers for formula generation.
-
-      :returns: [NEURAL, ARRAY_API].
-
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
 
-      No magic args.
-
-      :returns: Empty list.
-
 
    .. py:property:: structural_traits
-      :type: ml_switcheroo.frameworks.base.StructuralTraits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
 
-
-      Defines traits for the virtual 'midl' framework used in round-trip tests.
-      When parsing LaTeX, we generate class `M(midl.Module)`.
-
-      :returns: Config for parsing LaTeX-generated ASTs.
 
 
    .. py:property:: plugin_traits
-      :type: ml_switcheroo.frameworks.base.PluginTraits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
 
-
-      Defines default capabilities.
-
-      :returns: Default traits.
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Returns static definitions for math mappings.
-      Loaded dynamically from `frameworks/definitions/latex_dsl.json`.
 
-      :returns: Mappings for equation logic.
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
+
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      No RNG logic.
-
-      :returns: Empty list.
-
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
-
-      No API to collect.
-
-      :param category: Ignored.
-
-      :returns: Empty list.
-
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
-      Returns empty string to avoid polluting latex output with comments about devices.
-
-      :param device_type: Target device.
-      :param device_index: Optional device index.
-
-      :returns: Empty string.
-
-
 
    .. py:method:: get_device_check_syntax() -> str
-
-      Returns generic boolean.
-
-      :returns: "True".
-
 
 
    .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
 
-      Returns empty string.
-
-      :param rng_var: RNG variable name.
-      :param key_var: Key variable name.
-
-      :returns: Empty string.
-
-
 
    .. py:method:: get_serialization_imports() -> List[str]
-
-      Empty imports.
-
-      :returns: Empty list.
-
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      Returns empty string for IO.
-
-      :param op: Operation name.
-      :param file_arg: Filename argument.
-      :param object_arg: Optional object argument.
-
-      :returns: Empty string.
-
-
 
    .. py:method:: get_weight_conversion_imports() -> List[str]
-
-      Empty list.
-
-      :returns: Empty list.
-
 
 
    .. py:method:: get_weight_load_code(path_var: str) -> str
 
-      Returns comment code.
-
-      :param path_var: Variable name for path.
-
-      :returns: Comment code literal.
-
-
 
    .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
-
-      Identity.
-
-      :param tensor_var: Variable name.
-
-      :returns: Argument as is.
-
 
 
    .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
 
-      Returns comment code.
-
-      :param state_var: Variable name for state.
-      :param path_var: Variable name for path.
-
-      :returns: Comment code literal.
-
-
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
-
-      No wiring needed.
-
-      :param snapshot: Snapshot dict.
-
 
 
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
-      Returns None as I haven't documented this yet.
-
-      :param api_name: API name.
-      :type api_name: str
-
-      :returns: None
-
-
 
    .. py:method:: convert(data: Any) -> Any
-
-      Returns string representation of data.
-
-      :param data: Input.
-
-      :returns: Stringified input.
-
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
-      Returns LaTeX equation example.
-
-      :returns: TeX code.
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns example TeX strings.
-
-      :returns: Examples.
-
-
-
-   .. py:method:: create_parser(code: str) -> ml_switcheroo.core.latex.parser.LatexParser
-
-      Factory for the ingest parser.
-
-      :param code: Source code string.
-
-      :returns: Instance of LatexParser.
-
-
-
-   .. py:method:: create_emitter() -> ml_switcheroo.core.latex.emitter.LatexEmitter
-
-      Factory for the output generator.
-
-      :returns: Instance of LatexEmitter.
-
 
 

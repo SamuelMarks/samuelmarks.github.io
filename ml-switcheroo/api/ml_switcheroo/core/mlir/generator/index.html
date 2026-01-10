@@ -369,23 +369,6 @@
 <p>MLIR to Python (LibCST) Generator.</p>
 <p>This module provides the <cite>MlirToPythonGenerator</cite> class, which consumes the
 MLIR CST object model and reconstructs valid Python code via LibCST.</p>
-<p>It performs the inverse operation of the Emitter:</p>
-<ol class="arabic simple">
-<li><p><strong>Dialect Interpretation</strong>: Maps <cite>sw.*</cite> ops back to Python constructs.</p></li>
-<li><p><strong>SSA Resolution</strong>: Converts <cite>%id</cite> references into readable Python variable names.</p></li>
-<li><p><strong>Trivia Restoration</strong>: Transforms <cite>// comment</cite> back to <cite># comment</cite>.</p></li>
-<li><p><strong>Expression Folding</strong>: Inlines specific single-use intermediates (Atoms, Fused Statements)
-to produce Pythonic code.</p></li>
-</ol>
-<p>Feature Hardening:
-- Robustly handles <cite>sw.op</cite> “type” attributes for deep class hierarchies.
-- Distinguishes between static operation calls and dynamic calls.
-- Ensures valid assignment generation for results.
-- <strong>Naming Heuristics</strong>: Preserves variable names based on SSA IDs or Type Hints.
-- <strong>Type Reconstruction</strong>: Restores Python type hints from MLIR.
-- <strong>Void Assignment Suppression</strong>: Strips unused assignments.
-- <strong>Explicit Re-rolling</strong>: Enforces sequential statements for clarity unless fusion triggers.
-- <strong>Statement Fusion</strong>: Fuses operations into <cite>setattr</cite> and <cite>return</cite>.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -400,7 +383,7 @@ to produce Pythonic code.</p></li>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.mlir.generator.</span></span><span class="sig-name descname"><span class="pre">MlirToPythonGenerator</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L44-L306"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.mlir.generator.</span></span><span class="sig-name descname"><span class="pre">MlirToPythonGenerator</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L26-L290"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../gen_expressions/index.html#ml_switcheroo.core.mlir.gen_expressions.ExpressionGeneratorMixin" title="ml_switcheroo.core.mlir.gen_expressions.ExpressionGeneratorMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.mlir.gen_expressions.ExpressionGeneratorMixin</span></code></a>, <a class="reference internal" href="../gen_statements/index.html#ml_switcheroo.core.mlir.gen_statements.StatementGeneratorMixin" title="ml_switcheroo.core.mlir.gen_statements.StatementGeneratorMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.mlir.gen_statements.StatementGeneratorMixin</span></code></a>, <a class="reference internal" href="../gen_base/index.html#ml_switcheroo.core.mlir.gen_base.BaseGeneratorMixin" title="ml_switcheroo.core.mlir.gen_base.BaseGeneratorMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ml_switcheroo.core.mlir.gen_base.BaseGeneratorMixin</span></code></a></p>
 <p>Transpiler back-end: MLIR CST -&gt; Python LibCST.
 Integrates expression and statement generation logic.</p>
@@ -422,7 +405,7 @@ Integrates expression and statement generation logic.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.generate">
-<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../nodes/index.html#ml_switcheroo.core.mlir.nodes.ModuleNode" title="ml_switcheroo.core.mlir.nodes.ModuleNode"><span class="pre">ml_switcheroo.core.mlir.nodes.ModuleNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L66-L83"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.generate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../nodes/index.html#ml_switcheroo.core.mlir.nodes.ModuleNode" title="ml_switcheroo.core.mlir.nodes.ModuleNode"><span class="pre">ml_switcheroo.core.mlir.nodes.ModuleNode</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">libcst.Module</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/mlir/generator.py#L48-L65"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.mlir.generator.MlirToPythonGenerator.generate" title="Link to this definition">¶</a></dt>
 <dd><p>Main entry point. Converts MLIR Module to Python Module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

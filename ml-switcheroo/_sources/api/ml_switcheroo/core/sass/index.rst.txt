@@ -5,14 +5,10 @@ ml_switcheroo.core.sass
 
 .. autoapi-nested-parse::
 
-   NVIDIA SASS (Streaming Assembler) AST Package.
+   Shim Layer for SASS components.
 
-   This package defines the Concrete Syntax Tree (CST) nodes for representing
-   NVIDIA SASS assembly code. It supports Instructions, Operands (Registers,
-   Predicates, Immediates, Memory), Labels, Directives, and Comments.
-
-   These nodes provide a deterministic string representation matching standard
-   SASS syntax (e.g. `FADD R0, R1, R2;`).
+   Re-exports the new compiler components to maintain backward compatibility
+   with existing Framework Adapters and tests.
 
 
 
@@ -47,6 +43,23 @@ Classes
    ml_switcheroo.core.sass.Predicate
    ml_switcheroo.core.sass.Register
    ml_switcheroo.core.sass.SassNode
+   ml_switcheroo.core.sass.SassParser
+   ml_switcheroo.core.sass.SassLexer
+   ml_switcheroo.core.sass.Token
+   ml_switcheroo.core.sass.TokenType
+   ml_switcheroo.core.sass.SassLifter
+   ml_switcheroo.core.sass.SassAnalyzer
+   ml_switcheroo.core.sass.SassEmitter
+   ml_switcheroo.core.sass.SassSynthesizer
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.sass.expand_conv2d
+   ml_switcheroo.core.sass.expand_linear
 
 
 Package Contents
@@ -89,9 +102,13 @@ Package Contents
 
       The directive name (e.g., "headerflags").
 
+      :type: str
+
    .. attribute:: params
 
       List of string parameters.
+
+      :type: List[str]
 
 
    .. py:attribute:: name
@@ -119,11 +136,15 @@ Package Contents
 
    .. attribute:: value
 
-      The numeric value (int or float).
+      The numeric value.
+
+      :type: Union[int, float]
 
    .. attribute:: is_hex
 
       If True, renders as hex string (e.g., "0x1").
+
+      :type: bool
 
 
    .. py:attribute:: value
@@ -155,13 +176,19 @@ Package Contents
 
       The instruction mnemonic (e.g., "FADD", "MOV").
 
+      :type: str
+
    .. attribute:: operands
 
       List of operand nodes.
 
+      :type: List[Operand]
+
    .. attribute:: predicate
 
       Optional predicate guard executed before instruction.
+
+      :type: Optional[Predicate]
 
 
    .. py:attribute:: opcode
@@ -199,6 +226,8 @@ Package Contents
 
       The label identifier.
 
+      :type: str
+
 
    .. py:attribute:: name
       :type:  str
@@ -224,9 +253,13 @@ Package Contents
 
       The base register (e.g., "R1") or constant bank string (e.g., "c[0x0]").
 
+      :type: Union[str, Register]
+
    .. attribute:: offset
 
       Optional byte offset to add to the base.
+
+      :type: Optional[int]
 
 
    .. py:attribute:: base
@@ -267,9 +300,13 @@ Package Contents
 
       The predicate identifier (e.g., "P0", "PT").
 
+      :type: str
+
    .. attribute:: negated
 
       If True, indicates logical NOT (e.g., "!P0").
+
+      :type: bool
 
 
    .. py:attribute:: name
@@ -298,6 +335,8 @@ Package Contents
    .. attribute:: name
 
       The register identifier (e.g., "R0", "RZ").
+
+      :type: str
 
    .. attribute:: negated
 
@@ -344,5 +383,304 @@ Package Contents
 
       Returns the valid SASS string representation of the node.
 
+
+
+.. py:class:: SassParser(code: str)
+
+   Recursive descent parser for NVIDIA SASS.
+
+
+   .. py:attribute:: lexer
+
+
+   .. py:attribute:: tokens
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:method:: parse() -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
+
+      Parses the entire code block.
+
+      :returns: A list of AST nodes.
+      :rtype: List[SassNode]
+
+
+
+.. py:class:: SassLexer
+
+   Regex-based Lexer for NVIDIA SASS assembly.
+
+
+   .. py:attribute:: PATTERNS
+      :type:  List[Tuple[TokenType, str]]
+
+
+   .. py:attribute:: regex_pairs
+
+
+   .. py:method:: tokenize(text: str) -> Generator[Token, None, None]
+
+      Tokenizes the input string.
+
+      :param text: Raw SASS source code.
+      :type text: str
+
+      :Yields: *Token* -- Token objects.
+
+      :raises ValueError: If an unrecognized character sequence is encountered.
+
+
+
+.. py:class:: Token
+
+   Represents a lexical unit.
+
+   .. attribute:: kind
+
+      The type of token.
+
+      :type: TokenType
+
+   .. attribute:: value
+
+      The raw string content.
+
+      :type: str
+
+   .. attribute:: line
+
+      Line number in source (1-based).
+
+      :type: int
+
+   .. attribute:: column
+
+      Column number in source (1-based).
+
+      :type: int
+
+
+   .. py:attribute:: kind
+      :type:  TokenType
+
+
+   .. py:attribute:: value
+      :type:  str
+
+
+   .. py:attribute:: line
+      :type:  int
+
+
+   .. py:attribute:: column
+      :type:  int
+
+
+.. py:class:: TokenType(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Enumeration of valid SASS token types.
+
+
+   .. py:attribute:: LABEL_DEF
+
+
+   .. py:attribute:: DIRECTIVE
+
+
+   .. py:attribute:: COMMENT
+
+
+   .. py:attribute:: SEMICOLON
+
+
+   .. py:attribute:: COMMA
+
+
+   .. py:attribute:: PREDICATE
+
+
+   .. py:attribute:: REGISTER
+
+
+   .. py:attribute:: MEMORY
+
+
+   .. py:attribute:: IMMEDIATE
+
+
+   .. py:attribute:: IDENTIFIER
+
+
+.. py:class:: SassLifter
+
+   Reconstructs a LogicalGraph from a sequence of SASS AST nodes.
+
+
+   .. py:method:: lift(nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> ml_switcheroo.compiler.ir.LogicalGraph
+
+      Parses a list of SASS nodes to build a LogicalGraph.
+
+      Captures instructions within BEGIN/END blocks to feed into the Analyzer.
+      Captures orphan instructions into individual functional nodes (1:1 mapping).
+
+
+
+.. py:class:: SassAnalyzer
+
+   Analyzes sequences of SASS instructions to reverse-engineer high-level parameters.
+
+
+   .. py:method:: analyze_block(kind: str, instructions: List[ml_switcheroo.compiler.frontends.sass.nodes.Instruction]) -> Dict[str, Any]
+      :staticmethod:
+
+
+      Extracts metadata from a block of instructions based on the operation kind.
+
+      :param kind: The operation type (e.g. "Conv2d", "Linear").
+      :type kind: str
+      :param instructions: The assembly lines inside the block.
+      :type instructions: List[Instruction]
+
+      :returns: Extracted parameters (e.g., {"kernel_size": 3}).
+      :rtype: Dict[str, Any]
+
+
+
+.. py:class:: SassEmitter
+
+   Converts SASS AST nodes into textual assembly code.
+
+
+   .. py:method:: emit(nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> str
+
+      Generates the SASS source string from a list of nodes.
+
+      Formatting Rules:
+      - Labels (e.g. `L_1:`) are rendered flush-left.
+      - All other nodes are indented by 4 spaces.
+
+      :param nodes: AST nodes.
+      :type nodes: List[SassNode]
+
+      :returns: The formatted SASS source code string.
+      :rtype: str
+
+
+
+.. py:class:: SassSynthesizer(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Bidirectional transpiler component.
+
+   Handles:
+   1.  **Forward (Graph -> SASS)**: Synthesizes Assembly from Logical Graphs.
+       Delegates high-level ops (Conv2d, Linear) to Macros, and low-level ops
+       (Add, Mul) to Semantic Opcode Lookup.
+   2.  **Reverse (SASS -> Python)**: Synthesizes Python AST from Assembly nodes.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: allocator
+
+
+   .. py:attribute:: macro_registry
+      :type:  Dict[str, Callable]
+
+
+   .. py:method:: from_graph(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
+
+      Converts a LogicalGraph into a list of SASS AST nodes.
+
+      Process:
+      1.  Sorts nodes topologically.
+      2.  Traverses nodes.
+      3.  For each node:
+          a. Check if it matches a Macro (e.g. Conv2d). If so, expand kernel.
+          b. If not, lookup abstract opcode mapping (e.g. `Add` -> `FADD`).
+          c. Allocate/Resolve Input Registers.
+          d. Allocate Output Register.
+          e. Construct `Instruction` node.
+      4.  Handles `Input` nodes by pre-allocating registers (Contract: R0, R1...).
+
+      :param graph: The input computation graph.
+      :type graph: LogicalGraph
+
+      :returns: A structured list of assembly nodes.
+      :rtype: List[SassNode]
+
+
+
+   .. py:method:: to_python(sass_nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> libcst.Module
+
+      Converts SASS AST nodes into a Python source structure representation.
+
+      Used for analysis or round-trip verification. Registers are treated as
+      variables. Instructions map to function calls `sass.OPCODE(args)`.
+
+      Structure:
+          `R0 = sass.FADD(R1, R2)`
+
+      :param sass_nodes: List of parsed SASS nodes.
+      :type sass_nodes: List[SassNode]
+
+      :returns: A LibCST module containing the Python representation.
+      :rtype: cst.Module
+
+
+
+.. py:function:: expand_conv2d(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
+
+   Generates the SASS assembly kernel for a 2D Convolution loop.
+
+   Logic flow:
+   1.  Initialize Accumulator (R_ACC).
+   2.  Setup Loop Counters (Ky, Kx).
+   3.  Enter Y Loop -> Enter X Loop.
+   4.  Calculate addresses (IMAD) for image and weights.
+   5.  Load values (LDG).
+   6.  Multiply-Add (FFMA).
+   7.  Increment and Branch.
+   8.  Store result.
+
+   :param allocator: The register manager.
+   :type allocator: RegisterAllocatorProtocol
+   :param node_id: The unique ID of the operation node (used for output reg).
+   :type node_id: str
+   :param metadata: Layer configuration (k, stride, etc).
+   :type metadata: Dict[str, Any]
+
+   :returns: Sequence of labels and instructions.
+   :rtype: List[SassNode]
+
+
+.. py:function:: expand_linear(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
+
+   Generates the SASS assembly kernel for a Linear Layer (Matrix Multiply).
+
+   Structure:
+   1. Initialize Accumulator.
+   2. Loop over input features (Dot Product).
+   3. Load Input element and Weight element.
+   4. Fused Multiply-Add.
+   5. Increment pointers.
+   6. Add Bias (if present).
+
+   :param allocator: The register manager.
+   :type allocator: RegisterAllocatorProtocol
+   :param node_id: The unique ID of the operation node.
+   :type node_id: str
+   :param metadata: Attributes (in_features, out_features).
+   :type metadata: Dict[str, Any]
+
+   :returns: Sequence of instructions.
+   :rtype: List[SassNode]
 
 

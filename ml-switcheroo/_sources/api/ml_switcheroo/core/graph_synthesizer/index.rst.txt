@@ -5,16 +5,9 @@ ml_switcheroo.core.graph_synthesizer
 
 .. autoapi-nested-parse::
 
-   Graph Synthesizer Module.
+   Wrapper for the Python Backend (Legacy Compat).
 
-   This module provides the `GraphSynthesizer` class, which converts a high-level
-   `LogicalGraph` representation back into executable Python source code.
-
-   It supports two modes:
-   1.  **Fresh Generation**: Creates a new Python module from scratch (for simple decompilation).
-   2.  **Context Preservation**: Injects the synthesized graph logic into an existing
-       source tree (AST), replacing only the `__init__` and `forward` methods while
-       preserving class definitions, docstrings, decorators, and auxiliary methods.
+   Re-exports ``PythonBackend`` as ``GraphSynthesizer``.
 
 
 
@@ -37,30 +30,6 @@ Module Contents
 
    Transformer to swap __init__ and forward methods in a target class.
 
-   .. attribute:: target_class
-
-      The name of the class to update.
-
-      :type: str
-
-   .. attribute:: new_init
-
-      The new AST node for __init__.
-
-      :type: cst.FunctionDef
-
-   .. attribute:: new_forward
-
-      The new AST node for forward.
-
-      :type: cst.FunctionDef
-
-   .. attribute:: found
-
-      Flag indicating if the class was found and updated.
-
-      :type: bool
-
 
    .. py:attribute:: target_class
 
@@ -78,47 +47,12 @@ Module Contents
 
    .. py:method:: leave_ClassDef(original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
 
-      Visits the ClassDefinition and replaces methods if name matches.
 
-      :param original_node: The original node.
-      :type original_node: cst.ClassDef
-      :param updated_node: The node with processed children.
-      :type updated_node: cst.ClassDef
+.. py:class:: GraphSynthesizer(framework: str = 'torch', semantics: Any = None)
 
-      :returns: The modified class definition.
-      :rtype: cst.ClassDef
+   Bases: :py:obj:`ml_switcheroo.compiler.backends.python.PythonBackend`
 
 
-
-.. py:class:: GraphSynthesizer(framework: str = 'torch')
-
-   Synthesizes a Python CST Module from a LogicalGraph.
-
-   Primarily targets PyTorch `nn.Module` generation structure.
-
-
-   .. py:attribute:: framework
-      :value: 'torch'
-
-
-
-   .. py:method:: generate(graph: ml_switcheroo.core.graph.LogicalGraph, class_name: str = 'SwitcherooNet', original_tree: Optional[libcst.Module] = None) -> str
-
-      Generates Python source code for the given graph.
-
-      If `original_tree` is provided, it attempts to verify and patch the
-      existing class definition within that tree, preserving comments and
-      auxiliary methods. Otherwise, it generates a fresh file.
-
-      :param graph: The input computation graph.
-      :type graph: LogicalGraph
-      :param class_name: The name of the generated class.
-      :type class_name: str
-      :param original_tree: The original AST to patch.
-      :type original_tree: Optional[cst.Module]
-
-      :returns: The formatted Python source code.
-      :rtype: str
-
+   Legacy wrapper for PythonBackend.
 
 

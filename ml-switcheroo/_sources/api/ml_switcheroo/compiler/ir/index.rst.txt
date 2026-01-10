@@ -1,0 +1,120 @@
+ml_switcheroo.compiler.ir
+=========================
+
+.. py:module:: ml_switcheroo.compiler.ir
+
+.. autoapi-nested-parse::
+
+   Intermediate Representation (IR).
+
+   This module defines the language-agnostic graph data structures used to represent
+   Deep Learning models after ingestion from source code (e.g. Python/LibCST) or
+   explicit definition.
+
+   It acts as the contract between the Frontend (Ingestion) and the Backend (Synthesis).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.ir.LogicalNode
+   ml_switcheroo.compiler.ir.LogicalEdge
+   ml_switcheroo.compiler.ir.LogicalGraph
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.ir.topological_sort
+
+
+Module Contents
+---------------
+
+.. py:class:: LogicalNode
+
+   Represents a computation unit (Layer) in the graph.
+
+
+   .. py:attribute:: id
+      :type:  str
+
+      Unique identifier (e.g. 'conv1').
+
+
+   .. py:attribute:: kind
+      :type:  str
+
+      Operation type (e.g. 'Conv2d', 'Input', 'Output').
+
+
+   .. py:attribute:: metadata
+      :type:  Dict[str, str]
+
+      Dictionary of configuration parameters (e.g. ``kernel_size=3``).
+
+
+.. py:class:: LogicalEdge
+
+   Represents data flow between two nodes.
+
+
+   .. py:attribute:: source
+      :type:  str
+
+      Source node ID.
+
+
+   .. py:attribute:: target
+      :type:  str
+
+      Target node ID.
+
+
+.. py:class:: LogicalGraph
+
+   Language-agnostic representation of the neural network structure.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: 'Model'
+
+
+      Name of the graph model/class.
+
+
+   .. py:attribute:: nodes
+      :type:  List[LogicalNode]
+      :value: []
+
+
+      Ordered list of nodes in the graph.
+
+
+   .. py:attribute:: edges
+      :type:  List[LogicalEdge]
+      :value: []
+
+
+      List of directed edges between nodes.
+
+
+.. py:function:: topological_sort(graph: LogicalGraph) -> List[LogicalNode]
+
+   Sorts graph nodes by dependency order.
+
+   Ensures that for every edge u -> v, u appears before v in the returned list.
+   Handles disconnected components and cycles gracefully by appending
+   unreachable nodes in their original definition order.
+
+   :param graph: The logical graph to sort.
+
+   :returns: List of nodes in execution order.
+
+

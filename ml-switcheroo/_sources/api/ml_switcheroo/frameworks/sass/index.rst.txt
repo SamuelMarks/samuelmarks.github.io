@@ -7,20 +7,7 @@ ml_switcheroo.frameworks.sass
 
    NVIDIA SASS (Streaming Assembler) Framework Adapter.
 
-   This module registers 'sass' as a valid source and target for the transpiler.
-   It integrates the SASS compiler toolchain (Parser, Synthesizer, Emitter) into
-   the ASTEngine via the FrameworkAdapter protocol hooks.
-
-   Capabilities:
-   1.  **Target (Python -> SASS)**: Converts Logical Graphs derived from Python ASTs
-       into SASS Assembly text (`create_emitter`).
-   2.  **Source (SASS -> Python)**:
-       -   **Low-Level**: Parses raw instructions into python calls (`sass.FADD(...)`)
-           if no structure is detected.
-       -   **High-Level (Lifting)**: Parsing semantic comment markers (e.g., `// BEGIN`)
-           to reconstruct the original PyTorch model stucture (`nn.Module`).
-   3.  **Macro Injection**: Registers procedural macros (e.g. Conv2d loops) into
-       the synthesizer to support high-level neural network operations.
+   Provides metadata and legacy hooks for the SASS compiler stack.
 
 
 
@@ -30,7 +17,6 @@ Classes
 .. autoapisummary::
 
    ml_switcheroo.frameworks.sass.PythonToSassEmitter
-   ml_switcheroo.frameworks.sass.SassToPythonParser
    ml_switcheroo.frameworks.sass.SassAdapter
 
 
@@ -39,10 +25,8 @@ Module Contents
 
 .. py:class:: PythonToSassEmitter
 
-   Adapter wrapper handles the conversion pipeline:
-   Python Code -> Graph -> SASS AST -> SASS Text string.
-
-   It configures the SassSynthesizer with High-Level Macros.
+   Legacy wrapper for compilation pipeline (Python -> SASS).
+   Matches interface expected by old tests.
 
 
    .. py:attribute:: semantics
@@ -56,52 +40,6 @@ Module Contents
 
    .. py:method:: emit(code: str) -> str
 
-      Executes emission pipeline.
-
-      :param code: Python source code.
-      :type code: str
-
-      :returns: Formatted SASS assembly string.
-      :rtype: str
-
-
-
-.. py:class:: SassToPythonParser(code: str)
-
-   Adapter wrapper handling the ingestion pipeline:
-   SASS Text -> SASS AST -> Python CST.
-
-   Implements "Lifting" logic: if semantic markers (// BEGIN ...) are detected,
-   it promotes the low-level assembly back into a high-level PyTorch Module structure.
-   Otherwise, it translates 1:1 to instruction calls.
-
-
-   .. py:attribute:: code
-
-
-   .. py:attribute:: semantics
-
-
-   .. py:attribute:: synth
-
-
-   .. py:attribute:: parser_core
-
-
-   .. py:method:: parse() -> libcst.Module
-
-      Executes parsing pipeline.
-
-      Logic:
-      1. Parse Text to SASS AST.
-      2. Scan for Semantic Markers (High-Level Structure).
-      3. If markers found -> Lift to Logical Graph -> Synthesize PyTorch Class.
-      4. Else -> Synthesize Python AST calls for raw instructions.
-
-      :returns: LibCST Module.
-      :rtype: cst.Module
-
-
 
 .. py:class:: SassAdapter
 
@@ -110,16 +48,11 @@ Module Contents
 
    Adapter for NVIDIA SASS Assembly Generation.
 
-   Provides integration points for the ASTEngine to consume or emit SASS.
-   Registers procedural macros for neural layers to support 'Lowering' semantics.
-
 
    .. py:attribute:: display_name
       :type:  str
       :value: 'NVIDIA SASS'
 
-
-      Human-readable name of the framework.
 
 
    .. py:attribute:: inherits_from
@@ -127,35 +60,16 @@ Module Contents
       :value: None
 
 
-      Optional parent framework key to inherit behavior from.
-
 
    .. py:attribute:: ui_priority
       :type:  int
       :value: 150
 
 
-      Sort priority for UI display (lower is earlier).
-
-
-   .. py:method:: create_parser(code: str) -> SassToPythonParser
-
-      Factory for the SASS Ingestion Parser.
-
-      :param code: The input source.
-      :type code: str
-
-      :returns: The configured parser instance.
-      :rtype: SassToPythonParser
-
-
 
    .. py:method:: create_emitter() -> PythonToSassEmitter
 
-      Factory for the SASS Target Emitter.
-
-      :returns: The configured emitter instance with Macros wired.
-      :rtype: PythonToSassEmitter
+      Factory for legacy emitter shim.
 
 
 
@@ -163,219 +77,122 @@ Module Contents
       :type: List[str]
 
 
-      SASS is not a python module.
-
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
-
-      No submodules to blacklist.
 
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
-      Defines the virtual alias 'asm' used in intermediate representations.
-
 
    .. py:property:: import_namespaces
       :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
-
-      No namespace mappings.
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      No discovery possible.
-
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
-
-      Returns template for tests (Comments).
-
-      :returns: Test templates.
-      :rtype: Dict[str, str]
 
 
    .. py:property:: harness_imports
       :type: List[str]
 
 
-      No imports for execution.
-
 
    .. py:method:: get_harness_init_code() -> str
 
-      No init code.
-
-
 
    .. py:method:: get_to_numpy_code() -> str
-
-      Returns string conversion for text compatibility logic validation.
-
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Supports Array API (Math) primarily.
-
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
-
-      No magic args.
 
 
    .. py:property:: structural_traits
       :type: ml_switcheroo.semantics.schema.StructuralTraits
 
 
-      No structural traits.
-
 
    .. py:property:: plugin_traits
       :type: ml_switcheroo.semantics.schema.PluginTraits
 
-
-      No plugin logic.
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Returns mappings of Abstract Operations to SASS Implementations.
-      Combines file-based definitions with hardcoded instructions/macros.
-
-      :returns: The definitions dictionary.
-      :rtype: Dict[str, StandardMap]
-
 
    .. py:property:: specifications
       :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
 
-
-      No unique specifications.
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      No RNG seeding.
-
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
-
-      No API collection.
-
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
-      Emits comment for device selection.
-
-      :param device_type: CLI arg (cuda, cpu).
-      :type device_type: str
-      :param device_index: Index.
-      :type device_index: Optional[str]
-
-      :returns: Comment string.
-      :rtype: str
-
-
 
    .. py:method:: get_device_check_syntax() -> str
-
-      Always true (virtual).
-
-      :returns: "True".
-      :rtype: str
-
 
 
    .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
 
-      No-op.
-
-
 
    .. py:method:: get_serialization_imports() -> List[str]
-
-      No imports.
-
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      No serialization syntax.
-
-
 
    .. py:method:: get_weight_conversion_imports() -> List[str]
-
-      No imports.
-
 
 
    .. py:method:: get_weight_load_code(path_var: str) -> str
 
-      Stub.
-
-
 
    .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
-
-      Identity.
-
 
 
    .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
 
-      Stub.
-
-
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
-
-      No wiring logic.
-
 
 
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
-      No docs URL.
-
-
 
    .. py:method:: convert(data: Any) -> Any
-
-      Converts data to string representation.
-
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
-      Returns example SASS.
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns tiered examples dict.
-
 
 

@@ -7,13 +7,9 @@ ml_switcheroo.core.engine
 
    Orchestration Engine for AST Transformations.
 
-   This module provides the ``ASTEngine``, the primary driver for the transpilation process.
-   It coordinates the various analysis and transformation passes.
-
-   Updates:
-   - Integrates Snapshot emission at phase boundaries.
-   - Supports conditional Graph Optimization and Import Fixing logic via RuntimeConfig.
-   - Captures source code alongside AST graphs for "Time Travel" debugging.
+   This module provides the ``ASTEngine``, generating code via:
+   1.  **Compiler Pipeline**: For ISA/Visuals (Source -> Graph -> Backend -> Target).
+   2.  **Rewriter Pipeline**: For High-Level Frameworks (Source -> CST -> Rewriter -> Target).
 
 
 
@@ -30,11 +26,6 @@ Module Contents
 
 .. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, enable_fusion: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
 
-   The main compilation unit.
-
-   Orchestrates parsing, analysis, transformation, and code generation.
-
-
    .. py:attribute:: semantics
 
 
@@ -44,33 +35,27 @@ Module Contents
    .. py:attribute:: target
 
 
-   .. py:attribute:: strict_mode
+   .. py:method:: run(code: str) -> ml_switcheroo.core.conversion_result.ConversionResult
 
+      Main execution point for the pipeline.
+      Dispatches to either the Compiler (IR) or Rewriter (AST) path.
 
-   .. py:attribute:: intermediate
-
-
-   .. py:attribute:: source_adapter
-
-
-   .. py:attribute:: target_adapter
 
 
    .. py:method:: parse(code: str) -> libcst.Module
 
-      Parses Python source code into a LibCST module.
+      Parses python source into a CST (Helper for tests).
 
 
 
    .. py:method:: to_source(tree: libcst.Module) -> str
 
-      Converts a LibCST module back to source code string.
+      Converts CST back to source code.
 
 
 
-   .. py:method:: run(code: str) -> ml_switcheroo.core.conversion_result.ConversionResult
-
-      Executes the full transpilation pipeline.
+   .. py:property:: strict_mode
+      :type: bool
 
 
 

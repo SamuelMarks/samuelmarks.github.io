@@ -5,19 +5,9 @@ ml_switcheroo.frameworks.tikz
 
 .. autoapi-nested-parse::
 
-   TikZ / LaTeX Visualization Adapter.
+   TikZ Framework Adapter.
 
-   This framework adapter treats LaTeX/TikZ as a target "language" for
-   visualization purposes. It allows the system to transpile a model architecture
-   into a TikZ node graph representation.
-
-   As a non-computational framework, most runtime hooks (device management,
-   weight loading, execution) are implemented as no-ops or return comments.
-
-   Capabilities:
-   1.  **Format**: Generates LaTeX code strings.
-   2.  **Tiers**: Visual representation only.
-   3.  **No-Ops**: Weights, tensors, and runtime checks are explicitly disabled.
+   Simplified to only provide Metadata.
 
 
 
@@ -34,10 +24,10 @@ Module Contents
 
 .. py:class:: TikzAdapter
 
-   Adapter for generating TikZ (LaTeX) visualizations.
+   Bases: :py:obj:`ml_switcheroo.frameworks.base.FrameworkAdapter`
 
-   Targeting this framework results in the generation of a .tex file
-   content describing the model's computation graph.
+
+   Adapter for TikZ.
 
 
    .. py:attribute:: display_name
@@ -62,331 +52,122 @@ Module Contents
       :type: List[str]
 
 
-      No modules to search; TikZ is not a python library.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
-
-      No unsafe modules.
-
-      :returns: Empty set.
-      :rtype: Set[str]
 
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
 
-      Import alias definition.
-
-      :returns: ("tikz", "tikz").
-      :rtype: Tuple[str, str]
-
 
    .. py:property:: import_namespaces
       :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
-
-      No namespace mappings.
-
-      :returns: Empty dict.
-      :rtype: Dict[str, ImportConfig]
 
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
 
-      No discovery possible.
-
-      :returns: Empty dict.
-      :rtype: Dict[str, List[str]]
-
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
-
-      Returns placeholder configuration for testing.
-
-      :returns: Comment templates.
-      :rtype: Dict[str, str]
 
 
    .. py:property:: harness_imports
       :type: List[str]
 
 
-      Returns empty imports.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:method:: get_harness_init_code() -> str
 
-      Returns empty init code.
-
-      :returns: Empty string.
-      :rtype: str
-
-
 
    .. py:method:: get_to_numpy_code() -> str
-
-      Returns generic stringifier.
-
-      :returns: Code returning string representation.
-      :rtype: str
-
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Supports Neural tier for architecture visualization.
-
-      :returns: [NEURAL].
-      :rtype: List[SemanticTier]
-
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
 
-      No magic args.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:property:: structural_traits
-      :type: ml_switcheroo.frameworks.base.StructuralTraits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
 
-
-      Defines default structural traits (pass-through).
-
-      :returns: Default traits.
-      :rtype: StructuralTraits
 
 
    .. py:property:: plugin_traits
-      :type: ml_switcheroo.frameworks.base.PluginTraits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
 
-
-      Defines default capabilities.
-
-      :returns: Default traits.
-      :rtype: PluginTraits
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Returns static definitions for visual mappings.
-      Loaded dynamically from `frameworks/definitions/tikz.json`.
-
-      :returns: Mappings for drawing logic.
-      :rtype: Dict[str, StandardMap]
-
 
    .. py:property:: specifications
       :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
 
-
-      Returns empty specifications.
-
-      :returns: Empty dict.
-      :rtype: Dict[str, OpDefinition]
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      No RNG logic.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
-
-      No API to collect.
-
-      :param category: Ignored.
-      :type category: StandardCategory
-
-      :returns: Empty list.
-      :rtype: List[GhostRef]
-
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
-      Returns empty string.
-
-      :param device_type: Device.
-      :type device_type: str
-      :param device_index: Index.
-      :type device_index: Optional[str]
-
-      :returns: Empty string.
-      :rtype: str
-
-
 
    .. py:method:: get_device_check_syntax() -> str
-
-      Returns generic boolean.
-
-      :returns: "True".
-      :rtype: str
-
 
 
    .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
 
-      Returns empty string.
-
-      :param rng_var: RNG.
-      :type rng_var: str
-      :param key_var: New Key.
-      :type key_var: str
-
-      :returns: Empty string.
-      :rtype: str
-
-
 
    .. py:method:: get_serialization_imports() -> List[str]
-
-      Empty imports.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      Returns empty string for IO.
-
-      :param op: Operation.
-      :type op: str
-      :param file_arg: Filename.
-      :type file_arg: str
-      :param object_arg: Object.
-      :type object_arg: Optional[str]
-
-      :returns: Empty string.
-      :rtype: str
-
-
 
    .. py:method:: get_weight_conversion_imports() -> List[str]
-
-      Empty list.
-
-      :returns: Empty.
-      :rtype: List[str]
-
 
 
    .. py:method:: get_weight_load_code(path_var: str) -> str
 
-      Returns comment code.
-
-      :param path_var: Path.
-      :type path_var: str
-
-      :returns: Comment.
-      :rtype: str
-
-
 
    .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
-
-      Identity.
-
-      :param tensor_var: Var name.
-      :type tensor_var: str
-
-      :returns: Var name.
-      :rtype: str
-
 
 
    .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
 
-      Returns comment code.
-
-      :param state_var: State.
-      :type state_var: str
-      :param path_var: Path.
-      :type path_var: str
-
-      :returns: Comment.
-      :rtype: str
-
-
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
-
-      No wiring needed.
-
-      :param snapshot: Snapshot dict.
-      :type snapshot: Dict[str, Any]
-
 
 
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
-      Returns None as this TikZ DSL is undocumented.
-
-      :param api_name: API name.
-      :type api_name: str
-
-      :returns: None
-
-
 
    .. py:method:: convert(data: Any) -> Any
-
-      Returns string representation of data.
-
-      :param data: Input.
-      :type data: Any
-
-      :returns: Stringified input.
-      :rtype: str
-
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
-      Returns TikZ example wrapped in environment.
-
-      :returns: TeX code.
-      :rtype: str
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns example TeX strings.
-
-      :returns: Examples.
-      :rtype: Dict[str, str]
-
 
 

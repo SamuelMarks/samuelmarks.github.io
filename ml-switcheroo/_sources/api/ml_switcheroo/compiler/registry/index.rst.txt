@@ -1,0 +1,80 @@
+ml_switcheroo.compiler.registry
+===============================
+
+.. py:module:: ml_switcheroo.compiler.registry
+
+.. autoapi-nested-parse::
+
+   Compiler Registry.
+
+   Centralizes registration of Frontends (Source -> IR) and Backends (IR -> Target)
+   for the compiler pipeline.
+
+   This registry maps framework keys to their respective compiler components.
+   It cleanly separates Low-Level ISAs (SASS, RDNA) which use the explicit
+   Graph/Compiler pipeline, from High-Level frameworks (Torch, JAX, MLIR, TikZ)
+   which flow through the CST Rewriter pipeline.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.registry.BaseFrontend
+   ml_switcheroo.compiler.registry.GraphFrontend
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.registry.get_backend_class
+   ml_switcheroo.compiler.registry.is_isa_target
+   ml_switcheroo.compiler.registry.is_isa_source
+
+
+Module Contents
+---------------
+
+.. py:class:: BaseFrontend
+
+   Abstract base for registry typing.
+
+
+.. py:class:: GraphFrontend
+
+   Bases: :py:obj:`BaseFrontend`
+
+
+   Produces LogicalGraph from code via parse/lift chain.
+
+
+   .. py:method:: parse_to_graph(code: str) -> Any
+
+
+.. py:function:: get_backend_class(target: str) -> Optional[Type[ml_switcheroo.compiler.backend.CompilerBackend]]
+
+   Returns the backend class for the target (e.g. 'sass').
+
+
+.. py:function:: is_isa_target(target: str) -> bool
+
+   Determines if the target requires the Graph Compiler pipeline.
+
+   Only Low-Level Assembly targets handling Registers or Visualization
+   backends that strictly consume Graphs are routed here.
+
+   Note: MLIR/StableHLO/TikZ/Latex are high-level structural representations,
+   so they are routed through the Rewriter/CST pipeline (via Emitters)
+   for maximum fidelity, unless explicitly requested via CLI intermediate flags.
+
+
+.. py:function:: is_isa_source(source: str) -> bool
+
+   Determines if the source requires Lifting (ASM -> Graph -> AST).
+   Only SASS and RDNA are treated as low-level source inputs.
+
+

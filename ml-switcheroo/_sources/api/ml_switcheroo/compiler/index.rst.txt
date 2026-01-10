@@ -1,0 +1,133 @@
+ml_switcheroo.compiler
+======================
+
+.. py:module:: ml_switcheroo.compiler
+
+.. autoapi-nested-parse::
+
+   Compiler Package.
+
+   This package defines the core Intermediate Representation (IR) and Backend interfaces
+   for the ml-switcheroo compilation pipeline. It separates the logical definition
+   of a computation graph from the frontend parsing and backend generation logic.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/compiler/backend/index
+   /api/ml_switcheroo/compiler/backends/index
+   /api/ml_switcheroo/compiler/frontends/index
+   /api/ml_switcheroo/compiler/ir/index
+   /api/ml_switcheroo/compiler/registry/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.CompilerBackend
+   ml_switcheroo.compiler.LogicalGraph
+   ml_switcheroo.compiler.LogicalNode
+   ml_switcheroo.compiler.LogicalEdge
+
+
+Package Contents
+----------------
+
+.. py:class:: CompilerBackend
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for compilation backends.
+
+
+   .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> Any
+      :abstractmethod:
+
+
+      Compiles the Logical Intermediate Representation (IR) into a target artifact.
+
+      :param graph: The intermediate representation of the model structure.
+      :type graph: LogicalGraph
+
+      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
+      :rtype: Any
+
+
+
+.. py:class:: LogicalGraph
+
+   Language-agnostic representation of the neural network structure.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: 'Model'
+
+
+      Name of the graph model/class.
+
+
+   .. py:attribute:: nodes
+      :type:  List[LogicalNode]
+      :value: []
+
+
+      Ordered list of nodes in the graph.
+
+
+   .. py:attribute:: edges
+      :type:  List[LogicalEdge]
+      :value: []
+
+
+      List of directed edges between nodes.
+
+
+.. py:class:: LogicalNode
+
+   Represents a computation unit (Layer) in the graph.
+
+
+   .. py:attribute:: id
+      :type:  str
+
+      Unique identifier (e.g. 'conv1').
+
+
+   .. py:attribute:: kind
+      :type:  str
+
+      Operation type (e.g. 'Conv2d', 'Input', 'Output').
+
+
+   .. py:attribute:: metadata
+      :type:  Dict[str, str]
+
+      Dictionary of configuration parameters (e.g. ``kernel_size=3``).
+
+
+.. py:class:: LogicalEdge
+
+   Represents data flow between two nodes.
+
+
+   .. py:attribute:: source
+      :type:  str
+
+      Source node ID.
+
+
+   .. py:attribute:: target
+      :type:  str
+
+      Target node ID.
+
+

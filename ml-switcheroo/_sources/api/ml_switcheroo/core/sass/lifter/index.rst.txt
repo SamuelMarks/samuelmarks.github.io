@@ -5,15 +5,10 @@ ml_switcheroo.core.sass.lifter
 
 .. autoapi-nested-parse::
 
-   SASS Lifter Module.
+   SASS Lifter (Shim).
 
-   This module provides the logic to "lift" low-level SASS AST nodes back into a
-   high-level `LogicalGraph`. It relies on semantic comment markers emitted during
-   compilation (or manually annotated) to reconstruct the control flow.
-
-   Updates:
-   - Integrates `SassAnalyzer` to parse instructions between BEGIN/END markers.
-   - Populates `LogicalNode.metadata` with extracted parameters.
+   This module aliases the unified Lifter from the compiler frontend package
+   to maintain backward compatibility with previous core tests.
 
 
 
@@ -33,11 +28,12 @@ Module Contents
    Reconstructs a LogicalGraph from a sequence of SASS AST nodes.
 
 
-   .. py:method:: lift(nodes: List[ml_switcheroo.core.sass.nodes.SassNode]) -> ml_switcheroo.core.graph.LogicalGraph
+   .. py:method:: lift(nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> ml_switcheroo.compiler.ir.LogicalGraph
 
       Parses a list of SASS nodes to build a LogicalGraph.
 
       Captures instructions within BEGIN/END blocks to feed into the Analyzer.
+      Captures orphan instructions into individual functional nodes (1:1 mapping).
 
 
 

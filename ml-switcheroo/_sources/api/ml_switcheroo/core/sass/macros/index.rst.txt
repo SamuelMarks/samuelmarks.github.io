@@ -7,11 +7,8 @@ ml_switcheroo.core.sass.macros
 
    SASS Macro Expansion Logic.
 
-   This module defines procedural generators for complex SASS instruction kernels.
-   Unlike 1:1 mappings (e.g. ``Add`` -> ``FADD``), these macros generate entire
-   control flow blocks (loops, address calculations, memory loads) required to
-   implement high-level Neural Network layers like Convolution and Linear layers
-   directly in assembly.
+   Re-exports macros from the Compiler Backend implementation to ensure consistency
+   and object identity across the codebase, avoiding duplication issues in tests.
 
 
 
@@ -43,7 +40,7 @@ Module Contents
    Protocol for the Register Allocator used during expansion.
 
 
-   .. py:method:: get_register(var_name: str) -> ml_switcheroo.core.sass.nodes.Register
+   .. py:method:: get_register(var_name: str) -> ml_switcheroo.compiler.frontends.sass.nodes.Register
 
       Gets or allocates a register for a symbolic variable.
 
@@ -55,7 +52,7 @@ Module Contents
 
 
 
-   .. py:method:: allocate_temp() -> ml_switcheroo.core.sass.nodes.Register
+   .. py:method:: allocate_temp() -> ml_switcheroo.compiler.frontends.sass.nodes.Register
 
       Allocates an anonymous temporary register.
 
@@ -64,7 +61,7 @@ Module Contents
 
 
 
-.. py:function:: expand_conv2d(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.core.sass.nodes.SassNode]
+.. py:function:: expand_conv2d(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
 
    Generates the SASS assembly kernel for a 2D Convolution loop.
 
@@ -89,7 +86,7 @@ Module Contents
    :rtype: List[SassNode]
 
 
-.. py:function:: expand_linear(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.core.sass.nodes.SassNode]
+.. py:function:: expand_linear(allocator: RegisterAllocatorProtocol, node_id: str, metadata: Dict[str, Any]) -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
 
    Generates the SASS assembly kernel for a Linear Layer (Matrix Multiply).
 

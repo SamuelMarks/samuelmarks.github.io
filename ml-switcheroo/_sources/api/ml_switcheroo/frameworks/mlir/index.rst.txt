@@ -5,19 +5,9 @@ ml_switcheroo.frameworks.mlir
 
 .. autoapi-nested-parse::
 
-   MLIR (Multi-Level Intermediate Representation) Adapter.
+   MLIR Framework Adapter.
 
-   This framework adapter treats MLIR (specifically dialects like TOSA, Linalg, or Func)
-   as a target "language" for textual code generation or lower-level compilation inspection.
-
-   As MLIR is an Intermediate Representation rather than a high-level execution framework
-   accessible comfortably via Python runtime in the same way as PyTorch/JAX, this adapter
-   primarily serves as a text generator or a bridge for specialized compilers.
-
-   Capabilities:
-   1.  **Format**: Generates MLIR textual representation strings.
-   2.  **Tiers**: Visual/Structural representation only.
-   3.  **No-Ops**: Weights handling and runtime device checks are stubbed as comments.
+   Simplified to only provide Metadata.
 
 
 
@@ -26,18 +16,27 @@ Classes
 
 .. autoapisummary::
 
+   ml_switcheroo.frameworks.mlir.MlirEmitterWrapper
    ml_switcheroo.frameworks.mlir.MlirAdapter
 
 
 Module Contents
 ---------------
 
+.. py:class:: MlirEmitterWrapper
+
+   .. py:attribute:: emitter
+
+
+   .. py:method:: convert(tree)
+
+
 .. py:class:: MlirAdapter
 
-   Adapter for generating or inspecting MLIR code.
+   Bases: :py:obj:`ml_switcheroo.frameworks.base.FrameworkAdapter`
 
-   Usually targets dialects such as `tosa` (Tensor Operator Set Architecture)
-   or `linalg` for mathematical operations.
+
+   Adapter for MLIR.
 
 
    .. py:attribute:: display_name
@@ -58,340 +57,129 @@ Module Contents
 
 
 
+   .. py:method:: create_emitter() -> MlirEmitterWrapper
+
+
    .. py:property:: search_modules
       :type: List[str]
 
-
-      Returns list of search modules.
-      MLIR python bindings differ constantly (e.g. `iree.compiler`, `torch_mlir`).
-      Returns empty by default to treat as pure text target.
-
-      :returns: Empty list.
-      :rtype: List[str]
 
 
    .. py:property:: unsafe_submodules
       :type: Set[str]
 
 
-      Returns unsafe modules.
-
-      :returns: Empty set.
-      :rtype: Set[str]
-
 
    .. py:property:: import_alias
       :type: Tuple[str, str]
 
-
-      Defines the virtual alias `sw` used in intermediate representations.
-
-      :returns: ("mlir", "sw").
-      :rtype: Tuple[str, str]
 
 
    .. py:property:: import_namespaces
       :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
 
 
-      No namespace mappings.
-
-      :returns: Empty dict.
-      :rtype: Dict[str, ImportConfig]
-
 
    .. py:property:: discovery_heuristics
       :type: Dict[str, List[str]]
 
-
-      No discovery heuristics.
-
-      :returns: Empty dict.
-      :rtype: Dict[str, List[str]]
 
 
    .. py:property:: test_config
       :type: Dict[str, str]
 
 
-      Returns template for tests.
-      Generates comments using MLIR syntax (`//`).
-
-      :returns: Templates.
-      :rtype: Dict[str, str]
-
 
    .. py:property:: harness_imports
       :type: List[str]
 
 
-      Imports logic for harness.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:method:: get_harness_init_code() -> str
 
-      Initialization logic.
-
-      :returns: Empty string.
-      :rtype: str
-
-
 
    .. py:method:: get_to_numpy_code() -> str
-
-      Conversion to numpy.
-      Returns string conversion for text compatibility.
-
-      :returns: Python logic.
-      :rtype: str
-
 
 
    .. py:property:: supported_tiers
       :type: List[ml_switcheroo.enums.SemanticTier]
 
 
-      Supports Array API and Neural tiers (via Dialects).
-
-      :returns: [ARRAY_API, NEURAL].
-      :rtype: List[SemanticTier]
-
 
    .. py:property:: declared_magic_args
       :type: List[str]
 
 
-      No magic args.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:property:: structural_traits
-      :type: ml_switcheroo.frameworks.base.StructuralTraits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
 
-
-      Structural traits (Default).
-
-      :returns: Default configuration.
-      :rtype: StructuralTraits
 
 
    .. py:property:: plugin_traits
-      :type: ml_switcheroo.frameworks.base.PluginTraits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
 
-
-      Plugin traits (Default).
-
-      :returns: Default capability flags.
-      :rtype: PluginTraits
 
 
    .. py:property:: definitions
       :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
 
 
-      Static definitions for MLIR dialects.
-      Loaded dynamically from `frameworks/definitions/mlir.json`.
-
-      :returns: Mappings.
-      :rtype: Dict[str, StandardMap]
-
 
    .. py:property:: specifications
       :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
 
-
-      Returns empty specifications for MLIR adapter.
-
-      :returns: Empty dict.
-      :rtype: Dict[str, OpDefinition]
 
 
    .. py:property:: rng_seed_methods
       :type: List[str]
 
 
-      No global seed methods.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
    .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
-
-      No runtime API collection.
-
-      :param category: Category.
-      :type category: StandardCategory
-
-      :returns: Empty list.
-      :rtype: List[GhostRef]
-
 
 
    .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
 
-      Returns MLIR comment regarding targeting.
-
-      :param device_type: Device (e.g., 'cpu').
-      :type device_type: str
-      :param device_index: Index.
-      :type device_index: Optional[str]
-
-      :returns: Comment string.
-      :rtype: str
-
-
 
    .. py:method:: get_device_check_syntax() -> str
-
-      Returns check syntax (Always True).
-
-      :returns: "True".
-      :rtype: str
-
 
 
    .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
 
-      Returns RNG split comment.
-
-      :param rng_var: Source.
-      :type rng_var: str
-      :param key_var: Destination.
-      :type key_var: str
-
-      :returns: Comment string.
-      :rtype: str
-
-
 
    .. py:method:: get_serialization_imports() -> List[str]
-
-      Returns empty serialization imports.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
 
    .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
 
-      Returns serialization syntax (No-op comments).
-
-      :param op: 'save' or 'load'.
-      :type op: str
-      :param file_arg: Filename.
-      :type file_arg: str
-      :param object_arg: Target object.
-      :type object_arg: Optional[str]
-
-      :returns: Comment string.
-      :rtype: str
-
-
 
    .. py:method:: get_weight_conversion_imports() -> List[str]
-
-      Imports for weight conversion script.
-
-      :returns: Empty list.
-      :rtype: List[str]
-
 
 
    .. py:method:: get_weight_load_code(path_var: str) -> str
 
-      Code to load weights (No-op).
-      MLIR weights are typically `dense<>` attributes, not runtime loaded vars here.
-
-      :param path_var: Path variable.
-      :type path_var: str
-
-      :returns: Python comment code.
-      :rtype: str
-
-
 
    .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
-
-      Conversion to numpy expression.
-
-      :param tensor_var: Variable name.
-      :type tensor_var: str
-
-      :returns: Identity string.
-      :rtype: str
-
 
 
    .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
 
-      Code to save weights (No-op).
-
-      :param state_var: State variable.
-      :type state_var: str
-      :param path_var: Path variable.
-      :type path_var: str
-
-      :returns: Python comment code.
-      :rtype: str
-
-
 
    .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
-
-      Applies manual wiring.
-
-      :param snapshot: Snapshot dict.
-      :type snapshot: Dict[str, Any]
-
 
 
    .. py:method:: get_doc_url(api_name: str) -> Optional[str]
 
-      Returns None as this dialect is undocumented.
-
-      :param api_name: API name.
-      :type api_name: str
-
-      :returns: None
-
-
 
    .. py:method:: convert(data: Any) -> Any
-
-      Converts data to string representation for verification.
-
-      :param data: Input.
-      :type data: Any
-
-      :returns: String representation.
-      :rtype: Any
-
 
 
    .. py:method:: get_example_code() -> str
       :classmethod:
 
 
-      Returns example MLIR code.
-
-      :returns: Code string.
-      :rtype: str
-
-
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]
-
-      Returns tiered code examples.
-
-      :returns: Tier map.
-      :rtype: Dict[str, str]
-
 
 

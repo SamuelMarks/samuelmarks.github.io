@@ -9,7 +9,8 @@ ml_switcheroo.core.engine
 
    This module provides the ``ASTEngine``, generating code via:
    1.  **Compiler Pipeline**: For ISA/Visuals (Source -> Graph -> Backend -> Target).
-   2.  **Rewriter Pipeline**: For High-Level Frameworks (Source -> CST -> Rewriter -> Target).
+   2.  **Rewriter Pipeline**: For High-Level Frameworks (Source -> CST -> Pipeline(Structure, API, Aux) -> Target).
+       - Supports optional **Graph-Guided Rewriting** (Loopback).
 
 
 
@@ -24,9 +25,13 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, enable_fusion: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
+.. py:class:: ASTEngine(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None, config: Optional[ml_switcheroo.config.RuntimeConfig] = None, source: Optional[str] = None, target: Optional[str] = None, strict_mode: bool = False, enable_graph_optimization: bool = False, plugin_config: Optional[Dict[str, Any]] = None, intermediate: Optional[str] = None)
+
+   The main driver for the conversion process.
+
 
    .. py:attribute:: semantics
+      :type:  ml_switcheroo.semantics.manager.SemanticsManager
 
 
    .. py:attribute:: source
@@ -37,25 +42,26 @@ Module Contents
 
    .. py:method:: run(code: str) -> ml_switcheroo.core.conversion_result.ConversionResult
 
-      Main execution point for the pipeline.
-      Dispatches to either the Compiler (IR) or Rewriter (AST) path.
+      Main execution point.
 
 
 
    .. py:method:: parse(code: str) -> libcst.Module
 
-      Parses python source into a CST (Helper for tests).
+      Parses python string to CST Module.
 
 
 
    .. py:method:: to_source(tree: libcst.Module) -> str
 
-      Converts CST back to source code.
+      Converts CST Module back to string.
 
 
 
    .. py:property:: strict_mode
       :type: bool
 
+
+      Helper property for strict mode config.
 
 

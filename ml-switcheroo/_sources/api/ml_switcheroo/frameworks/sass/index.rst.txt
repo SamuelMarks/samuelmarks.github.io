@@ -7,7 +7,13 @@ ml_switcheroo.frameworks.sass
 
    NVIDIA SASS (Streaming Assembler) Framework Adapter.
 
-   Provides metadata and legacy hooks for the SASS compiler stack.
+   Provides metadata and configuration for the SASS compiler stack.
+   This adapter acts as a metadata container for the Compiler Registry,
+   identifying SASS as a target language and providing static definitions.
+
+   Migration Note:
+       Legacy shim classes (`PythonToSassEmitter`) have been removed.
+       Compilation logic is now handled by `ml_switcheroo.compiler.backends.sass.SassBackend`.
 
 
 
@@ -16,30 +22,11 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.frameworks.sass.PythonToSassEmitter
    ml_switcheroo.frameworks.sass.SassAdapter
 
 
 Module Contents
 ---------------
-
-.. py:class:: PythonToSassEmitter
-
-   Legacy wrapper for compilation pipeline (Python -> SASS).
-   Matches interface expected by old tests.
-
-
-   .. py:attribute:: semantics
-
-
-   .. py:attribute:: synth
-
-
-   .. py:attribute:: emitter
-
-
-   .. py:method:: emit(code: str) -> str
-
 
 .. py:class:: SassAdapter
 
@@ -64,12 +51,6 @@ Module Contents
    .. py:attribute:: ui_priority
       :type:  int
       :value: 150
-
-
-
-   .. py:method:: create_emitter() -> PythonToSassEmitter
-
-      Factory for legacy emitter shim.
 
 
 
@@ -140,7 +121,7 @@ Module Contents
 
 
    .. py:property:: specifications
-      :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
+      :type: Dict[str, ml_switcheroo.frameworks.base.OperationDef]
 
 
 
@@ -186,11 +167,6 @@ Module Contents
 
 
    .. py:method:: convert(data: Any) -> Any
-
-
-   .. py:method:: get_example_code() -> str
-      :classmethod:
-
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]

@@ -5,13 +5,16 @@ ml_switcheroo.compiler.backends.extras
 
 .. autoapi-nested-parse::
 
-   Extra Backends (Wrappers for Legacy/IR Emitters).
+   Extra Backends (Standardized implementations for Visual/DSL Targets).
 
    Provides CompilerBackend implementations for:
-   - TikZ
-   - HTML
-   - LaTeX DSL
-   - MLIR (StableHLO)
+   - TikZ (Visualization)
+   - HTML (Visualization)
+   - LaTeX DSL (MIDL)
+   - MLIR (Graph to MLIR Text)
+   - StableHLO (Graph to StableHLO-flavored MLIR Text)
+
+   These backends consume the LogicalGraph IR and emit target-specific textual representations.
 
 
 
@@ -20,8 +23,8 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.compiler.backends.extras.TikzBackend
    ml_switcheroo.compiler.backends.extras.HtmlBackend
+   ml_switcheroo.compiler.backends.extras.TikzBackend
    ml_switcheroo.compiler.backends.extras.LatexBackend
    ml_switcheroo.compiler.backends.extras.MlirBackend
    ml_switcheroo.compiler.backends.extras.StableHloBackend
@@ -30,112 +33,128 @@ Classes
 Module Contents
 ---------------
 
-.. py:class:: TikzBackend(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None)
+.. py:class:: HtmlBackend(semantics: Optional[Any] = None)
 
    Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
 
 
-   Abstract base class for compilation backends.
+   Orchestrates the conversion of Logical Graphs to the HTML visual DSL.
 
 
-   .. py:attribute:: emitter
+   .. py:attribute:: ROW_HEIGHT
+      :value: 80
+
+
+
+   .. py:attribute:: GAP_HEIGHT
+      :value: 0
+
 
 
    .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
 
-      Compiles the Logical Intermediate Representation (IR) into a target artifact.
+      Compiles the graph into an HTML string document.
 
-      :param graph: The intermediate representation of the model structure.
-      :type graph: LogicalGraph
+      :param graph: The logical graph.
 
-      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
-      :rtype: Any
+      :returns: HTML string.
 
 
 
-.. py:class:: HtmlBackend(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None)
+.. py:class:: TikzBackend(semantics: Optional[Any] = None, y_spacing: float = 2.5, x_spacing: float = 3.0)
 
    Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
 
 
-   Abstract base class for compilation backends.
+   Orchestrates the conversion of a LogicalGraph to TikZ source code.
+   Verified to use Rank-Based Layout.
 
 
-   .. py:attribute:: emitter
+   .. py:attribute:: y_spacing
+      :value: 2.5
+
+
+
+   .. py:attribute:: x_spacing
+      :value: 3.0
+
 
 
    .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
 
-      Compiles the Logical Intermediate Representation (IR) into a target artifact.
-
-      :param graph: The intermediate representation of the model structure.
-      :type graph: LogicalGraph
-
-      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
-      :rtype: Any
+      Compile graph to TikZ LaTeX code.
 
 
 
-.. py:class:: LatexBackend(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None)
+.. py:class:: LatexBackend(semantics: Optional[Any] = None)
 
    Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
 
 
-   Abstract base class for compilation backends.
-
-
-   .. py:attribute:: emitter
+   Transforms Logical Graphs into MIDL LaTeX format.
 
 
    .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
 
-      Compiles the Logical Intermediate Representation (IR) into a target artifact.
-
-      :param graph: The intermediate representation of the model structure.
-      :type graph: LogicalGraph
-
-      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
-      :rtype: Any
+      Compiles graph to LaTeX.
 
 
 
-.. py:class:: MlirBackend(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None)
+.. py:class:: MlirBackend(semantics: Optional[Any] = None)
 
    Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
 
 
-   Abstract base class for compilation backends.
+   Back-end for generating MLIR text from a LogicalGraph.
+
+   This implementation provides a direct Graph-to-MLIR conversion path for
+   scenarios bypassing the high-level Python CST Rewriter (e.g. source is RDNA).
+
+
+   .. py:attribute:: semantics
+      :value: None
+
 
 
    .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
 
-      Compiles the Logical Intermediate Representation (IR) into a target artifact.
+      Compiles the LogicalGraph into an MLIR string representation.
 
-      :param graph: The intermediate representation of the model structure.
-      :type graph: LogicalGraph
+      It emits a simple `module` structure with a single block, mapping each
+      logical node to an `sw.op` operation. Inputs are generated as
+      `sw.constant` if metadata values exist, or `sw.op {type="Input"}`.
 
-      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
-      :rtype: Any
+      :param graph: The logical graph IR.
+
+      :returns: The generated MLIR code.
+      :rtype: str
 
 
 
-.. py:class:: StableHloBackend(semantics: ml_switcheroo.semantics.manager.SemanticsManager = None)
+.. py:class:: StableHloBackend(semantics: Optional[Any] = None)
 
    Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
 
 
-   Abstract base class for compilation backends.
+   Back-end for generating StableHLO text from a LogicalGraph.
+
+   This implementation provides a direct Graph-to-StableHLO conversion path
+   used when an ISA is the source format (e.g. SASS -> StableHLO).
+
+
+   .. py:attribute:: semantics
+      :value: None
+
 
 
    .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
 
-      Compiles the Logical Intermediate Representation (IR) into a target artifact.
+      Compiles the graph to StableHLO-flavored MLIR.
 
-      :param graph: The intermediate representation of the model structure.
-      :type graph: LogicalGraph
+      :param graph: The logical graph.
 
-      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
-      :rtype: Any
+      :returns: MLIR code string using stablehlo dialect.
+      :rtype: str
 
 
 

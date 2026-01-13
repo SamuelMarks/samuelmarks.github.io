@@ -59,6 +59,10 @@ Module Contents
 
    Returns the backend class for the target (e.g. 'sass').
 
+   :param target: The target framework identifier.
+
+   :returns: The backend class type or PythonBackend if not found, or None.
+
 
 .. py:function:: is_isa_target(target: str) -> bool
 
@@ -67,14 +71,21 @@ Module Contents
    Only Low-Level Assembly targets handling Registers or Visualization
    backends that strictly consume Graphs are routed here.
 
-   Note: MLIR/StableHLO/TikZ/Latex are high-level structural representations,
-   so they are routed through the Rewriter/CST pipeline (via Emitters)
-   for maximum fidelity, unless explicitly requested via CLI intermediate flags.
+   Note: MLIR/StableHLO/TikZ/Latex/HTML/RDNA/SASS use this path for graph-based generation
+   if selected as target in CLI, bypassing the CST rewriter.
+
+   :param target: The target framework identifier.
+
+   :returns: True if the target is an ISA or Graph-based format.
 
 
 .. py:function:: is_isa_source(source: str) -> bool
 
    Determines if the source requires Lifting (ASM -> Graph -> AST).
    Only SASS and RDNA are treated as low-level source inputs.
+
+   :param source: The source framework identifier.
+
+   :returns: True if the source is an ISA requiring lifting.
 
 

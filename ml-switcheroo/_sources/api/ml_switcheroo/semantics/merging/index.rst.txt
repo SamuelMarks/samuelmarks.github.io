@@ -34,7 +34,6 @@ Functions
 .. autoapisummary::
 
    ml_switcheroo.semantics.merging.infer_tier_from_priority
-   ml_switcheroo.semantics.merging.merge_imports
    ml_switcheroo.semantics.merging.merge_frameworks
    ml_switcheroo.semantics.merging.merge_patterns
    ml_switcheroo.semantics.merging.merge_tier_data
@@ -57,15 +56,6 @@ Module Contents
    :rtype: SemanticTier
 
 
-.. py:function:: merge_imports(master_import_data: Dict[str, Dict], new_imports: Dict[str, Any]) -> None
-
-   Merges new import definitions (from __imports__ block) into the master dictionary.
-   Updates in-place.
-
-   :param master_import_data: The central import dictionary.
-   :param new_imports: Dictionary of new import rules to merge.
-
-
 .. py:function:: merge_frameworks(master_configs: Dict[str, Dict], new_configs: Dict[str, Any]) -> None
 
    Merges new framework configurations (from __frameworks__ block) into the master.
@@ -80,17 +70,17 @@ Module Contents
    Append new patterns to the master list, avoiding duplicates by name.
 
 
-.. py:function:: merge_tier_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], new_content: Dict[str, Any], tier: ml_switcheroo.enums.SemanticTier, patterns: Optional[List[ml_switcheroo.semantics.schema.PatternDef]] = None, is_internal: bool = False) -> None
+.. py:function:: merge_tier_data(data: Dict[str, Dict], key_origins: Dict[str, str], framework_configs: Dict[str, Dict], new_content: Dict[str, Any], tier: ml_switcheroo.enums.SemanticTier, patterns: Optional[List[ml_switcheroo.semantics.schema.PatternDef]] = None, is_internal: bool = False) -> None
 
    Merges content from a Specification file (hub) into the manager state.
 
    Handles precedence logic: Neural definitions overwrite Array definitions silently
    for upgrades. Duplicate definitions at the same tier level with conflicting signatures
-   trigger warnings.
+   trigger warnings only if signatures are ambiguous (same length, different names).
+   Otherwise, prefers the richer signature (Superset/Length).
 
    :param data: Master dictionary of operations.
    :param key_origins: Dict tracking where an op was defined (Math vs Neural).
-   :param import_data: Master dictionary of import mappings.
    :param framework_configs: Master dictionary of framework traits.
    :param new_content: The JSON content being loaded.
    :param tier: The Semantic Tier of the file being loaded.
@@ -98,7 +88,7 @@ Module Contents
    :param is_internal: If True, marks entries as internal defaults which can be silently overwritten.
 
 
-.. py:function:: merge_overlay_data(data: Dict[str, Dict], key_origins: Dict[str, str], import_data: Dict[str, Dict], framework_configs: Dict[str, Dict], test_templates: Dict[str, Dict], content: Dict[str, Any], filename: str) -> None
+.. py:function:: merge_overlay_data(data: Dict[str, Dict], key_origins: Dict[str, str], framework_configs: Dict[str, Dict], test_templates: Dict[str, Dict], content: Dict[str, Any], filename: str) -> None
 
    Merges a mapping overlay file (snapshot) into the main data.
 
@@ -107,7 +97,6 @@ Module Contents
 
    :param data: Master dictionary of operations.
    :param key_origins: Dict tracking tier origins.
-   :param import_data: Master dictionary of import mappings.
    :param framework_configs: Master dictionary of framework traits.
    :param test_templates: Master dictionary of testing templates.
    :param content: The JSON content of the snapshot file.

@@ -8,14 +8,10 @@ ml_switcheroo.core.graph
    Graph Extraction Frontend.
 
    This module is responsible for analyzing Python Abstract Syntax Trees (ASTs) using LibCST
-   and extracting a `LogicalGraph` Intermediate Representation.
+   and extracting a `LogicalGraph` Intermediate Representation via the `GraphExtractor`.
 
-   It re-exports the `LogicalGraph` and related classes from `ml_switcheroo.compiler.ir`
-   to maintain backward compatibility with existing code that imports from `ml_switcheroo.core.graph`.
-
-   Logic:
-       - Init Pass: Extracts `self.layer = ...` assignments.
-       - Forward Pass: Traces data flow `y = self.layer(x)`.
+   It performs Provenance Tracking, mapping logical nodes back to their source CST nodes,
+   enabling surgical patching later in the pipeline.
 
 
 
@@ -131,11 +127,34 @@ Module Contents
    LibCST Visitor that extracts a LogicalGraph from Python source code.
 
    Two-Pass Logic:
-
    1.  **Init Pass**: Scans ``__init__`` or ``setup`` to register named layers
-       assigned to ``self``. Populates the node registry.
+       assigned to ``self``. Populates the node registry and provenance map.
    2.  **Forward Pass**: Scans ``forward`` or ``__call__`` to trace variable usage.
        Builds edges between registered nodes based on data flow.
+
+   .. attribute:: graph
+
+      The constructed intermediate representation.
+
+      :type: LogicalGraph
+
+   .. attribute:: layer_registry
+
+      Mapping of node IDs to LogicalNodes.
+
+      :type: Dict[str, LogicalNode]
+
+   .. attribute:: provenance
+
+      Mapping of variable names to producer node IDs.
+
+      :type: Dict[str, str]
+
+   .. attribute:: node_map
+
+      Provenance registry mapping Node ID -> CST Node.
+
+      :type: Dict[str, cst.CSTNode]
 
 
    .. py:attribute:: graph
@@ -149,6 +168,10 @@ Module Contents
       :type:  Dict[str, str]
 
 
+   .. py:attribute:: node_map
+      :type:  Dict[str, libcst.CSTNode]
+
+
    .. py:attribute:: model_name
       :type:  str
       :value: 'GeneratedNet'
@@ -159,31 +182,23 @@ Module Contents
 
       Capture the model class name.
 
-      :param node: ClassDef node.
-
-      :returns: True to visit children.
-
 
 
    .. py:method:: leave_ClassDef(node: libcst.ClassDef) -> None
 
+      Exit class scope.
+
+
 
    .. py:method:: leave_Module(original_node: libcst.Module) -> None
 
-      Finalize graph construction after visiting the whole module.
-      Populates the nodes list from the registry.
-
-      :param original_node: The module node.
+      Finalize graph construction.
 
 
 
    .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
 
-      Detects entry into lifecycle methods (__init__, forward, etc).
-
-      :param node: The function definition node.
-
-      :returns: True to visit children.
+      Detects entry into lifecycle methods.
 
 
 
@@ -191,28 +206,24 @@ Module Contents
 
       Resets context flags upon exiting methods.
 
-      :param node: The function definition node.
-
 
 
    .. py:method:: visit_Assign(node: libcst.Assign) -> Optional[bool]
 
       Handles assignment logic for both layer definition and data flow.
 
-      :param node: The assignment node.
 
-      :returns: True to visit children.
+
+   .. py:method:: visit_Expr(node: libcst.Expr) -> Optional[bool]
+
+      Handles standalone expression statements (e.g. `func(x)` without assignment).
+      Used for 1:1 translations where top-level expressions are valid (e.g. MLIR roundtrips).
 
 
 
    .. py:method:: visit_Return(node: libcst.Return) -> Optional[bool]
 
-      Handles return statements in forward pass to create Output nodes.
-      Links the variable returned to an implicit 'Output' node.
-
-      :param node: The return statement node.
-
-      :returns: False to stop recursion into the return statement (logic handled here).
+      Handles return statements to identify Output nodes.
 
 
 

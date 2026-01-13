@@ -7,7 +7,13 @@ ml_switcheroo.frameworks.rdna
 
    AMD RDNA / GCN Framework Adapter.
 
-   Provides metadata and legacy hooks for the RDNA compiler stack.
+   Provides metadata and configuration for the RDNA compiler stack.
+   This adapter acts as a metadata container for the Compiler Registry,
+   identifying RDNA as a target language and providing static definitions.
+
+   Migration Note:
+       Legacy shim classes (`PythonToRdnaEmitter`, `RdnaToPythonParser`)
+       have been removed. Routing now occurs via `compiler.registry`.
 
 
 
@@ -16,53 +22,11 @@ Classes
 
 .. autoapisummary::
 
-   ml_switcheroo.frameworks.rdna.PythonToRdnaEmitter
-   ml_switcheroo.frameworks.rdna.RdnaToPythonParser
    ml_switcheroo.frameworks.rdna.RdnaAdapter
 
 
 Module Contents
 ---------------
-
-.. py:class:: PythonToRdnaEmitter(target_arch: str = 'gfx1030')
-
-   Legacy wrapper for compilation pipeline (Python -> RDNA).
-   Matches interface expected by old tests.
-
-
-   .. py:attribute:: target_arch
-      :value: 'gfx1030'
-
-
-
-   .. py:attribute:: semantics
-
-
-   .. py:attribute:: synthesizer
-
-
-   .. py:attribute:: emitter
-
-
-   .. py:method:: emit(code: str) -> str
-
-
-.. py:class:: RdnaToPythonParser(code: str)
-
-   Legacy wrapper for decompilation pipeline (RDNA -> Python).
-
-
-   .. py:attribute:: code
-
-
-   .. py:attribute:: parser
-
-
-   .. py:attribute:: lifter
-
-
-   .. py:method:: parse() -> libcst.Module
-
 
 .. py:class:: RdnaAdapter(target_arch: str = 'gfx1030')
 
@@ -92,18 +56,6 @@ Module Contents
 
    .. py:attribute:: target_arch
       :value: 'gfx1030'
-
-
-
-   .. py:method:: create_emitter() -> PythonToRdnaEmitter
-
-      Factory for legacy emitter shim.
-
-
-
-   .. py:method:: create_parser(code: str) -> RdnaToPythonParser
-
-      Factory for legacy parser shim.
 
 
 
@@ -174,7 +126,7 @@ Module Contents
 
 
    .. py:property:: specifications
-      :type: Dict[str, ml_switcheroo.frameworks.base.OpDefinition]
+      :type: Dict[str, ml_switcheroo.frameworks.base.OperationDef]
 
 
 
@@ -220,11 +172,6 @@ Module Contents
 
 
    .. py:method:: convert(data: Any) -> Any
-
-
-   .. py:method:: get_example_code() -> str
-      :classmethod:
-
 
 
    .. py:method:: get_tiered_examples() -> Dict[str, str]

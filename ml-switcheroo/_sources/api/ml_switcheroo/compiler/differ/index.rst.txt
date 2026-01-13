@@ -1,0 +1,112 @@
+ml_switcheroo.compiler.differ
+=============================
+
+.. py:module:: ml_switcheroo.compiler.differ
+
+.. autoapi-nested-parse::
+
+   Topological Diff Engine.
+
+   Analyzes differences between two LogicalGraphs to produce a patch plan.
+   It supports:
+   1. Identifying deleted nodes (nodes in source but not in target).
+   2. Identifying replacements (new fused nodes).
+   3. Mapping new nodes to anchors in the original graph for placement.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.differ.PatchAction
+   ml_switcheroo.compiler.differ.DeleteAction
+   ml_switcheroo.compiler.differ.ReplaceAction
+   ml_switcheroo.compiler.differ.GraphDiffer
+
+
+Module Contents
+---------------
+
+.. py:class:: PatchAction
+
+   Base patch operation.
+
+
+   .. py:attribute:: node_id
+      :type:  str
+
+
+.. py:class:: DeleteAction
+
+   Bases: :py:obj:`PatchAction`
+
+
+   Instruction to remove a node.
+
+
+.. py:class:: ReplaceAction
+
+   Bases: :py:obj:`PatchAction`
+
+
+   Instruction to replace an anchor node with new logic.
+   For the Differ context, 'new_node' is the LogicalNode from the target graph.
+
+
+   .. py:attribute:: new_node
+      :type:  Any
+
+
+   .. py:attribute:: input_vars
+      :type:  List[str]
+
+
+   .. py:attribute:: output_var
+      :type:  str
+
+
+   .. py:attribute:: is_init
+      :type:  bool
+      :value: False
+
+
+
+.. py:class:: GraphDiffer
+
+   Calculates transformation steps to migrate from Source Graph to Target Graph.
+
+   Assumption:
+   - Optimization is mostly fusion/deletion.
+   - New nodes (fused) are distinct by ID or metadata.
+   - We anchor rewrites to the *last* node of a fused chain (the sink).
+
+
+   .. py:method:: diff(source: ml_switcheroo.compiler.ir.LogicalGraph, target: ml_switcheroo.compiler.ir.LogicalGraph) -> List[PatchAction]
+
+      Compare graphs and return list of actions.
+
+      Algorithm:
+      1. Identify Removed IDs: `source_ids - target_ids`.
+      2. Identify Added/Changed Nodes.
+      3. Match Added Nodes to Removed Nodes (Find Anchor).
+         - Heuristic: If FusedNode depends on input X, and RemovedNode N depends on input X,
+           they might be related.
+         - Current Heuristic: Use provenance or manual mapping supplied by Optimizer?
+         - Simpler Heuristic: Fused nodes usually REPLACE a subgraph. The "output" variable
+           usually stays consistent flow-wise, or we replace the Sink of the subgraph.
+
+      For this implementation, we rely on the Optimizer naming convention or graph
+      structure. Since graph optimization logic isn't fully inspectable here,
+      we implement a Diff strategy based on ID presence.
+
+      Strategies:
+      - If ID is missing in Target -> DELETE.
+      - If ID is new/fused in Target -> REPLACE.
+        - We need an Anchor in Source to attach the Replacement.
+        - We attach the Replacement to the *first available* deleted node that matches topology?
+        - Better: If Optimizer produced FusedNode `fused_c1`, and `c1` is deleted, `c1` is anchor?
+
+
+

@@ -617,7 +617,7 @@ window.addEventListener("load", load);
         </li>
         <li class="md-nav__item"><a href="#optimization-phase-graphoptimizer" class="md-nav__link">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)</a>
         </li>
-        <li class="md-nav__item"><a href="#rewriting-phase-pivotrewriter" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        <li class="md-nav__item"><a href="#rewriting-phase-rewriterpipeline" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code>)</a>
         </li>
         <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">4. Refinement Phase</a>
         </li></ul>
@@ -633,7 +633,7 @@ window.addEventListener("load", load);
         </li>
         <li class="md-nav__item"><a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter-via-passes" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> via Passes)</a>
         </li>
         <li class="md-nav__item"><a href="#plugin-hooks-in-src-ml-switcheroo-plugins" class="md-nav__link">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)</a>
         </li></ul>
@@ -708,6 +708,13 @@ window.addEventListener("load", load);
     <li class="md-nav__item">
     
     
+      <a href="INTERNALS.html" class="md-nav__link">Internal Architecture & Theoretical Mechanics</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="IDEAS.html" class="md-nav__link">Ideas</a>
       
     
@@ -763,7 +770,7 @@ window.addEventListener("load", load);
         </li>
         <li class="md-nav__item"><a href="#optimization-phase-graphoptimizer" class="md-nav__link">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)</a>
         </li>
-        <li class="md-nav__item"><a href="#rewriting-phase-pivotrewriter" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        <li class="md-nav__item"><a href="#rewriting-phase-rewriterpipeline" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code>)</a>
         </li>
         <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">4. Refinement Phase</a>
         </li></ul>
@@ -779,7 +786,7 @@ window.addEventListener("load", load);
         </li>
         <li class="md-nav__item"><a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)</a>
+        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter-via-passes" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> via Passes)</a>
         </li>
         <li class="md-nav__item"><a href="#plugin-hooks-in-src-ml-switcheroo-plugins" class="md-nav__link">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)</a>
         </li></ul>
@@ -830,15 +837,15 @@ Macros) or Plugin hooks.</p></li>
 to evolve independently of the “How” (Implementation).</p>
 <pre class="mermaid">
         graph TD
-    %% --- STYLE DEFINITIONS ---
-    classDef default font-family:'Google Sans',color:#20344b,stroke:#20344b;
-    classDef input fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
-    classDef build fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
-    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
-    classDef spoke fill:#fff4c7,stroke:#f9ab00,stroke-width:2px,stroke-dasharray: 5 5,color:#20344b,font-family:'Google Sans',rx:5px;
+    %% --- STYLE DEFINITIONS --- 
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef input fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef build fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef spoke fill:#ffd427,stroke:#f9ab00,stroke-width:2px,stroke-dasharray:5 5,color:#20344b,font-family:'Google Sans Medium',rx:5px;
 
-    %% --- PHASE 1: DISCOVERY ---
-    subgraph P1 ["1. Ingestion Phase"]
+    %% --- PHASE 1: DISCOVERY --- 
+    subgraph P1 [1. Ingestion Phase]
         direction TB
         STANDARDS("External Specs&lt;br/&gt;(ONNX / Array API)"):::input
         CODE("Adapter Classes&lt;br/&gt;(frameworks/*.py)"):::input
@@ -849,22 +856,22 @@ to evolve independently of the “How” (Implementation).</p>
         CODE --&gt; LOADER
     end
 
-    %% --- PHASE 2: STORAGE ---
-    subgraph P2 ["2. Semantics Manager"]
+    %% --- PHASE 2: STORAGE --- 
+    subgraph P2 [2. Semantics Manager]
         direction TB
         HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
         SPOKE[("&lt;b&gt;The Spokes (Variants)&lt;/b&gt;&lt;br/&gt;snapshots/*.json&lt;br/&gt;&lt;i&gt;Framework Implementations&lt;/i&gt;")]:::spoke
         
         %% Internal Context Link
-        SPOKE -.-&gt;|" Hydrates "| HUB
+        SPOKE -.-&gt;|"Hydrates"| HUB
     end
 
     %% Flow P1 -&gt; P2
     LOADER --&gt;|"Populate"| HUB
     LOADER --&gt;|"Populate"| SPOKE
 
-    %% --- PHASE 3: VERIFICATION ---
-    subgraph P3 ["3. Verification Phase"]
+    %% --- PHASE 3: VERIFICATION --- 
+    subgraph P3 [3. Verification Phase]
         direction TB
         TESTER("TestGen &amp; Fuzzer"):::build
     end
@@ -901,23 +908,24 @@ locally.</p>
 transformation.</p>
 <pre class="mermaid">
         graph TD
-    %% --- STYLE DEFINITIONS ---
-    classDef default font-family:'Google Sans',color:#20344b,stroke:#20344b;
-    classDef artifact fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono',stroke-dasharray: 0;
-    classDef process fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
-    classDef optimization fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
-    classDef kb fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
-    classDef plugin fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
-    classDef output fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
+    %% --- STYLE DEFINITIONS --- 
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef artifact fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono Normal',stroke-dasharray: 0;
+    classDef process fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef optimization fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef kb fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef plugin fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef output fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
 
-    %% --- NODES ---
+    %% --- NODES --- 
     SRC("Source Code"):::artifact
     
-    subgraph ENGINE ["AST Engine"]
+    subgraph ENGINE [AST Engine]
         direction TB
         INGEST("1. Ingestion&lt;br/&gt;(Python/MLIR/TikZ)"):::process
         
-        subgraph ANALYSIS_BLOCK [" Analysis Phase "]
+        subgraph ANALYSIS_BLOCK [Analysis Phase]
+            direction TB
             SYMBOLS("Symbol Table"):::process
             PURITY("Purity &amp; Safety"):::process
         end
@@ -926,7 +934,7 @@ transformation.</p>
         
         GRAPH_OPT("2. Graph Optimizer&lt;br/&gt;(Fusion)"):::optimization
         
-        REWRITER("3. Pivot Rewriter"):::process
+        REWRITER("3. Rewriter Pipeline&lt;br/&gt;(Structure/API/Aux Passes)"):::process
         PLUGINS{{Plugin &amp; DSL System}}:::plugin
         
         FIXER("4. Refinement&lt;br/&gt;(Import Fixer)"):::process
@@ -934,7 +942,7 @@ transformation.</p>
     
     TGT("Target Code"):::output
 
-    %% --- EDGES ---
+    %% --- EDGES --- 
     SRC --&gt; INGEST
     INGEST --&gt; SYMBOLS
     SYMBOLS --&gt; PURITY
@@ -966,15 +974,13 @@ rewriting.</p></li>
 <li><p>Replaces them with fused macro operations (e.g., <code class="docutils literal notranslate"><span class="pre">FusedCBR</span></code>) based on <code class="docutils literal notranslate"><span class="pre">PatternDef</span></code> in Semantics.</p></li>
 </ul>
 </section>
-<section id="rewriting-phase-pivotrewriter">
-<h3 id="rewriting-phase-pivotrewriter">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#rewriting-phase-pivotrewriter" title="Link to this heading">¶</a></h3>
-<p>The core transformer is built on a Mixin architecture:</p>
+<section id="rewriting-phase-rewriterpipeline">
+<h3 id="rewriting-phase-rewriterpipeline">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code>)<a class="headerlink" href="#rewriting-phase-rewriterpipeline" title="Link to this heading">¶</a></h3>
+<p>The core transformer is built on a <strong>Pipeline</strong> architecture. The <code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code> orchestrates sequential <strong>Passes</strong> which share a mutable <code class="docutils literal notranslate"><span class="pre">RewriterContext</span></code>.</p>
 <ul class="simple">
-<li><p><strong>StructureMixin:</strong> Handles Class/Function definitions (swaps Base classes, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code>, injects <code class="docutils literal notranslate"><span class="pre">rngs</span></code> args).</p></li>
-<li><p><strong>CallMixin:</strong> The workhorse. Resolves calls to Abstract IDs, applies Layout Permutation, Argument Normalization, and
-dispatches to Plugins.</p></li>
-<li><p><strong>AttributeMixin:</strong> Handles constant renaming (e.g., <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">jnp.float32</span></code>) and stateful assignment
-tracking.</p></li>
+<li><p><strong>StructuralPass:</strong> Handles Class/Function definitions (swaps Base classes, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code>, injects <code class="docutils literal notranslate"><span class="pre">rngs</span></code> args, strips Lifecycle methods).</p></li>
+<li><p><strong>ApiPass:</strong> The workhorse. Resolves API calls and Attributes to Abstract IDs, applies Layout Permutation, Argument Normalization, and dispatches to Plugins.</p></li>
+<li><p><strong>AuxiliaryPass:</strong> Handles secondary syntax constructions (Decorators) and ensures safety for Control Flow (e.g., Loop Unrolling checks).</p></li>
 </ul>
 </section>
 <section id="refinement-phase">
@@ -1016,8 +1022,8 @@ rather than hardcoded logic.</p>
 <h2 id="dsl-plugin-system">🧠 4. DSL &amp; Plugin System<a class="headerlink" href="#dsl-plugin-system" title="Link to this heading">¶</a></h2>
 <p>The system favors declarative logic in the ODL (Operation Definition Language) over python code, but falls back to
 Python Hooks for complex structural changes.</p>
-<section id="core-dsl-logic-in-pivotrewriter">
-<h3 id="core-dsl-logic-in-pivotrewriter">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code>)<a class="headerlink" href="#core-dsl-logic-in-pivotrewriter" title="Link to this heading">¶</a></h3>
+<section id="core-dsl-logic-in-pivotrewriter-via-passes">
+<h3 id="core-dsl-logic-in-pivotrewriter-via-passes">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> via Passes)<a class="headerlink" href="#core-dsl-logic-in-pivotrewriter-via-passes" title="Link to this heading">¶</a></h3>
 <p>Common patterns are handled directly by the engine using the ODL schema:</p>
 <ul class="simple">
 <li><p><strong>Variadic Packing:</strong> <code class="docutils literal notranslate"><span class="pre">pack_to_tuple="axes"</span></code> converts <code class="docutils literal notranslate"><span class="pre">permute(x,</span> <span class="pre">0,</span> <span class="pre">1)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">transpose(x,</span> <span class="pre">axes=(0,</span> <span class="pre">1))</span></code>.</p></li>

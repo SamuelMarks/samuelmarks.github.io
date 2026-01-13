@@ -260,6 +260,13 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../../INTERNALS.html" class="md-nav__link">Internal Architecture & Theoretical Mechanics</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../../IDEAS.html" class="md-nav__link">Ideas</a>
       
     
@@ -277,7 +284,56 @@
     <li class="md-nav__item">
     
     
+      <a href="../../../pre/index.html" class="md-nav__link">pre</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../post/index.html" class="md-nav__link">post</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../utils/index.html" class="md-nav__link">utils</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../guards/index.html" class="md-nav__link">guards</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../dispatch/index.html" class="md-nav__link">dispatch</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../strategy/index.html" class="md-nav__link">strategy</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="../../../injector_fw/index.html" class="md-nav__link">injector_fw</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../transformers/index.html" class="md-nav__link">transformers</a>
       
     
     </li>
@@ -371,6 +427,16 @@
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.provenance" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.provenance</span></code></a>
         </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.node_map" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.node_map</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id0" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.graph</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id1" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.layer_registry</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id2" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.provenance</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#id3" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.node_map</span></code></a>
+        </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.model_name" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.model_name</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.visit_ClassDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.visit_ClassDef()</span></code></a>
@@ -384,6 +450,8 @@
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.leave_FunctionDef" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.leave_FunctionDef()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.visit_Assign" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.visit_Assign()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.visit_Expr" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.visit_Expr()</span></code></a>
         </li>
         <li class="md-nav__item"><a href="#ml_switcheroo.core.graph.GraphExtractor.visit_Return" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">GraphExtractor.visit_Return()</span></code></a>
         </li></ul>
@@ -411,16 +479,9 @@
 <span id="ml-switcheroo-core-graph"></span><h1 id="api-ml-switcheroo-core-graph-index--page-root">ml_switcheroo.core.graph<a class="headerlink" href="#api-ml-switcheroo-core-graph-index--page-root" title="Link to this heading">¶</a></h1>
 <p>Graph Extraction Frontend.</p>
 <p>This module is responsible for analyzing Python Abstract Syntax Trees (ASTs) using LibCST
-and extracting a <cite>LogicalGraph</cite> Intermediate Representation.</p>
-<p>It re-exports the <cite>LogicalGraph</cite> and related classes from <cite>ml_switcheroo.compiler.ir</cite>
-to maintain backward compatibility with existing code that imports from <cite>ml_switcheroo.core.graph</cite>.</p>
-<dl class="simple">
-<dt>Logic:</dt><dd><ul class="simple">
-<li><p>Init Pass: Extracts <cite>self.layer = …</cite> assignments.</p></li>
-<li><p>Forward Pass: Traces data flow <cite>y = self.layer(x)</cite>.</p></li>
-</ul>
-</dd>
-</dl>
+and extracting a <cite>LogicalGraph</cite> Intermediate Representation via the <cite>GraphExtractor</cite>.</p>
+<p>It performs Provenance Tracking, mapping logical nodes back to their source CST nodes,
+enabling surgical patching later in the pipeline.</p>
 <section id="classes">
 <h2 id="classes">Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
@@ -525,27 +586,73 @@ unreachable nodes in their original definition order.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.graph.</span></span><span class="sig-name descname"><span class="pre">GraphExtractor</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L27-L339"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ml_switcheroo.core.graph.</span></span><span class="sig-name descname"><span class="pre">GraphExtractor</span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L23-L271"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">libcst.CSTVisitor</span></code></p>
 <p>LibCST Visitor that extracts a LogicalGraph from Python source code.</p>
-<p>Two-Pass Logic:</p>
-<ol class="arabic simple">
-<li><p><strong>Init Pass</strong>: Scans <code class="docutils literal notranslate"><span class="pre">__init__</span></code> or <code class="docutils literal notranslate"><span class="pre">setup</span></code> to register named layers
-assigned to <code class="docutils literal notranslate"><span class="pre">self</span></code>. Populates the node registry.</p></li>
+<p>Two-Pass Logic:
+1.  <strong>Init Pass</strong>: Scans <code class="docutils literal notranslate"><span class="pre">__init__</span></code> or <code class="docutils literal notranslate"><span class="pre">setup</span></code> to register named layers</p>
+<blockquote>
+<div><p>assigned to <code class="docutils literal notranslate"><span class="pre">self</span></code>. Populates the node registry and provenance map.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
 <li><p><strong>Forward Pass</strong>: Scans <code class="docutils literal notranslate"><span class="pre">forward</span></code> or <code class="docutils literal notranslate"><span class="pre">__call__</span></code> to trace variable usage.
 Builds edges between registered nodes based on data flow.</p></li>
 </ol>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.graph">
 <span class="sig-name descname"><span class="pre">graph</span></span><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.graph" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The constructed intermediate representation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ml_switcheroo.core.graph.LogicalGraph" title="ml_switcheroo.core.graph.LogicalGraph">LogicalGraph</a></p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.layer_registry">
-<span class="sig-name descname"><span class="pre">layer_registry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/ir/index.html#ml_switcheroo.compiler.ir.LogicalNode" title="ml_switcheroo.compiler.ir.LogicalNode"><span class="pre">ml_switcheroo.compiler.ir.LogicalNode</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.layer_registry" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">layer_registry</span></span><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.layer_registry" title="Link to this definition">¶</a></dt>
+<dd><p>Mapping of node IDs to LogicalNodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="#ml_switcheroo.core.graph.LogicalNode" title="ml_switcheroo.core.graph.LogicalNode">LogicalNode</a>]</p>
+</dd>
+</dl>
+</dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.provenance">
-<span class="sig-name descname"><span class="pre">provenance</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.provenance" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">provenance</span></span><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.provenance" title="Link to this definition">¶</a></dt>
+<dd><p>Mapping of variable names to producer node IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.node_map">
+<span class="sig-name descname"><span class="pre">node_map</span></span><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.node_map" title="Link to this definition">¶</a></dt>
+<dd><p>Provenance registry mapping Node ID -&gt; CST Node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, cst.CSTNode]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">graph</span></span><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">layer_registry</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../compiler/ir/index.html#ml_switcheroo.compiler.ir.LogicalNode" title="ml_switcheroo.compiler.ir.LogicalNode"><span class="pre">ml_switcheroo.compiler.ir.LogicalNode</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">provenance</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">node_map</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">libcst.CSTNode</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.model_name">
@@ -553,81 +660,44 @@ Builds edges between registered nodes based on data flow.</p></li>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.visit_ClassDef">
-<span class="sig-name descname"><span class="pre">visit_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L52-L64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_ClassDef" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">visit_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L54-L58"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_ClassDef" title="Link to this definition">¶</a></dt>
 <dd><p>Capture the model class name.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node</strong> – ClassDef node.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True to visit children.</p>
-</dd>
-</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.leave_ClassDef">
-<span class="sig-name descname"><span class="pre">leave_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L66-L67"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.leave_ClassDef" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">leave_ClassDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.ClassDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L60-L62"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.leave_ClassDef" title="Link to this definition">¶</a></dt>
+<dd><p>Exit class scope.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.leave_Module">
-<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L69-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.leave_Module" title="Link to this definition">¶</a></dt>
-<dd><p>Finalize graph construction after visiting the whole module.
-Populates the nodes list from the registry.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>original_node</strong> – The module node.</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">leave_Module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Module</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L64-L66"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.leave_Module" title="Link to this definition">¶</a></dt>
+<dd><p>Finalize graph construction.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.visit_FunctionDef">
-<span class="sig-name descname"><span class="pre">visit_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L79-L100"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_FunctionDef" title="Link to this definition">¶</a></dt>
-<dd><p>Detects entry into lifecycle methods (__init__, forward, etc).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node</strong> – The function definition node.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True to visit children.</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">visit_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L68-L81"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_FunctionDef" title="Link to this definition">¶</a></dt>
+<dd><p>Detects entry into lifecycle methods.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.leave_FunctionDef">
-<span class="sig-name descname"><span class="pre">leave_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L102-L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.leave_FunctionDef" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">leave_FunctionDef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.FunctionDef</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L83-L89"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.leave_FunctionDef" title="Link to this definition">¶</a></dt>
 <dd><p>Resets context flags upon exiting methods.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node</strong> – The function definition node.</p>
-</dd>
-</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.visit_Assign">
-<span class="sig-name descname"><span class="pre">visit_Assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L115-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_Assign" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">visit_Assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Assign</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L91-L99"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_Assign" title="Link to this definition">¶</a></dt>
 <dd><p>Handles assignment logic for both layer definition and data flow.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node</strong> – The assignment node.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True to visit children.</p>
-</dd>
-</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.visit_Expr">
+<span class="sig-name descname"><span class="pre">visit_Expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Expr</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L101-L110"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_Expr" title="Link to this definition">¶</a></dt>
+<dd><p>Handles standalone expression statements (e.g. <cite>func(x)</cite> without assignment).
+Used for 1:1 translations where top-level expressions are valid (e.g. MLIR roundtrips).</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="ml_switcheroo.core.graph.GraphExtractor.visit_Return">
-<span class="sig-name descname"><span class="pre">visit_Return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Return</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L134-L167"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_Return" title="Link to this definition">¶</a></dt>
-<dd><p>Handles return statements in forward pass to create Output nodes.
-Links the variable returned to an implicit ‘Output’ node.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>node</strong> – The return statement node.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>False to stop recursion into the return statement (logic handled here).</p>
-</dd>
-</dl>
+<span class="sig-name descname"><span class="pre">visit_Return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">libcst.Return</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference external" href="https://github.com/SamuelMarks/ml-switcheroo/blob/master/src/ml_switcheroo/core/graph.py#L112-L138"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ml_switcheroo.core.graph.GraphExtractor.visit_Return" title="Link to this definition">¶</a></dt>
+<dd><p>Handles return statements to identify Output nodes.</p>
 </dd></dl>
 </dd></dl>
 </section>

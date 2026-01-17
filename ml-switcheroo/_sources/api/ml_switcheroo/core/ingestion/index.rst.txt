@@ -1,0 +1,47 @@
+ml_switcheroo.core.ingestion
+============================
+
+.. py:module:: ml_switcheroo.core.ingestion
+
+.. autoapi-nested-parse::
+
+   Ingestion logic for parsing source code into an Abstract Syntax Tree (AST).
+
+   This module handles the complexity of accepting different input formats (Python,
+   MLIR, TikZ, Custom DSLs) and normalizing them into a LibCST Module to be processed
+   by the core Transpilation Engine.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.ingestion.ingest_code
+
+
+Module Contents
+---------------
+
+.. py:function:: ingest_code(code: str, source_fw: str, target_fw: str, source_adapter: Optional[ml_switcheroo.frameworks.base.FrameworkAdapter], tracer: Any) -> libcst.Module
+
+   Parses input code handles non-python sources via adapters.
+
+   Supports:
+   1. Adapter-specific parsers (e.g. LaTeX).
+   2. MLIR text parsing via `MlirParser`.
+   3. TikZ text parsing via `TikzParser`.
+   4. Standard Python parsing via `libcst`.
+
+   :param code: Raw source code string.
+   :param source_fw: Key identifying the source framework (e.g., 'torch', 'tikz').
+   :param target_fw: Key identifying the target framework (used for synthesis contexts).
+   :param source_adapter: The loaded adapter for the source framework, if any.
+   :param tracer: The trace logger instance for recording phase events.
+
+   :returns: A validated Python LibCST Module.
+
+   :raises Exception: If parsing fails for any reason (syntax errors, etc.).
+
+

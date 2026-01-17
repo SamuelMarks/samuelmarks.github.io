@@ -1,0 +1,352 @@
+ml_switcheroo.frameworks.base
+=============================
+
+.. py:module:: ml_switcheroo.frameworks.base
+
+.. autoapi-nested-parse::
+
+   Base Protocol and Registry for Framework Adapters.
+
+   This module defines the interface that all Framework Adapters must implement.
+   Updated to remove legacy `create_parser` and `create_emitter` hooks,
+   enforcing the new Pipeline Routing architecture.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.base.SNAPSHOT_DIR
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.base.StandardCategory
+   ml_switcheroo.frameworks.base.InitMode
+   ml_switcheroo.frameworks.base.ImportConfig
+   ml_switcheroo.frameworks.base.StandardMap
+   ml_switcheroo.frameworks.base.FrameworkAdapter
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.base.load_snapshot_for_adapter
+   ml_switcheroo.frameworks.base.register_framework
+   ml_switcheroo.frameworks.base.available_frameworks
+   ml_switcheroo.frameworks.base.get_adapter
+
+
+Module Contents
+---------------
+
+.. py:data:: SNAPSHOT_DIR
+
+.. py:class:: StandardCategory
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration of API categories for discovery.
+
+
+   .. py:attribute:: LOSS
+      :value: 'loss'
+
+
+
+   .. py:attribute:: OPTIMIZER
+      :value: 'optimizer'
+
+
+
+   .. py:attribute:: LAYER
+      :value: 'layer'
+
+
+
+   .. py:attribute:: ACTIVATION
+      :value: 'activation'
+
+
+
+.. py:class:: InitMode
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Initialization mode for adapters.
+
+
+   .. py:attribute:: LIVE
+      :value: 'live'
+
+
+
+   .. py:attribute:: GHOST
+      :value: 'ghost'
+
+
+
+.. py:class:: ImportConfig(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for an exposed namespace.
+
+
+   .. py:attribute:: tier
+      :type:  ml_switcheroo.enums.SemanticTier
+      :value: None
+
+
+
+   .. py:attribute:: recommended_alias
+      :type:  Optional[str]
+      :value: None
+
+
+
+.. py:class:: StandardMap(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Defines how a Framework implements a Middle Layer standard.
+
+
+   .. py:attribute:: api
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: args
+      :type:  Optional[Dict[str, Optional[str]]]
+      :value: None
+
+
+
+   .. py:attribute:: inject_args
+      :type:  Optional[Dict[str, Any]]
+      :value: None
+
+
+
+   .. py:attribute:: requires_plugin
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: transformation_type
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: operator
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: pack_to_tuple
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: macro_template
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: output_cast
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: arg_values
+      :type:  Optional[Dict[str, Dict[str, str]]]
+      :value: None
+
+
+
+   .. py:attribute:: required_imports
+      :type:  List[Union[str, Any]]
+      :value: None
+
+
+
+   .. py:attribute:: missing_message
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: layout_map
+      :type:  Optional[Dict[str, str]]
+      :value: None
+
+
+
+.. py:class:: FrameworkAdapter
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol definition for a Framework Adapter.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
+
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+
+   .. py:property:: display_name
+      :type: str
+
+
+
+   .. py:property:: ui_priority
+      :type: int
+
+
+
+   .. py:property:: discovery_heuristics
+      :type: Dict[str, List[str]]
+
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+
+   .. py:property:: import_alias
+      :type: Tuple[str, str]
+
+
+
+   .. py:property:: inherits_from
+      :type: Optional[str]
+
+
+
+   .. py:property:: structural_traits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
+
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+
+   .. py:property:: rng_seed_methods
+      :type: List[str]
+
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+
+   .. py:method:: get_serialization_imports() -> List[str]
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+
+   .. py:method:: get_doc_url(api_name: str) -> Optional[str]
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+
+   .. py:property:: definitions
+      :type: Dict[str, StandardMap]
+
+
+
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.semantics.schema.OperationDef]
+
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, Union[Dict[str, str], ImportConfig]]
+
+
+
+   .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+
+.. py:function:: load_snapshot_for_adapter(fw_key: str) -> Dict[str, Any]
+
+.. py:function:: register_framework(name: str)
+
+.. py:function:: available_frameworks() -> List[str]
+
+.. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
+

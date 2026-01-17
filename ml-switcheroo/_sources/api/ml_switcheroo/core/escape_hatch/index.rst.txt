@@ -1,0 +1,73 @@
+ml_switcheroo.core.escape_hatch
+===============================
+
+.. py:module:: ml_switcheroo.core.escape_hatch
+
+.. autoapi-nested-parse::
+
+   Escape Hatch Mechanism for Untranslatable Code.
+
+   This module provides the `EscapeHatch` class, responsible for wrapping code
+   that cannot be deterministically transpiled with specific marker comments.
+   It ensures that broken or partial translations are not emitted silently.
+
+   Reliability Logic:
+
+   - START_MARKER: injected into the leading lines of the failed statement.
+   - END_MARKER: injected via a sentinel statement (Ellipsis) following the failure.
+   - Verbatim Preservation: The caller is responsible for passing the *original* node
+     to avoid emitting partially mutated (broken) code.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.escape_hatch.EscapeHatch
+
+
+Module Contents
+---------------
+
+.. py:class:: EscapeHatch
+
+   Handles the "Pass-Through" Protocol.
+   Wraps untranslatable nodes with standardized comment flags and valid Python syntax markers.
+
+
+   .. py:attribute:: START_MARKER
+      :value: '# <SWITCHEROO_FAILED_TO_TRANS>'
+
+
+
+   .. py:attribute:: END_MARKER
+      :value: '# </SWITCHEROO_FAILED_TO_TRANS>'
+
+
+
+   .. py:method:: mark_failure(node: libcst.CSTNode, reason: str) -> Union[libcst.CSTNode, libcst.FlattenSentinel]
+      :staticmethod:
+
+
+      Attaches warning comments to the node and appends an end marker.
+
+      Transformation:
+          original_stmt()
+
+      Becomes:
+          # <SWITCHEROO_FAILED_TO_TRANS>
+          # Reason: ...
+          original_stmt()
+          # </SWITCHEROO_FAILED_TO_TRANS>
+          ...
+
+      :param node: The CST node (typically original_node) to preserve.
+      :param reason: Human-readable explanation of the failure.
+
+      :returns: A FlattenSentinel containing the preserved node (with header)
+                and a footer node (Ellipsis) containing the end marker.
+
+
+

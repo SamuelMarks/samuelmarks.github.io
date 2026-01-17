@@ -1,0 +1,55 @@
+ml_switcheroo.plugins.scatter
+=============================
+
+.. py:module:: ml_switcheroo.plugins.scatter
+
+.. autoapi-nested-parse::
+
+   Plugin for Scatter/Gather Syntax Transformation.
+
+   Handles the fundamental semantic difference between:
+   1. PyTorch (`x.scatter_(dim, index, src)`): Implicitly iterates `dim`.
+   2. JAX/NumPy (`x.at[index].set(src)`): Explicit indexing via special accessor.
+
+   This plugin converts:
+   - `x.scatter_(dim, index, src)` -> `x.at[index].set(src)` (Simple Case)
+   - `x.scatter(dim, index, src)` -> `x.at[index].set(src)` (Out-of-place)
+
+   Decoupling Logic:
+       Removed framework checks. This logic executes if the operation is mapped
+       via `requires_plugin="scatter_indexer"`.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.scatter.transform_scatter
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_scatter(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
+
+   Hook: Transforms scatter method calls into index-update syntax (JAX style).
+
+   Trigger: Operations mapped with `requires_plugin: "scatter_indexer"`.
+
+   Transformation:
+       Input:  `tensor.scatter_(dim, index, src)`
+       Output: `tensor.at[index].set(src)`
+
+   Note regarding `dim`:
+   JAX's `at[index]` syntax implies the indices are fully specified or slicing.
+   PyTorch's `scatter` applies along a `dim`.
+   This transformation maps to the high-level `at[idx].set(src)` utility.
+
+   :param node: The original CST Call (scatter).
+   :param ctx: The hook context.
+
+   :returns: The transformed CST Call (at[].set()).
+
+

@@ -1,0 +1,79 @@
+ml_switcheroo.compiler.backends.python
+======================================
+
+.. py:module:: ml_switcheroo.compiler.backends.python
+
+.. autoapi-nested-parse::
+
+   Python Source Code Backend.
+
+   This module implements a Compiler Backend that synthesizes Python source code
+   from the Logical Graph Internal Representation via LibCST.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.backends.python.ClassBodyReplacer
+   ml_switcheroo.compiler.backends.python.PythonBackend
+
+
+Module Contents
+---------------
+
+.. py:class:: ClassBodyReplacer(target_class: str, new_init: libcst.FunctionDef, new_forward: libcst.FunctionDef)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   Transformer to swap __init__ and forward methods in a target class.
+
+
+   .. py:attribute:: target_class
+
+
+   .. py:attribute:: new_init
+
+
+   .. py:attribute:: new_forward
+
+
+   .. py:attribute:: found
+      :value: False
+
+
+
+   .. py:method:: leave_ClassDef(original_node: libcst.ClassDef, updated_node: libcst.ClassDef) -> libcst.ClassDef
+
+
+.. py:class:: PythonBackend(framework: str = 'torch', semantics: Any = None)
+
+   Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
+
+
+   Synthesizes a Python CST Module from a LogicalGraph.
+
+
+   .. py:attribute:: framework
+      :value: 'torch'
+
+
+
+   .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
+
+      Compiles the Logical Intermediate Representation (IR) into a target artifact.
+
+      :param graph: The intermediate representation of the model structure.
+      :type graph: LogicalGraph
+
+      :returns: The compiled output (e.g., source code string, binary buffer, or AST).
+      :rtype: Any
+
+
+
+   .. py:method:: generate(graph: ml_switcheroo.compiler.ir.LogicalGraph, class_name: str = 'SwitcherooNet', original_tree: Optional[libcst.Module] = None) -> str
+
+

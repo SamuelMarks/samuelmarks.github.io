@@ -1,0 +1,71 @@
+ml_switcheroo.testing.fuzzer
+============================
+
+.. py:module:: ml_switcheroo.testing.fuzzer
+
+.. autoapi-nested-parse::
+
+   Fuzzer Package.
+
+   This package provides the input generation engine for verification tests.
+   It exposes the main `InputFuzzer` class which orchestrates the generation
+   of random inputs (Arrays, Scalars, Containers) based on semantic type hints
+   and constraints.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/testing/fuzzer/core/index
+   /api/ml_switcheroo/testing/fuzzer/generators/index
+   /api/ml_switcheroo/testing/fuzzer/heuristics/index
+   /api/ml_switcheroo/testing/fuzzer/parser/index
+   /api/ml_switcheroo/testing/fuzzer/strategies/index
+   /api/ml_switcheroo/testing/fuzzer/utils/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.testing.fuzzer.InputFuzzer
+
+
+Package Contents
+----------------
+
+.. py:class:: InputFuzzer
+
+   Facade for creating Hypothesis strategies based on Semantic Spec.
+
+
+   .. py:method:: build_strategies(params: List[str], hints: Optional[Dict[str, str]] = None, constraints: Optional[Dict[str, Dict]] = None) -> Dict[str, hypothesis.strategies.SearchStrategy]
+
+      Constructs a dictionary of Hypothesis strategies for the given parameters.
+      Automatically handles shared symbolic dimensions (e.g. Array['N']).
+
+      :param params: List of argument names.
+      :param hints: Mapping of name -> type string.
+      :param constraints: Mapping of name -> dict constraints (min, max, etc).
+
+      :returns: Strategies ready to be fed into @given.
+      :rtype: Dict[str, Strategy]
+
+
+
+   .. py:method:: adapt_to_framework(kwargs: Dict[str, Any], framework: str) -> Dict[str, Any]
+
+      Delegates to Framework Adapter to convert Numpy/Native inputs to Tensors.
+
+      :param kwargs: Dictionary of input values.
+      :param framework: Target framework key (e.g. 'torch').
+
+      :returns: Dict with converted values.
+
+
+

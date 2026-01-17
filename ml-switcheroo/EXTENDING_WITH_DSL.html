@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Extending with DSL &#8212; ml-switcheroo</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=2ca74108" />
+    <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=b0d570c0" />
+    <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
+    <script src="_static/trace_render.js?v=d399b484"></script>
+    <script src="_static/switcheroo_demo.js?v=ec22a231"></script>
+    <script src="_static/op_tabs.js?v=cd874ca5"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";
+
+const defaultStyle = document.createElement('style');
+defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+`;
+document.head.appendChild(defaultStyle);
+
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+document.head.appendChild(fullscreenStyle);
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }
+    return false;
+};
+
+const load = async () => {
+    await mermaid.run();
+
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(load, 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(load, 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(load, 200);
+        return;
+    }
+
+    const darkTheme = isDarkTheme();
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    const modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    const allButtons = [];
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        container.appendChild(fullscreenBtn);
+        allButtons.push(fullscreenBtn);
+    });
+
+    // Update theme classes when theme changes
+    const updateTheme = () => {
+        const dark = isDarkTheme();
+        allButtons.forEach(btn => {
+            if (dark) {
+                btn.classList.add('dark-theme');
+            } else {
+                btn.classList.remove('dark-theme');
+            }
+        });
+        if (dark) {
+            modal.classList.add('dark-theme');
+            modalContent.classList.add('dark-theme');
+            closeBtn.classList.add('dark-theme');
+        } else {
+            modal.classList.remove('dark-theme');
+            modalContent.classList.remove('dark-theme');
+            closeBtn.classList.remove('dark-theme');
+        }
+    };
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+};
+
+window.addEventListener("load", load);
+</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Maintenance" href="MAINTENANCE.html" />
+    <link rel="prev" title="Extending" href="EXTENDING.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue data-md-color-accent=light-blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#EXTENDING_WITH_DSL" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="ml-switcheroo"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">ml-switcheroo</span>
+          <span class="md-header-nav__topic"> Extending with DSL </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="ml-switcheroo" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="ml-switcheroo">ml-switcheroo</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Documentation</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="README.html" class="md-nav__link">ml-switcheroo 🔄🦘</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ARCHITECTURE.html" class="md-nav__link">Architecture</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="EXTENDING.html" class="md-nav__link">Extending</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Extending with DSL </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Extending with DSL</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#extending-with-dsl--page-root" class="md-nav__link">Extending with DSL</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-odl-lifecycle" class="md-nav__link">🏗️ The ODL Lifecycle</a>
+        </li>
+        <li class="md-nav__item"><a href="#llm-assisted-workflow-the-fast-cycle" class="md-nav__link">🤖 LLM-Assisted Workflow (The Fast Cycle)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#find-missing-ops-audit" class="md-nav__link">1. Find Missing Ops (<code class="docutils literal notranslate"><span class="pre">audit</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#generate-context-suggest" class="md-nav__link">2. Generate Context (<code class="docutils literal notranslate"><span class="pre">suggest</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#validate-safety-dry-run" class="md-nav__link">3. Validate Safety (<code class="docutils literal notranslate"><span class="pre">dry-run</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#inject-verify" class="md-nav__link">4. Inject & Verify</a>
+        </li>
+        <li class="md-nav__item"><a href="#schema-export-schema" class="md-nav__link">5. Schema Export (<code class="docutils literal notranslate"><span class="pre">schema</span></code>)</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#the-schema-at-a-glance" class="md-nav__link">📚 The Schema at a Glance</a>
+        </li>
+        <li class="md-nav__item"><a href="#feature-reference" class="md-nav__link">🧬 Feature Reference</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#argument-normalization" class="md-nav__link">1. Argument Normalization</a>
+        </li>
+        <li class="md-nav__item"><a href="#rich-parameter-constraints-fuzzer-control" class="md-nav__link">2. Rich Parameter Constraints (Fuzzer Control)</a>
+        </li>
+        <li class="md-nav__item"><a href="#conditional-dispatch-rules" class="md-nav__link">3. Conditional Dispatch (Rules)</a>
+        </li>
+        <li class="md-nav__item"><a href="#argument-value-mapping-enum-translation" class="md-nav__link">4. Argument Value Mapping (Enum Translation)</a>
+        </li>
+        <li class="md-nav__item"><a href="#output-adaptation" class="md-nav__link">5. Output Adaptation</a>
+        </li>
+        <li class="md-nav__item"><a href="#tensor-layout-permutation" class="md-nav__link">6. Tensor Layout Permutation</a>
+        </li>
+        <li class="md-nav__item"><a href="#argument-packing-variadics" class="md-nav__link">7. Argument Packing & Variadics</a>
+        </li>
+        <li class="md-nav__item"><a href="#constraint-injection-via-metadata" class="md-nav__link">8. Constraint Injection via Metadata</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#advanced-configuration" class="md-nav__link">🔌 Advanced Configuration</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#version-constraints" class="md-nav__link">Version Constraints</a>
+        </li>
+        <li class="md-nav__item"><a href="#dependency-management" class="md-nav__link">Dependency Management</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-scaffolding" class="md-nav__link">Plugin Scaffolding</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#verification-logic" class="md-nav__link">🧪 Verification Logic</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/EXTENDING_WITH_DSL.md.txt">Show Source</a> </li>
+
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-odl-lifecycle" class="md-nav__link">🏗️ The ODL Lifecycle</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#llm-assisted-workflow-the-fast-cycle" class="md-nav__link">🤖 LLM-Assisted Workflow (The Fast Cycle)</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-schema-at-a-glance" class="md-nav__link">📚 The Schema at a Glance</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#feature-reference" class="md-nav__link">🧬 Feature Reference</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#advanced-configuration" class="md-nav__link">🔌 Advanced Configuration</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#verification-logic" class="md-nav__link">🧪 Verification Logic</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="INTERNALS.html" class="md-nav__link">Internal Architecture & Theoretical Mechanics</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="IDEAS.html" class="md-nav__link">Ideas</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Reference</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="api/index.html" class="md-nav__link">API Reference</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ops/index.html" class="md-nav__link">Operation Reference</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#extending-with-dsl--page-root" class="md-nav__link">Extending with DSL</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-odl-lifecycle" class="md-nav__link">🏗️ The ODL Lifecycle</a>
+        </li>
+        <li class="md-nav__item"><a href="#llm-assisted-workflow-the-fast-cycle" class="md-nav__link">🤖 LLM-Assisted Workflow (The Fast Cycle)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#find-missing-ops-audit" class="md-nav__link">1. Find Missing Ops (<code class="docutils literal notranslate"><span class="pre">audit</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#generate-context-suggest" class="md-nav__link">2. Generate Context (<code class="docutils literal notranslate"><span class="pre">suggest</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#validate-safety-dry-run" class="md-nav__link">3. Validate Safety (<code class="docutils literal notranslate"><span class="pre">dry-run</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#inject-verify" class="md-nav__link">4. Inject & Verify</a>
+        </li>
+        <li class="md-nav__item"><a href="#schema-export-schema" class="md-nav__link">5. Schema Export (<code class="docutils literal notranslate"><span class="pre">schema</span></code>)</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#the-schema-at-a-glance" class="md-nav__link">📚 The Schema at a Glance</a>
+        </li>
+        <li class="md-nav__item"><a href="#feature-reference" class="md-nav__link">🧬 Feature Reference</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#argument-normalization" class="md-nav__link">1. Argument Normalization</a>
+        </li>
+        <li class="md-nav__item"><a href="#rich-parameter-constraints-fuzzer-control" class="md-nav__link">2. Rich Parameter Constraints (Fuzzer Control)</a>
+        </li>
+        <li class="md-nav__item"><a href="#conditional-dispatch-rules" class="md-nav__link">3. Conditional Dispatch (Rules)</a>
+        </li>
+        <li class="md-nav__item"><a href="#argument-value-mapping-enum-translation" class="md-nav__link">4. Argument Value Mapping (Enum Translation)</a>
+        </li>
+        <li class="md-nav__item"><a href="#output-adaptation" class="md-nav__link">5. Output Adaptation</a>
+        </li>
+        <li class="md-nav__item"><a href="#tensor-layout-permutation" class="md-nav__link">6. Tensor Layout Permutation</a>
+        </li>
+        <li class="md-nav__item"><a href="#argument-packing-variadics" class="md-nav__link">7. Argument Packing & Variadics</a>
+        </li>
+        <li class="md-nav__item"><a href="#constraint-injection-via-metadata" class="md-nav__link">8. Constraint Injection via Metadata</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#advanced-configuration" class="md-nav__link">🔌 Advanced Configuration</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#version-constraints" class="md-nav__link">Version Constraints</a>
+        </li>
+        <li class="md-nav__item"><a href="#dependency-management" class="md-nav__link">Dependency Management</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-scaffolding" class="md-nav__link">Plugin Scaffolding</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#verification-logic" class="md-nav__link">🧪 Verification Logic</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/EXTENDING_WITH_DSL.md.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="extending-with-dsl">
+<h1 id="extending-with-dsl--page-root">Extending with DSL<a class="headerlink" href="#extending-with-dsl--page-root" title="Link to this heading">¶</a></h1>
+<p>The <strong>Operation Definition Language (ODL)</strong> is a declarative YAML schema used to teach <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> new mathematical concepts. It serves as the “DNA” of the transpiler, defining:</p>
+<ol class="arabic simple">
+<li><p><strong>Semantic Interface</strong>: Arguments, Types, Shapes, and Constraints.</p></li>
+<li><p><strong>Implementation logic</strong>: How to map the operation to specific backends (Torch, JAX, TF, etc.).</p></li>
+<li><p><strong>Verification Data</strong>: Hints for the automated fuzzer to prove correctness.</p></li>
+</ol>
+<p>ODL allows you to inject logic into the <strong>Knowledge Base</strong> without writing Python AST transformation code.</p>
+<hr class="docutils"/>
+<section id="the-odl-lifecycle">
+<h2 id="the-odl-lifecycle">🏗️ The ODL Lifecycle<a class="headerlink" href="#the-odl-lifecycle" title="Link to this heading">¶</a></h2>
+<p>Data flows from the declarative YAML file into the distributed Knowledge Base (Hub &amp; Spoke), triggering the automatic generation of validation tests.</p>
+<pre class="mermaid">
+        graph TD
+    %% --- STYLE DEFINITIONS ---
+    classDef default font-family:'Google Sans',color:#20344b,stroke:#20344b;
+    classDef file fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
+    classDef process fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
+    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
+    classDef output fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans',rx:5px;
+    classDef generated fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans',rx:5px;
+
+    %% --- NODES ---
+    YAML("&lt;b&gt;ODL YAML&lt;/b&gt;&lt;br/&gt;my_op.yaml"):::file
+    
+    subgraph CLI [" CLI: ml_switcheroo define "]
+        direction TB
+        PARSER("&lt;b&gt;ODL Parser&lt;/b&gt;&lt;br/&gt;Validates Schema"):::process
+        INJECTOR("&lt;b&gt;Injectors&lt;/b&gt;&lt;br/&gt;Updates AST &amp; JSONs"):::process
+        
+        PARSER --&gt; INJECTOR
+    end
+    
+    subgraph KB [" Knowledge Base "]
+        direction TB
+        HUB[("&lt;b&gt;The Hub&lt;/b&gt;&lt;br/&gt;standards.py&lt;br/&gt;&lt;i&gt;Abstract Def&lt;/i&gt;")]:::hub
+        SPOKE[("&lt;b&gt;The Spokes&lt;/b&gt;&lt;br/&gt;frameworks/*.json&lt;br/&gt;&lt;i&gt;Variants&lt;/i&gt;")]:::hub
+    end
+    
+    TEST_GEN("&lt;b&gt;Test Generator&lt;/b&gt;&lt;br/&gt;Builds PyTest Harness"):::process
+    
+    ARTIFACTS("&lt;b&gt;Generated Code&lt;/b&gt;&lt;br/&gt;tests/generated/test_my_op.py&lt;br/&gt;plugins/my_op_plugin.py"):::output
+
+    %% --- EDGES ---
+    YAML --&gt; PARSER
+    INJECTOR --&gt;|" 1a. Writes spec "| HUB
+    INJECTOR --&gt;|" 1b. Writes maps "| SPOKE
+    
+    HUB --&gt; TEST_GEN
+    SPOKE --&gt; TEST_GEN
+    
+    TEST_GEN --&gt;|" 2. Creates "| ARTIFACTS
+    </pre></section>
+<hr class="docutils"/>
+<section id="llm-assisted-workflow-the-fast-cycle">
+<h2 id="llm-assisted-workflow-the-fast-cycle">🤖 LLM-Assisted Workflow (The Fast Cycle)<a class="headerlink" href="#llm-assisted-workflow-the-fast-cycle" title="Link to this heading">¶</a></h2>
+<p>Writing YAML manually is slow. <code class="docutils literal notranslate"><span class="pre">ml-switcheroo</span></code> includes a suite of CLI tools designed to put an LLM “in the loop” for rapid API coverage.</p>
+<section id="find-missing-ops-audit">
+<h3 id="find-missing-ops-audit">1. Find Missing Ops (<code class="docutils literal notranslate"><span class="pre">audit</span></code>)<a class="headerlink" href="#find-missing-ops-audit" title="Link to this heading">¶</a></h3>
+<p>Identify API calls in your codebase that are not yet mapped. Usage of <code class="docutils literal notranslate"><span class="pre">--json</span></code> allows piping to automation scripts.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check coverage</span>
+ml_switcheroo<span class="w"> </span>audit<span class="w"> </span>./my_project<span class="w"> </span>--roots<span class="w"> </span>torch
+
+<span class="c1"># Output JSON for tooling</span>
+ml_switcheroo<span class="w"> </span>audit<span class="w"> </span>./my_project<span class="w"> </span>--roots<span class="w"> </span>torch<span class="w"> </span>--json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[].api'</span>
+</pre></div>
+</div>
+</section>
+<section id="generate-context-suggest">
+<h3 id="generate-context-suggest">2. Generate Context (<code class="docutils literal notranslate"><span class="pre">suggest</span></code>)<a class="headerlink" href="#generate-context-suggest" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">suggest</span></code> command introspects the installed source library (live!) and generates a pre-filled prompt for an LLM. This prompt includes:</p>
+<ul class="simple">
+<li><p><strong>Signatures &amp; Docstrings</strong>: Extracted via runtime introspection.</p></li>
+<li><p><strong>ODL Schema</strong>: The rigid ODL JSON schema required by the parser.</p></li>
+<li><p><strong>One-Shot Example</strong>: A valid baseline mapping.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate prompt for a specific API</span>
+ml_switcheroo<span class="w"> </span>suggest<span class="w"> </span>torch.nn.functional.grid_sample<span class="w"> </span>&gt;<span class="w"> </span>prompt.txt
+
+<span class="c1"># Copy prompt.txt to ChatGPT / Claude / Local LLM to get valid YAML.</span>
+</pre></div>
+</div>
+</section>
+<section id="validate-safety-dry-run">
+<h3 id="validate-safety-dry-run">3. Validate Safety (<code class="docutils literal notranslate"><span class="pre">dry-run</span></code>)<a class="headerlink" href="#validate-safety-dry-run" title="Link to this heading">¶</a></h3>
+<p>LLMs can hallucinate. Always preview the changes before injecting code.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># View Unified Diff of standards.py and framework adapters</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>generated_op.yaml<span class="w"> </span>--dry-run
+</pre></div>
+</div>
+</section>
+<section id="inject-verify">
+<h3 id="inject-verify">4. Inject &amp; Verify<a class="headerlink" href="#inject-verify" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Apply the definition and generate tests</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>generated_op.yaml
+</pre></div>
+</div>
+</section>
+<section id="schema-export-schema">
+<h3 id="schema-export-schema">5. Schema Export (<code class="docutils literal notranslate"><span class="pre">schema</span></code>)<a class="headerlink" href="#schema-export-schema" title="Link to this heading">¶</a></h3>
+<p>If building custom agents, you can export the raw JSON schema for function calling.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ml_switcheroo<span class="w"> </span>schema<span class="w"> </span>&gt;<span class="w"> </span>odl_schema.json
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="the-schema-at-a-glance">
+<h2 id="the-schema-at-a-glance">📚 The Schema at a Glance<a class="headerlink" href="#the-schema-at-a-glance" title="Link to this heading">¶</a></h2>
+<p>A complete ODL definition looks like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"LogSoftmax"</span>
+<span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"Applies</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">LogSoftmax</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">n-dimensional</span><span class="nv"> </span><span class="s">input</span><span class="nv"> </span><span class="s">Tensor."</span>
+<span class="nt">op_type</span><span class="p">:</span><span class="w"> </span><span class="s">"function"</span><span class="w"> </span><span class="c1"># function | context | decorator</span>
+
+<span class="c1"># 1. Standard Arguments (The Abstract Signature)</span>
+<span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"input"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">                 </span><span class="c1"># Constraint: Must be 4D (e.g. NCHW)</span>
+<span class="w">    </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="s">"float32"</span><span class="w">        </span><span class="c1"># Constraint: Input must be float check</span>
+<span class="w">    </span><span class="nt">shape_spec</span><span class="p">:</span><span class="w"> </span><span class="s">"[B,</span><span class="nv"> </span><span class="s">C,</span><span class="nv"> </span><span class="s">...]"</span><span class="w"> </span><span class="c1"># Symbolic shape hint for Fuzzer</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"int"</span>
+<span class="w">    </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="s">"-1"</span><span class="w">           </span><span class="c1"># Default value if missing in source</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-2</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+
+<span class="c1"># 2. Return Verification</span>
+<span class="nt">return_type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="nt">output_shape_calc</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">input,</span><span class="nv"> </span><span class="s">dim:</span><span class="nv"> </span><span class="s">input.shape"</span><span class="w"> </span><span class="c1"># Verifies output shape matches input</span>
+
+<span class="c1"># 3. Framework Implementations</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.nn.functional.log_softmax"</span>
+
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.nn.log_softmax"</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="s">"axis"</span><span class="w">           </span><span class="c1"># Rename 'dim' -&gt; 'axis'</span>
+<span class="w">    </span><span class="nt">min_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.4.0"</span><span class="w">    </span><span class="c1"># Version constraints</span>
+<span class="w">    </span><span class="nt">required_imports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">jax"</span>
+</pre></div>
+</div>
+<p>To apply this file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Preview</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>my_op.yaml<span class="w"> </span>--dry-run
+<span class="c1"># Apply</span>
+ml_switcheroo<span class="w"> </span>define<span class="w"> </span>my_op.yaml
+</pre></div>
+</div>
+</section>
+<hr class="docutils"/>
+<section id="feature-reference">
+<h2 id="feature-reference">🧬 Feature Reference<a class="headerlink" href="#feature-reference" title="Link to this heading">¶</a></h2>
+<section id="argument-normalization">
+<h3 id="argument-normalization">1. Argument Normalization<a class="headerlink" href="#argument-normalization" title="Link to this heading">¶</a></h3>
+<p>The core job of ODL is pivoting arguments from <strong>Source Names</strong> to <strong>Standard Names</strong>, and then to <strong>Target Names</strong>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"axis"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"keepdims"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.sum"</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">axis</span><span class="p">:</span><span class="w"> </span><span class="s">"dim"</span><span class="w">          </span><span class="c1"># Map Spec 'axis' -&gt; Torch 'dim'</span>
+<span class="w">      </span><span class="nt">keepdims</span><span class="p">:</span><span class="w"> </span><span class="s">"keepdim"</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.sum"</span>
+<span class="w">    </span><span class="c1"># JAX matches standard names, no mapping needed</span>
+</pre></div>
+</div>
+</section>
+<section id="rich-parameter-constraints-fuzzer-control">
+<h3 id="rich-parameter-constraints-fuzzer-control">2. Rich Parameter Constraints (Fuzzer Control)<a class="headerlink" href="#rich-parameter-constraints-fuzzer-control" title="Link to this heading">¶</a></h3>
+<p>You can attach metadata to <code class="docutils literal notranslate"><span class="pre">std_args</span></code> to constrain the inputs generated during verification (CI) or strict mode checking.</p>
+<table>
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Field</p></th>
+<th class="head text-left"><p>Description</p></th>
+<th class="head text-left"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></td>
+<td class="text-left"><p>Python Type Hint string.</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">"int"</span></code>, <code class="docutils literal notranslate"><span class="pre">"Tensor"</span></code>, <code class="docutils literal notranslate"><span class="pre">"List[int]"</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">default</span></code></p></td>
+<td class="text-left"><p>Default value (transpiled if arg missing).</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">"1e-5"</span></code>, <code class="docutils literal notranslate"><span class="pre">"True"</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">rank</span></code></p></td>
+<td class="text-left"><p>Required tensor rank (number of dims).</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">4</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">dtype</span></code></p></td>
+<td class="text-left"><p>Required data type.</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">"float32"</span></code>, <code class="docutils literal notranslate"><span class="pre">"int64"</span></code>, <code class="docutils literal notranslate"><span class="pre">"bool"</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shape_spec</span></code></p></td>
+<td class="text-left"><p>Symbolic shape string.</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">"[B,</span> <span class="pre">T,</span> <span class="pre">D]"</span></code>, <code class="docutils literal notranslate"><span class="pre">"[N,</span> <span class="pre">N]"</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">min</span></code> / <code class="docutils literal notranslate"><span class="pre">max</span></code></p></td>
+<td class="text-left"><p>Numeric bounds for scalar generation.</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">min:</span> <span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">max:</span> <span class="pre">1</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">options</span></code></p></td>
+<td class="text-left"><p>Allowed values (Enumeration).</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">["sum",</span> <span class="pre">"mean",</span> <span class="pre">"none"]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example: Convolution Weights</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"weight"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"Tensor"</span>
+<span class="w">    </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">    </span><span class="nt">shape_spec</span><span class="p">:</span><span class="w"> </span><span class="s">"[Out,</span><span class="nv"> </span><span class="s">In,</span><span class="nv"> </span><span class="s">K,</span><span class="nv"> </span><span class="s">K]"</span><span class="w"> </span><span class="c1"># Enforce square kernel in fuzzer</span>
+</pre></div>
+</div>
+</section>
+<section id="conditional-dispatch-rules">
+<h3 id="conditional-dispatch-rules">3. Conditional Dispatch (Rules)<a class="headerlink" href="#conditional-dispatch-rules" title="Link to this heading">¶</a></h3>
+<p>Sometimes a single API mapping isn’t enough. You can use <strong>Dispatch Rules</strong> to switch the target API based on the <em>value</em> or <em>type</em> of an argument at runtime.</p>
+<p><strong>Supported Operators:</strong> <code class="docutils literal notranslate"><span class="pre">eq</span></code>, <code class="docutils literal notranslate"><span class="pre">neq</span></code>, <code class="docutils literal notranslate"><span class="pre">gt</span></code>, <code class="docutils literal notranslate"><span class="pre">lt</span></code>, <code class="docutils literal notranslate"><span class="pre">in</span></code>, <code class="docutils literal notranslate"><span class="pre">not_in</span></code>, <code class="docutils literal notranslate"><span class="pre">is_type</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Resize"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"image"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"mode"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize"</span><span class="w"> </span><span class="c1"># Default</span>
+<span class="w">    </span><span class="nt">dispatch_rules</span><span class="p">:</span>
+<span class="w">      </span><span class="c1"># If mode == 'nearest', use specific function</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"mode"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"nearest"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_nearest"</span>
+
+<span class="w">      </span><span class="c1"># If input is a List, use batch processor</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"image"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"is_type"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="s">"list"</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.image.resize_batch"</span>
+</pre></div>
+</div>
+</section>
+<section id="argument-value-mapping-enum-translation">
+<h3 id="argument-value-mapping-enum-translation">4. Argument Value Mapping (Enum Translation)<a class="headerlink" href="#argument-value-mapping-enum-translation" title="Link to this heading">¶</a></h3>
+<p>Map string literals or integers between frameworks.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Reduce"</span>
+<span class="nt">std_args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">"x"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"reduction"</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.reduce"</span>
+<span class="w">    </span><span class="c1"># Logic: Source 'mean' -&gt; Target 'avg'</span>
+<span class="w">    </span><span class="nt">arg_values</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">reduction</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">mean</span><span class="p">:</span><span class="w"> </span><span class="s">"'avg'"</span>
+<span class="w">        </span><span class="nt">sum</span><span class="p">:</span><span class="w"> </span><span class="s">"'add'"</span>
+</pre></div>
+</div>
+</section>
+<section id="output-adaptation">
+<h3 id="output-adaptation">5. Output Adaptation<a class="headerlink" href="#output-adaptation" title="Link to this heading">¶</a></h3>
+<p>Handle differences in return signatures.</p>
+<ul class="simple">
+<li><p><strong>Selection:</strong> If source returns a Tuple <code class="docutils literal notranslate"><span class="pre">(val,</span> <span class="pre">idx)</span></code> but target returns only <code class="docutils literal notranslate"><span class="pre">val</span></code>.</p></li>
+<li><p><strong>Casting:</strong> If target usually returns <code class="docutils literal notranslate"><span class="pre">float32</span></code> but spec requires <code class="docutils literal notranslate"><span class="pre">int64</span></code>.</p></li>
+</ul>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.max_indices"</span>
+<span class="w">    </span><span class="c1"># Select index 0 from result tuple</span>
+<span class="w">    </span><span class="nt">output_select_index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="c1"># Cast result to int64</span>
+<span class="w">    </span><span class="nt">output_cast</span><span class="p">:</span><span class="w"> </span><span class="s">"jnp.int64"</span>
+</pre></div>
+</div>
+</section>
+<section id="tensor-layout-permutation">
+<h3 id="tensor-layout-permutation">6. Tensor Layout Permutation<a class="headerlink" href="#tensor-layout-permutation" title="Link to this heading">¶</a></h3>
+<p>Automatically inject <code class="docutils literal notranslate"><span class="pre">transpose</span></code> / <code class="docutils literal notranslate"><span class="pre">permute</span></code> calls to align memory layouts (e.g. NCHW vs NHWC).</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Conv2d"</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.lax.conv"</span>
+<span class="w">    </span><span class="c1"># Syntax: SOURCE_LAYOUT -&gt; TARGET_LAYOUT</span>
+<span class="w">    </span><span class="nt">layout_map</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="s">"NCHW-&gt;NHWC"</span>
+<span class="w">      </span><span class="nt">weight</span><span class="p">:</span><span class="w"> </span><span class="s">"OIHW-&gt;HWIO"</span>
+<span class="w">      </span><span class="nt">return</span><span class="p">:</span><span class="w"> </span><span class="s">"NHWC-&gt;NCHW"</span>
+</pre></div>
+</div>
+</section>
+<section id="argument-packing-variadics">
+<h3 id="argument-packing-variadics">7. Argument Packing &amp; Variadics<a class="headerlink" href="#argument-packing-variadics" title="Link to this heading">¶</a></h3>
+<p>Convert <code class="docutils literal notranslate"><span class="pre">func(*args)</span></code> to <code class="docutils literal notranslate"><span class="pre">func(list=[...])</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">std_args</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"tensors"</span>
+<span class="w">    </span><span class="nt">is_variadic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"> </span><span class="c1"># Accepts *tensors</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">keras</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"keras.layers.Add"</span>
+<span class="w">    </span><span class="c1"># Packs *tensors into a list and passes to 'inputs' argument (implicit pos 0)</span>
+<span class="w">    </span><span class="nt">pack_as</span><span class="p">:</span><span class="w"> </span><span class="s">"List"</span>
+</pre></div>
+</div>
+</section>
+<section id="constraint-injection-via-metadata">
+<h3 id="constraint-injection-via-metadata">8. Constraint Injection via Metadata<a class="headerlink" href="#constraint-injection-via-metadata" title="Link to this heading">¶</a></h3>
+<p>Mark operations with specific flags to trigger built-in engine plugins without writing custom code.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"Add_"</span>
+<span class="nt">is_inplace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">   </span><span class="c1"># Triggers 'unroll_inplace_ops' plugin automatically</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">torch</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> api</span><span class="p">:</span><span class="w"> </span><span class="s">"torch.add_"</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="advanced-configuration">
+<h2 id="advanced-configuration">🔌 Advanced Configuration<a class="headerlink" href="#advanced-configuration" title="Link to this heading">¶</a></h2>
+<section id="version-constraints">
+<h3 id="version-constraints">Version Constraints<a class="headerlink" href="#version-constraints" title="Link to this heading">¶</a></h3>
+<p>Prevent invalid code generation if the target environment is too old or too new.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.scipy.special.logits"</span>
+<span class="w">    </span><span class="nt">min_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.4.0"</span>
+<span class="w">    </span><span class="nt">max_version</span><span class="p">:</span><span class="w"> </span><span class="s">"0.5.0"</span>
+</pre></div>
+</div>
+</section>
+<section id="dependency-management">
+<h3 id="dependency-management">Dependency Management<a class="headerlink" href="#dependency-management" title="Link to this heading">¶</a></h3>
+<p>Inject imports required by your mapping. The <code class="docutils literal notranslate"><span class="pre">ImportFixer</span></code> will place these at the top of the file and deduplicate them.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">numpy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">api</span><span class="p">:</span><span class="w"> </span><span class="s">"np.sigmoid"</span>
+<span class="w">    </span><span class="c1"># Can be simple strings or structured objects</span>
+<span class="w">    </span><span class="nt">required_imports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"import</span><span class="nv"> </span><span class="s">numpy</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">np"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="s">"scipy.special"</span>
+<span class="w">        </span><span class="nt">alias</span><span class="p">:</span><span class="w"> </span><span class="s">"sp"</span>
+</pre></div>
+</div>
+</section>
+<section id="plugin-scaffolding">
+<h3 id="plugin-scaffolding">Plugin Scaffolding<a class="headerlink" href="#plugin-scaffolding" title="Link to this heading">¶</a></h3>
+<p>If ODL is not expressive enough, define a stub for a Python plugin loop. The CLI will generate the file <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/{name}.py</span></code> for you to fill in.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="s">"ComplexOp"</span>
+<span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jax</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">requires_plugin</span><span class="p">:</span><span class="w"> </span><span class="s">"my_complex_logic"</span>
+
+<span class="c1"># Define the stub to generate</span>
+<span class="nt">scaffold_plugins</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"my_complex_logic"</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"call_transform"</span>
+<span class="w">    </span><span class="nt">doc</span><span class="p">:</span><span class="w"> </span><span class="s">"Handles</span><span class="nv"> </span><span class="s">complex</span><span class="nv"> </span><span class="s">logic</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">JAX."</span>
+<span class="w">    </span><span class="c1"># Optional: Pre-compile rules into the python code</span>
+<span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">if_arg</span><span class="p">:</span><span class="w"> </span><span class="s">"x"</span>
+<span class="w">        </span><span class="nt">op</span><span class="p">:</span><span class="w"> </span><span class="s">"eq"</span>
+<span class="w">        </span><span class="nt">val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">        </span><span class="nt">use_api</span><span class="p">:</span><span class="w"> </span><span class="s">"jax.zeros_like"</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="verification-logic">
+<h2 id="verification-logic">🧪 Verification Logic<a class="headerlink" href="#verification-logic" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">gen-tests</span></code> command uses the metadata in your ODL to create physical test files.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_rtol</span></code> / <code class="docutils literal notranslate"><span class="pre">test_atol</span></code>: Set numerical tolerance for equivalence checks.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nondeterministic</span></code>: Set to <code class="docutils literal notranslate"><span class="pre">true</span></code> to relax checks for RNG ops.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verification_mode</span></code>: Set to <code class="docutils literal notranslate"><span class="pre">"exact"</span></code> for strict integer/boolean matching, or <code class="docutils literal notranslate"><span class="pre">"approx"</span></code> (default) for floating point tolerances.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_shape_calc</span></code>: A Python lambda string to verify output shape rigorously.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Checks that output shape is input shape with last dim removed</span>
+<span class="nt">output_shape_calc</span><span class="p">:</span><span class="w"> </span><span class="s">"lambda</span><span class="nv"> </span><span class="s">input,</span><span class="nv"> </span><span class="s">dim:</span><span class="nv"> </span><span class="s">input.shape[:-1]"</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="EXTENDING.html" title="Extending"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> "Previous" </span> Extending </span>
+              </div>
+            </a>
+          
+          
+            <a href="MAINTENANCE.html" title="Maintenance"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> "Next" </span> Maintenance </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2026, Samuel Marks.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

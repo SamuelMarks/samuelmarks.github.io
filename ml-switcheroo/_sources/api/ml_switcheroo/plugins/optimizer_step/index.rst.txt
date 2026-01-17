@@ -1,0 +1,86 @@
+ml_switcheroo.plugins.optimizer_step
+====================================
+
+.. py:module:: ml_switcheroo.plugins.optimizer_step
+
+.. autoapi-nested-parse::
+
+   Plugin for Optimizer Step Translation.
+
+   Handles the conversion of imperative optimization steps (e.g., PyTorch) to
+   functional state updates (e.g., JAX/Optax).
+
+   This logic is **Wired-Only**: It executes blindly if the semantic map requests it.
+
+   Transformations:
+
+   1.  **Instantiation (`optimizer_constructor`)**:
+
+       - Strips the first argument (commonly `model.parameters()` in Torch) because
+         functional optimizers (Optax) are initialized stateless/factory-style.
+       - Input: `opt = torch.optim.Adam(model.parameters(), lr=0.01)`
+       - Output: `opt = optax.adam(lr=0.01)`
+
+   2.  **Step Execution (`optimizer_step`)**:
+
+       - Flags `step()` calls as requiring manual intervention or functional rewrite.
+       - Output: An `EscapeHatch` warning block suggesting the update pattern.
+
+   3.  **Zero Grad (`optimizer_zero_grad`)**:
+
+       - Strips the call completely (No-Op), as functional gradients don't accumulate state.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.optimizer_step.transform_optimizer_init
+   ml_switcheroo.plugins.optimizer_step.transform_optimizer_step
+   ml_switcheroo.plugins.optimizer_step.strip_zero_grad
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_optimizer_init(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Hook to rewrite Optimizer instantiation.
+
+   Removes the first argument (parameters) to support factory-pattern initialization.
+
+   :param node: Original CST call.
+   :param ctx: Hook context.
+
+   :returns: Transformed CST call.
+
+
+.. py:function:: transform_optimizer_step(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> Union[libcst.Call, libcst.FlattenSentinel]
+
+   Hook to rewrite ``optimizer.step()``.
+
+   Since `step()` logic implies side-effects on the optimizer state and parameters,
+   which doesn't translate 1:1 to functional updates without knowing variable names
+   (params, grads, opt_state), this hook emits a specialized Escape Hatch.
+
+   :param node: Original CST call.
+   :param ctx: Hook context.
+
+   :returns: CST node wrapped with escape hatch comments.
+
+
+.. py:function:: strip_zero_grad(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.CSTNode
+
+   Hook for ``optimizer.zero_grad()``.
+
+   Removes the call (No-op), as gradient accumulation is generally explicit
+   in functional frameworks.
+
+   :param node: Original CST call.
+   :param ctx: Hook context.
+
+   :returns: A CST Name('None') representing a no-op expression.
+
+

@@ -1,0 +1,68 @@
+ml_switcheroo.cli.handlers.convert_weights
+==========================================
+
+.. py:module:: ml_switcheroo.cli.handlers.convert_weights
+
+.. autoapi-nested-parse::
+
+   Weight Migration Script Generation.
+
+   This module provides the `WeightScriptGenerator`, a utility that creates
+   standalone Python scripts for migrating model checkpoints (weights) between
+   deep learning frameworks.
+
+   It analyzes the source AST to identify model layers, queries the Semantic
+   Knowledge Base for parameter mapping rules (e.g., ``weight`` -> ``kernel``),
+   and determines tensor layout permutations (e.g., NCHW -> NHWC).
+
+   Supported Directions:
+   - PyTorch -> JAX (Flax)
+   - JAX (Flax) -> PyTorch
+
+   Unsupported combinations degrade gracefully by returning False.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.cli.handlers.convert_weights.WeightScriptGenerator
+
+
+Module Contents
+---------------
+
+.. py:class:: WeightScriptGenerator(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig)
+
+   Generates a Python script to migrate weights between frameworks.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: source_fw
+
+
+   .. py:attribute:: target_fw
+
+
+   .. py:attribute:: source_adapter
+
+
+   .. py:attribute:: target_adapter
+
+
+   .. py:method:: generate(source_path: pathlib.Path, output_script: pathlib.Path) -> bool
+
+      Main entry point to generate the migration script.
+
+      :param source_path: Path to the Python file containing the source model definition.
+      :param output_script: Path where the generated script will be written.
+
+      :returns: True if generation was successful.
+      :rtype: bool
+
+
+

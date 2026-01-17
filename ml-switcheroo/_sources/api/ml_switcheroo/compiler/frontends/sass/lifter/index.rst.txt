@@ -1,0 +1,46 @@
+ml_switcheroo.compiler.frontends.sass.lifter
+============================================
+
+.. py:module:: ml_switcheroo.compiler.frontends.sass.lifter
+
+.. autoapi-nested-parse::
+
+   SASS Lifter (Frontend).
+
+   This module provides the logic to "lift" low-level SASS AST nodes back into a
+   high-level `LogicalGraph`. It relies on semantic comment markers (e.g. `; BEGIN`)
+   to reconstruct the control flow and layer definitions.
+
+   Updates:
+   - Integrates `SassAnalyzer` to parse instructions between BEGIN/END markers.
+   - Populates `LogicalNode.metadata` with extracted parameters.
+   - **FIX**: Captures top-level instructions (unmapped/raw) into default logic blocks.
+   - **FIX**: Preserves register destinations as node IDs for faithful variables.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.frontends.sass.lifter.SassLifter
+
+
+Module Contents
+---------------
+
+.. py:class:: SassLifter
+
+   Reconstructs a LogicalGraph from a sequence of SASS AST nodes.
+
+
+   .. py:method:: lift(nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> ml_switcheroo.compiler.ir.LogicalGraph
+
+      Parses a list of SASS nodes to build a LogicalGraph.
+
+      Captures instructions within BEGIN/END blocks to feed into the Analyzer.
+      Captures orphan instructions into individual functional nodes (1:1 mapping).
+
+
+

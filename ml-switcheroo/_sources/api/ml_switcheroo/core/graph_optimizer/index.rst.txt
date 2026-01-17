@@ -1,0 +1,58 @@
+ml_switcheroo.core.graph_optimizer
+==================================
+
+.. py:module:: ml_switcheroo.core.graph_optimizer
+
+.. autoapi-nested-parse::
+
+   Graph-Level Rewriter for Pattern Fusion.
+
+   This module implements the `GraphOptimizer`, which performs fusion on
+   the `LogicalGraph` intermediate representation. It scans the graph for
+   topological sequences that match predefined patterns (e.g., Conv -> BN -> ReLU)
+   and replaces them with fused macro nodes.
+
+   Algorithm:
+       1.  Build an adjacency map for efficient traversal.
+       2.  Iterate through all nodes in the graph in topological order.
+       3.  For each node, check if it starts a sequence matching any known PatternDef.
+       4.  If a match is found (A -> B -> C):
+           a. Create a new Fused Node (Kind=Replacement).
+           b. Merge metadata from A, B, C into Fused Node.
+           c. Rewire input edges: Source(A) -> Fused.
+           d. Rewire output edges: Fused -> Target(C).
+           e. Mark A, B, C for removal.
+           f. Continue scan after C.
+       5.  Reconstruct graph with fused nodes and updated edges.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.graph_optimizer.GraphOptimizer
+
+
+Module Contents
+---------------
+
+.. py:class:: GraphOptimizer(patterns: List[ml_switcheroo.core.dsl.PatternDef])
+
+   Optimizes a LogicalGraph by fusing subgraphs based on defined patterns.
+
+
+   .. py:attribute:: patterns
+
+
+   .. py:method:: optimize(graph: ml_switcheroo.core.graph.LogicalGraph) -> ml_switcheroo.core.graph.LogicalGraph
+
+      Runs the fusion pass on the graph.
+
+      :param graph: The input `LogicalGraph`.
+
+      :returns: A new `LogicalGraph` with fusion applied.
+
+
+

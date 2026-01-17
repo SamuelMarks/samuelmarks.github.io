@@ -1,0 +1,59 @@
+ml_switcheroo.testing.fuzzer.parser
+===================================
+
+.. py:module:: ml_switcheroo.testing.fuzzer.parser
+
+.. autoapi-nested-parse::
+
+   Type Hint Parser and Recursive Generation Logic.
+
+   This module processes string type hints (e.g. `List[Array['N']]`) and
+   generates conforming data structures for runtime fuzzing.
+
+   It includes logic to:
+   1.  Parse nested generic types.
+   2.  Resolve symbolic shape constraints.
+   3.  Respect semantic constraints (`min`, `max`, `options`).
+   4.  **Infer generation strategy from default values** when explicit hints are erased.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.testing.fuzzer.parser.get_fallback_base_value
+   ml_switcheroo.testing.fuzzer.parser.generate_from_hint
+
+
+Module Contents
+---------------
+
+.. py:function:: get_fallback_base_value(type_str: str, base_shape: Tuple[int, Ellipsis]) -> Any
+
+   Returns a minimal valid value to terminate recursion when depth limit is reached.
+
+   :param type_str: The target type hint.
+   :param base_shape: Default shape for array fallbacks.
+
+   :returns: Safe fallback value (0, empty list, etc).
+
+
+.. py:function:: generate_from_hint(type_str: str, base_shape: Tuple[int, Ellipsis], depth: int, max_depth: int, symbol_map: Dict[str, int], constraints: Optional[Dict[str, Any]] = None) -> Any
+
+   Recursively parses a type string and generates conforming data.
+
+   If type hints are generic ("Any"), it attempts to infer the type logic
+   from the `default` value provided in constraints.
+
+   :param type_str: The type hint string to parse.
+   :param base_shape: Default shape helper.
+   :param depth: Current recursion depth.
+   :param max_depth: Limit for recursion.
+   :param symbol_map: Shared context for dimension symbols ('N').
+   :param constraints: Semantic constraints (min, max, options, default).
+
+   :returns: Generated data structure.
+
+

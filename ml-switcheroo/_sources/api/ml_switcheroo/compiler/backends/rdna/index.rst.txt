@@ -1,0 +1,107 @@
+ml_switcheroo.compiler.backends.rdna
+====================================
+
+.. py:module:: ml_switcheroo.compiler.backends.rdna
+
+.. autoapi-nested-parse::
+
+   RDNA Backend Package.
+
+   Contains the backend implementation for synthesizing AMD RDNA assembly
+   from the Logical Graph representation.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/compiler/backends/rdna/emitter/index
+   /api/ml_switcheroo/compiler/backends/rdna/macros/index
+   /api/ml_switcheroo/compiler/backends/rdna/synthesizer/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.backends.rdna.RdnaSynthesizer
+   ml_switcheroo.compiler.backends.rdna.RdnaBackend
+   ml_switcheroo.compiler.backends.rdna.RdnaEmitter
+
+
+Package Contents
+----------------
+
+.. py:class:: RdnaSynthesizer(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Bidirectional transpiler component for RDNA ISA.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: allocator
+
+
+   .. py:attribute:: macro_registry
+      :type:  Dict[str, Callable]
+
+
+   .. py:method:: from_graph(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]
+
+      Converts a LogicalGraph into a list of RDNA AST nodes.
+
+
+
+   .. py:method:: to_python(rdna_nodes: List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]) -> libcst.Module
+
+      Converts RDNA AST nodes into a Python source structure representation.
+
+
+
+.. py:class:: RdnaBackend(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None)
+
+   Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
+
+
+   Compiler Backend implementation for AMD RDNA.
+   Orchestrates the synthesis (Graph -> AST) and emission (AST -> Text).
+
+
+   .. py:attribute:: synthesizer
+
+
+   .. py:attribute:: emitter
+
+
+   .. py:attribute:: target_arch
+      :value: 'gfx1030'
+
+
+
+   .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
+
+      Compiles LogicalGraph to RDNA Assembly string.
+
+      :param graph: The intermediate representation.
+
+      :returns: The RDNA code.
+      :rtype: str
+
+
+
+.. py:class:: RdnaEmitter
+
+   Converts RDNA AST nodes into textual assembly code.
+
+
+   .. py:method:: emit(nodes: List[ml_switcheroo.compiler.frontends.rdna.nodes.RdnaNode]) -> str
+
+      Generates the RDNA source string from a list of nodes.
+
+
+

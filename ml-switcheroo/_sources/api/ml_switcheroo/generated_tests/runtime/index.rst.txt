@@ -1,0 +1,68 @@
+ml_switcheroo.generated_tests.runtime
+=====================================
+
+.. py:module:: ml_switcheroo.generated_tests.runtime
+
+.. autoapi-nested-parse::
+
+   Runtime helpers for generated verification tests.
+
+   This module contains the reference implementation of ``verify_results``,
+   a robust recursive comparison utility for validating equivalence between
+   arbitrary data structures (Arrays, Lists, Dicts) across different frameworks.
+
+   It also defines the ``ensure_determinism`` fixture, which is injected into
+   generated tests to enforce reproducibility by seeding RNGs for Torch, JAX,
+   TensorFlow, Numpy, and Python.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.generated_tests.runtime.ensure_determinism
+   ml_switcheroo.generated_tests.runtime.verify_results
+
+
+Module Contents
+---------------
+
+.. py:function:: ensure_determinism() -> None
+
+   Auto-injects fixed seeds for reproducibility at the start of every test.
+
+   Covers:
+   - Python `random`
+   - NumPy `np.random`
+   - PyTorch `torch.manual_seed` (CPU & CUDA)
+   - TensorFlow `tf.random.set_seed`
+   - MLX `mlx.core.random.seed`
+
+
+.. py:function:: verify_results(ref: Any, val: Any, rtol: float = 0.001, atol: float = 0.0001, exact: bool = False) -> bool
+
+   Cross-framework comparison helper.
+
+   Recursively compares data structures (Lists, Dicts, Tuples, Arrays).
+
+   Modes:
+   - **Fuzzy (Default)**: Uses `np.allclose` with tolerances for floats.
+   - **Exact**: Enforces strict equality (ids for None, `np.array_equal` for arrays).
+
+   :param ref: The reference value (e.g. from Source Framework).
+   :type ref: Any
+   :param val: The candidate value (e.g. from Target Framework).
+   :type val: Any
+   :param rtol: Relative tolerance for floating point comparison.
+   :type rtol: float
+   :param atol: Absolute tolerance for floating point comparison.
+   :type atol: float
+   :param exact: If True, disables fuzzy matching.
+   :type exact: bool
+
+   :returns: True if values are considered equivalent.
+   :rtype: bool
+
+

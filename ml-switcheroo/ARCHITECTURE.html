@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Architecture &#8212; ml-switcheroo</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/switcheroo_demo.css?v=2ca74108" />
+    <link rel="stylesheet" type="text/css" href="_static/trace_graph.css?v=b0d570c0" />
+    <link rel="stylesheet" type="text/css" href="_static/op_tabs.css?v=cf6d298f" />
+    <script src="_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>window.TIKZJAX_URL = '_static/tikzjax/tikzjax.js';</script>
+    <script src="_static/trace_render.js?v=d399b484"></script>
+    <script src="_static/switcheroo_demo.js?v=ec22a231"></script>
+    <script src="_static/op_tabs.js?v=cd874ca5"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";
+
+const defaultStyle = document.createElement('style');
+defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+`;
+document.head.appendChild(defaultStyle);
+
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+document.head.appendChild(fullscreenStyle);
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }
+    return false;
+};
+
+const load = async () => {
+    await mermaid.run();
+
+    const all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(load, 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(load, 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(load, 200);
+        return;
+    }
+
+    const darkTheme = isDarkTheme();
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    const modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    let previousScrollOffset = [window.scrollX, window.scrollY];
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    const allButtons = [];
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        container.appendChild(fullscreenBtn);
+        allButtons.push(fullscreenBtn);
+    });
+
+    // Update theme classes when theme changes
+    const updateTheme = () => {
+        const dark = isDarkTheme();
+        allButtons.forEach(btn => {
+            if (dark) {
+                btn.classList.add('dark-theme');
+            } else {
+                btn.classList.remove('dark-theme');
+            }
+        });
+        if (dark) {
+            modal.classList.add('dark-theme');
+            modalContent.classList.add('dark-theme');
+            closeBtn.classList.add('dark-theme');
+        } else {
+            modal.classList.remove('dark-theme');
+            modalContent.classList.remove('dark-theme');
+            closeBtn.classList.remove('dark-theme');
+        }
+    };
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+};
+
+window.addEventListener("load", load);
+</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Extending" href="EXTENDING.html" />
+    <link rel="prev" title="ml-switcheroo 🔄🦘" href="README.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue data-md-color-accent=light-blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#ARCHITECTURE" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="ml-switcheroo"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">ml-switcheroo</span>
+          <span class="md-header-nav__topic"> Architecture </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="ml-switcheroo" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="ml-switcheroo">ml-switcheroo</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/SamuelMarks/ml-switcheroo" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    ml-switcheroo
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Documentation</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="README.html" class="md-nav__link">ml-switcheroo 🔄🦘</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Architecture </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Architecture</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#architecture--page-root" class="md-nav__link">Architecture</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-semantic-pivot-strategy" class="md-nav__link">🏗️ The Semantic Pivot Strategy</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-knowledge-base-hub-spoke" class="md-nav__link">🧩 1. The Knowledge Base (Hub & Spoke)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-hub-semantic-specifications" class="md-nav__link">The Hub: Semantic Specifications</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-spokes-framework-overlays" class="md-nav__link">The Spokes: Framework Overlays</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#the-transpilation-engine" class="md-nav__link">⚡ 2. The Transpilation Engine</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ingestion-analysis" class="md-nav__link">1. Ingestion & Analysis</a>
+        </li>
+        <li class="md-nav__item"><a href="#optimization-phase-graphoptimizer" class="md-nav__link">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#rewriting-phase-rewriterpipeline" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">4. Refinement Phase</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#framework-adapters-traits-hierarchy" class="md-nav__link">🔌 3. Framework Adapters (Traits & Hierarchy)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#structural-traits" class="md-nav__link">Structural Traits</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-traits" class="md-nav__link">Plugin Traits</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter-via-passes" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> via Passes)</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-hooks-in-src-ml-switcheroo-plugins" class="md-nav__link">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/ARCHITECTURE.md.txt">Show Source</a> </li>
+
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-semantic-pivot-strategy" class="md-nav__link">🏗️ The Semantic Pivot Strategy</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-knowledge-base-hub-spoke" class="md-nav__link">🧩 1. The Knowledge Base (Hub & Spoke)</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#the-transpilation-engine" class="md-nav__link">⚡ 2. The Transpilation Engine</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#framework-adapters-traits-hierarchy" class="md-nav__link">🔌 3. Framework Adapters (Traits & Hierarchy)</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="EXTENDING.html" class="md-nav__link">Extending</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="EXTENDING_WITH_DSL.html" class="md-nav__link">Extending with DSL</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="MAINTENANCE.html" class="md-nav__link">Maintenance</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="INTERNALS.html" class="md-nav__link">Internal Architecture & Theoretical Mechanics</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="IDEAS.html" class="md-nav__link">Ideas</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Reference</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="api/index.html" class="md-nav__link">API Reference</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ops/index.html" class="md-nav__link">Operation Reference</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#architecture--page-root" class="md-nav__link">Architecture</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-semantic-pivot-strategy" class="md-nav__link">🏗️ The Semantic Pivot Strategy</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-knowledge-base-hub-spoke" class="md-nav__link">🧩 1. The Knowledge Base (Hub & Spoke)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#the-hub-semantic-specifications" class="md-nav__link">The Hub: Semantic Specifications</a>
+        </li>
+        <li class="md-nav__item"><a href="#the-spokes-framework-overlays" class="md-nav__link">The Spokes: Framework Overlays</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#the-transpilation-engine" class="md-nav__link">⚡ 2. The Transpilation Engine</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#ingestion-analysis" class="md-nav__link">1. Ingestion & Analysis</a>
+        </li>
+        <li class="md-nav__item"><a href="#optimization-phase-graphoptimizer" class="md-nav__link">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#rewriting-phase-rewriterpipeline" class="md-nav__link">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code>)</a>
+        </li>
+        <li class="md-nav__item"><a href="#refinement-phase" class="md-nav__link">4. Refinement Phase</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#framework-adapters-traits-hierarchy" class="md-nav__link">🔌 3. Framework Adapters (Traits & Hierarchy)</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#structural-traits" class="md-nav__link">Structural Traits</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-traits" class="md-nav__link">Plugin Traits</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#dsl-plugin-system" class="md-nav__link">🧠 4. DSL & Plugin System</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#core-dsl-logic-in-pivotrewriter-via-passes" class="md-nav__link">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> via Passes)</a>
+        </li>
+        <li class="md-nav__item"><a href="#plugin-hooks-in-src-ml-switcheroo-plugins" class="md-nav__link">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/ARCHITECTURE.md.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="architecture">
+<h1 id="architecture--page-root">Architecture<a class="headerlink" href="#architecture--page-root" title="Link to this heading">¶</a></h1>
+<p><strong>ml-switcheroo</strong> is a deterministic, specification-driven transpiler designed to convert Deep Learning code between
+frameworks (e.g., PyTorch to JAX/Flax, Keras 3 to TensorFlow) with mathematical rigor.</p>
+<p>It solves the <span class="math notranslate nohighlight">\(O(N^2)\)</span> translation problem by decoupling <strong>Specification</strong> (the Abstract Operation) from
+<strong>Implementation</strong> (the Framework API) using a <strong>Hub-and-Spoke</strong> architecture. Rather than writing translators for every
+pair of frameworks, we map every framework to a central “Abstract Standard.”</p>
+<hr class="docutils"/>
+<section id="the-semantic-pivot-strategy">
+<h2 id="the-semantic-pivot-strategy">🏗️ The Semantic Pivot Strategy<a class="headerlink" href="#the-semantic-pivot-strategy" title="Link to this heading">¶</a></h2>
+<p>The conversion process is a three-step movement through an abstract intermediate state:</p>
+<ol class="arabic simple">
+<li><p><strong>Ingest (Source <span class="math notranslate nohighlight">\(\to\)</span> Hub):</strong> The system identifies a framework call (e.g., <code class="docutils literal notranslate"><span class="pre">torch.permute</span></code>) and maps it to an *
+<em>Abstract Operation</em>* (e.g., <code class="docutils literal notranslate"><span class="pre">permute_dims</span></code>) using the source framework’s snapshot or adapter definition. It also
+normalizes input formats (assignments, attributes) into a unified AST.</p></li>
+<li><p><strong>Pivot (Normalization):</strong> Arguments are reordered, renamed, unpacked, and validated to match the Abstract Standard (
+The “Hub” signature).</p></li>
+<li><p><strong>Project (Hub <span class="math notranslate nohighlight">\(\to\)</span> Target):</strong> The system looks up the implementation for the target framework (e.g.,
+<code class="docutils literal notranslate"><span class="pre">jax.numpy.transpose</span></code>) and generates the corresponding AST, applying any necessary DSL logic (Layout Permutation,
+Macros) or Plugin hooks.</p></li>
+</ol>
+</section>
+<hr class="docutils"/>
+<section id="the-knowledge-base-hub-spoke">
+<h2 id="the-knowledge-base-hub-spoke">🧩 1. The Knowledge Base (Hub &amp; Spoke)<a class="headerlink" href="#the-knowledge-base-hub-spoke" title="Link to this heading">¶</a></h2>
+<p>The core dataset driving the transpiler is distributed across two layers. This separation allows the “What” (Standard)
+to evolve independently of the “How” (Implementation).</p>
+<pre class="mermaid">
+        graph TD
+    %% --- STYLE DEFINITIONS --- 
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef input fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef build fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef spoke fill:#ffd427,stroke:#f9ab00,stroke-width:2px,stroke-dasharray:5 5,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+
+    %% --- PHASE 1: DISCOVERY --- 
+    subgraph P1 [1. Ingestion Phase]
+        direction TB
+        STANDARDS("External Specs&lt;br/&gt;(ONNX / Array API)"):::input
+        CODE("Adapter Classes&lt;br/&gt;(frameworks/*.py)"):::input
+        
+        LOADER("Registry &amp; File&lt;br/&gt;Loaders"):::build
+        
+        STANDARDS --&gt; LOADER
+        CODE --&gt; LOADER
+    end
+
+    %% --- PHASE 2: STORAGE --- 
+    subgraph P2 [2. Semantics Manager]
+        direction TB
+        HUB[("&lt;b&gt;The Hub (Specs)&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;")]:::hub
+        SPOKE[("&lt;b&gt;The Spokes (Variants)&lt;/b&gt;&lt;br/&gt;snapshots/*.json&lt;br/&gt;&lt;i&gt;Framework Implementations&lt;/i&gt;")]:::spoke
+        
+        %% Internal Context Link
+        SPOKE -.-&gt;|"Hydrates"| HUB
+    end
+
+    %% Flow P1 -&gt; P2
+    LOADER --&gt;|"Populate"| HUB
+    LOADER --&gt;|"Populate"| SPOKE
+
+    %% --- PHASE 3: VERIFICATION --- 
+    subgraph P3 [3. Verification Phase]
+        direction TB
+        TESTER("TestGen &amp; Fuzzer"):::build
+    end
+
+    %% Flow P2 -&gt; P3
+    HUB -.-&gt;|"Read Constraints"| TESTER
+    SPOKE -.-&gt;|"Read Variants"| TESTER
+    </pre><section id="the-hub-semantic-specifications">
+<h3 id="the-hub-semantic-specifications">The Hub: Semantic Specifications<a class="headerlink" href="#the-hub-semantic-specifications" title="Link to this heading">¶</a></h3>
+<p>Defines <strong>WHAT</strong> an operation is. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/*.json</span></code> and internal defaults.</p>
+<ul class="simple">
+<li><p><strong>Tier A (Math):</strong> <code class="docutils literal notranslate"><span class="pre">k_array_api.json</span></code> — Array API Standard (NumPy-like).</p></li>
+<li><p><strong>Tier B (Neural):</strong> <code class="docutils literal notranslate"><span class="pre">k_neural_net.json</span></code> — ONNX Operators (Layers, Activations).</p></li>
+<li><p><strong>Tier C (Extras):</strong> <code class="docutils literal notranslate"><span class="pre">k_framework_extras.json</span></code> — Framework utilities, IO, and internals.</p></li>
+</ul>
+</section>
+<section id="the-spokes-framework-overlays">
+<h3 id="the-spokes-framework-overlays">The Spokes: Framework Overlays<a class="headerlink" href="#the-spokes-framework-overlays" title="Link to this heading">¶</a></h3>
+<p>Defines <strong>HOW</strong> a specific framework implements the standard. Populated from <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/*.py</span></code> (Live)
+or <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/snapshots/</span></code> (Ghost).</p>
+<ul class="simple">
+<li><p><strong>API Path:</strong> E.g., <code class="docutils literal notranslate"><span class="pre">torch.abs</span></code>, <code class="docutils literal notranslate"><span class="pre">jax.numpy.abs</span></code>.</p></li>
+<li><p><strong>Argument Map:</strong> E.g., <code class="docutils literal notranslate"><span class="pre">{"input":</span> <span class="pre">"x",</span> <span class="pre">"dim":</span> <span class="pre">"axis"}</span></code>.</p></li>
+<li><p><strong>DSL Config:</strong> Layout maps, Macros, Type Casting rules.</p></li>
+</ul>
+<p>This supports <strong>Ghost Mode</strong>, allowing the engine to transpile code even if source/target libraries are not installed
+locally.</p>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="the-transpilation-engine">
+<h2 id="the-transpilation-engine">⚡ 2. The Transpilation Engine<a class="headerlink" href="#the-transpilation-engine" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ASTEngine</span></code> orchestrates the conversion pipeline. It handles parsing, deep analysis, optimization, and
+transformation.</p>
+<pre class="mermaid">
+        graph TD
+    %% --- STYLE DEFINITIONS --- 
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef artifact fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono Normal',stroke-dasharray: 0;
+    classDef process fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef optimization fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef kb fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef plugin fill:#57caff,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef output fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+
+    %% --- NODES --- 
+    SRC("Source Code"):::artifact
+    
+    subgraph ENGINE [AST Engine]
+        direction TB
+        INGEST("1. Ingestion&lt;br/&gt;(Python/MLIR/TikZ)"):::process
+        
+        subgraph ANALYSIS_BLOCK [Analysis Phase]
+            direction TB
+            SYMBOLS("Symbol Table"):::process
+            PURITY("Purity &amp; Safety"):::process
+        end
+
+        SERVER[("Semantics&lt;br/&gt;Manager")]:::kb
+        
+        GRAPH_OPT("2. Graph Optimizer&lt;br/&gt;(Fusion)"):::optimization
+        
+        REWRITER("3. Rewriter Pipeline&lt;br/&gt;(Structure/API/Aux Passes)"):::process
+        PLUGINS{{Plugin &amp; DSL System}}:::plugin
+        
+        FIXER("4. Refinement&lt;br/&gt;(Import Fixer)"):::process
+    end
+    
+    TGT("Target Code"):::output
+
+    %% --- EDGES --- 
+    SRC --&gt; INGEST
+    INGEST --&gt; SYMBOLS
+    SYMBOLS --&gt; PURITY
+    PURITY --&gt; GRAPH_OPT
+    
+    GRAPH_OPT --&gt; REWRITER
+    SERVER -.-&gt;|"Lookup API"| REWRITER
+    REWRITER &lt;--&gt;|"Complex Logic"| PLUGINS
+    
+    REWRITER --&gt; FIXER
+    FIXER --&gt; TGT
+    </pre><section id="ingestion-analysis">
+<h3 id="ingestion-analysis">1. Ingestion &amp; Analysis<a class="headerlink" href="#ingestion-analysis" title="Link to this heading">¶</a></h3>
+<p>Before touching the code, the engine parses and scans for context.</p>
+<ul class="simple">
+<li><p><strong>Parsers:</strong> Supports Python (LibCST), MLIR Text, and TikZ/Latex sources via Adapters.</p></li>
+<li><p><strong>SymbolTableAnalyzer:</strong> Infers variable types (e.g., “is <code class="docutils literal notranslate"><span class="pre">x</span></code> a Tensor or a Module?”) and scopes to drive intelligent
+rewriting.</p></li>
+<li><p><strong>PurityScanner:</strong> Detects side effects (IO, Globals, in-place mutation) unsafe for JAX/XLA targets (Enabled via
+<code class="docutils literal notranslate"><span class="pre">PluginTraits</span></code>).</p></li>
+<li><p><strong>LifecycleTracker:</strong> Verification pass ensuring all class attributes used in <code class="docutils literal notranslate"><span class="pre">forward</span></code> are initialized in <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p></li>
+</ul>
+</section>
+<section id="optimization-phase-graphoptimizer">
+<h3 id="optimization-phase-graphoptimizer">2. Optimization Phase (<code class="docutils literal notranslate"><span class="pre">GraphOptimizer</span></code>)<a class="headerlink" href="#optimization-phase-graphoptimizer" title="Link to this heading">¶</a></h3>
+<p>An optional pass that builds a <code class="docutils literal notranslate"><span class="pre">LogicalGraph</span></code> from the AST and applies fusion patterns.</p>
+<ul class="simple">
+<li><p>Matches sequences like <code class="docutils literal notranslate"><span class="pre">Conv2d</span> <span class="pre">-&gt;</span> <span class="pre">BatchNorm</span> <span class="pre">-&gt;</span> <span class="pre">ReLU</span></code>.</p></li>
+<li><p>Replaces them with fused macro operations (e.g., <code class="docutils literal notranslate"><span class="pre">FusedCBR</span></code>) based on <code class="docutils literal notranslate"><span class="pre">PatternDef</span></code> in Semantics.</p></li>
+</ul>
+</section>
+<section id="rewriting-phase-rewriterpipeline">
+<h3 id="rewriting-phase-rewriterpipeline">3. Rewriting Phase (<code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code>)<a class="headerlink" href="#rewriting-phase-rewriterpipeline" title="Link to this heading">¶</a></h3>
+<p>The core transformer is built on a <strong>Pipeline</strong> architecture. The <code class="docutils literal notranslate"><span class="pre">RewriterPipeline</span></code> orchestrates sequential <strong>Passes</strong> which share a mutable <code class="docutils literal notranslate"><span class="pre">RewriterContext</span></code>.</p>
+<ul class="simple">
+<li><p><strong>StructuralPass:</strong> Handles Class/Function definitions (swaps Base classes, renames <code class="docutils literal notranslate"><span class="pre">forward</span></code>, injects <code class="docutils literal notranslate"><span class="pre">rngs</span></code> args, strips Lifecycle methods).</p></li>
+<li><p><strong>ApiPass:</strong> The workhorse. Resolves API calls and Attributes to Abstract IDs, applies Layout Permutation, Argument Normalization, and dispatches to Plugins.</p></li>
+<li><p><strong>AuxiliaryPass:</strong> Handles secondary syntax constructions (Decorators) and ensures safety for Control Flow (e.g., Loop Unrolling checks).</p></li>
+</ul>
+</section>
+<section id="refinement-phase">
+<h3 id="refinement-phase">4. Refinement Phase<a class="headerlink" href="#refinement-phase" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>ImportFixer:</strong> An intelligent pass that post-processes the AST. It injects required imports (e.g.,
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>) only if used and prunes unused source imports.</p></li>
+<li><p><strong>StructuralLinter:</strong> A final sanity verification that flags any residual artifacts from the source framework.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="framework-adapters-traits-hierarchy">
+<h2 id="framework-adapters-traits-hierarchy">🔌 3. Framework Adapters (Traits &amp; Hierarchy)<a class="headerlink" href="#framework-adapters-traits-hierarchy" title="Link to this heading">¶</a></h2>
+<p>Support for specific libraries resides in <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/</span></code>. Adapters provide <strong>Traits</strong> to the engine
+rather than hardcoded logic.</p>
+<section id="structural-traits">
+<h3 id="structural-traits">Structural Traits<a class="headerlink" href="#structural-traits" title="Link to this heading">¶</a></h3>
+<p>Adapters define a <code class="docutils literal notranslate"><span class="pre">StructuralTraits</span></code> configuration object that controls syntax generation:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">module_base</span></code>: The base class for layers (e.g., <code class="docutils literal notranslate"><span class="pre">"flax.nnx.Module"</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">forward_method</span></code>: The inference method name (<code class="docutils literal notranslate"><span class="pre">"forward"</span></code> vs <code class="docutils literal notranslate"><span class="pre">"call"</span></code> vs <code class="docutils literal notranslate"><span class="pre">"__call__"</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inject_magic_args</span></code>: Tuple of arguments to inject into signatures (e.g., <code class="docutils literal notranslate"><span class="pre">[("rngs",</span> <span class="pre">"nnx.Rngs")]</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lifecycle_strip_methods</span></code>: Methods to silently remove (e.g., <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>, <code class="docutils literal notranslate"><span class="pre">.detach()</span></code>).</p></li>
+</ul>
+</section>
+<section id="plugin-traits">
+<h3 id="plugin-traits">Plugin Traits<a class="headerlink" href="#plugin-traits" title="Link to this heading">¶</a></h3>
+<p>Adapters define <code class="docutils literal notranslate"><span class="pre">PluginTraits</span></code> to toggle logic blocks used by generic plugins:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">has_numpy_compatible_arrays</span></code>: Enables <code class="docutils literal notranslate"><span class="pre">.astype()</span></code> casting and tuple-padding logic (JAX/TF/NumPy/MLX).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requires_explicit_rng</span></code>: Enables PRNG key threading logic (JAX/Flax).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requires_functional_state</span></code>: Enables BatchNorm state unwrapping logic (JAX).</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils"/>
+<section id="dsl-plugin-system">
+<h2 id="dsl-plugin-system">🧠 4. DSL &amp; Plugin System<a class="headerlink" href="#dsl-plugin-system" title="Link to this heading">¶</a></h2>
+<p>The system favors declarative logic in the ODL (Operation Definition Language) over python code, but falls back to
+Python Hooks for complex structural changes.</p>
+<section id="core-dsl-logic-in-pivotrewriter-via-passes">
+<h3 id="core-dsl-logic-in-pivotrewriter-via-passes">Core DSL Logic (In <code class="docutils literal notranslate"><span class="pre">PivotRewriter</span></code> via Passes)<a class="headerlink" href="#core-dsl-logic-in-pivotrewriter-via-passes" title="Link to this heading">¶</a></h3>
+<p>Common patterns are handled directly by the engine using the ODL schema:</p>
+<ul class="simple">
+<li><p><strong>Variadic Packing:</strong> <code class="docutils literal notranslate"><span class="pre">pack_to_tuple="axes"</span></code> converts <code class="docutils literal notranslate"><span class="pre">permute(x,</span> <span class="pre">0,</span> <span class="pre">1)</span></code> <span class="math notranslate nohighlight">\(\to\)</span> <code class="docutils literal notranslate"><span class="pre">transpose(x,</span> <span class="pre">axes=(0,</span> <span class="pre">1))</span></code>.</p></li>
+<li><p><strong>Layout Mapping:</strong> <code class="docutils literal notranslate"><span class="pre">layout_map={"input":</span> <span class="pre">"NCHW-&gt;NHWC"}</span></code> injects permutation calls via <code class="docutils literal notranslate"><span class="pre">inject_permute_call</span></code>.</p></li>
+<li><p><strong>Macros:</strong> <code class="docutils literal notranslate"><span class="pre">macro_template="{x}</span> <span class="pre">*</span> <span class="pre">sigmoid({x})"</span></code> expands composite ops inline.</p></li>
+<li><p><strong>Dispatch Rules:</strong> <code class="docutils literal notranslate"><span class="pre">dispatch_rules</span></code> switch APIs based on argument values at runtime (e.g. <code class="docutils literal notranslate"><span class="pre">mode="nearest"</span></code> uses a
+different function).</p></li>
+</ul>
+</section>
+<section id="plugin-hooks-in-src-ml-switcheroo-plugins">
+<h3 id="plugin-hooks-in-src-ml-switcheroo-plugins">Plugin Hooks (In <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/plugins/</span></code>)<a class="headerlink" href="#plugin-hooks-in-src-ml-switcheroo-plugins" title="Link to this heading">¶</a></h3>
+<p>Complex architectural mismatches are handled by Python functions registered via <code class="docutils literal notranslate"><span class="pre">@register_hook</span></code>.</p>
+<ul class="simple">
+<li><p><strong>RNG Threading (<code class="docutils literal notranslate"><span class="pre">rng_threading</span></code>):</strong> Transforms global seeds to explicit JAX keys. Injects <code class="docutils literal notranslate"><span class="pre">rng,</span> <span class="pre">key</span> <span class="pre">=</span> <span class="pre">split(rng)</span></code>
+preambles.</p></li>
+<li><p><strong>Context Wrappers (<code class="docutils literal notranslate"><span class="pre">context_to_function_wrap</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> to <code class="docutils literal notranslate"><span class="pre">contextlib.nullcontext()</span></code> for JAX.</p></li>
+<li><p><strong>State Containers (<code class="docutils literal notranslate"><span class="pre">state_container</span></code>):</strong> Converts <code class="docutils literal notranslate"><span class="pre">register_buffer</span></code>/<code class="docutils literal notranslate"><span class="pre">Parameter</span></code> calls into framework-specific object
+wrappers (e.g., <code class="docutils literal notranslate"><span class="pre">nnx.BatchStat</span></code>, <code class="docutils literal notranslate"><span class="pre">nnx.Param</span></code>).</p></li>
+<li><p><strong>IO Handlers (<code class="docutils literal notranslate"><span class="pre">io_handler</span></code>):</strong> Maps <code class="docutils literal notranslate"><span class="pre">torch.save</span></code> to <code class="docutils literal notranslate"><span class="pre">orbax.checkpoint</span></code> or <code class="docutils literal notranslate"><span class="pre">tf.io.write_file</span></code> depending on the target
+adapter’s I/O configuration.</p></li>
+<li><p><strong>Data Loaders (<code class="docutils literal notranslate"><span class="pre">convert_dataloader</span></code>):</strong> Injects a generic Shim class to replace <code class="docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="README.html" title="ml-switcheroo 🔄🦘"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> "Previous" </span> ml-switcheroo 🔄🦘 </span>
+              </div>
+            </a>
+          
+          
+            <a href="EXTENDING.html" title="Extending"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> "Next" </span> Extending </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2026, Samuel Marks.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

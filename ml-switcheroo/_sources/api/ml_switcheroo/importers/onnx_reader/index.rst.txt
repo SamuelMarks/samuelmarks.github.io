@@ -1,0 +1,54 @@
+ml_switcheroo.importers.onnx_reader
+===================================
+
+.. py:module:: ml_switcheroo.importers.onnx_reader
+
+.. autoapi-nested-parse::
+
+   Importer for ONNX Markdown Specifications.
+
+   This module parses the official ONNX Operators documentation (Markdown files),
+   extracting operator names, summaries, inputs, and attributes. It converts
+   these definitions into the Semantic Knowledge Base format.
+
+   Key Features:
+
+   - **Markdown Splitting**: Identifies operators via specific HTML anchors.
+   - **Input & Attribute Parsing**: Extracts definitions lists (``<dl>``).
+   - **Type Extraction**: Parses HTML type signatures (e.g., ``<dt>x : T</dt>``)
+     and maps them to ml-switcheroo/Fuzzer compatible type hints (e.g., ``Tensor``, ``int``).
+   - **Sanitization**: Cleans HTML tags like ``<tt>``, ``<b>`` from names.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.importers.onnx_reader.OnnxSpecImporter
+
+
+Module Contents
+---------------
+
+.. py:class:: OnnxSpecImporter
+
+   Parses ONNX Markdown specification files into semantic JSON structures.
+
+   This class reads Markdown files (like `Operators.md`), identifies operator
+   blocks, and parses their Inputs and Attributes sections to build a rich
+   function signature including type hints.
+
+
+   .. py:method:: parse_file(target_file: pathlib.Path) -> Dict[str, Any]
+
+      Parses a specific ONNX Markdown file (e.g. Operators.md).
+
+      :param target_file: Path to the .md file to parse.
+
+      :returns: Dictionary mapping Operator IDs (e.g., "Conv") to their semantic definition.
+                The definition includes 'std_args' as a list of (name, type) tuples.
+
+
+

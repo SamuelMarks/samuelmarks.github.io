@@ -73,11 +73,11 @@
     <script src="_static/trace_render.js?v=d399b484"></script>
     <script src="_static/switcheroo_demo.js?v=ec22a231"></script>
     <script src="_static/op_tabs.js?v=cd874ca5"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs"></script>
-    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.2.0/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
     <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.esm.min.mjs";
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.esm.min.mjs";
 
 const defaultStyle = document.createElement('style');
 defaultStyle.textContent = `pre.mermaid {
@@ -751,15 +751,15 @@ window.addEventListener("load", load);
 <ol class="arabic simple">
 <li><p><strong>ODL (Operation Definition Language)</strong>: Declaratively define operations using YAML or <code class="docutils literal notranslate"><span class="pre">StandardMap</span></code> objects. This handles 90% of cases (renaming, reordering, packing args, macros). <strong>[See: <a class="reference internal" href="EXTENDING_WITH_DSL.html"><span class="std std-doc">EXTENDING_WITH_DSL</span></a>]</strong></p>
 <ul class="simple">
-<li><p>Or update these Python files directly (no YAML DSL required):</p>
+<li><p>Or update these files directly (no YAML DSL required):</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/standards_internal.py</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/definitions/*.json</span></code> (for torch, mlx, tensorflow, jax, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/semantics/*.json</span></code> (Abstract Specifications)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/definitions/*.json</span></code> (Framework Implementations)</p></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p><strong>Adapter API</strong>: Write Python classes to support entirely new frameworks (e.g. adding <code class="docutils literal notranslate"><span class="pre">TinyGrad</span></code> or <code class="docutils literal notranslate"><span class="pre">MindSpore</span></code>).</p></li>
+<li><p><strong>Adapter API</strong>: Write Python classes to support entirely new frameworks (e.g. adding <code class="docutils literal notranslate"><span class="pre">TinyGrad</span></code>).</p></li>
 <li><p><strong>Plugin Hooks</strong>: Write AST transformation logic for complex architectural mismatches that ODL cannot handle (e.g., state injection, context manager rewriting).</p></li>
 </ol>
 <p>This document covers <strong>2</strong> and <strong>3</strong>.</p>
@@ -769,26 +769,26 @@ window.addEventListener("load", load);
 <p>The extension system works by injecting definitions into the Knowledge Base (The Hub) and linking them to specific framework implementations (The Spokes).</p>
 <pre class="mermaid">
         graph TD
-    %% Styles based on ARCHITECTURE.md theme
-    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b; 
-    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px; 
-    classDef adapter fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px; 
-    classDef plugin fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px; 
-    classDef tool fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px; 
-    classDef input fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono Normal',stroke-dasharray: 2 2; 
+    %% --- STYLE DEFINITIONS ---
+    classDef default font-family:'Google Sans Normal',color:#20344b,stroke:#20344b;
+    classDef hub fill:#f9ab00,stroke:#20344b,stroke-width:2px,color:#20344b,font-family:'Google Sans Medium',rx:5px;
+    classDef adapter fill:#4285f4,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef plugin fill:#34a853,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef tool fill:#ea4335,stroke:#20344b,stroke-width:2px,color:#ffffff,font-family:'Google Sans Medium',rx:5px;
+    classDef input fill:#ffffff,stroke:#20344b,stroke-width:1px,color:#20344b,font-family:'Roboto Mono Normal',stroke-dasharray: 2 2;
 
-    subgraph "Your Extension" 
+    subgraph "Your Extension"
         direction TB
         ADAPTER("&lt;b&gt;Framework Adapter&lt;/b&gt;&lt;br/&gt;src/frameworks/*.py&lt;br/&gt;&lt;i&gt;Definitions &amp; Traits&lt;/i&gt;"):::adapter
         PLUGIN("&lt;b&gt;Plugin Hooks&lt;/b&gt;&lt;br/&gt;src/plugins/*.py&lt;br/&gt;&lt;i&gt;AST Logic&lt;/i&gt;"):::plugin
     end
 
-    subgraph "Core System" 
+    subgraph "Core System"
         direction TB
-        HUB("&lt;b&gt;Semantic Hub&lt;/b&gt;&lt;br/&gt;standards_internal.py&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;"):::hub
+        HUB("&lt;b&gt;Semantic Hub&lt;/b&gt;&lt;br/&gt;semantics/*.json&lt;br/&gt;&lt;i&gt;Abstract Operations&lt;/i&gt;"):::hub
     end
 
-    subgraph "Automation Tools" 
+    subgraph "Automation Tools"
         direction TB
         DEFINE("&lt;b&gt;CLI Command&lt;/b&gt;&lt;br/&gt;ml_switcheroo define&lt;br/&gt;&lt;i&gt;Code Injection&lt;/i&gt;"):::tool
         YAML("&lt;b&gt;ODL YAML&lt;/b&gt;&lt;br/&gt;Operation Definition&lt;br/&gt;&lt;i&gt;Declarative Spec&lt;/i&gt;"):::input
@@ -796,9 +796,9 @@ window.addEventListener("load", load);
 
     %% Wiring
     YAML --&gt; DEFINE
-    DEFINE --&gt;|" 1. Inject Spec "| HUB
-    DEFINE --&gt;|" 2. Inject Mapping "| ADAPTER
-    DEFINE --&gt;|" 3. Scaffold File "| PLUGIN
+    DEFINE --&gt;|" 1a. Inject Spec "| HUB
+    DEFINE --&gt;|" 1b. Inject Mapping "| ADAPTER
+    DEFINE --&gt;|" 2. Scaffold File "| PLUGIN
     ADAPTER --&gt;|" Registration "| HUB
     PLUGIN -.-&gt;|" AST Transformation "| HUB
     </pre></section>
@@ -808,96 +808,97 @@ window.addEventListener("load", load);
 <p>To support a new library (e.g., <code class="docutils literal notranslate"><span class="pre">tinygrad</span></code>, <code class="docutils literal notranslate"><span class="pre">custom_engine</span></code>), you create a Python class that acts as the translation interface. It converts the library’s specific idioms into traits understood by the core engine.</p>
 <p><strong>Location:</strong> <code class="docutils literal notranslate"><span class="pre">src/ml_switcheroo/frameworks/{my_lib}.py</span></code></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.frameworks.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span> 
-    <span class="n">register_framework</span><span class="p">,</span> 
-    <span class="n">FrameworkAdapter</span><span class="p">,</span> 
-    <span class="n">StandardMap</span><span class="p">,</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.frameworks.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">register_framework</span><span class="p">,</span>
+    <span class="n">FrameworkAdapter</span><span class="p">,</span>
+    <span class="n">StandardMap</span><span class="p">,</span>
     <span class="n">ImportConfig</span>
-<span class="p">)</span> 
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.semantics.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">StructuralTraits</span><span class="p">,</span> <span class="n">PluginTraits</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SemanticTier</span>
 
-<span class="nd">@register_framework</span><span class="p">(</span><span class="s2">"my_lib"</span><span class="p">)</span> 
-<span class="k">class</span><span class="w"> </span><span class="nc">MyLibAdapter</span><span class="p">:</span> 
-    <span class="n">display_name</span> <span class="o">=</span> <span class="s2">"My Library"</span> 
+<span class="nd">@register_framework</span><span class="p">(</span><span class="s2">"my_lib"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyLibAdapter</span><span class="p">:</span>
+    <span class="n">display_name</span> <span class="o">=</span> <span class="s2">"My Library"</span>
     
-    <span class="c1"># Optional: Inherit implementation behavior (e.g., 'flax_nnx' inherits 'jax' math) </span>
+    <span class="c1"># Optional: Inherit implementation behavior (e.g., 'flax_nnx' inherits 'jax' math)</span>
     <span class="n">inherits_from</span> <span class="o">=</span> <span class="kc">None</span>
     
     <span class="c1"># Discovery configuration</span>
     <span class="n">ui_priority</span> <span class="o">=</span> <span class="mi">100</span>
 
-    <span class="c1"># --- 1. Import Logic --- </span>
+    <span class="c1"># --- 1. Import Logic ---</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">import_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span> 
-        <span class="c1"># How is the library imported? (Package Name, Common Alias) </span>
-        <span class="k">return</span> <span class="p">(</span><span class="s2">"my_lib"</span><span class="p">,</span> <span class="s2">"ml"</span><span class="p">)</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="c1"># How is the library imported? (Package Name, Common Alias)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">"my_lib"</span><span class="p">,</span> <span class="s2">"ml"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">import_namespaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ImportConfig</span><span class="p">]:</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">import_namespaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ImportConfig</span><span class="p">]:</span>
         <span class="c1"># Declare namespaces for the Import Fixer</span>
-        <span class="k">return</span> <span class="p">{</span> 
-            <span class="s2">"my_lib"</span><span class="p">:</span> <span class="n">ImportConfig</span><span class="p">(</span><span class="n">tier</span><span class="o">=</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="p">,</span> <span class="n">recommended_alias</span><span class="o">=</span><span class="s2">"ml"</span><span class="p">),</span> 
-            <span class="s2">"my_lib.layers"</span><span class="p">:</span> <span class="n">ImportConfig</span><span class="p">(</span><span class="n">tier</span><span class="o">=</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="p">,</span> <span class="n">recommended_alias</span><span class="o">=</span><span class="s2">"layers"</span><span class="p">),</span> 
-        <span class="p">}</span> 
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"my_lib"</span><span class="p">:</span> <span class="n">ImportConfig</span><span class="p">(</span><span class="n">tier</span><span class="o">=</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="p">,</span> <span class="n">recommended_alias</span><span class="o">=</span><span class="s2">"ml"</span><span class="p">),</span>
+            <span class="s2">"my_lib.layers"</span><span class="p">:</span> <span class="n">ImportConfig</span><span class="p">(</span><span class="n">tier</span><span class="o">=</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="p">,</span> <span class="n">recommended_alias</span><span class="o">=</span><span class="s2">"layers"</span><span class="p">),</span>
+        <span class="p">}</span>
 
-    <span class="c1"># --- 2. Static Mappings (The "Definitions") --- </span>
-    <span class="c1"># This property allows Ghost Mode to work without the library installed. </span>
+    <span class="c1"># --- 2. Static Mappings (The "Definitions") ---</span>
+    <span class="c1"># This property allows Ghost Mode to work without the library installed.</span>
+    <span class="c1"># Alternatively, populate src/ml_switcheroo/frameworks/definitions/my_lib.json</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StandardMap</span><span class="p">]:</span> 
-        <span class="k">return</span> <span class="p">{</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StandardMap</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
             <span class="c1"># Simple 1:1 Mapping</span>
-            <span class="s2">"Abs"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">"ml.abs"</span><span class="p">),</span> 
+            <span class="s2">"Abs"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">"ml.abs"</span><span class="p">),</span>
 
             <span class="c1"># Argument Renaming</span>
-            <span class="s2">"Linear"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span> 
-                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.layers.Dense"</span><span class="p">,</span> 
-                <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"in_features"</span><span class="p">:</span> <span class="s2">"input_dim"</span><span class="p">,</span> <span class="s2">"out_features"</span><span class="p">:</span> <span class="s2">"units"</span><span class="p">}</span> 
-            <span class="p">),</span> 
+            <span class="s2">"Linear"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.layers.Dense"</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">{</span><span class="s2">"in_features"</span><span class="p">:</span> <span class="s2">"input_dim"</span><span class="p">,</span> <span class="s2">"out_features"</span><span class="p">:</span> <span class="s2">"units"</span><span class="p">}</span>
+            <span class="p">),</span>
 
-            <span class="c1"># DSL Feature: Argument Packing (Variadic -&gt; Tuple) </span>
-            <span class="s2">"permute_dims"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span> 
-                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.transpose"</span><span class="p">,</span> 
-                <span class="n">pack_to_tuple</span><span class="o">=</span><span class="s2">"axes"</span> 
-            <span class="p">),</span> 
+            <span class="c1"># DSL Feature: Argument Packing (Variadic -&gt; Tuple)</span>
+            <span class="s2">"permute_dims"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">api</span><span class="o">=</span><span class="s2">"ml.transpose"</span><span class="p">,</span>
+                <span class="n">pack_to_tuple</span><span class="o">=</span><span class="s2">"axes"</span>
+            <span class="p">),</span>
 
             <span class="c1"># DSL Feature: Inline Macro</span>
-            <span class="s2">"SiLU"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span> 
-                <span class="n">macro_template</span><span class="o">=</span><span class="s2">"</span><span class="si">{x}</span><span class="s2"> * ml.sigmoid(</span><span class="si">{x}</span><span class="s2">)"</span> 
-            <span class="p">),</span> 
+            <span class="s2">"SiLU"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">macro_template</span><span class="o">=</span><span class="s2">"</span><span class="si">{x}</span><span class="s2"> * ml.sigmoid(</span><span class="si">{x}</span><span class="s2">)"</span>
+            <span class="p">),</span>
             
-            <span class="c1"># Linking to a Custom Plugin (Logic located in src/plugins/) </span>
-            <span class="s2">"SpecialOp"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span> 
-                <span class="n">requires_plugin</span><span class="o">=</span><span class="s2">"my_custom_logic"</span> 
-            <span class="p">)</span> 
-        <span class="p">}</span> 
+            <span class="c1"># Linking to a Custom Plugin (Logic located in src/plugins/)</span>
+            <span class="s2">"SpecialOp"</span><span class="p">:</span> <span class="n">StandardMap</span><span class="p">(</span>
+                <span class="n">requires_plugin</span><span class="o">=</span><span class="s2">"my_custom_logic"</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
 
-    <span class="c1"># --- 3. Structural Traits --- </span>
+    <span class="c1"># --- 3. Structural Traits ---</span>
     <span class="c1"># Configure how Classes/Functions are rewritten without custom code</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">structural_traits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructuralTraits</span><span class="p">:</span> 
-        <span class="k">return</span> <span class="n">StructuralTraits</span><span class="p">(</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">structural_traits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructuralTraits</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">StructuralTraits</span><span class="p">(</span>
             <span class="n">module_base</span><span class="o">=</span><span class="s2">"ml.Module"</span><span class="p">,</span>           <span class="c1"># Base class for layers</span>
             <span class="n">forward_method</span><span class="o">=</span><span class="s2">"call"</span><span class="p">,</span>             <span class="c1"># Inference method name</span>
-            <span class="n">requires_super_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>          <span class="c1"># Inject super().__init__()? </span>
+            <span class="n">requires_super_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>          <span class="c1"># Inject super().__init__()?</span>
             <span class="n">inject_magic_args</span><span class="o">=</span><span class="p">[],</span>              <span class="c1"># No special context args</span>
             <span class="n">lifecycle_strip_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"gpu"</span><span class="p">],</span>   <span class="c1"># Methods to silently remove</span>
             <span class="n">impurity_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"add_"</span><span class="p">]</span>          <span class="c1"># Methods flagged as side-effects</span>
-        <span class="p">)</span> 
+        <span class="p">)</span>
 
-    <span class="c1"># --- 4. Plugin Traits --- </span>
+    <span class="c1"># --- 4. Plugin Traits ---</span>
     <span class="c1"># Configure how generic plugins interact with this framework</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">plugin_traits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PluginTraits</span><span class="p">:</span> 
-        <span class="k">return</span> <span class="n">PluginTraits</span><span class="p">(</span> 
-            <span class="n">has_numpy_compatible_arrays</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># Supports .astype() casting? </span>
-            <span class="n">requires_explicit_rng</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>         <span class="c1"># Requires JAX-style keys? </span>
-            <span class="n">requires_functional_state</span><span class="o">=</span><span class="kc">False</span>      <span class="c1"># Requires BatchNorm unrolling? </span>
-        <span class="p">)</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">plugin_traits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PluginTraits</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PluginTraits</span><span class="p">(</span>
+            <span class="n">has_numpy_compatible_arrays</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># Supports .astype() casting?</span>
+            <span class="n">requires_explicit_rng</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>         <span class="c1"># Requires JAX-style keys?</span>
+            <span class="n">requires_functional_state</span><span class="o">=</span><span class="kc">False</span>      <span class="c1"># Requires BatchNorm unrolling?</span>
+        <span class="p">)</span>
         
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">supported_tiers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SemanticTier</span><span class="p">]:</span> 
-        <span class="k">return</span> <span class="p">[</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="p">,</span> <span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="p">]</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">supported_tiers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SemanticTier</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">SemanticTier</span><span class="o">.</span><span class="n">ARRAY_API</span><span class="p">,</span> <span class="n">SemanticTier</span><span class="o">.</span><span class="n">NEURAL</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -912,29 +913,29 @@ window.addEventListener("load", load);
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">libcst</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cst</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ml_switcheroo.core.hooks</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_hook</span><span class="p">,</span> <span class="n">HookContext</span>
 
-<span class="nd">@register_hook</span><span class="p">(</span><span class="s2">"my_custom_logic"</span><span class="p">)</span> 
-<span class="k">def</span><span class="w"> </span><span class="nf">transform_special_op</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">:</span> 
-<span class="w">    </span><span class="sd">""" </span>
+<span class="nd">@register_hook</span><span class="p">(</span><span class="s2">"my_custom_logic"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_special_op</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">CSTNode</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Example: Transforms `special_op(x)` into `context_wrapper(x)`</span>
-<span class="sd">    """</span> 
+<span class="sd">    """</span>
     <span class="c1"># 1. Inspect Context</span>
     <span class="c1"># Check framework capabilities or configuration</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ctx</span><span class="o">.</span><span class="n">plugin_traits</span><span class="o">.</span><span class="n">has_numpy_compatible_arrays</span><span class="p">:</span> 
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ctx</span><span class="o">.</span><span class="n">plugin_traits</span><span class="o">.</span><span class="n">has_numpy_compatible_arrays</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">node</span>
         
-    <span class="c1"># Look up API path dynamically (Decoupling) </span>
-    <span class="n">target_api</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">lookup_api</span><span class="p">(</span><span class="s2">"SpecialOp"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"default.op"</span> 
+    <span class="c1"># Look up API path dynamically (Decoupling)</span>
+    <span class="n">target_api</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">lookup_api</span><span class="p">(</span><span class="s2">"SpecialOp"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"default.op"</span>
     
-    <span class="c1"># 2. Inject Dependencies (Preamble) </span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ctx</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"my_helper_injected"</span><span class="p">):</span> 
-        <span class="n">ctx</span><span class="o">.</span><span class="n">inject_preamble</span><span class="p">(</span><span class="s2">"import my_helper_lib"</span><span class="p">)</span> 
+    <span class="c1"># 2. Inject Dependencies (Preamble)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ctx</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"my_helper_injected"</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">inject_preamble</span><span class="p">(</span><span class="s2">"import my_helper_lib"</span><span class="p">)</span>
         <span class="n">ctx</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"my_helper_injected"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         
     <span class="c1"># 3. Modify AST</span>
     <span class="c1"># Change function name</span>
     <span class="c1"># Ensure you import logic for creating dotted names</span>
     <span class="c1"># from ml_switcheroo.plugins.utils import create_dotted_name</span>
-    <span class="k">pass</span> 
+    <span class="k">pass</span>
         
     <span class="k">return</span> <span class="n">node</span>
 </pre></div>
@@ -955,22 +956,22 @@ window.addEventListener("load", load);
 <section id="auto-wired-plugins">
 <h3 id="auto-wired-plugins">Auto-Wired Plugins<a class="headerlink" href="#auto-wired-plugins" title="Link to this heading">¶</a></h3>
 <p>You can register a hook and inject its semantic mapping (“Hub entry”) in one place using the <code class="docutils literal notranslate"><span class="pre">auto_wire</span></code> parameter. This architecture maintains locality of behavior.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_hook</span><span class="p">(</span> 
-    <span class="n">trigger</span><span class="o">=</span><span class="s2">"custom_reshape"</span><span class="p">,</span> 
-    <span class="n">auto_wire</span><span class="o">=</span><span class="p">{</span> 
-        <span class="s2">"ops"</span><span class="p">:</span> <span class="p">{</span> 
-            <span class="s2">"Reshape"</span><span class="p">:</span> <span class="p">{</span> 
-                <span class="s2">"std_args"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"shape"</span><span class="p">],</span> 
-                <span class="s2">"variants"</span><span class="p">:</span> <span class="p">{</span> 
-                    <span class="s2">"torch"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"api"</span><span class="p">:</span> <span class="s2">"torch.reshape"</span><span class="p">},</span> 
-                    <span class="s2">"jax"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requires_plugin"</span><span class="p">:</span> <span class="s2">"custom_reshape"</span><span class="p">}</span> 
-                <span class="p">}</span> 
-            <span class="p">}</span> 
-        <span class="p">}</span> 
-    <span class="p">}</span> 
-<span class="p">)</span> 
-<span class="k">def</span><span class="w"> </span><span class="nf">transform_reshape</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">:</span> 
-    <span class="c1"># Logic here... </span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_hook</span><span class="p">(</span>
+    <span class="n">trigger</span><span class="o">=</span><span class="s2">"custom_reshape"</span><span class="p">,</span>
+    <span class="n">auto_wire</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"ops"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"Reshape"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"std_args"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"shape"</span><span class="p">],</span>
+                <span class="s2">"variants"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">"torch"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"api"</span><span class="p">:</span> <span class="s2">"torch.reshape"</span><span class="p">},</span>
+                    <span class="s2">"jax"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"requires_plugin"</span><span class="p">:</span> <span class="s2">"custom_reshape"</span><span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_reshape</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">HookContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">cst</span><span class="o">.</span><span class="n">Call</span><span class="p">:</span>
+    <span class="c1"># Logic here...</span>
     <span class="k">return</span> <span class="n">node</span>
 </pre></div>
 </div>

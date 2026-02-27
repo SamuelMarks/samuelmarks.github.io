@@ -1,0 +1,83 @@
+ml_switcheroo.core.import_fixer.resolution
+==========================================
+
+.. py:module:: ml_switcheroo.core.import_fixer.resolution
+
+.. autoapi-nested-parse::
+
+   Import Resolution Logic.
+
+   This module centralizes the decision-making process for imports. It allows the current
+   codebase to be analyzed *before* transformation commits to determine imports.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.import_fixer.resolution.ImportReq
+   ml_switcheroo.core.import_fixer.resolution.ResolutionPlan
+   ml_switcheroo.core.import_fixer.resolution.ImportResolver
+
+
+Module Contents
+---------------
+
+.. py:class:: ImportReq
+
+   Represents a normalized import requirement.
+   Can represent `import module as alias` or `from module import sub as alias`.
+
+
+   .. py:attribute:: module
+      :type:  str
+
+
+   .. py:attribute:: subcomponent
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: alias
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:property:: signature
+      :type: str
+
+
+      Unique signature for deduplication.
+
+
+.. py:class:: ResolutionPlan
+
+   The strategy for the ImportFixer to execute.
+
+
+   .. py:attribute:: required_imports
+      :type:  List[ImportReq]
+      :value: []
+
+
+
+   .. py:attribute:: mappings
+      :type:  Dict[str, ImportReq]
+
+
+   .. py:attribute:: path_to_alias
+      :type:  Dict[str, str]
+
+
+.. py:class:: ImportResolver(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   .. py:attribute:: semantics
+
+
+   .. py:method:: resolve(tree: libcst.Module, target_fw: str) -> ResolutionPlan
+
+

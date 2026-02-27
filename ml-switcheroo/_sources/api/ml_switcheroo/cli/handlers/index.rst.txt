@@ -1,0 +1,205 @@
+ml_switcheroo.cli.handlers
+==========================
+
+.. py:module:: ml_switcheroo.cli.handlers
+
+.. autoapi-nested-parse::
+
+   CLI handlers module.
+
+   Exposes individual command handler functions aggregated by domain.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/cli/handlers/audit/index
+   /api/ml_switcheroo/cli/handlers/convert/index
+   /api/ml_switcheroo/cli/handlers/convert_weights/index
+   /api/ml_switcheroo/cli/handlers/define/index
+   /api/ml_switcheroo/cli/handlers/dev/index
+   /api/ml_switcheroo/cli/handlers/discovery/index
+   /api/ml_switcheroo/cli/handlers/learning/index
+   /api/ml_switcheroo/cli/handlers/meta/index
+   /api/ml_switcheroo/cli/handlers/snapshots/index
+   /api/ml_switcheroo/cli/handlers/suggest/index
+   /api/ml_switcheroo/cli/handlers/verify/index
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.cli.handlers.handle_scaffold
+   ml_switcheroo.cli.handlers.handle_import_spec
+   ml_switcheroo.cli.handlers.handle_sync_standards
+   ml_switcheroo.cli.handlers.handle_snapshot
+   ml_switcheroo.cli.handlers.handle_sync
+   ml_switcheroo.cli.handlers.handle_wizard
+   ml_switcheroo.cli.handlers.handle_harvest
+   ml_switcheroo.cli.handlers.handle_ci
+   ml_switcheroo.cli.handlers.handle_matrix
+   ml_switcheroo.cli.handlers.handle_docs
+   ml_switcheroo.cli.handlers.handle_gen_tests
+
+
+Package Contents
+----------------
+
+.. py:function:: handle_scaffold(frameworks: list[str], out_dir: pathlib.Path) -> int
+
+   Handles the 'scaffold' command.
+
+   -   Iterates through provided frameworks.
+   -   Uses `FrameworkAdapter.discovery_heuristics` regexes to fuzzy match framework
+       APIs against known specs or structural conventions.
+   -   Populates semantic specs (Hub) and framework mappings (Spokes/Snapshots).
+
+   :param frameworks: List of framework package names to scaffold (e.g., ['torch', 'jax']).
+   :type frameworks: list[str]
+   :param out_dir: The root directory for generating the knowledge base.
+                   Defaults to the package source if None.
+   :type out_dir: Path
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_import_spec(target: pathlib.Path) -> int
+
+   Handles the 'import-spec' command.
+
+   Parses upstream standards documentation or stubs and merges the definitions
+   into the local semantics Hub.
+
+   :param target: .md file, .html file, or directory to parse.
+   :type target: Path
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_sync_standards(categories: List[str], frameworks: Optional[List[str]], dry_run: bool) -> int
+
+   Handles 'sync-standards' command.
+
+   Invokes the Consensus Engine to automatically discover new Abstract Operations
+   by finding commonalities across multiple framework API surfaces. Writes the
+   results to `k_discovered.json` (The Unofficial/Discovered Standard).
+
+   :param categories: List of category strings (layer, loss, etc.) to scan.
+   :type categories: List[str]
+   :param frameworks: List of framework keys to scan.
+                      Defaults to installed/registered frameworks.
+   :type frameworks: Optional[List[str]]
+   :param dry_run: If True, prints results without saving.
+   :type dry_run: bool
+
+   :returns: Exit code.
+   :rtype: int
+
+
+.. py:function:: handle_snapshot(out_dir: Optional[pathlib.Path]) -> int
+
+   Handles the 'snapshot' command.
+
+   Scans installed frameworks and dumps their API signatures to JSON files.
+   These snapshots allow the engine to operate in "Ghost Mode" (e.g., in WebAssembly)
+   without requiring the heavy frameworks to be installed.
+
+   :param out_dir: Optional custom output directory. Defaults to package/snapshots.
+
+   :returns: Exit code (0 for success, 1 for failure).
+
+
+.. py:function:: handle_sync(framework: str) -> int
+
+   Handles the 'sync' command.
+
+   Links the Abstract Standards (Hub) to the concrete implementation in a
+   specific framework. This process involves:
+   1.  Reading the Specs from ``semantics/``.
+   2.  Introspecting the installed framework to find matching APIs.
+   3.  **Merging Static Definitions** from the Adapter (for Ghost support).
+   4.  Applying Adapter-specific manual wiring (plugins, templates).
+   5.  **Persisting Test Configuration templates**.
+   6.  Writing the results to the Snapshot Overlay (``snapshots/{fw}_mappings.json``).
+
+   :param framework: The framework key to sync (e.g. 'torch', 'jax').
+
+   :returns: Exit code (0 for success, 1 for failure).
+
+
+.. py:function:: handle_wizard(package: str) -> int
+
+   Handles the 'wizard' command for interactive mapping discovery.
+
+   :param package: The name of the python package to inspect (e.g., 'torch').
+
+   :returns: Exit code (0 for success).
+   :rtype: int
+
+
+.. py:function:: handle_harvest(path: pathlib.Path, target: str, dry_run: bool) -> int
+
+   Handles the 'harvest' command to learn mappings from manual tests.
+
+   :param path: File or directory containing python test files.
+   :param target: The framework target used in the tests (e.g., 'jax').
+   :param dry_run: If True, prints changes without writing to disk.
+
+   :returns: Exit code (0 for success, 1 for path errors).
+   :rtype: int
+
+
+.. py:function:: handle_ci(update_readme: bool, readme_path: pathlib.Path, json_report: Optional[pathlib.Path], repair: bool = False) -> int
+
+   Handles 'ci' command.
+
+   :param update_readme: If True, updates the compatibility matrix in the README.
+   :param readme_path: Path to the README file.
+   :param json_report: Optional path to dump results JSON.
+   :param repair: If True, attempts to automatically relax tolerances for failing tests via bisection.
+
+   :returns: Exit code (0 on success, 1 on error).
+   :rtype: int
+
+
+.. py:function:: handle_matrix() -> int
+
+   Handles 'matrix' command.
+   Prints the compatibility table to stdout.
+
+   :returns: 0 on success.
+   :rtype: int
+
+
+.. py:function:: handle_docs(source: str, target: str, out_path: pathlib.Path) -> int
+
+   Handles 'gen-docs' command.
+   Generates a migration guide Markdown file.
+
+   :param source: Source framework key.
+   :param target: Target framework key.
+   :param out_path: Output file path.
+
+   :returns: 0 on success.
+   :rtype: int
+
+
+.. py:function:: handle_gen_tests(out: pathlib.Path) -> int
+
+   Handles 'gen-tests' command.
+   Generates physical test files for known APIs.
+
+   :param out: Output file path.
+
+   :returns: 0 on success.
+   :rtype: int
+
+

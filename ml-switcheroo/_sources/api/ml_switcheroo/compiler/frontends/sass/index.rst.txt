@@ -1,0 +1,541 @@
+ml_switcheroo.compiler.frontends.sass
+=====================================
+
+.. py:module:: ml_switcheroo.compiler.frontends.sass
+
+.. autoapi-nested-parse::
+
+   SASS Frontend (Parser & Lifter).
+
+   Handles the parsing of NVIDIA SASS assembly text into an Abstract Syntax Tree (AST)
+   and the lifting of that AST into the high-level Logical Graph IR.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/compiler/frontends/sass/analysis/index
+   /api/ml_switcheroo/compiler/frontends/sass/lifter/index
+   /api/ml_switcheroo/compiler/frontends/sass/nodes/index
+   /api/ml_switcheroo/compiler/frontends/sass/parser/index
+   /api/ml_switcheroo/compiler/frontends/sass/tokens/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.frontends.sass.Comment
+   ml_switcheroo.compiler.frontends.sass.Directive
+   ml_switcheroo.compiler.frontends.sass.Immediate
+   ml_switcheroo.compiler.frontends.sass.Instruction
+   ml_switcheroo.compiler.frontends.sass.Label
+   ml_switcheroo.compiler.frontends.sass.Memory
+   ml_switcheroo.compiler.frontends.sass.Operand
+   ml_switcheroo.compiler.frontends.sass.Predicate
+   ml_switcheroo.compiler.frontends.sass.Register
+   ml_switcheroo.compiler.frontends.sass.SassNode
+   ml_switcheroo.compiler.frontends.sass.SassParser
+   ml_switcheroo.compiler.frontends.sass.SassLexer
+   ml_switcheroo.compiler.frontends.sass.Token
+   ml_switcheroo.compiler.frontends.sass.TokenType
+   ml_switcheroo.compiler.frontends.sass.SassLifter
+   ml_switcheroo.compiler.frontends.sass.SassAnalyzer
+
+
+Package Contents
+----------------
+
+.. py:class:: Comment
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents a line comment.
+
+   Format: `// {text}`
+
+   .. attribute:: text
+
+      The comment content.
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Directive
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents an assembler directive.
+
+   Format: `.{name} {params}`
+
+   .. attribute:: name
+
+      The directive name (e.g., "headerflags").
+
+      :type: str
+
+   .. attribute:: params
+
+      List of string parameters.
+
+      :type: List[str]
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: params
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Immediate
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a literal constant value.
+
+   .. attribute:: value
+
+      The numeric value.
+
+      :type: Union[int, float]
+
+   .. attribute:: is_hex
+
+      If True, renders as hex string (e.g., "0x1").
+
+      :type: bool
+
+
+   .. py:attribute:: value
+      :type:  Union[int, float]
+
+
+   .. py:attribute:: is_hex
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Instruction
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents a single SASS operation line.
+
+   Format: `@{predicate} {opcode} {operands};`
+
+   .. attribute:: opcode
+
+      The instruction mnemonic (e.g., "FADD", "MOV").
+
+      :type: str
+
+   .. attribute:: operands
+
+      List of operand nodes.
+
+      :type: List[Operand]
+
+   .. attribute:: predicate
+
+      Optional predicate guard executed before instruction.
+
+      :type: Optional[Predicate]
+
+
+   .. py:attribute:: opcode
+      :type:  str
+
+
+   .. py:attribute:: operands
+      :type:  List[Operand]
+      :value: []
+
+
+
+   .. py:attribute:: predicate
+      :type:  Optional[Predicate]
+      :value: None
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Label
+
+   Bases: :py:obj:`SassNode`
+
+
+   Represents a jump target label.
+
+   Format: `{name}:`
+
+   .. attribute:: name
+
+      The label identifier.
+
+      :type: str
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Memory
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a memory address operand.
+
+   Supports Constant Bank access (e.g., `c[0x0][0x4]`) and Global/Local
+   addressing (e.g., `[R1]`, `[R1 + 0x4]`).
+
+   .. attribute:: base
+
+      The base register (e.g., "R1") or constant bank string (e.g., "c[0x0]").
+
+      :type: Union[str, Register]
+
+   .. attribute:: offset
+
+      Optional byte offset to add to the base.
+
+      :type: Optional[int]
+
+
+   .. py:attribute:: base
+      :type:  Union[str, Register]
+
+
+   .. py:attribute:: offset
+      :type:  Optional[int]
+      :value: None
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Operand
+
+   Bases: :py:obj:`SassNode`
+
+
+   Base class for instruction operands (Registers, Immediates, etc.).
+
+
+.. py:class:: Predicate
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a predicate register (e.g., @P0, !P1).
+
+   Used both as instruction guards (preceding the opcode) and as operands
+   in logical instructions (ISETP).
+
+   .. attribute:: name
+
+      The predicate identifier (e.g., "P0", "PT").
+
+      :type: str
+
+   .. attribute:: negated
+
+      If True, indicates logical NOT (e.g., "!P0").
+
+      :type: bool
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: negated
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: Register
+
+   Bases: :py:obj:`Operand`
+
+
+   Represents a general-purpose register (e.g., R0, RZ).
+
+   .. attribute:: name
+
+      The register identifier (e.g., "R0", "RZ").
+
+      :type: str
+
+   .. attribute:: negated
+
+      If True, prepends a negation sign (e.g., "-R0").
+
+   .. attribute:: absolute
+
+      If True, wraps in absolute value pipes (e.g., "|R0|").
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: negated
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: absolute
+      :type:  bool
+      :value: False
+
+
+
+   .. py:method:: __str__() -> str
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: SassNode
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for all SASS AST nodes.
+
+
+   .. py:method:: __str__() -> str
+      :abstractmethod:
+
+
+      Returns the valid SASS string representation of the node.
+
+
+
+.. py:class:: SassParser(code: str)
+
+   Recursive descent parser for NVIDIA SASS.
+
+
+   .. py:attribute:: lexer
+
+
+   .. py:attribute:: tokens
+
+
+   .. py:attribute:: pos
+      :value: 0
+
+
+
+   .. py:method:: parse() -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
+
+      Parses the entire code block.
+
+      :returns: A list of AST nodes.
+      :rtype: List[SassNode]
+
+
+
+.. py:class:: SassLexer
+
+   Regex-based Lexer for NVIDIA SASS assembly.
+
+
+   .. py:attribute:: PATTERNS
+      :type:  List[Tuple[TokenType, str]]
+
+
+   .. py:attribute:: regex_pairs
+
+
+   .. py:method:: tokenize(text: str) -> Generator[Token, None, None]
+
+      Tokenizes the input string.
+
+      :param text: Raw SASS source code.
+      :type text: str
+
+      :Yields: *Token* -- Token objects.
+
+      :raises ValueError: If an unrecognized character sequence is encountered.
+
+
+
+.. py:class:: Token
+
+   Represents a lexical unit.
+
+   .. attribute:: kind
+
+      The type of token.
+
+      :type: TokenType
+
+   .. attribute:: value
+
+      The raw string content.
+
+      :type: str
+
+   .. attribute:: line
+
+      Line number in source (1-based).
+
+      :type: int
+
+   .. attribute:: column
+
+      Column number in source (1-based).
+
+      :type: int
+
+
+   .. py:attribute:: kind
+      :type:  TokenType
+
+
+   .. py:attribute:: value
+      :type:  str
+
+
+   .. py:attribute:: line
+      :type:  int
+
+
+   .. py:attribute:: column
+      :type:  int
+
+
+.. py:class:: TokenType(*args, **kwds)
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Enumeration of valid SASS token types.
+
+
+   .. py:attribute:: LABEL_DEF
+
+
+   .. py:attribute:: DIRECTIVE
+
+
+   .. py:attribute:: COMMENT
+
+
+   .. py:attribute:: SEMICOLON
+
+
+   .. py:attribute:: COMMA
+
+
+   .. py:attribute:: PREDICATE
+
+
+   .. py:attribute:: REGISTER
+
+
+   .. py:attribute:: MEMORY
+
+
+   .. py:attribute:: IMMEDIATE
+
+
+   .. py:attribute:: IDENTIFIER
+
+
+.. py:class:: SassLifter
+
+   Reconstructs a LogicalGraph from a sequence of SASS AST nodes.
+
+
+   .. py:method:: lift(nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> ml_switcheroo.compiler.ir.LogicalGraph
+
+      Parses a list of SASS nodes to build a LogicalGraph.
+
+      Captures instructions within BEGIN/END blocks to feed into the Analyzer.
+      Captures orphan instructions into individual functional nodes (1:1 mapping).
+
+
+
+.. py:class:: SassAnalyzer
+
+   Analyzes sequences of SASS instructions to reverse-engineer high-level parameters.
+
+
+   .. py:method:: analyze_block(kind: str, instructions: List[ml_switcheroo.compiler.frontends.sass.nodes.Instruction]) -> Dict[str, Any]
+      :staticmethod:
+
+
+      Extracts metadata from a block of instructions based on the operation kind.
+
+      :param kind: The operation type (e.g. "Conv2d", "Linear").
+      :type kind: str
+      :param instructions: The assembly lines inside the block.
+      :type instructions: List[Instruction]
+
+      :returns: Extracted parameters (e.g., {"kernel_size": 3}).
+      :rtype: Dict[str, Any]
+
+
+

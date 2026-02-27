@@ -1,0 +1,94 @@
+ml_switcheroo.core.import_fixer.utils
+=====================================
+
+.. py:module:: ml_switcheroo.core.import_fixer.utils
+
+.. autoapi-nested-parse::
+
+   Utilities for the Import Fixer.
+
+   Contains static helper functions for analyzing AST nodes, extracting names,
+   generating signatures for deduplication, and creating CST nodes.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.import_fixer.utils.REDUNDANT_SEGMENTS
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.import_fixer.utils.get_root_name
+   ml_switcheroo.core.import_fixer.utils.create_dotted_name
+   ml_switcheroo.core.import_fixer.utils.get_signature
+   ml_switcheroo.core.import_fixer.utils.is_docstring
+   ml_switcheroo.core.import_fixer.utils.is_future_import
+
+
+Module Contents
+---------------
+
+.. py:data:: REDUNDANT_SEGMENTS
+
+.. py:function:: get_root_name(node: Union[libcst.Name, libcst.Attribute]) -> str
+
+   Recursively extracts the root identifier from a Name or Attribute chain.
+
+   :param node: The CST node (e.g., `Attribute(value=Name('torch'), ...)`).
+
+   :returns: The root name (e.g., "torch").
+   :rtype: str
+
+
+.. py:function:: create_dotted_name(name_str: str) -> Union[libcst.Name, libcst.Attribute]
+
+   Creates a CST node structure for a dotted path string.
+
+   :param name_str: Dot-separated path (e.g. "jax.numpy").
+   :type name_str: str
+
+   :returns: The constructed AST node.
+   :rtype: Union[cst.Name, cst.Attribute]
+
+
+.. py:function:: get_signature(node: libcst.CSTNode) -> str
+
+   Computes a deduplication signature for an AST node (usually an Import statement).
+
+   It normalizes the source code representation to ignore basic formatting differences,
+   allowing detection of duplicate import injections.
+
+   :param node: The CST node to sign.
+
+   :returns: Normalized source code string.
+   :rtype: str
+
+
+.. py:function:: is_docstring(node: libcst.CSTNode, idx: int) -> bool
+
+   Determines if a statement node represents a module docstring.
+
+   :param node: The statement node from the module body.
+   :param idx: The index of this statement in the body list.
+
+   :returns: True if it is a docstring (string expression at index 0).
+   :rtype: bool
+
+
+.. py:function:: is_future_import(node: libcst.CSTNode) -> bool
+
+   Determines if a statement is a `from __future__ import ...` directive.
+
+   :param node: The statement node.
+
+   :returns: True if it is a future import.
+   :rtype: bool
+
+

@@ -1,0 +1,276 @@
+ml_switcheroo.core.hooks
+========================
+
+.. py:module:: ml_switcheroo.core.hooks
+
+.. autoapi-nested-parse::
+
+   Plugin Binding Infrastructure.
+
+   This module provides the infrastructure for extending ml-switcheroo via plugins.
+   It enables developers to intercept and modify the Abstract Syntax Tree (AST)
+   during the conversion process using a hook-based system.
+
+   Refactor:
+       - Added `auto_wire` support to the `register_hook` decorator.
+       - Plugins can now declare their own Semantic definitions.
+       - HookContext now exposes `plugin_traits` and `current_variant` for data-driven logic.
+       - **New**: `resolve_type` method to query Symbol Table.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.hooks.SymbolTableType
+   ml_switcheroo.core.hooks.SemanticsManagerType
+   ml_switcheroo.core.hooks.T
+   ml_switcheroo.core.hooks.ArgInjectorType
+   ml_switcheroo.core.hooks.PreambleInjectorType
+   ml_switcheroo.core.hooks.HookFunction
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.hooks.AutoWireSpec
+   ml_switcheroo.core.hooks.HookContext
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.hooks.register_hook
+   ml_switcheroo.core.hooks.get_hook
+   ml_switcheroo.core.hooks.get_all_hook_metadata
+   ml_switcheroo.core.hooks.clear_hooks
+   ml_switcheroo.core.hooks.load_plugins
+
+
+Module Contents
+---------------
+
+.. py:data:: SymbolTableType
+
+.. py:data:: SemanticsManagerType
+
+.. py:data:: T
+
+.. py:data:: ArgInjectorType
+
+.. py:data:: PreambleInjectorType
+
+.. py:class:: AutoWireSpec(/, **data: Any)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Schema for plugin self-registration metadata.
+   Allows a plugin to define the Semantic Operation it satisfies.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: ops
+      :type:  Dict[str, Dict[str, Any]]
+      :value: None
+
+
+
+.. py:class:: HookContext(semantics: SemanticsManagerType, config: ml_switcheroo.config.RuntimeConfig, arg_injector: Optional[ArgInjectorType] = None, preamble_injector: Optional[PreambleInjectorType] = None, symbol_table: Optional[SymbolTableType] = None)
+
+   Context object passed to every plugin hook during transcoding.
+
+   Provides read-only access to global state and write access
+   to specific injection points (signature args, function body preambles).
+   Now exposes `plugin_traits` and `current_variant` for data-driven decisions.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: source_fw
+
+
+   .. py:attribute:: target_fw
+
+
+   .. py:attribute:: metadata
+      :type:  Dict[str, Any]
+
+
+   .. py:attribute:: current_op_id
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:method:: resolve_type(node: Any) -> Optional[str]
+
+      Queries the Symbol Table for the inferred type of a node.
+
+      :param node: The LibCST node to inspect.
+
+      :returns: "Tensor" if it's a tensor, "Module" if module, or None.
+      :rtype: str
+
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+      Returns the capabilities of the current Target Framework.
+      This allows plugins to check functionality (e.g. has_numpy_compatible_arrays)
+      rather than checking the framework name string.
+
+      :returns: The capability flags for the target framework.
+      :rtype: PluginTraits
+
+
+   .. py:property:: current_variant
+      :type: Optional[ml_switcheroo.semantics.schema.FrameworkVariant]
+
+
+      Returns the Variant definition for the current operation/target.
+      Allows plugins to read extra metadata defined in the JSON (e.g. pack_to_tuple).
+
+      :returns: The variant definition if resolved, else None.
+      :rtype: Optional[FrameworkVariant]
+
+
+   .. py:method:: inject_signature_arg(name: str, annotation: Optional[str] = None) -> None
+
+      Requests injection of argument into the current function signature.
+
+      :param name: The name of the argument to inject.
+      :type name: str
+      :param annotation: Type hint string for the argument.
+      :type annotation: Optional[str]
+
+
+
+   .. py:method:: inject_preamble(code_str: str) -> None
+
+      Requests injection of a statement at the beginning of the function body.
+
+      :param code_str: Python source code string to inject.
+      :type code_str: str
+
+
+
+   .. py:method:: raw_config(key: str, default: Any = None) -> Any
+
+      Retrieve a raw value from the unstructured plugin settings dict.
+
+      :param key: Configuration key.
+      :type key: str
+      :param default: Default value if key is not found.
+      :type default: Any
+
+      :returns: The configuration value.
+      :rtype: Any
+
+
+
+   .. py:method:: validate_settings(model: Type[T]) -> T
+
+      Validates global config against a Plugin-specific Pydantic schema.
+
+      :param model: Pydantic model definition.
+      :type model: Type[T]
+
+      :returns: Validated configuration object.
+      :rtype: T
+
+
+
+   .. py:method:: lookup_api(op_name: str) -> Optional[str]
+
+      Resolves target framework's API string for a given standard operation.
+
+      :param op_name: Standard operation ID.
+      :type op_name: str
+
+      :returns: The target API string, or None if not found.
+      :rtype: Optional[str]
+
+
+
+   .. py:method:: lookup_signature(op_name: str) -> List[str]
+
+      Retrieves standard argument list for a given operation.
+
+      :param op_name: Standard operation ID.
+      :type op_name: str
+
+      :returns: List of argument names.
+      :rtype: List[str]
+
+
+
+.. py:data:: HookFunction
+
+.. py:function:: register_hook(trigger: str, auto_wire: Optional[Dict[str, Any]] = None) -> Callable[[HookFunction], HookFunction]
+
+   Decorator to register a function as a plugin hook.
+
+   :param trigger: The unique identifier. Can be an operation ID or a
+                   reserved system event like "transform_for_loop".
+   :param auto_wire: Optional dictionary defining the Semantic Spec for this plugin.
+                     If provided, the SemanticsManager will automatically load
+                     these definitions, eliminating the need for JSON usage.
+                     Format matches `semantics/*.json` schema (e.g. `{"ops": {"MyOp": ...}}`).
+
+   :returns: The decorator wrapper.
+   :rtype: Callable
+
+
+.. py:function:: get_hook(trigger: str) -> Optional[HookFunction]
+
+   Retrieves a registered hook function by its trigger name.
+   Lazily loads plugins from the default directory if registry is empty.
+
+   :param trigger: Hook identifier key.
+   :type trigger: str
+
+   :returns: The registered function or None.
+   :rtype: Optional[HookFunction]
+
+
+.. py:function:: get_all_hook_metadata() -> Dict[str, AutoWireSpec]
+
+   Returns the metadata for all registered hooks.
+   Used by SemanticsManager to hydrate the Knowledge Base.
+
+   :returns: Metadata for autowired plugins.
+   :rtype: Dict[str, AutoWireSpec]
+
+
+.. py:function:: clear_hooks() -> None
+
+   Resets the internal hook registry. Primarily for testing.
+
+
+.. py:function:: load_plugins(plugins_dir: Optional[pathlib.Path] = None, extra_dirs: Optional[List[pathlib.Path]] = None) -> int
+
+   Dynamically imports plugins.
+
+   :param plugins_dir: Overrides default package directory.
+                       If provided, this directory is scanned for .py files.
+                       If NOT provided, the internal `ml_switcheroo.plugins` package is loaded.
+   :param extra_dirs: Additional directories to scan (e.g. user extensions).
+
+   :returns: Number of modules loaded.
+   :rtype: int
+
+

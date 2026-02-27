@@ -1,0 +1,65 @@
+ml_switcheroo.generated_tests.templates
+=======================================
+
+.. py:module:: ml_switcheroo.generated_tests.templates
+
+.. autoapi-nested-parse::
+
+   Test Generation Templates and configuration descriptors.
+
+   This module stores default code templates for supported frameworks and
+   provides utilities to determine properties of test arguments (e.g., static JIT args).
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.generated_tests.templates.DEFAULT_TEST_TEMPLATES
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.generated_tests.templates.get_template
+   ml_switcheroo.generated_tests.templates.is_static_arg
+
+
+Module Contents
+---------------
+
+.. py:data:: DEFAULT_TEST_TEMPLATES
+
+.. py:function:: get_template(manager: Any, framework: str) -> Dict[str, str]
+
+   Retrieves the code generation template for a specific framework.
+
+   Priority:
+   1. SemanticsManager lookup (loaded from snapshots).
+   2. Hardcoded defaults in `DEFAULT_TEST_TEMPLATES`.
+   3. Empty dict.
+
+   :param manager: The SemanticsManager instance (can be None).
+   :param framework: The framework key (e.g., 'torch', 'jax').
+
+   :returns: Template strings for imports, conversion, etc.
+   :rtype: Dict[str, str]
+
+
+.. py:function:: is_static_arg(arg_info: Dict[str, Any]) -> bool
+
+   Determines if an argument should be marked static for JIT compilation.
+
+   Heuristic checks for primitive types (int, bool, str) or specific names
+   common to axis/dimension arguments.
+
+   :param arg_info: A dictionary containing 'name' and 'type' keys.
+
+   :returns: True if the argument should be static.
+   :rtype: bool
+
+

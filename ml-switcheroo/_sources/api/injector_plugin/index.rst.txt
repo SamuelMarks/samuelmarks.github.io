@@ -1,0 +1,206 @@
+injector_plugin
+===============
+
+.. py:module:: injector_plugin
+
+.. autoapi-nested-parse::
+
+   Plugin Scaffolder.
+
+   Generates valid Python source files for new hooks in the plugins directory.
+   Used by the CLI to provide a starting point for complex logic implementations.
+   Feature 083: Supports compiling declarative rules including complex operators into switch statements.
+   Feature 084: Supports Preservative Updates (Body Extraction).
+   Feature 085: Enforces PEP8 Filenaming (Snake Case).
+   Feature 086: Auto-Wire Dictionary injection.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   injector_plugin.HELPER_LOGIC
+   injector_plugin.TEMPLATE_HEADER
+   injector_plugin.TEMPLATE_FUNC_DEF_AUTO_WIRE
+   injector_plugin.TEMPLATE_FUNC_DEF
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   injector_plugin.BodyExtractor
+   injector_plugin.PluginGenerator
+
+
+Module Contents
+---------------
+
+.. py:data:: HELPER_LOGIC
+   :value: Multiline-String
+
+   .. raw:: html
+
+      <details><summary>Show Value</summary>
+
+   .. code-block:: python
+
+      """
+      def _get_kwarg_value(node: cst.Call, arg_name: str):
+          for arg in node.args:
+              if arg.keyword and arg.keyword.value == arg_name:
+                   return _node_to_literal(arg.value)
+          return None
+      
+      def _node_to_literal(node):
+          if isinstance(node, cst.Integer): return int(node.value)
+          if isinstance(node, cst.Float): return float(node.value)
+          if isinstance(node, cst.SimpleString): return node.value.strip("'").strip('"')
+          if isinstance(node, cst.Name):
+               if node.value == "True": return True
+               if node.value == "False": return False
+               if node.value == "None": return None
+          return None
+      
+      def _create_dotted_name(name_str: str) -> cst.BaseExpression:
+          parts = name_str.split(".")
+          node = cst.Name(parts[0])
+          for part in parts[1:]:
+              node = cst.Attribute(value=node, attr=cst.Name(part))
+          return node
+      """
+
+   .. raw:: html
+
+      </details>
+
+
+
+.. py:data:: TEMPLATE_HEADER
+   :value: Multiline-String
+
+   .. raw:: html
+
+      <details><summary>Show Value</summary>
+
+   .. code-block:: python
+
+      """"""
+      {doc}
+      """
+      import libcst as cst
+      from ml_switcheroo.core.hooks import register_hook, HookContext
+      
+      """
+
+   .. raw:: html
+
+      </details>
+
+
+
+.. py:data:: TEMPLATE_FUNC_DEF_AUTO_WIRE
+   :value: Multiline-String
+
+   .. raw:: html
+
+      <details><summary>Show Value</summary>
+
+   .. code-block:: python
+
+      """@register_hook(trigger="{name}", auto_wire={auto_wire})
+      def {name}(node: {node_type}, ctx: HookContext) -> cst.CSTNode:
+          """
+          Plugin Hook: {doc}
+          """
+      """
+
+   .. raw:: html
+
+      </details>
+
+
+
+.. py:data:: TEMPLATE_FUNC_DEF
+   :value: Multiline-String
+
+   .. raw:: html
+
+      <details><summary>Show Value</summary>
+
+   .. code-block:: python
+
+      """@register_hook("{name}")
+      def {name}(node: {node_type}, ctx: HookContext) -> cst.CSTNode:
+          """
+          Plugin Hook: {doc}
+          """
+      """
+
+   .. raw:: html
+
+      </details>
+
+
+
+.. py:class:: BodyExtractor(func_name: str)
+
+   Bases: :py:obj:`libcst.CSTVisitor`
+
+
+   Extracts the body of a specific function definition.
+   Used to preserve user implementation logic during scaffolding updates.
+
+
+   .. py:attribute:: func_name
+
+
+   .. py:attribute:: body_node
+      :type:  Optional[libcst.BaseSuite]
+      :value: None
+
+
+
+   .. py:attribute:: found
+      :value: False
+
+
+
+   .. py:method:: visit_FunctionDef(node: libcst.FunctionDef) -> Optional[bool]
+
+      Visits function definitions to find the target hook.
+      If found, captures the body and stops recursion.
+
+      :param node: The function definition node.
+      :type node: cst.FunctionDef
+
+      :returns: False if found to stop recursion, True otherwise.
+      :rtype: Optional[bool]
+
+
+
+.. py:class:: PluginGenerator(plugins_dir: pathlib.Path)
+
+   Writes Python plugin files to disk based on scaffold definitions.
+
+
+   .. py:attribute:: plugins_dir
+
+
+   .. py:method:: generate(scaffold: ml_switcheroo.core.dsl.PluginScaffoldDef) -> bool
+
+      Creates or updates a plugin file.
+
+      If the file exists, it attempts to preserve the existing function body logic
+      while updating the wrapper (docstrings/decorators/imports).
+
+      :param scaffold: Definition model containing name, type, docs, and rules.
+
+      :returns: True if file was written/updated.
+      :rtype: bool
+
+
+

@@ -1,0 +1,70 @@
+ml_switcheroo.frameworks.loader
+===============================
+
+.. py:module:: ml_switcheroo.frameworks.loader
+
+.. autoapi-nested-parse::
+
+   Framework Definition Loader.
+
+   This module provides utilities to load static operation definitions from JSON files
+   located in `src/ml_switcheroo/frameworks/definitions/`. It utilizes caching to
+   ensure efficient access during runtime and discovery.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.loader.DEFINITIONS_DIR
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.loader.load_definitions
+   ml_switcheroo.frameworks.loader.clear_definition_cache
+   ml_switcheroo.frameworks.loader.get_definitions_path
+
+
+Module Contents
+---------------
+
+.. py:data:: DEFINITIONS_DIR
+
+.. py:function:: load_definitions(framework: str) -> Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+   Loads static definitions for a specific framework from its JSON file.
+
+   Uses `functools.lru_cache` to ensure the file is read and parsed only once per execution.
+   Converts raw JSON dictionaries into `StandardMap` Pydantic objects.
+
+   :param framework: The framework key (e.g., 'torch', 'jax').
+   :type framework: str
+
+   :returns: A dictionary mapping Operation Names to StandardDefs.
+             Returns an empty dict if the definition file does not exist.
+   :rtype: Dict[str, StandardMap]
+
+
+.. py:function:: clear_definition_cache() -> None
+
+   Clears the LRU cache for definitions.
+   Useful for tests or hot-reloading scenarios.
+
+
+.. py:function:: get_definitions_path(framework: str) -> pathlib.Path
+
+   Returns the resolved path for a framework's definition JSON.
+
+   :param framework: The framework key.
+   :type framework: str
+
+   :returns: The absolute path to the intended JSON file.
+   :rtype: Path
+
+

@@ -1,0 +1,174 @@
+ml_switcheroo.core.html.nodes
+=============================
+
+.. py:module:: ml_switcheroo.core.html.nodes
+
+.. autoapi-nested-parse::
+
+   HTML DSL Semantic Nodes.
+
+   Defines the structure for the visual elements used in the HTML/SVG DSL:
+   - GridBox: Represents a layer (Red), operation (Blue), or data shape (Green).
+   - SvgArrow: Represents data flow connections.
+   - HtmlDocument: The root container holding CSS and body content.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.html.nodes.HtmlNode
+   ml_switcheroo.core.html.nodes.SvgArrow
+   ml_switcheroo.core.html.nodes.GridBox
+   ml_switcheroo.core.html.nodes.HtmlDocument
+
+
+Module Contents
+---------------
+
+.. py:class:: HtmlNode
+
+   Abstract base class for all HTML DSL elements.
+
+
+   .. py:method:: to_html() -> str
+      :abstractmethod:
+
+
+      Render the node and its children to an HTML string.
+
+      :returns: The raw HTML content.
+      :rtype: str
+
+      :raises NotImplementedError: If not implemented by subclass.
+
+
+
+.. py:class:: SvgArrow
+
+   Bases: :py:obj:`HtmlNode`
+
+
+   Represents an SVG connection line between grid cells.
+
+
+   .. py:attribute:: x1
+      :type:  int
+
+
+   .. py:attribute:: y1
+      :type:  int
+
+
+   .. py:attribute:: x2
+      :type:  int
+
+
+   .. py:attribute:: y2
+      :type:  int
+
+
+   .. py:attribute:: style_class
+      :type:  str
+
+
+   .. py:attribute:: marker_end
+      :type:  str
+
+
+   .. py:attribute:: parent_style
+      :type:  str
+
+
+   .. py:method:: to_html() -> str
+
+      Renders the arrow as an absolute SVG element.
+      Adds 'sw-arrow' class for scoped styling.
+
+
+
+.. py:class:: GridBox
+
+   Bases: :py:obj:`HtmlNode`
+
+
+   Represents a content box positioned within the CSS Grid.
+
+
+   .. py:attribute:: row
+      :type:  int
+
+
+   .. py:attribute:: col
+      :type:  int
+
+
+   .. py:attribute:: css_class
+      :type:  str
+
+
+   .. py:attribute:: header_text
+      :type:  str
+
+
+   .. py:attribute:: code_text
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: body_text
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: arrows
+      :type:  List[SvgArrow]
+      :value: []
+
+
+
+   .. py:attribute:: z_index
+      :type:  Optional[int]
+      :value: None
+
+
+
+   .. py:method:: to_html() -> str
+
+      Renders the grid cell div, its content, and attached arrows.
+
+
+
+.. py:class:: HtmlDocument
+
+   Bases: :py:obj:`HtmlNode`
+
+
+   Root container for the generated HTML.
+
+
+   .. py:attribute:: model_name
+      :type:  str
+
+
+   .. py:attribute:: children
+      :type:  List[GridBox]
+
+
+   .. py:method:: to_html() -> str
+
+      Renders the complete HTML document.
+
+      Notes:
+
+      - Removed 'visibility:hidden' from markers block to enable correct rendering in some browsers
+        when injected via innerHTML. Use 0 sizes and pointer-events logic instead.
+
+      :returns: The complete HTML string document.
+
+
+

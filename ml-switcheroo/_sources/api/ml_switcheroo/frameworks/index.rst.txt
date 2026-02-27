@@ -1,0 +1,215 @@
+ml_switcheroo.frameworks
+========================
+
+.. py:module:: ml_switcheroo.frameworks
+
+.. autoapi-nested-parse::
+
+   Framework Adapters Package.
+
+   Automatically discovers and registers framework adapters by scanning this
+   directory for modules. This allows for "Zero-Edit" extensibility: simply drop
+   a new adapter file (e.g., `tinygrad.py`) into this folder, and it will be
+   automatically registered.
+
+   This module exposes the registry helpers (`get_adapter`, `available_frameworks`)
+   but relies on the side-effects of importing submodules to populate the
+   internal `_ADAPTER_REGISTRY`.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/frameworks/base/index
+   /api/ml_switcheroo/frameworks/common/index
+   /api/ml_switcheroo/frameworks/flax_nnx/index
+   /api/ml_switcheroo/frameworks/html_dsl/index
+   /api/ml_switcheroo/frameworks/jax/index
+   /api/ml_switcheroo/frameworks/keras/index
+   /api/ml_switcheroo/frameworks/latex_dsl/index
+   /api/ml_switcheroo/frameworks/loader/index
+   /api/ml_switcheroo/frameworks/mlir/index
+   /api/ml_switcheroo/frameworks/mlx/index
+   /api/ml_switcheroo/frameworks/numpy/index
+   /api/ml_switcheroo/frameworks/optax_shim/index
+   /api/ml_switcheroo/frameworks/paxml/index
+   /api/ml_switcheroo/frameworks/rdna/index
+   /api/ml_switcheroo/frameworks/sass/index
+   /api/ml_switcheroo/frameworks/stablehlo/index
+   /api/ml_switcheroo/frameworks/tensorflow/index
+   /api/ml_switcheroo/frameworks/tikz/index
+   /api/ml_switcheroo/frameworks/torch/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.FrameworkAdapter
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.register_framework
+   ml_switcheroo.frameworks.get_adapter
+   ml_switcheroo.frameworks.available_frameworks
+
+
+Package Contents
+----------------
+
+.. py:class:: FrameworkAdapter
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol definition for a Framework Adapter.
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
+
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+
+   .. py:property:: display_name
+      :type: str
+
+
+
+   .. py:property:: ui_priority
+      :type: int
+
+
+
+   .. py:property:: discovery_heuristics
+      :type: Dict[str, List[str]]
+
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+
+   .. py:property:: import_alias
+      :type: Tuple[str, str]
+
+
+
+   .. py:property:: inherits_from
+      :type: Optional[str]
+
+
+
+   .. py:property:: structural_traits
+      :type: ml_switcheroo.semantics.schema.StructuralTraits
+
+
+
+   .. py:property:: plugin_traits
+      :type: ml_switcheroo.semantics.schema.PluginTraits
+
+
+
+   .. py:property:: rng_seed_methods
+      :type: List[str]
+
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+
+   .. py:method:: get_serialization_imports() -> List[str]
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+
+   .. py:method:: get_doc_url(api_name: str) -> Optional[str]
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+
+   .. py:property:: definitions
+      :type: Dict[str, StandardMap]
+
+
+
+   .. py:property:: specifications
+      :type: Dict[str, ml_switcheroo.semantics.schema.OperationDef]
+
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, Union[Dict[str, str], ImportConfig]]
+
+
+
+   .. py:method:: collect_api(category: StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+
+.. py:function:: register_framework(name: str)
+
+.. py:function:: get_adapter(name: str) -> Optional[FrameworkAdapter]
+
+.. py:function:: available_frameworks() -> List[str]
+

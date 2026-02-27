@@ -1,0 +1,73 @@
+ml_switcheroo.analysis.dependencies
+===================================
+
+.. py:module:: ml_switcheroo.analysis.dependencies
+
+.. autoapi-nested-parse::
+
+   Static Dependency Analysis for Transpilation Safety.
+
+   This module provides the ``DependencyScanner``, a LibCST visitor that identifies
+   third-party dependencies imported in the source code.
+
+   It serves as a safety check during transpilation:
+
+   1.  Identifies imports (e.g., ``import pandas``, ``from sklearn import metrics``).
+   2.  Filters out **Standard Library** modules (e.g., ``os``, ``sys``, ``json``).
+   3.  Filters out the **Source Framework** (e.g., ``torch``), as these are handled
+       by the core ``ImportFixer`` and ``PivotRewriter``.
+   4.  Validates the remaining imports against the **Semantics Manager**.
+
+   If a third-party import (e.g., ``cv2``) is found but not mapped in the
+   semantics (Import Map), it warns the user that the target environment
+   might lack the equivalent library or that the mapping logic is missing.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.analysis.dependencies.DependencyScanner
+
+
+Module Contents
+---------------
+
+.. py:class:: DependencyScanner(semantics: ml_switcheroo.semantics.manager.SemanticsManager, source_fw: str)
+
+   Bases: :py:obj:`libcst.CSTVisitor`
+
+
+   Scans for 3rd-party imports not covered by the Semantic Knowledge Base.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: source_fw
+
+
+   .. py:attribute:: unknown_imports
+      :type:  Set[str]
+
+
+   .. py:method:: visit_Import(node: libcst.Import) -> None
+
+      Visits ``import x``, ``import x.y``.
+      Checks the root package name.
+
+      :param node: The import statement node.
+
+
+
+   .. py:method:: visit_ImportFrom(node: libcst.ImportFrom) -> None
+
+      Visits ``from x import y``.
+      Checks the module root package name.
+
+      :param node: The import-from statement node.
+
+
+

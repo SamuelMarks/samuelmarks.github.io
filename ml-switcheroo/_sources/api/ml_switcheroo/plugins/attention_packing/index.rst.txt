@@ -1,0 +1,67 @@
+ml_switcheroo.plugins.attention_packing
+=======================================
+
+.. py:module:: ml_switcheroo.plugins.attention_packing
+
+.. autoapi-nested-parse::
+
+   Plugin for MultiHead Attention Strategy Selection.
+
+   This module provides modular hooks for transforming MultiHeadAttention API calls
+   between frameworks. Logic is split into discrete argument-mapping strategies
+   (`repack_attn_keras` and `repack_attn_flax`).
+
+   Decoupling Logic:
+       - **No Hardcoded Frameworks:** The plugin does not contain strings like
+         `flax.nnx` or `keras.layers`.
+       - **Strict Lookup:** Target class names are resolved via `ctx.lookup_api`.
+       - **Safety:** If the Knowledge Base is missing a mapping for "MultiheadAttention",
+         constructor transformations are aborted to prevent hallucination.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.attention_packing.repack_attn_keras
+   ml_switcheroo.plugins.attention_packing.repack_attn_flax
+
+
+Module Contents
+---------------
+
+.. py:function:: repack_attn_keras(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Strategy: Keras Attention Packing.
+
+   **Constructor:**
+   - Requires 'MultiheadAttention' mapping in Semantics.
+   - Renames `embed_dim` -> `key_dim` recursively.
+
+   **Call (Inference):**
+   - Remaps typical Torch signature `(q, k, v, mask)` to Keras `(q, v, key=k, attention_mask=mask)`.
+
+   :param node: Original Call node.
+   :param ctx: HookContext for API lookup.
+
+   :returns: Transformed Call node, or original if dependencies missing.
+
+
+.. py:function:: repack_attn_flax(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.Call
+
+   Strategy: Flax/JAX Attention Packing.
+
+   **Constructor:**
+   - Requires 'MultiheadAttention' mapping in Semantics.
+
+   **Call (Inference):**
+   - Maps `key_padding_mask` -> `mask`.
+
+   :param node: Original Call node.
+   :param ctx: HookContext for API lookup.
+
+   :returns: Transformed Call node, or original if dependencies missing.
+
+

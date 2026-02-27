@@ -1,0 +1,147 @@
+ml_switcheroo.compiler.backends.sass
+====================================
+
+.. py:module:: ml_switcheroo.compiler.backends.sass
+
+.. autoapi-nested-parse::
+
+   SASS Backend Package.
+
+   Contains the backend implementation for synthesizing NVIDIA SASS assembly
+   from the Logical Graph representation.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/compiler/backends/sass/emitter/index
+   /api/ml_switcheroo/compiler/backends/sass/macros/index
+   /api/ml_switcheroo/compiler/backends/sass/synthesizer/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.backends.sass.SassSynthesizer
+   ml_switcheroo.compiler.backends.sass.SassBackend
+   ml_switcheroo.compiler.backends.sass.SassEmitter
+
+
+Package Contents
+----------------
+
+.. py:class:: SassSynthesizer(semantics: ml_switcheroo.semantics.manager.SemanticsManager)
+
+   Bidirectional transpiler component.
+
+   Handles:
+   1.  **Forward (Graph -> SASS)**: Synthesizes Assembly from Logical Graphs.
+       Delegates high-level ops (Conv2d, Linear) to Macros, and low-level ops
+       (Add, Mul) to Semantic Opcode Lookup.
+   2.  **Reverse (SASS -> Python)**: Synthesizes Python AST from Assembly nodes.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: allocator
+
+
+   .. py:attribute:: macro_registry
+      :type:  Dict[str, Callable]
+
+
+   .. py:method:: from_graph(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]
+
+      Converts a LogicalGraph into a list of SASS AST nodes.
+
+      Process:
+      1.  Sorts nodes topologically.
+      2.  Traverses nodes.
+      3.  For each node:
+          a. Check if it matches a Macro (e.g. Conv2d). If so, expand kernel.
+          b. If not, lookup abstract opcode mapping (e.g. `Add` -> `FADD`).
+          c. Allocate/Resolve Input Registers.
+          d. Allocate Output Register.
+          e. Construct `Instruction` node.
+      4.  Handles `Input` nodes by pre-allocating registers (Contract: R0, R1...).
+
+      :param graph: The input computation graph.
+      :type graph: LogicalGraph
+
+      :returns: A structured list of assembly nodes.
+      :rtype: List[SassNode]
+
+
+
+   .. py:method:: to_python(sass_nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> libcst.Module
+
+      Converts SASS AST nodes into a Python source structure representation.
+
+      Used for analysis or round-trip verification. Registers are treated as
+      variables. Instructions map to function calls `sass.OPCODE(args)`.
+
+      Structure:
+          `R0 = sass.FADD(R1, R2)`
+
+      :param sass_nodes: List of parsed SASS nodes.
+      :type sass_nodes: List[SassNode]
+
+      :returns: A LibCST module containing the Python representation.
+      :rtype: cst.Module
+
+
+
+.. py:class:: SassBackend(semantics: Optional[ml_switcheroo.semantics.manager.SemanticsManager] = None)
+
+   Bases: :py:obj:`ml_switcheroo.compiler.backend.CompilerBackend`
+
+
+   Compiler Backend implementation for NVIDIA SASS.
+   Orchestrates the synthesis (Graph -> AST) and emission (AST -> Text).
+
+
+   .. py:attribute:: synthesizer
+
+
+   .. py:attribute:: emitter
+
+
+   .. py:method:: compile(graph: ml_switcheroo.compiler.ir.LogicalGraph) -> str
+
+      Compiles LogicalGraph to SASS Assembly string.
+
+      :param graph: The intermediate representation.
+
+      :returns: The SASS code.
+      :rtype: str
+
+
+
+.. py:class:: SassEmitter
+
+   Converts SASS AST nodes into textual assembly code.
+
+
+   .. py:method:: emit(nodes: List[ml_switcheroo.compiler.frontends.sass.nodes.SassNode]) -> str
+
+      Generates the SASS source string from a list of nodes.
+
+      Formatting Rules:
+      - Labels (e.g. `L_1:`) are rendered flush-left.
+      - All other nodes are indented by 4 spaces.
+
+      :param nodes: AST nodes.
+      :type nodes: List[SassNode]
+
+      :returns: The formatted SASS source code string.
+      :rtype: str
+
+
+

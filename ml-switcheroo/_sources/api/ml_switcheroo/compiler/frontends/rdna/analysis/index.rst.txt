@@ -1,0 +1,50 @@
+ml_switcheroo.compiler.frontends.rdna.analysis
+==============================================
+
+.. py:module:: ml_switcheroo.compiler.frontends.rdna.analysis
+
+.. autoapi-nested-parse::
+
+   RDNA Instruction Analyzer.
+
+   This module implements heuristics to extract high-level semantic parameters
+   (like Loop Bounds, Kernel Sizes) by analyzing the raw RDNA instructions
+   within a basic block.
+
+   It enables the "Lifting" process to recover parameters like `kernel_size=3`
+   from `s_cmp_lt_i32 sX, 3` instructions inside a loop structure.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.frontends.rdna.analysis.RdnaAnalyzer
+
+
+Module Contents
+---------------
+
+.. py:class:: RdnaAnalyzer
+
+   Analyzes sequences of RDNA instructions to reverse-engineer high-level parameters.
+
+
+   .. py:method:: analyze_block(kind: str, instructions: List[ml_switcheroo.compiler.frontends.rdna.nodes.Instruction]) -> Dict[str, Any]
+      :staticmethod:
+
+
+      Extracts metadata from a block of instructions based on the operation kind.
+
+      :param kind: The operation type (e.g. "Conv2d", "Linear").
+      :type kind: str
+      :param instructions: The assembly lines inside the block.
+      :type instructions: List[Instruction]
+
+      :returns: Extracted parameters (e.g., {"k": 3}).
+      :rtype: Dict[str, Any]
+
+
+

@@ -1,0 +1,91 @@
+ml_switcheroo.core.rewriter.passes.auxiliary
+============================================
+
+.. py:module:: ml_switcheroo.core.rewriter.passes.auxiliary
+
+.. autoapi-nested-parse::
+
+   Auxiliary Logic Pass.
+
+   This module consolidates transformations that are adjacent to the core API logic,
+   specifically:
+   1.  **Decorators**: Rewriting or stripping function decorators (e.g., `@torch.jit.script`).
+   2.  **Control Flow**: Analyzing and transforming loops (`for`, `while`) to ensure safety
+       in functional frameworks (e.g., JAX/XLA compatibility checks).
+
+   It merges logic previously found in `decorators.py` and `control_flow.py`.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.passes.auxiliary.AuxiliaryPass
+   ml_switcheroo.core.rewriter.passes.auxiliary.AuxiliaryTransformer
+
+
+Module Contents
+---------------
+
+.. py:class:: AuxiliaryPass
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.interface.RewriterPass`
+
+
+   Pass dealing with auxiliary syntax constructs: decorators and control flow.
+
+
+   .. py:method:: transform(module: libcst.Module, context: ml_switcheroo.core.rewriter.context.RewriterContext) -> libcst.Module
+
+      Executes the auxiliary transformation logic.
+
+      :param module: The source CST.
+      :param context: Shared state.
+
+      :returns: The transformed CST.
+
+
+
+.. py:class:: AuxiliaryTransformer(context: ml_switcheroo.core.rewriter.context.RewriterContext)
+
+   Bases: :py:obj:`libcst.CSTTransformer`
+
+
+   LibCST Transformer for auxiliary constructs.
+
+
+   .. py:attribute:: context
+
+
+   .. py:method:: visit_SimpleStatementLine(node: libcst.SimpleStatementLine) -> Optional[bool]
+
+      Reset statement buffers.
+
+
+
+   .. py:method:: leave_SimpleStatementLine(original_node: libcst.SimpleStatementLine, updated_node: libcst.SimpleStatementLine) -> Union[libcst.SimpleStatementLine, libcst.FlattenSentinel]
+
+      Process statement errors.
+
+
+
+   .. py:method:: leave_Decorator(original_node: libcst.Decorator, updated_node: libcst.Decorator) -> Union[libcst.Decorator, libcst.RemovalSentinel]
+
+      Rewrites decorators.
+
+      Logic:
+      1. Resolve decorator name (e.g. `torch.jit.script`).
+      2. Lookup semantics.
+      3. If target variant is None -> Remove.
+      4. If target variant has API -> Rename.
+
+
+
+   .. py:method:: leave_For(original_node: libcst.For, updated_node: libcst.For) -> Union[libcst.For, libcst.CSTNode, libcst.FlattenSentinel]
+
+      Processes 'for' loops for safety checks and unrolling.
+
+
+

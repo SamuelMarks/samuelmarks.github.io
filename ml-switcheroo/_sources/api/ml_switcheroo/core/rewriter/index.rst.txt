@@ -1,0 +1,235 @@
+ml_switcheroo.core.rewriter
+===========================
+
+.. py:module:: ml_switcheroo.core.rewriter
+
+.. autoapi-nested-parse::
+
+   Rewriter Package.
+
+   This package provides the core AST transformation logic via a composable pipeline.
+
+   Components:
+   - `RewriterPipeline`: Orchestrates the execution of sequence passes.
+   - `RewriterContext`: Shared state container (Symbol Table, Semantics).
+   - `RewriterPass`: Base interface for transformation logic.
+
+   Core Passes:
+   - `StructuralPass`: Handles class inheritance, method renaming, signature changes.
+   - `ApiPass`: Handles API mapping, argument pivoting, and macro expansion.
+   - `AuxiliaryPass`: Handles decorators and control flow safety.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/ml_switcheroo/core/rewriter/context/index
+   /api/ml_switcheroo/core/rewriter/interface/index
+   /api/ml_switcheroo/core/rewriter/normalization_utils/index
+   /api/ml_switcheroo/core/rewriter/passes/index
+   /api/ml_switcheroo/core/rewriter/patcher/index
+   /api/ml_switcheroo/core/rewriter/pipeline/index
+   /api/ml_switcheroo/core/rewriter/types/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.RewriterContext
+   ml_switcheroo.core.rewriter.RewriterPipeline
+   ml_switcheroo.core.rewriter.RewriterPass
+   ml_switcheroo.core.rewriter.StructuralPass
+   ml_switcheroo.core.rewriter.ApiPass
+   ml_switcheroo.core.rewriter.AuxiliaryPass
+
+
+Package Contents
+----------------
+
+.. py:class:: RewriterContext(semantics: ml_switcheroo.semantics.manager.SemanticsManager, config: ml_switcheroo.config.RuntimeConfig, symbol_table: Optional[ml_switcheroo.analysis.symbol_table.SymbolTable] = None, arg_injector: Optional[Callable[[str, Optional[str]], None]] = None, preamble_injector: Optional[Callable[[str], None]] = None)
+
+   Shared state container for the rewriting pipeline.
+
+   Encapsulates all mutable state required during the AST traversal, allowing
+   multiple `RewriterStage` passes to operate on a consistent context.
+
+
+   .. py:attribute:: semantics
+
+
+   .. py:attribute:: config
+
+
+   .. py:attribute:: symbol_table
+      :value: None
+
+
+
+   .. py:attribute:: scope_stack
+      :type:  List[Set[str]]
+
+
+   .. py:attribute:: signature_stack
+      :type:  List[ml_switcheroo.core.rewriter.types.SignatureContext]
+      :value: []
+
+
+
+   .. py:attribute:: alias_map
+      :type:  Dict[str, str]
+
+
+   .. py:attribute:: current_stmt_errors
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:attribute:: current_stmt_warnings
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:attribute:: module_preamble
+      :type:  List[str]
+      :value: []
+
+
+
+   .. py:attribute:: in_module_class
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: hook_context
+
+
+   .. py:property:: source_fw
+      :type: str
+
+
+      Returns effective source framework string.
+
+
+   .. py:property:: target_fw
+      :type: str
+
+
+      Returns effective target framework string.
+
+
+.. py:class:: RewriterPipeline(passes: List[ml_switcheroo.core.rewriter.interface.RewriterPass])
+
+   Manages a sequence of rewriting passes and executes them in order.
+
+
+   .. py:attribute:: passes
+
+
+   .. py:method:: run(module: libcst.Module, context: ml_switcheroo.core.rewriter.context.RewriterContext) -> libcst.Module
+
+      Executes all registered passes sequentially on the module.
+
+      :param module: The source AST to transform.
+      :param context: The shared execution state containing semantics and config.
+
+      :returns: The fully transformed AST.
+
+
+
+.. py:class:: RewriterPass
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract contract for a transformation pass in the rewriting pipeline.
+
+   Passes encapsulate discrete transformation logic (e.g. Structural Rewriting,
+   API Remapping) and are executed sequentially by the pipeline.
+
+
+   .. py:method:: transform(module: libcst.Module, context: ml_switcheroo.core.rewriter.context.RewriterContext) -> libcst.Module
+      :abstractmethod:
+
+
+      Executes the transformation logic on the given CST module.
+
+      :param module: The input LibCST module.
+      :param context: The shared rewriter context containing configuration and state.
+
+      :returns: The transformed LibCST module.
+
+
+
+.. py:class:: StructuralPass
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.interface.RewriterPass`
+
+
+   Pass responsible for modifying the structural scaffolding of the code.
+
+   It transforms class definitions, function signatures, and type hints
+   to match the idioms of the target framework.
+
+
+   .. py:method:: transform(module: libcst.Module, context: ml_switcheroo.core.rewriter.context.RewriterContext) -> libcst.Module
+
+      Executes the structural transformation.
+
+      :param module: The source CST.
+      :param context: Shared rewriter state.
+
+      :returns: The transformed CST.
+
+
+
+.. py:class:: ApiPass
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.interface.RewriterPass`
+
+
+   Transformation pass for rewiring API usage.
+
+   Handles resolving function calls to Abstract Operations (The Hub) and then projecting
+   them to the Target Framework (The Spoke). Also handles attribute renaming and
+   stateful assignment tracking.
+
+
+   .. py:method:: transform(module: libcst.Module, context: ml_switcheroo.core.rewriter.context.RewriterContext) -> libcst.Module
+
+      Executes the API transformation logic.
+
+      :param module: The source CST.
+      :param context: Shared rewriter state.
+
+      :returns: The transformed CST.
+
+
+
+.. py:class:: AuxiliaryPass
+
+   Bases: :py:obj:`ml_switcheroo.core.rewriter.interface.RewriterPass`
+
+
+   Pass dealing with auxiliary syntax constructs: decorators and control flow.
+
+
+   .. py:method:: transform(module: libcst.Module, context: ml_switcheroo.core.rewriter.context.RewriterContext) -> libcst.Module
+
+      Executes the auxiliary transformation logic.
+
+      :param module: The source CST.
+      :param context: Shared state.
+
+      :returns: The transformed CST.
+
+
+

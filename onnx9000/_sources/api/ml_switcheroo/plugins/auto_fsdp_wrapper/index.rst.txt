@@ -1,0 +1,42 @@
+ml_switcheroo.plugins.auto_fsdp_wrapper
+=======================================
+
+.. py:module:: ml_switcheroo.plugins.auto_fsdp_wrapper
+
+.. autoapi-nested-parse::
+
+   Automatic Fully Sharded Data Parallel (FSDP) and PJIT Wrapper Plugin.
+
+   This plugin automatically handles the injection of distributed sharding primitives
+   like PyTorch's FSDP or JAX's `pjit`/`shard_map` into the translated AST. It relies
+   on a user-provided `mesh.json` configuration, parsing it to inject logical axis bindings.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.auto_fsdp_wrapper.wrap_with_sharding
+
+
+Module Contents
+---------------
+
+.. py:function:: wrap_with_sharding(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> Union[libcst.Call, libcst.BaseExpression]
+
+   Wraps module instantiations in distributed sharding primitives based on target framework.
+
+   If the target is PyTorch, it wraps the layer instantiation in FSDP.
+   If the target is JAX/Flax, it uses pjit mappings.
+
+   This function reads `ctx.op_def.sharding_supported` and only wraps if
+   sharding is enabled and the hardware topology warrants it.
+
+   :param node: The CST Call node (e.g., `nn.Linear(...)`).
+   :param ctx: Hook context providing access to the current operation traits.
+
+   :returns: A wrapped CST Call node. For example, `FSDP(nn.Linear(...), mesh=mesh)`.
+
+

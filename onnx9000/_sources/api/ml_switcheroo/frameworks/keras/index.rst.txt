@@ -1,0 +1,342 @@
+ml_switcheroo.frameworks.keras
+==============================
+
+.. py:module:: ml_switcheroo.frameworks.keras
+
+.. autoapi-nested-parse::
+
+   Keras (v3) Framework Adapter.
+
+   This module implements the adapter for the Keras 3 framework, supporting
+   multi-backend translation (JAX/Torch/TensorFlow).
+
+   It handles:
+   1.  **Math**: Mapping `keras.ops.*` (backend-agnostic math).
+   2.  **Layers**: Mapping `keras.layers.*`.
+   3.  **Discovery**: Runtime introspection of the Keras API surface.
+   4.  **Ghost Mode**: Silent fallback when Keras is not installed.
+   5.  **Weight Migration**: Loading/saving .h5 or .keras files via h5py.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.keras.keras
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.frameworks.keras.KerasAdapter
+
+
+Module Contents
+---------------
+
+.. py:data:: keras
+   :value: None
+
+
+.. py:class:: KerasAdapter
+
+   Adapter for Keras v3 (Multi-backend).
+
+   Provides definitions for Keras Core Ops, Layers, and Models.
+
+
+   .. py:attribute:: display_name
+      :type:  str
+      :value: 'Keras'
+
+
+
+   .. py:attribute:: inherits_from
+      :type:  Optional[str]
+      :value: None
+
+
+
+   .. py:attribute:: ui_priority
+      :type:  int
+      :value: 25
+
+
+
+   .. py:property:: search_modules
+      :type: List[str]
+
+
+      Returns list of search modules.
+
+      If in Ghost Mode, returns empty list to prevent Scaffolder
+      from attempting to import missing modules.
+
+      :returns: *List[str]* -- Module names.
+
+
+   .. py:property:: unsafe_submodules
+      :type: Set[str]
+
+
+      Submodules to exclude from recursive scans.
+
+      :returns: *Set[str]* -- Empty set for Keras properly scoped imports.
+
+
+   .. py:property:: import_alias
+      :type: Tuple[str, str]
+
+
+      Default import alias.
+
+      :returns: *Tuple[str, str]* -- ("keras", "keras").
+
+
+   .. py:property:: import_namespaces
+      :type: Dict[str, ml_switcheroo.frameworks.base.ImportConfig]
+
+
+      Namespace mapping for import fixer.
+
+      :returns: *Dict[str, ImportConfig]* -- Configuration for import injection.
+
+
+   .. py:property:: discovery_heuristics
+      :type: Dict[str, List[str]]
+
+
+      Regex patterns for scaffold categorization.
+
+      :returns: *Dict[str, List[str]]* -- Patterns mapping tiers to paths.
+
+
+   .. py:property:: test_config
+      :type: Dict[str, str]
+
+
+      Templates for test code generation.
+
+      :returns: *Dict[str, str]* -- Test Harness values.
+
+
+   .. py:property:: harness_imports
+      :type: List[str]
+
+
+      Imports for verification harness.
+
+      :returns: *List[str]* -- Empty list.
+
+
+   .. py:method:: get_harness_init_code() -> str
+
+      Init code for verification harness.
+
+      :returns: *str* -- Empty string.
+
+
+
+   .. py:method:: get_to_numpy_code() -> str
+
+      Returns code to convert Keras tensors to NumPy.
+
+      :returns: *str* -- Conversion logic checking for `numpy` property.
+
+
+
+   .. py:property:: supported_tiers
+      :type: List[ml_switcheroo.enums.SemanticTier]
+
+
+      Supported semantic tiers.
+
+      :returns: *List[SemanticTier]* -- [ARRAY_API, NEURAL, EXTRAS].
+
+
+   .. py:property:: declared_magic_args
+      :type: List[str]
+
+
+      List of framework-specific magic arguments.
+
+      :returns: *List[str]* -- Empty list as Keras handles state implicitly.
+
+
+   .. py:property:: structural_traits
+      :type: ml_switcheroo.frameworks.base.StructuralTraits
+
+
+      Structural transformation rules.
+
+      :returns: *StructuralTraits* -- Configuration object.
+
+
+   .. py:property:: plugin_traits
+      :type: Any
+
+
+      Plugin behavior flags.
+
+      :returns: *PluginTraits* -- Object defining capabilities.
+
+
+   .. py:property:: definitions
+      :type: Dict[str, ml_switcheroo.frameworks.base.StandardMap]
+
+
+      Static mappings for Keras.
+      Loaded dynamically from `frameworks/definitions/keras.json`.
+
+      :returns: *Dict[str, StandardMap]* -- Definitions.
+
+
+   .. py:property:: rng_seed_methods
+      :type: List[str]
+
+
+      Global seed methods.
+
+      :returns: *List[str]* -- Names like "set_random_seed".
+
+
+   .. py:method:: collect_api(category: ml_switcheroo.frameworks.base.StandardCategory) -> List[ml_switcheroo.core.ghost.GhostRef]
+
+      Collects API definitions via introspection or snapshot.
+
+      :param category: Category to scan.
+      :type category: StandardCategory
+
+      :returns: *List[GhostRef]* -- Found items.
+
+
+
+   .. py:method:: convert(data: Any) -> Any
+
+      Converts input data to Keras Tensor.
+
+      :param data: Input data.
+      :type data: Any
+
+      :returns: *Any* -- Keras Tensor or original data.
+
+
+
+   .. py:method:: get_serialization_imports() -> List[str]
+
+      Imports for saving/loading.
+
+      :returns: *List[str]* -- Imports.
+
+
+
+   .. py:method:: get_serialization_syntax(op: str, file_arg: str, object_arg: Optional[str] = None) -> str
+
+      Syntax for saving/loading models.
+
+      :param op: 'save' or 'load'.
+      :type op: str
+      :param file_arg: Path string.
+      :type file_arg: str
+      :param object_arg: Object name.
+      :type object_arg: Optional[str]
+
+      :returns: *str* -- Generated python code.
+
+
+
+   .. py:method:: get_weight_conversion_imports() -> List[str]
+
+      Returns imports required for the generated weight migration script.
+
+      :returns: *List[str]* -- List of import statements.
+
+
+
+   .. py:method:: get_weight_load_code(path_var: str) -> str
+
+      Returns python code to load a checkpoint.
+      Stub implemented as Keras models contain structure + weights, making raw dict handling tricky.
+
+
+
+   .. py:method:: get_tensor_to_numpy_expr(tensor_var: str) -> str
+
+      Returns python expression string that converts `tensor_var` from Keras tensor to numpy array.
+
+
+
+   .. py:method:: get_weight_save_code(state_var: str, path_var: str) -> str
+
+      Returns Python code to save the dictionary `state_var` (mapping flat keys to numpy arrays)
+      to `path_var` using h5py.
+
+      :param state_var: Variable name of the state dictionary.
+      :type state_var: str
+      :param path_var: Variable name of the output path.
+      :type path_var: str
+
+      :returns: *str* -- Generated Python code block.
+
+
+
+   .. py:method:: get_device_syntax(device_type: str, device_index: Optional[str] = None) -> str
+
+      Syntax for device scoping.
+
+      :param device_type: 'cuda', 'cpu'.
+      :type device_type: str
+      :param device_index: Index.
+      :type device_index: Optional[str]
+
+      :returns: *str* -- Generated code.
+
+
+
+   .. py:method:: get_device_check_syntax() -> str
+
+      Syntax for checking GPU availability.
+
+      :returns: *str* -- Logic expression.
+
+
+
+   .. py:method:: get_rng_split_syntax(rng_var: str, key_var: str) -> str
+
+      Keras handles RNG state internally.
+
+      :returns: *str* -- "pass".
+
+
+
+   .. py:method:: apply_wiring(snapshot: Dict[str, Any]) -> None
+
+      Applies configuration wiring.
+
+      :param snapshot: Snapshot dict.
+
+
+
+   .. py:method:: get_doc_url(api_name: str) -> Optional[str]
+
+      Provides a search URL for Keras documentation as direct API mapping is non-trivial.
+
+      :param api_name: API path.
+      :type api_name: str
+
+      :returns: *Optional[str]* -- URL.
+
+
+
+   .. py:method:: get_tiered_examples() -> Dict[str, str]
+
+      Returns tiered examples.
+
+      :returns: *Dict[str, str]* -- Map of tiers to examples.
+
+
+

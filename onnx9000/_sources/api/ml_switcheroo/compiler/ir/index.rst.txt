@@ -1,0 +1,189 @@
+ml_switcheroo.compiler.ir
+=========================
+
+.. py:module:: ml_switcheroo.compiler.ir
+
+.. autoapi-nested-parse::
+
+   Intermediate Representation (IR).
+
+   This module defines the language-agnostic graph data structures used to represent
+   Deep Learning models after ingestion from source code (e.g. Python/LibCST) or
+   explicit definition.
+
+   It acts as the contract between the Frontend (Ingestion) and the Backend (Synthesis).
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.ir.LogicalAxis
+   ml_switcheroo.compiler.ir.PartitionSpec
+   ml_switcheroo.compiler.ir.LogicalMesh
+   ml_switcheroo.compiler.ir.LogicalNode
+   ml_switcheroo.compiler.ir.LogicalEdge
+   ml_switcheroo.compiler.ir.LogicalGraph
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.compiler.ir.topological_sort
+
+
+Module Contents
+---------------
+
+.. py:class:: LogicalAxis
+
+   Represents a named dimension for tensor sizes and sharding (e.g., 'batch', 'embed', 'heads').
+
+
+   .. py:attribute:: name
+      :type:  str
+
+      Name of the logical axis.
+
+
+   .. py:attribute:: size
+      :type:  Optional[int]
+      :value: None
+
+
+      Optional fixed size of the axis.
+
+
+.. py:class:: PartitionSpec
+
+   Describes how a tensor's dimensions are mapped to a logical mesh.
+
+   Each element in `axes` corresponds to a tensor dimension. An element can be:
+   - A string representing the mesh axis name (e.g., 'data').
+   - A tuple of strings for multi-axis sharding (e.g., ('data', 'model')).
+   - None for a replicated/unsharded dimension.
+
+
+   .. py:attribute:: axes
+      :type:  Tuple[Optional[Union[str, Tuple[str, Ellipsis]]], Ellipsis]
+
+      Tuple mapping tensor dimensions to mesh axes.
+
+
+.. py:class:: LogicalMesh
+
+   Represents a multi-dimensional grid of devices for distributed execution.
+
+
+   .. py:attribute:: shape
+      :type:  Dict[str, int]
+
+      2}).
+
+      :type: Mapping of mesh axis names to their sizes (e.g., {'data'
+
+      :type: 4, 'model'
+
+
+.. py:class:: LogicalNode
+
+   Represents a computation unit (Layer) in the graph.
+
+
+   .. py:attribute:: id
+      :type:  str
+
+      Unique identifier (e.g. 'conv1').
+
+
+   .. py:attribute:: kind
+      :type:  str
+
+      Operation type. Standard types include 'Conv2d', 'Linear', 'Input', 'Output', as well as advanced primitives like 'SwiGLU', 'RoPE', 'RMSNorm', and 'VisionPatchEmbedding').
+
+
+   .. py:attribute:: metadata
+      :type:  Dict[str, str]
+
+      Dictionary of configuration parameters (e.g. ``kernel_size=3``).
+
+
+   .. py:attribute:: sharding
+      :type:  Optional[PartitionSpec]
+      :value: None
+
+
+      Optional layout specification for distributed placement of this node's output.
+
+
+.. py:class:: LogicalEdge
+
+   Represents data flow between two nodes.
+
+
+   .. py:attribute:: source
+      :type:  str
+
+      Source node ID.
+
+
+   .. py:attribute:: target
+      :type:  str
+
+      Target node ID.
+
+
+.. py:class:: LogicalGraph
+
+   Language-agnostic representation of the neural network structure.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: 'Model'
+
+
+      Name of the graph model/class.
+
+
+   .. py:attribute:: nodes
+      :type:  List[LogicalNode]
+      :value: []
+
+
+      Ordered list of nodes in the graph.
+
+
+   .. py:attribute:: edges
+      :type:  List[LogicalEdge]
+      :value: []
+
+
+      List of directed edges between nodes.
+
+
+   .. py:attribute:: mesh
+      :type:  Optional[LogicalMesh]
+      :value: None
+
+
+      Optional logical device mesh for distributed training/inference.
+
+
+.. py:function:: topological_sort(graph: LogicalGraph) -> List[LogicalNode]
+
+   Sorts graph nodes by dependency order.
+
+   Ensures that for every edge u -> v, u appears before v in the returned list.
+   Handles disconnected components and cycles gracefully by appending
+   unreachable nodes in their original definition order.
+
+   :param graph: The logical graph to sort.
+
+   :returns: List of nodes in execution order.
+
+

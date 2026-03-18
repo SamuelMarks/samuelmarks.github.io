@@ -1,0 +1,97 @@
+ml_switcheroo.core.rewriter.calls.transformers
+==============================================
+
+.. py:module:: ml_switcheroo.core.rewriter.calls.transformers
+
+.. autoapi-nested-parse::
+
+   AST Transformation Helpers.
+
+   Provides logic to reconstruct CST nodes for Infix operators, Inline Lambdas,
+   and Structured Index Selection.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.core.rewriter.calls.transformers.apply_index_select
+   ml_switcheroo.core.rewriter.calls.transformers.rewrite_as_inline_lambda
+   ml_switcheroo.core.rewriter.calls.transformers.rewrite_as_macro
+   ml_switcheroo.core.rewriter.calls.transformers.rewrite_as_infix
+
+
+Module Contents
+---------------
+
+.. py:function:: apply_index_select(inner_node: libcst.CSTNode, index: int) -> libcst.Subscript
+
+   Wraps an expression node with a subscript access for a specific integer index.
+   Safe, structured alternative to string output adapters for tuple destructuring.
+
+   Transformation:
+       Input node: `func(...)`
+       Output: `func(...)[index]`
+
+   :param inner_node: The expression node (usually a Call) to slice.
+   :type inner_node: cst.CSTNode
+   :param index: The integer index to access.
+   :type index: int
+
+   :returns: *cst.Subscript* -- The wrapped node.
+
+
+.. py:function:: rewrite_as_inline_lambda(lambda_str: str, args: list[libcst.Arg]) -> libcst.Call
+
+   Wraps arguments in an Immediately Invoked Lambda Expression (IIFE).
+
+   :param lambda_str: The string representation of the lambda function.
+   :type lambda_str: str
+   :param args: The list of arguments to pass to the lambda.
+   :type args: list[cst.Arg]
+
+   :returns: *cst.Call* -- A CST call node representing the invoked lambda.
+
+   :raises ValueError: If the lambda string has invalid syntax.
+
+
+.. py:function:: rewrite_as_macro(template: str, args_list: list[libcst.Arg], std_arg_names: list[str]) -> libcst.CSTNode
+
+   Replaces an operation call with a python expression defined in the template.
+
+   Arguments are substituted into the template string using placeholders matching
+   the standard argument names (e.g. `{x}`).
+
+   :param template: The macro string (e.g. "{x} * jax.nn.sigmoid({x})").
+   :type template: str
+   :param args_list: The normalized argument nodes for this call.
+   :type args_list: list[cst.Arg]
+   :param std_arg_names: The names of standard arguments in order.
+   :type std_arg_names: list[str]
+
+   :returns: *cst.CSTNode* -- The constructed expression logic.
+
+   :raises ValueError: If arguments required by the template are missing.
+   :raises cst.ParserSyntaxError: If the resulting string is invalid Python.
+
+
+.. py:function:: rewrite_as_infix(_original_node: libcst.Call, args: List[libcst.Arg], op_symbol: str, std_args: List[str]) -> Union[libcst.BinaryOperation, libcst.UnaryOperation]
+
+   Transforms a functional call into an infix (binary) or prefix (unary) expression.
+
+   :param _original_node: The original call node.
+   :type _original_node: cst.Call
+   :param args: The arguments for the operator.
+   :type args: List[cst.Arg]
+   :param op_symbol: The operator symbol (e.g., "+", "*").
+   :type op_symbol: str
+   :param std_args: Standard argument names for arity checking.
+   :type std_args: List[str]
+
+   :returns: *Union[cst.BinaryOperation, cst.UnaryOperation]* -- The new AST node for the operation.
+
+   :raises ValueError: If unsupported operators or wrong number of arguments are passed.
+
+

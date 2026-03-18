@@ -1,0 +1,41 @@
+ml_switcheroo.plugins.jax_decompose
+===================================
+
+.. py:module:: ml_switcheroo.plugins.jax_decompose
+
+.. autoapi-nested-parse::
+
+   JAX Fallback Decomposition Plugin for ml-switcheroo.
+
+   This plugin handles operations that have no direct mapping in the target framework.
+   It routes the AST call to the equivalent JAX operation, invokes the generic transpiler
+   on that JAX subgraph, and stitches the resulting AST back into the target.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.jax_decompose.decompose_via_jax
+
+
+Module Contents
+---------------
+
+.. py:function:: decompose_via_jax(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> Union[libcst.Call, libcst.BaseExpression]
+
+   Translates an unsupported API call by routing it through JAX AST semantics.
+
+   This acts as a fallback for complex math ops (e.g. `Hardswish`) when migrating to
+   frameworks that lack them. Since JAX acts as our universal mathematical IR, we
+   re-write the AST as if it were JAX, then optionally rely on subsequent passes
+   to lower it further if needed.
+
+   :param node: The original CST Call node that has no direct mapping.
+   :param ctx: Hook context containing target framework information.
+
+   :returns: A rewritten CST node pointing to the JAX equivalent, or a custom lowered graph.
+
+

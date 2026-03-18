@@ -1,0 +1,66 @@
+set_default_device
+==================
+
+Sets the default ``torch.Tensor`` to be allocated on ``device``.  This
+does not affect factory function calls which are called with an explicit
+``device`` argument.  Factory calls will be performed as if they
+were passed ``device`` as an argument.
+
+To only temporarily change the default device instead of setting it
+globally, use ``with torch.device(device):`` instead.
+
+The default device is initially ``cpu``.  If you set the default tensor
+device to another device (e.g., ``cuda``) without a device index, tensors
+will be allocated on whatever the current device for the device type,
+even after :func:`torch.cuda.set_device` is called.
+
+.. warning::
+
+    This function imposes a slight performance cost on every Python
+    call to the torch API (not just factory functions).  If this
+    is causing problems for you, please comment on
+    https://github.com/pytorch/pytorch/issues/92701
+
+.. note::
+
+    This doesn't affect functions that create tensors that share the same memory as the input, like:
+    :func:`torch.from_numpy` and :func:`torch.frombuffer`
+
+Args:
+    device (device or string): the device to set as default
+
+Example::
+
+    >>> # xdoctest: +SKIP("requires cuda, changes global state")
+    >>> torch.get_default_device()
+    device(type='cpu')
+    >>> torch.set_default_device('cuda')  # current device is 0
+    >>> torch.get_default_device()
+    device(type='cuda', index=0)
+    >>> torch.set_default_device('cuda')
+    >>> torch.cuda.set_device('cuda:1')  # current device is 1
+    >>> torch.get_default_device()
+    device(type='cuda', index=1)
+    >>> torch.set_default_device('cuda:1')
+    >>> torch.get_default_device()
+    device(type='cuda', index=1)
+
+**Abstract Signature:**
+
+``set_default_device(device)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'PyTorch_0')">PyTorch</button><button class="op-tab-btn " onclick="openOpTab(event, 'Apple MLX_1')">Apple MLX</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="PyTorch_0" class="op-tab-pane active"><h4>PyTorch</h4><div class="op-detail-row"><span class="label">API:</span> <code>torch.nn.functional.grad.torch.set_default_device</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.grad.torch.set_default_device.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Apple MLX_1" class="op-tab-pane "><h4>Apple MLX</h4><div class="op-detail-row"><span class="label">API:</span> <code>mlx.core.set_default_device</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.set_default_device.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

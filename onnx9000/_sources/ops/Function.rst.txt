@@ -1,0 +1,54 @@
+Function
+========
+
+Base class to create custom autograd.Function.
+
+To create a custom autograd.Function, subclass this class and implement
+the :meth:forward and :meth:backward static methods. Then, to use your custom
+op in the forward pass, call the class method apply. Do not call
+:meth:forward directly.
+
+To ensure correctness and best performance, make sure you are calling the
+correct methods on ctx and validating your backward function using
+:func:torch.autograd.gradcheck.
+
+See extending-autograd for more details on how to use this class.
+
+Examples::
+
+    >>> # xdoctest: +REQUIRES(env:TORCH_DOCTEST_AUTOGRAD)
+    >>> class Exp(Function):
+    >>>     @staticmethod
+    >>>     def forward(ctx, i):
+    >>>         result = i.exp()
+    >>>         ctx.save_for_backward(result)
+    >>>         return result
+    >>>
+    >>>     @staticmethod
+    >>>     def backward(ctx, grad_output):
+    >>>         result, = ctx.saved_tensors
+    >>>         return grad_output * result
+    >>>
+    >>> # Use it by calling the apply method:
+    >>> # xdoctest: +SKIP
+    >>> output = Exp.apply(input)
+
+**Abstract Signature:**
+
+``Function(args, kwargs)``
+
+.. raw:: html
+
+ 
+    <div class="op-tabs-container"> 
+      <div class="op-tabs-nav"> 
+        <button class="op-tab-btn active" onclick="openOpTab(event, 'PyTorch_0')">PyTorch</button><button class="op-tab-btn " onclick="openOpTab(event, 'NumPy_1')">NumPy</button><button class="op-tab-btn " onclick="openOpTab(event, 'Keras_2')">Keras</button><button class="op-tab-btn " onclick="openOpTab(event, 'TensorFlow_3')">TensorFlow</button> 
+      </div> 
+      <div class="op-tabs-content"> 
+        <div id="PyTorch_0" class="op-tab-pane active"><h4>PyTorch</h4><div class="op-detail-row"><span class="label">API:</span> <code>torch.nn.functional.grad.torch.distributions.dirichlet.Function</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.grad.torch.distributions.dirichlet.Function.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="NumPy_1" class="op-tab-pane "><h4>NumPy</h4><div class="op-detail-row"><span class="label">API:</span> <code>genapi.Function</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://numpy.org/doc/stable/reference/generated/genapi.Function.html" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="Keras_2" class="op-tab-pane "><h4>Keras</h4><div class="op-detail-row"><span class="label">API:</span> <code>function.Function</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://keras.io/search.html?q=function.Function" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div><div id="TensorFlow_3" class="op-tab-pane "><h4>TensorFlow</h4><div class="op-detail-row"><span class="label">API:</span> <code>tf.function</code></div><div class="op-detail-row"><span class="label">Strategy:</span> <span>Direct Mapping</span></div><div class="op-detail-row"><a href="https://www.tensorflow.org/api_docs/python/tf/function" target="_blank" class="op-doc-link">Official Docs ↗</a></div></div> 
+      </div> 
+
+      <!-- Load JS Logic only once per page ideally, but safe to exist globally --> 
+      <script src="../_static/op_tabs.js"></script> 
+    </div> 
+

@@ -1,0 +1,43 @@
+ml_switcheroo.plugins.device_allocator
+======================================
+
+.. py:module:: ml_switcheroo.plugins.device_allocator
+
+.. autoapi-nested-parse::
+
+   Plugin for translating Device Allocation logic.
+
+   Delegates syntax generation to the target FrameworkAdapter to ensure logic
+   remains decoupled from the core transpiler.
+
+   Supported:
+   - Extracts device type and index from `torch.device(...)`.
+   - Handles `cuda:0` string parsing.
+   - Calls `adapter.get_device_syntax()` for target code generation.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   ml_switcheroo.plugins.device_allocator.transform_device_allocator
+
+
+Module Contents
+---------------
+
+.. py:function:: transform_device_allocator(node: libcst.Call, ctx: ml_switcheroo.core.hooks.HookContext) -> libcst.BaseExpression
+
+   Plugin Hook: Transforms device construction calls via Adapter delegation.
+
+   Triggers:
+       Operations marked with `requires_plugin: "device_allocator"` (e.g., `torch.device`).
+
+   :param node: The original CST Call node.
+   :param ctx: HookContext for target framework access.
+
+   :returns: A CST Expression representing the target device access.
+
+

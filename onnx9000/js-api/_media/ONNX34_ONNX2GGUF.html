@@ -1,0 +1,972 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)" href="ONNX32_ONNX2TF.html"><link rel="prev" title="ONNX25: WebNN API (Native Browser NPU Execution)" href="ONNX25_WEBNN_EP.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX34_ONNX2GGUF.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx34-onnx2gguf-web-native-gguf-compiler-llama-cpp-bridge">
+<h1>ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)<a class="headerlink" href="#onnx34-onnx2gguf-web-native-gguf-compiler-llama-cpp-bridge" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ggml</span></code> ecosystem (famously powering <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code>) uses the <strong>GGUF</strong> (GPT-Generated Unified Format) binary format. GGUF is heavily optimized for fast loading and memory-mapping (mmap) of large language models (LLMs) on CPUs and GPUs. Converting models into GGUF traditionally requires heavy Python scripts (<code class="docutils literal notranslate"><span class="pre">convert.py</span></code>) that depend on PyTorch, SentencePiece, and Hugging Face Transformers to parse <code class="docutils literal notranslate"><span class="pre">.safetensors</span></code>, <code class="docutils literal notranslate"><span class="pre">.bin</span></code>, or <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> files, extract tokenizers, and map tensors into the strict GGUF naming and metadata standards.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx9000.onnx2gguf</span></code> bridges the standard ONNX ecosystem to the <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> ecosystem using a <strong>100% pure TypeScript and Python binary compiler</strong>.</p>
+<ul class="simple">
+<li><p><strong>Zero-Dependency Binary Emission:</strong> It parses ONNX and Safetensors natively, bypassing PyTorch and SentencePiece completely, to emit GGUF files directly in memory or via streaming disk I/O.</p></li>
+<li><p><strong>Browser-Based GGUF Compilation:</strong> Users can drag-and-drop an ONNX model and its associated <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> into a webpage. The tool instantly packs them into a valid <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> file locally, providing the ultimate privacy-preserving model converter.</p></li>
+<li><p><strong>Native Sub-byte Quantization:</strong> Standard GGUF relies on <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> tools for K-quants (e.g., <code class="docutils literal notranslate"><span class="pre">Q4_K_M</span></code>). <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> implements the GGML quantization math directly in WASM/Python, allowing users to quantize an ONNX model directly to a <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> or <code class="docutils literal notranslate"><span class="pre">Q8_0</span></code> GGUF payload in a single pass.</p></li>
+<li><p><strong>Bidirectional Support:</strong> Unlike standard scripts, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> can also <em>read</em> <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> files natively, mapping GGML’s custom tensors back up into standard ONNX operations to execute <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> models directly inside the WebGPU-accelerated <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> runtime.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-gguf-format-binary-serialization-engine">
+<h3>Phase 1: GGUF Format Binary Serialization Engine<a class="headerlink" href="#phase-1-gguf-format-binary-serialization-engine" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Implement zero-dependency GGUF Builder in TypeScript/JS.</p></li>
+<li><p>[x] 2. Implement zero-dependency GGUF Builder in Python.</p></li>
+<li><p>[x] 3. Emit GGUF Magic Bytes (<code class="docutils literal notranslate"><span class="pre">0x46554747</span></code> / “GGUF”).</p></li>
+<li><p>[x] 4. Emit GGUF Version (Strictly targeting Version 3).</p></li>
+<li><p>[x] 5. Handle strict Little-Endian serialization natively across all platforms.</p></li>
+<li><p>[x] 6. Write <code class="docutils literal notranslate"><span class="pre">tensor_count</span></code> (uint64).</p></li>
+<li><p>[x] 7. Write <code class="docutils literal notranslate"><span class="pre">metadata_kv_count</span></code> (uint64).</p></li>
+<li><p>[x] 8. Implement <code class="docutils literal notranslate"><span class="pre">write_string</span></code> matching GGUF length-prefixed format (uint64 length + UTF-8 bytes).</p></li>
+<li><p>[x] 9. Support implicit padding alignment (defaulting to 32-byte alignment for tensors).</p></li>
+<li><p>[x] 10. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">UINT8</span></code>.</p></li>
+<li><p>[x] 11. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">INT8</span></code>.</p></li>
+<li><p>[x] 12. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">UINT16</span></code>.</p></li>
+<li><p>[x] 13. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">INT16</span></code>.</p></li>
+<li><p>[x] 14. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">UINT32</span></code>.</p></li>
+<li><p>[x] 15. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">INT32</span></code>.</p></li>
+<li><p>[x] 16. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">FLOAT32</span></code>.</p></li>
+<li><p>[x] 17. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">BOOL</span></code>.</p></li>
+<li><p>[x] 18. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">STRING</span></code>.</p></li>
+<li><p>[x] 19. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">ARRAY</span></code> types.</p></li>
+<li><p>[x] 20. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">UINT64</span></code>.</p></li>
+<li><p>[x] 21. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">INT64</span></code>.</p></li>
+<li><p>[x] 22. Implement metadata writing for <code class="docutils literal notranslate"><span class="pre">FLOAT64</span></code>.</p></li>
+<li><p>[x] 23. Implement dynamic KV dictionary schema mapping inside the Builder.</p></li>
+<li><p>[x] 24. Write <code class="docutils literal notranslate"><span class="pre">tensor_info</span></code> blocks (Name, Dimensions, GGML Type, Offset).</p></li>
+<li><p>[x] 25. Calculate explicit tensor binary offsets dynamically during header generation.</p></li>
+<li><p>[x] 26. Guarantee absolute structural compliance with the <code class="docutils literal notranslate"><span class="pre">ggml</span></code> standard C-struct parsers.</p></li>
+<li><p>[x] 27. Provide an API to stream binary tensor arrays directly to the output buffer/file.</p></li>
+<li><p>[x] 28. Throw strict validation errors if a string exceeds standard allocation limits.</p></li>
+<li><p>[x] 29. Fuzz-test the GGUF writer against corrupted metadata dictionaries.</p></li>
+<li><p>[x] 30. Support Javascript <code class="docutils literal notranslate"><span class="pre">BigInt</span></code> securely for all <code class="docutils literal notranslate"><span class="pre">uint64</span></code> file size offsets.</p></li>
+</ul>
+</section>
+<section id="phase-2-general-standard-metadata-mapping">
+<h3>Phase 2: General &amp; Standard Metadata Mapping<a class="headerlink" href="#phase-2-general-standard-metadata-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 31. Set <code class="docutils literal notranslate"><span class="pre">general.architecture</span></code> automatically based on ONNX graph topology.</p></li>
+<li><p>[x] 32. Set <code class="docutils literal notranslate"><span class="pre">general.name</span></code> mapping to <code class="docutils literal notranslate"><span class="pre">ModelProto.graph.name</span></code>.</p></li>
+<li><p>[x] 33. Set <code class="docutils literal notranslate"><span class="pre">general.author</span></code> mapping to <code class="docutils literal notranslate"><span class="pre">ModelProto.producer_name</span></code>.</p></li>
+<li><p>[x] 34. Set <code class="docutils literal notranslate"><span class="pre">general.version</span></code> mapping to <code class="docutils literal notranslate"><span class="pre">ModelProto.model_version</span></code>.</p></li>
+<li><p>[x] 35. Set <code class="docutils literal notranslate"><span class="pre">general.file_type</span></code> automatically based on the detected quantization level.</p></li>
+<li><p>[x] 36. Set <code class="docutils literal notranslate"><span class="pre">general.quantization_version</span></code> (typically 2).</p></li>
+<li><p>[x] 37. Set <code class="docutils literal notranslate"><span class="pre">general.alignment</span></code> explicitly in the KV store (typically 32).</p></li>
+<li><p>[x] 38. Support user overrides for any <code class="docutils literal notranslate"><span class="pre">general.*</span></code> KV pair.</p></li>
+<li><p>[x] 39. Provide a fallback <code class="docutils literal notranslate"><span class="pre">general.architecture</span> <span class="pre">=</span> <span class="pre">&quot;unknown&quot;</span></code> if the ONNX graph doesn’t match standard LLM architectures.</p></li>
+<li><p>[x] 40. Extract and sanitize ONNX <code class="docutils literal notranslate"><span class="pre">doc_string</span></code> into <code class="docutils literal notranslate"><span class="pre">general.description</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-3-llama-architecture-metadata-mapping">
+<h3>Phase 3: LLaMA Architecture Metadata Mapping<a class="headerlink" href="#phase-3-llama-architecture-metadata-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 41. Identify LLaMA architecture topologies automatically from ONNX IR.</p></li>
+<li><p>[x] 42. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.context_length</span></code>.</p></li>
+<li><p>[x] 43. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.embedding_length</span></code>.</p></li>
+<li><p>[x] 44. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.block_count</span></code>.</p></li>
+<li><p>[x] 45. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.feed_forward_length</span></code>.</p></li>
+<li><p>[x] 46. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.attention.head_count</span></code>.</p></li>
+<li><p>[x] 47. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.attention.head_count_kv</span></code> (for GQA/MQA).</p></li>
+<li><p>[x] 48. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.attention.layer_norm_rms_epsilon</span></code>.</p></li>
+<li><p>[x] 49. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.rope.dimension_count</span></code>.</p></li>
+<li><p>[x] 50. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.rope.freq_base</span></code>.</p></li>
+<li><p>[x] 51. Extract and set <code class="docutils literal notranslate"><span class="pre">llama.vocab_size</span></code>.</p></li>
+<li><p>[x] 52. Handle dynamic detection of Grouped Query Attention (GQA) ratios.</p></li>
+<li><p>[x] 53. Determine and map SwiGLU vs GeGLU activation patterns natively into the metadata.</p></li>
+<li><p>[x] 54. Check for standard vs transposed weight formats prior to generating LLAMA metadata.</p></li>
+<li><p>[x] 55. Validate <code class="docutils literal notranslate"><span class="pre">block_count</span></code> matches the actual number of Transformer layer copies found in the ONNX graph.</p></li>
+</ul>
+</section>
+<section id="phase-4-other-llm-architectures-metadata-mapping">
+<h3>Phase 4: Other LLM Architectures Metadata Mapping<a class="headerlink" href="#phase-4-other-llm-architectures-metadata-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 56. Identify and support <strong>Mistral</strong> architecture.</p></li>
+<li><p>[x] 57. Extract Mistral sliding window parameters (<code class="docutils literal notranslate"><span class="pre">mistral.attention.sliding_window</span></code>).</p></li>
+<li><p>[x] 58. Identify and support <strong>Phi-2 / Phi-3</strong> architecture.</p></li>
+<li><p>[x] 59. Identify and support <strong>Qwen2</strong> architecture.</p></li>
+<li><p>[x] 60. Identify and support <strong>Gemma</strong> architecture.</p></li>
+<li><p>[x] 61. Extract Gemma specific layer norm scale parameters.</p></li>
+<li><p>[x] 62. Identify and support <strong>StarCoder</strong> architecture.</p></li>
+<li><p>[x] 63. Identify and support <strong>Falcon</strong> architecture.</p></li>
+<li><p>[x] 64. Identify and support <strong>Bloom</strong> architecture.</p></li>
+<li><p>[x] 65. Identify and support <strong>Mixtral</strong> (MoE) architecture.</p></li>
+<li><p>[x] 66. Extract <code class="docutils literal notranslate"><span class="pre">expert_count</span></code> and <code class="docutils literal notranslate"><span class="pre">expert_used_count</span></code> for MoE architectures.</p></li>
+<li><p>[x] 67. Identify and support <strong>StableLM</strong> architecture.</p></li>
+<li><p>[x] 68. Identify and support <strong>Command-R</strong> architecture.</p></li>
+<li><p>[x] 69. Support exporting classic <strong>BERT</strong> architectures to GGUF (rare, but supported by some GGML forks).</p></li>
+<li><p>[x] 70. Throw descriptive errors if an unsupported topology is forced into a strict architecture mapping.</p></li>
+</ul>
+</section>
+<section id="phase-5-tokenizer-extraction-gguf-embedding">
+<h3>Phase 5: Tokenizer Extraction &amp; GGUF Embedding<a class="headerlink" href="#phase-5-tokenizer-extraction-gguf-embedding" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 71. Extract tokenizer natively from ONNX <code class="docutils literal notranslate"><span class="pre">ai.onnx.contrib</span></code> (HuggingFace tokenizers).</p></li>
+<li><p>[x] 72. Extract tokenizer by directly parsing an external <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> file.</p></li>
+<li><p>[x] 73. Extract tokenizer by directly parsing an external <code class="docutils literal notranslate"><span class="pre">tokenizer.model</span></code> (SentencePiece) file.</p></li>
+<li><p>[x] 74. Map tokenizer model type to <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.model</span></code> (<code class="docutils literal notranslate"><span class="pre">llama</span></code>, <code class="docutils literal notranslate"><span class="pre">gpt2</span></code>, <code class="docutils literal notranslate"><span class="pre">bert</span></code>).</p></li>
+<li><p>[x] 75. Extract and format the complete vocabulary into <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.tokens</span></code> (ARRAY of STRINGs).</p></li>
+<li><p>[x] 76. Extract and format the scores into <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.scores</span></code> (ARRAY of FLOAT32).</p></li>
+<li><p>[x] 77. Extract and format token types into <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.token_type</span></code> (ARRAY of INT32).</p></li>
+<li><p>[x] 78. Extract and format merges for BPE tokenizers into <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.merges</span></code> (ARRAY of STRINGs).</p></li>
+<li><p>[x] 79. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.bos_token_id</span></code>.</p></li>
+<li><p>[x] 80. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.eos_token_id</span></code>.</p></li>
+<li><p>[x] 81. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.unknown_token_id</span></code>.</p></li>
+<li><p>[x] 82. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.padding_token_id</span></code>.</p></li>
+<li><p>[x] 83. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.separator_token_id</span></code> (if applicable).</p></li>
+<li><p>[x] 84. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.add_bos_token</span></code> (boolean).</p></li>
+<li><p>[x] 85. Determine and set <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.add_eos_token</span></code> (boolean).</p></li>
+<li><p>[x] 86. Support mapping specific Chat Templates into <code class="docutils literal notranslate"><span class="pre">tokenizer.chat_template</span></code> (STRING).</p></li>
+<li><p>[x] 87. Extract byte-fallback configurations specifically for Llama models.</p></li>
+<li><p>[x] 88. Encode vocabulary strings safely, preserving whitespace and control characters exactly as GGML expects.</p></li>
+<li><p>[x] 89. Generate a dummy tokenizer if no tokenizer metadata is provided (to prevent <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> crash, though inference will be raw tokens).</p></li>
+<li><p>[x] 90. Validate the length of <code class="docutils literal notranslate"><span class="pre">tokens</span></code> array matches <code class="docutils literal notranslate"><span class="pre">vocab_size</span></code> exactly.</p></li>
+</ul>
+</section>
+<section id="phase-6-onnx-to-gguf-tensor-naming-translation">
+<h3>Phase 6: ONNX to GGUF Tensor Naming Translation<a class="headerlink" href="#phase-6-onnx-to-gguf-tensor-naming-translation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 91. Build a Regex-based tensor renaming engine.</p></li>
+<li><p>[x] 92. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.embed_tokens.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">token_embd.weight</span></code>.</p></li>
+<li><p>[x] 93. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.input_layernorm.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.attn_norm.weight</span></code>.</p></li>
+<li><p>[x] 94. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.self_attn.q_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.attn_q.weight</span></code>.</p></li>
+<li><p>[x] 95. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.self_attn.k_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.attn_k.weight</span></code>.</p></li>
+<li><p>[x] 96. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.self_attn.v_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.attn_v.weight</span></code>.</p></li>
+<li><p>[x] 97. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.self_attn.o_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.attn_output.weight</span></code>.</p></li>
+<li><p>[x] 98. Support fused QKV mapping -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.attn_qkv.weight</span></code>.</p></li>
+<li><p>[x] 99. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.post_attention_layernorm.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.ffn_norm.weight</span></code>.</p></li>
+<li><p>[x] 100. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.mlp.gate_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.ffn_gate.weight</span></code>.</p></li>
+<li><p>[x] 101. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.mlp.down_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.ffn_down.weight</span></code>.</p></li>
+<li><p>[x] 102. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.layers.N.mlp.up_proj.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">blk.N.ffn_up.weight</span></code>.</p></li>
+<li><p>[x] 103. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">model.norm.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">output_norm.weight</span></code>.</p></li>
+<li><p>[x] 104. Map ONNX/HF <code class="docutils literal notranslate"><span class="pre">lm_head.weight</span></code> -&gt; GGUF <code class="docutils literal notranslate"><span class="pre">output.weight</span></code>.</p></li>
+<li><p>[x] 105. Handle bias mappings (e.g., <code class="docutils literal notranslate"><span class="pre">blk.N.attn_q.bias</span></code>) if the architecture uses biases.</p></li>
+<li><p>[x] 106. Handle <code class="docutils literal notranslate"><span class="pre">ffn_gate_up.weight</span></code> for fused MLP layers natively.</p></li>
+<li><p>[x] 107. Handle MoE explicit layer mapping (<code class="docutils literal notranslate"><span class="pre">blk.N.ffn_gate_inp.weight</span></code>).</p></li>
+<li><p>[x] 108. Support overriding the mapping dictionaries via a user-provided JSON configuration.</p></li>
+<li><p>[x] 109. Maintain an internal registry of standard mappings for all 15+ supported LLM architectures.</p></li>
+<li><p>[x] 110. Fail cleanly and log unmatched tensors if an ONNX model contains unknown weights.</p></li>
+</ul>
+</section>
+<section id="phase-7-tensor-memory-transposition-layout-adjustments">
+<h3>Phase 7: Tensor Memory Transposition &amp; Layout Adjustments<a class="headerlink" href="#phase-7-tensor-memory-transposition-layout-adjustments" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 111. GGML expects standard Row-Major arrays. Ensure ONNX weights match.</p></li>
+<li><p>[x] 112. Identify 1D tensors (Biases, LayerNorm scales) and write them directly.</p></li>
+<li><p>[x] 113. Identify 2D tensors (Linear/MatMul weights) and write them directly.</p></li>
+<li><p>[x] 114. Handle Transposition specifically if the ONNX graph uses <code class="docutils literal notranslate"><span class="pre">[In,</span> <span class="pre">Out]</span></code> instead of <code class="docutils literal notranslate"><span class="pre">[Out,</span> <span class="pre">In]</span></code> for MatMuls.</p></li>
+<li><p>[x] 115. Ensure <code class="docutils literal notranslate"><span class="pre">token_embd.weight</span></code> shape strictly matches <code class="docutils literal notranslate"><span class="pre">[vocab_size,</span> <span class="pre">embedding_length]</span></code>.</p></li>
+<li><p>[x] 116. Ensure <code class="docutils literal notranslate"><span class="pre">output.weight</span></code> shape strictly matches <code class="docutils literal notranslate"><span class="pre">[vocab_size,</span> <span class="pre">embedding_length]</span></code>.</p></li>
+<li><p>[x] 117. Intercept and permute Attention weights (Q, K) if the ONNX model did not cleanly isolate the RoPE head dimensions.</p></li>
+<li><p>[x] 118. Handle multi-dimensional (3D/4D) tensors if exporting non-LLM architectures to GGUF.</p></li>
+<li><p>[x] 119. Pad tensors implicitly if GGML quantization block requirements mandate specific dimension multiples.</p></li>
+<li><p>[x] 120. Provide a zero-copy fast-path when weights require no transposition or quantization.</p></li>
+</ul>
+</section>
+<section id="phase-8-gguf-quantization-engine-ggml-data-types">
+<h3>Phase 8: GGUF Quantization Engine (GGML Data Types)<a class="headerlink" href="#phase-8-gguf-quantization-engine-ggml-data-types" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 121. Support generating <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_F32</span></code> (0).</p></li>
+<li><p>[x] 122. Support generating <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_F16</span></code> (1).</p></li>
+<li><p>[x] 123. Implement C-equivalent <code class="docutils literal notranslate"><span class="pre">Float32</span></code> to <code class="docutils literal notranslate"><span class="pre">Float16</span></code> downcasting loop natively in JS/Python.</p></li>
+<li><p>[x] 124. Support generating <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_Q4_0</span></code> (2).</p></li>
+<li><p>[x] 125. Implement <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> quantization math (block size 32, scale, 4-bit nibbles).</p></li>
+<li><p>[x] 126. Support generating <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_Q4_1</span></code> (3).</p></li>
+<li><p>[x] 127. Implement <code class="docutils literal notranslate"><span class="pre">Q4_1</span></code> quantization math (block size 32, scale, min_val, 4-bit nibbles).</p></li>
+<li><p>[x] 128. Support generating <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_Q8_0</span></code> (8).</p></li>
+<li><p>[x] 129. Implement <code class="docutils literal notranslate"><span class="pre">Q8_0</span></code> quantization math (block size 32, scale, 8-bit values).</p></li>
+<li><p>[x] 130. Extract standard ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> nodes and convert them dynamically to the requested GGML format.</p></li>
+<li><p>[x] 131. Bypass quantizing 1D tensors (Biases, Norm scales) natively (GGML strictly keeps these as F32).</p></li>
+<li><p>[x] 132. Bypass quantizing <code class="docutils literal notranslate"><span class="pre">token_embd.weight</span></code> if <code class="docutils literal notranslate"><span class="pre">--leave-embeddings-f32</span></code> is flagged.</p></li>
+<li><p>[x] 133. Evaluate WASM SIMD acceleration for the <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> quantization loop to prevent browser freezing on 10GB files.</p></li>
+<li><p>[x] 134. Track quantization errors (MSE) dynamically to warn users if <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> degrades the model severely.</p></li>
+<li><p>[x] 135. Map <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> ONNX inputs safely to <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_F32</span></code> or quantize them, as native BF16 support in GGML can be spotty.</p></li>
+<li><p>[x] 136. Support mapping <code class="docutils literal notranslate"><span class="pre">INT8</span></code> ONNX weights to <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_Q8_0</span></code> with zero conversion overhead if scales align.</p></li>
+<li><p>[x] 137. Output precise block-alignment validation errors if tensor dimensions are not multiples of 32.</p></li>
+<li><p>[x] 138. Validate <code class="docutils literal notranslate"><span class="pre">Q8_0</span></code> structural format exactly matches the C-struct <code class="docutils literal notranslate"><span class="pre">block_q8_0</span></code> definition.</p></li>
+<li><p>[x] 139. Validate <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> structural format exactly matches the C-struct <code class="docutils literal notranslate"><span class="pre">block_q4_0</span></code> definition.</p></li>
+<li><p>[x] 140. Generate quantization histograms if detailed logs are requested.</p></li>
+</ul>
+</section>
+<section id="phase-9-reverse-translation-gguf-onnx">
+<h3>Phase 9: Reverse Translation (GGUF -&gt; ONNX)<a class="headerlink" href="#phase-9-reverse-translation-gguf-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 141. Implement zero-dependency GGUF Reader in TypeScript/JS.</p></li>
+<li><p>[x] 142. Implement zero-dependency GGUF Reader in Python.</p></li>
+<li><p>[x] 143. Parse GGUF v2 and v3 headers smoothly.</p></li>
+<li><p>[x] 144. Extract metadata dictionary into a standard Python/JS dictionary object.</p></li>
+<li><p>[x] 145. Expose <code class="docutils literal notranslate"><span class="pre">safetensors</span></code>-like lazy evaluation API (<code class="docutils literal notranslate"><span class="pre">gguf.get_tensor(&quot;blk.0.attn_q.weight&quot;)</span></code>).</p></li>
+<li><p>[x] 146. Reverse map GGUF standard names back to ONNX/HF naming conventions.</p></li>
+<li><p>[x] 147. Reverse map <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_F32</span></code> -&gt; ONNX <code class="docutils literal notranslate"><span class="pre">FLOAT32</span></code>.</p></li>
+<li><p>[x] 148. Reverse map <code class="docutils literal notranslate"><span class="pre">GGML_TYPE_F16</span></code> -&gt; ONNX <code class="docutils literal notranslate"><span class="pre">FLOAT16</span></code>.</p></li>
+<li><p>[x] 149. Handle <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> reverse mapping: Extract blocks, apply scales, and emit ONNX <code class="docutils literal notranslate"><span class="pre">Float32</span></code> arrays dynamically.</p></li>
+<li><p>[x] 150. Emulate native WebGPU/WASM <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> decompression shaders directly inside the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution engine.</p></li>
+<li><p>[x] 151. Reconstruct the ONNX AST (Nodes and Edges) specifically based on the parsed <code class="docutils literal notranslate"><span class="pre">general.architecture</span></code>.</p></li>
+<li><p>[x] 152. Synthesize <code class="docutils literal notranslate"><span class="pre">MatMul</span></code>, <code class="docutils literal notranslate"><span class="pre">Add</span></code>, <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> nodes correctly based on LLaMA architecture flags.</p></li>
+<li><p>[x] 153. Inject RoPE embedding generation directly into the reconstructed ONNX graph.</p></li>
+<li><p>[x] 154. Convert <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.tokens</span></code> back into standard ONNX <code class="docutils literal notranslate"><span class="pre">String</span></code> tensors or a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file for HF.</p></li>
+<li><p>[x] 155. Provide CLI command: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">gguf2onnx</span> <span class="pre">model.gguf</span> <span class="pre">-o</span> <span class="pre">model.onnx</span></code>.</p></li>
+<li><p>[x] 156. Safely handle multi-file GGUF splits (<code class="docutils literal notranslate"><span class="pre">model-00001-of-00002.gguf</span></code>) during reading.</p></li>
+<li><p>[x] 157. Export reconstructed GGUF weights directly into <code class="docutils literal notranslate"><span class="pre">onnx9000.safetensors</span></code> external data format.</p></li>
+<li><p>[x] 158. Reconstruct Attention Mask logic securely during reverse-translation.</p></li>
+<li><p>[x] 159. Output a fully compliant, executable <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> graph capable of running in standard ONNX Runtime.</p></li>
+<li><p>[x] 160. Test the GGUF reader successfully mapping an <code class="docutils literal notranslate"><span class="pre">INT8</span></code> model to an ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> graph.</p></li>
+</ul>
+</section>
+<section id="phase-10-cli-tooling-onnx9000-onnx2gguf">
+<h3>Phase 10: CLI Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">onnx2gguf</span></code>)<a class="headerlink" href="#phase-10-cli-tooling-onnx9000-onnx2gguf" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 161. Implement CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">onnx2gguf</span> <span class="pre">model.onnx</span> <span class="pre">-o</span> <span class="pre">model.gguf</span></code>.</p></li>
+<li><p>[x] 162. Support <code class="docutils literal notranslate"><span class="pre">--tokenizer</span> <span class="pre">&lt;path&gt;</span></code> flag to point explicitly to a <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> or <code class="docutils literal notranslate"><span class="pre">tokenizer.model</span></code>.</p></li>
+<li><p>[x] 163. Support <code class="docutils literal notranslate"><span class="pre">--outtype</span> <span class="pre">&lt;type&gt;</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">f32</span></code>, <code class="docutils literal notranslate"><span class="pre">f16</span></code>, <code class="docutils literal notranslate"><span class="pre">q8_0</span></code>, <code class="docutils literal notranslate"><span class="pre">q4_0</span></code>).</p></li>
+<li><p>[x] 164. Support <code class="docutils literal notranslate"><span class="pre">--architecture</span> <span class="pre">&lt;arch&gt;</span></code> override flag (e.g., <code class="docutils literal notranslate"><span class="pre">--architecture</span> <span class="pre">llama</span></code>).</p></li>
+<li><p>[x] 165. Support <code class="docutils literal notranslate"><span class="pre">--split-max-size</span></code> flag (e.g., <code class="docutils literal notranslate"><span class="pre">4GB</span></code>) to automatically generate GGUF shards.</p></li>
+<li><p>[x] 166. Handle directory inputs (e.g., reading a directory containing <code class="docutils literal notranslate"><span class="pre">model.safetensors</span></code> and <code class="docutils literal notranslate"><span class="pre">config.json</span></code>).</p></li>
+<li><p>[x] 167. Implement progress bars specifically tracking block-quantization percentage.</p></li>
+<li><p>[x] 168. Expose <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> flag to print the generated Metadata and Tensor maps without writing binary data.</p></li>
+<li><p>[x] 169. Provide memory footprint checks warning the user before initiating a 70B parameter conversion.</p></li>
+<li><p>[x] 170. Validate full CLI parity against <code class="docutils literal notranslate"><span class="pre">llama.cpp/convert_hf_to_gguf.py</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-11-the-web-ui-client-side-exporter">
+<h3>Phase 11: The Web UI (Client-Side Exporter)<a class="headerlink" href="#phase-11-the-web-ui-client-side-exporter" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 171. Build a static Web Components Web UI for <code class="docutils literal notranslate"><span class="pre">onnx2gguf</span></code>.</p></li>
+<li><p>[x] 172. Implement drag-and-drop for <code class="docutils literal notranslate"><span class="pre">model.onnx</span></code> or multiple <code class="docutils literal notranslate"><span class="pre">.safetensors</span></code> files simultaneously.</p></li>
+<li><p>[x] 173. Implement drag-and-drop for <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> and <code class="docutils literal notranslate"><span class="pre">config.json</span></code>.</p></li>
+<li><p>[x] 174. Display an interactive table previewing the extracted KV Metadata.</p></li>
+<li><p>[x] 175. Allow the user to explicitly edit KV metadata values in the browser before export.</p></li>
+<li><p>[x] 176. Implement visual dropdowns for the Quantization Target (<code class="docutils literal notranslate"><span class="pre">f16</span></code>, <code class="docutils literal notranslate"><span class="pre">q8_0</span></code>, <code class="docutils literal notranslate"><span class="pre">q4_0</span></code>).</p></li>
+<li><p>[x] 177. Use Web Workers to process the multi-gigabyte conversion without freezing the UI.</p></li>
+<li><p>[x] 178. Utilize Streams API to pipe the output <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> directly to the local filesystem (preventing RAM limit crashes).</p></li>
+<li><p>[x] 179. Show real-time encoding speed (e.g., <code class="docutils literal notranslate"><span class="pre">Encoding</span> <span class="pre">Q4_0:</span> <span class="pre">150</span> <span class="pre">MB/s</span></code>).</p></li>
+<li><p>[x] 180. Provide specific browser compatibility warnings if running on devices with &lt;8GB RAM.</p></li>
+</ul>
+</section>
+<section id="phase-12-huggingface-hub-integration">
+<h3>Phase 12: HuggingFace Hub Integration<a class="headerlink" href="#phase-12-huggingface-hub-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 181. Support fetching model configurations natively from the HF Hub API.</p></li>
+<li><p>[x] 182. Download <code class="docutils literal notranslate"><span class="pre">config.json</span></code> and <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> dynamically if they aren’t provided locally.</p></li>
+<li><p>[x] 183. Identify <code class="docutils literal notranslate"><span class="pre">.safetensors.index.json</span></code> manifests on the Hub and stream-convert shards seamlessly.</p></li>
+<li><p>[x] 184. Append HF repository origin strings to the <code class="docutils literal notranslate"><span class="pre">general.source.url</span></code> KV metadata.</p></li>
+<li><p>[x] 185. Handle HF authentication tokens for private repositories.</p></li>
+<li><p>[x] 186. Output standard <code class="docutils literal notranslate"><span class="pre">README.md</span></code> text formatted for a new GGUF model repository.</p></li>
+<li><p>[x] 187. Publish a Node.js utility script capable of fetching, converting, and re-uploading to the Hub automatically.</p></li>
+<li><p>[x] 188. Catch 404s and 403s cleanly during remote configuration fetching.</p></li>
+<li><p>[x] 189. Cache fetched weight chunks into IndexedDB/Local disk temporarily during processing.</p></li>
+<li><p>[x] 190. Match <code class="docutils literal notranslate"><span class="pre">transformers</span></code> internal dictionary structures seamlessly when bypassing standard ONNX inputs.</p></li>
+</ul>
+</section>
+<section id="phase-13-edge-cases-security-validation">
+<h3>Phase 13: Edge Cases, Security &amp; Validation<a class="headerlink" href="#phase-13-edge-cases-security-validation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 191. Prevent integer overflows in Javascript when aggregating massive tensor offsets (<code class="docutils literal notranslate"><span class="pre">BigInt</span></code> enforcement).</p></li>
+<li><p>[x] 192. Handle extremely long tensor names (validating against reasonable limits).</p></li>
+<li><p>[x] 193. Trap Out-Of-Memory (OOM) errors and report them as “Hardware Constrained” rather than vague JS stack traces.</p></li>
+<li><p>[x] 194. Handle 0-D (Scalar) tensors strictly if the architecture requires them.</p></li>
+<li><p>[x] 195. Verify that <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> itself can cleanly read and execute the generated <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> file without warnings.</p></li>
+<li><p>[x] 196. Sanitize tokenizer strings containing invalid or malformed UTF-8 characters.</p></li>
+<li><p>[x] 197. Validate <code class="docutils literal notranslate"><span class="pre">alignment</span></code> rules strictly. Every tensor data block MUST start at an address divisible by <code class="docutils literal notranslate"><span class="pre">general.alignment</span></code>.</p></li>
+<li><p>[x] 198. Protect against path traversal attacks if loading shards based on manifest JSON strings.</p></li>
+<li><p>[x] 199. Strip all sensitive local system path strings from the metadata payload.</p></li>
+<li><p>[x] 200. Execute validation against Endianness discrepancies if running the Node.js CLI on Big-Endian architectures.</p></li>
+</ul>
+</section>
+<section id="phase-14-llama-cpp-specific-quirks-hacks">
+<h3>Phase 14: LLaMA.cpp Specific Quirks &amp; Hacks<a class="headerlink" href="#phase-14-llama-cpp-specific-quirks-hacks" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 201. Support <code class="docutils literal notranslate"><span class="pre">llama.attention.key_length</span></code> overrides explicitly.</p></li>
+<li><p>[x] 202. Support <code class="docutils literal notranslate"><span class="pre">llama.attention.value_length</span></code> overrides explicitly.</p></li>
+<li><p>[x] 203. Set <code class="docutils literal notranslate"><span class="pre">llama.tensor_data_layout</span></code> if spatial conventions differ.</p></li>
+<li><p>[x] 204. Manage custom <code class="docutils literal notranslate"><span class="pre">expert_weights_scale</span></code> vectors specifically for MoE.</p></li>
+<li><p>[x] 205. Implement implicit permuting of <code class="docutils literal notranslate"><span class="pre">attn_q</span></code> and <code class="docutils literal notranslate"><span class="pre">attn_k</span></code> weights specifically for RoPE application in <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code>.</p></li>
+<li><p>[x] 206. Identify and reverse permutation of RoPE weights if reversing GGUF -&gt; ONNX.</p></li>
+<li><p>[x] 207. Extract <code class="docutils literal notranslate"><span class="pre">layer_norm_eps</span></code> globally or locally depending on the specific model dialect.</p></li>
+<li><p>[x] 208. Emit dummy <code class="docutils literal notranslate"><span class="pre">rope.freq_base</span></code> if the ONNX model calculates RoPE dynamically but <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> requires static definition.</p></li>
+<li><p>[x] 209. Map standard SentencePiece control tokens directly to the <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.tokens</span></code> array indices.</p></li>
+<li><p>[x] 210. Map <code class="docutils literal notranslate"><span class="pre">AddedTokens</span></code> natively to the end of the <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.tokens</span></code> array.</p></li>
+</ul>
+</section>
+<section id="phase-15-advanced-quantization-k-quants-custom-types">
+<h3>Phase 15: Advanced Quantization (K-Quants &amp; Custom Types)<a class="headerlink" href="#phase-15-advanced-quantization-k-quants-custom-types" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 211. Provide structural support for <code class="docutils literal notranslate"><span class="pre">Q2_K</span></code>, <code class="docutils literal notranslate"><span class="pre">Q3_K</span></code>, <code class="docutils literal notranslate"><span class="pre">Q4_K</span></code>, <code class="docutils literal notranslate"><span class="pre">Q5_K</span></code>, <code class="docutils literal notranslate"><span class="pre">Q6_K</span></code> formats in the parser.</p></li>
+<li><p>[x] 212. Implement <code class="docutils literal notranslate"><span class="pre">Q4_K</span></code> quantization loop native in JS/Python (highly complex block structures).</p></li>
+<li><p>[x] 213. Implement <code class="docutils literal notranslate"><span class="pre">Q6_K</span></code> quantization loop.</p></li>
+<li><p>[x] 214. Validate Super-Block and Sub-Block alignments natively.</p></li>
+<li><p>[x] 215. Extract <code class="docutils literal notranslate"><span class="pre">IQ2_XXS</span></code> and <code class="docutils literal notranslate"><span class="pre">IQ2_XS</span></code> configurations if the parser is used as a reader.</p></li>
+<li><p>[x] 216. Allow users to define a mixed-quantization strategy (e.g., <code class="docutils literal notranslate"><span class="pre">Q8_0</span></code> for Attention, <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> for FFN).</p></li>
+<li><p>[x] 217. Emit the corresponding <code class="docutils literal notranslate"><span class="pre">general.file_type</span></code> for mixed <code class="docutils literal notranslate"><span class="pre">K</span></code> quants dynamically.</p></li>
+<li><p>[x] 218. Utilize Web Workers to parallelize block quantization (chunking the weight matrices).</p></li>
+<li><p>[x] 219. Prevent quantizing the final <code class="docutils literal notranslate"><span class="pre">output.weight</span></code> layer by default, as doing so severely damages perplexity.</p></li>
+<li><p>[x] 220. Output the quantization error MSE strictly for the user’s review.</p></li>
+</ul>
+</section>
+<section id="phase-16-interoperability-with-other-onnx9000-tools">
+<h3>Phase 16: Interoperability with other <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Tools<a class="headerlink" href="#phase-16-interoperability-with-other-onnx9000-tools" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 221. Integration: <code class="docutils literal notranslate"><span class="pre">onnx9000.optimum</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">onnx9000.onnx2gguf</span></code> pipeline.</p></li>
+<li><p>[x] 222. Convert HuggingFace PyTorch models to ONNX to GGUF in one fluid CLI command.</p></li>
+<li><p>[x] 223. Support injecting <code class="docutils literal notranslate"><span class="pre">onnx9000.modifier</span></code> AST changes directly into the GGUF compiler stream.</p></li>
+<li><p>[x] 224. Expose the <code class="docutils literal notranslate"><span class="pre">gguf</span></code> reading functionality natively to the <code class="docutils literal notranslate"><span class="pre">onnx9000.Netron</span></code> visualizer.</p></li>
+<li><p>[x] 225. Expose <code class="docutils literal notranslate"><span class="pre">safetensors</span></code> fast-streaming logic to bypass memory limits during GGUF packing.</p></li>
+<li><p>[x] 226. Use <code class="docutils literal notranslate"><span class="pre">onnx9000.onnx-tool</span></code> to estimate the final GGUF file size before compiling.</p></li>
+<li><p>[x] 227. Compare original ONNX MACs vs GGUF intended MACs (informational).</p></li>
+<li><p>[x] 228. Provide a simple <code class="docutils literal notranslate"><span class="pre">np.load_gguf(&quot;model.gguf&quot;)</span></code> API mapping directly to <code class="docutils literal notranslate"><span class="pre">onnx9000.array</span></code>.</p></li>
+<li><p>[x] 229. Allow executing the GGUF file natively inside the <code class="docutils literal notranslate"><span class="pre">onnx9000.genai</span></code> LLM pipeline.</p></li>
+<li><p>[x] 230. Support evaluating raw <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> files via WebGPU directly inside the browser.</p></li>
+</ul>
+</section>
+<section id="phase-17-code-quality-optimization-ci">
+<h3>Phase 17: Code Quality, Optimization &amp; CI<a class="headerlink" href="#phase-17-code-quality-optimization-ci" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 231. Establish automated CI pipeline converting TinyLlama to GGUF.</p></li>
+<li><p>[x] 232. Run the generated GGUF through an actual compiled <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> binary in GitHub Actions to verify functionality.</p></li>
+<li><p>[x] 233. Measure memory allocations during the TypeScript Web Worker process (keeping it below 1GB).</p></li>
+<li><p>[x] 234. Expose strict Typescript interfaces (<code class="docutils literal notranslate"><span class="pre">GGUFMetadata</span></code>, <code class="docutils literal notranslate"><span class="pre">GGUFTensorInfo</span></code>) for external API consumers.</p></li>
+<li><p>[x] 235. Compile the JS codebase using ESBuild/Vite targeting modern ESM modules.</p></li>
+<li><p>[x] 236. Eliminate any Node.js native <code class="docutils literal notranslate"><span class="pre">fs</span></code> imports from the core converter library to ensure strict isomorphic compliance.</p></li>
+<li><p>[x] 237. Emulate <code class="docutils literal notranslate"><span class="pre">fs</span></code> using <code class="docutils literal notranslate"><span class="pre">File</span></code> and <code class="docutils literal notranslate"><span class="pre">Blob</span></code> APIs correctly.</p></li>
+<li><p>[x] 238. Export a standalone UMD package for easy <code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> tag inclusion.</p></li>
+<li><p>[x] 239. Test across Windows, Linux, and macOS environments natively.</p></li>
+<li><p>[x] 240. Ensure all generated code passes rigorous linting and formatting.</p></li>
+</ul>
+</section>
+<section id="phase-18-specific-metadata-model-edge-cases">
+<h3>Phase 18: Specific Metadata &amp; Model Edge Cases<a class="headerlink" href="#phase-18-specific-metadata-model-edge-cases" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 241. Extract <code class="docutils literal notranslate"><span class="pre">falcon.attention.use_alibi</span></code> parameter correctly.</p></li>
+<li><p>[x] 242. Extract <code class="docutils literal notranslate"><span class="pre">starcoder.attention.head_count_kv</span></code> correctly.</p></li>
+<li><p>[x] 243. Handle models with tied embeddings (where <code class="docutils literal notranslate"><span class="pre">output.weight</span></code> is mathematically linked to <code class="docutils literal notranslate"><span class="pre">token_embd.weight</span></code>).</p></li>
+<li><p>[x] 244. Skip generating <code class="docutils literal notranslate"><span class="pre">output.weight</span></code> explicitly if tied embeddings are detected to save disk space.</p></li>
+<li><p>[x] 245. Validate multi-query attention (MQA) correctly maps to $KV_Heads = 1$.</p></li>
+<li><p>[x] 246. Handle custom padding token configurations that mismatch BOS/EOS.</p></li>
+<li><p>[x] 247. Encode specific <code class="docutils literal notranslate"><span class="pre">phi2</span></code> normalization constants correctly.</p></li>
+<li><p>[x] 248. Resolve specific <code class="docutils literal notranslate"><span class="pre">qwen2</span></code> RoPE parameters natively.</p></li>
+<li><p>[x] 249. Map classic Transformer relative positional encodings if found.</p></li>
+<li><p>[x] 250. Support extracting vocabulary from legacy HuggingFace <code class="docutils literal notranslate"><span class="pre">vocab.json</span></code> instead of just <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-19-comprehensive-documentation">
+<h3>Phase 19: Comprehensive Documentation<a class="headerlink" href="#phase-19-comprehensive-documentation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 251. Write Tutorial: “Converting ONNX to GGUF in the Browser”.</p></li>
+<li><p>[x] 252. Write Tutorial: “Reading a GGUF model natively in Node.js”.</p></li>
+<li><p>[x] 253. Document the complete mapping schema of <code class="docutils literal notranslate"><span class="pre">ONNX</span> <span class="pre">-&gt;</span> <span class="pre">GGUF</span></code>.</p></li>
+<li><p>[x] 254. Provide a compatibility matrix of supported LLM architectures.</p></li>
+<li><p>[x] 255. Detail the memory limitations and browser configuration (e.g., enabling WASM-64) required for massive models.</p></li>
+<li><p>[x] 256. Provide clear code snippets for integrating <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/onnx2gguf</span></code> into a Web application.</p></li>
+<li><p>[x] 257. Document all supported CLI flags and arguments.</p></li>
+<li><p>[x] 258. Create an architectural diagram showing how data flows from <code class="docutils literal notranslate"><span class="pre">.safetensors</span></code> through the transpiler to <code class="docutils literal notranslate"><span class="pre">.gguf</span></code>.</p></li>
+<li><p>[x] 259. Publish a specific “Troubleshooting” guide for shape mismatch errors.</p></li>
+<li><p>[x] 260. Include a benchmark report proving quantization parity with <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-20-final-deliverables-web-native-polish">
+<h3>Phase 20: Final Deliverables &amp; Web-Native Polish<a class="headerlink" href="#phase-20-final-deliverables-web-native-polish" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 261. Expose <code class="docutils literal notranslate"><span class="pre">get_metadata(file)</span></code> API for incredibly fast extraction without parsing the multi-GB payload.</p></li>
+<li><p>[x] 262. Support dynamic fetching of GGUF metadata via HTTP Range requests natively.</p></li>
+<li><p>[x] 263. Establish a unified error handling class (<code class="docutils literal notranslate"><span class="pre">GGUFParseError</span></code>, <code class="docutils literal notranslate"><span class="pre">GGUFCompileError</span></code>).</p></li>
+<li><p>[x] 264. Guarantee absolutely identical hash sums if the tool is run twice on the same model.</p></li>
+<li><p>[x] 265. Provide visual feedback (spinners/bars) during long I/O operations.</p></li>
+<li><p>[x] 266. Enable “Append” mode, allowing users to inject new KV metadata into an existing <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> file without rewriting the multi-GB tensor block.</p></li>
+<li><p>[x] 267. Cleanly catch user attempts to load incompatible model types (e.g., attempting to compile a ResNet as a LLaMA).</p></li>
+<li><p>[x] 268. Provide a simple <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">info</span> <span class="pre">model.gguf</span></code> CLI command to dump the metadata to the console.</p></li>
+<li><p>[x] 269. Map <code class="docutils literal notranslate"><span class="pre">general.license</span></code> strings dynamically from Hub configs.</p></li>
+<li><p>[x] 270. Extract hardware-specific execution hints if embedded in ONNX properties.</p></li>
+<li><p>[x] 271. Verify that <code class="docutils literal notranslate"><span class="pre">ArrayBuffer</span></code> allocation sizes strictly respect the necessary 8-byte boundaries globally.</p></li>
+<li><p>[x] 272. Add custom support for decoding string values spanning multiple chunks safely.</p></li>
+<li><p>[x] 273. Support <code class="docutils literal notranslate"><span class="pre">tokenizer.ggml.pre</span></code> string configurations explicitly (e.g., <code class="docutils literal notranslate"><span class="pre">llama3</span></code>, <code class="docutils literal notranslate"><span class="pre">deepseek</span></code>).</p></li>
+<li><p>[x] 274. Handle multiple chat templates if stored as arrays in <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code>.</p></li>
+<li><p>[x] 275. Ensure backward compatibility with <code class="docutils literal notranslate"><span class="pre">llama.cpp</span></code> binaries compiled in mid-2023.</p></li>
+<li><p>[x] 276. Develop specific fallbacks for un-quantizable dense layers.</p></li>
+<li><p>[x] 277. Render visual warnings if quantization scales evaluate to <code class="docutils literal notranslate"><span class="pre">NaN</span></code> or <code class="docutils literal notranslate"><span class="pre">Infinity</span></code>.</p></li>
+<li><p>[x] 278. Automatically drop intermediate caches immediately after block packing.</p></li>
+<li><p>[x] 279. Expose raw internal byte arrays if a user requests them natively.</p></li>
+<li><p>[x] 280. Handle specific MoE (Mixture of Experts) expert routing maps cleanly.</p></li>
+<li><p>[x] 281. Test performance degradation when Web Workers are unavailable (synchronous mode).</p></li>
+<li><p>[x] 282. Add a <code class="docutils literal notranslate"><span class="pre">verify_checksum()</span></code> utility verifying the internal structural integrity of the GGUF arrays.</p></li>
+<li><p>[x] 283. Support generating the older <code class="docutils literal notranslate"><span class="pre">GGML</span></code> or <code class="docutils literal notranslate"><span class="pre">GGJT</span></code> magic bytes if specifically requested via legacy flags.</p></li>
+<li><p>[x] 284. Allow developers to register custom metadata serializers.</p></li>
+<li><p>[x] 285. Support parsing and embedding custom LoRA weights directly into the GGUF payload.</p></li>
+<li><p>[x] 286. Handle ONNX Sequence outputs logically inside the GGUF translation boundary.</p></li>
+<li><p>[x] 287. Expose an interactive JSON viewer specifically for GGUF metadata inside the web tool.</p></li>
+<li><p>[x] 288. Manage specific Safari-only bugs regarding <code class="docutils literal notranslate"><span class="pre">Blob</span></code> and <code class="docutils literal notranslate"><span class="pre">File</span></code> object lifecycle limits.</p></li>
+<li><p>[x] 289. Add a specific warning if the user attempts to run a <code class="docutils literal notranslate"><span class="pre">Q4_0</span></code> quantization on a model with <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> inputs.</p></li>
+<li><p>[x] 290. Support conversion from <code class="docutils literal notranslate"><span class="pre">.h5</span></code> natively via <code class="docutils literal notranslate"><span class="pre">onnx9000.keras</span></code> linking prior to GGUF packing.</p></li>
+<li><p>[x] 291. Validate exact mathematical equivalence of <code class="docutils literal notranslate"><span class="pre">Exp</span></code> and <code class="docutils literal notranslate"><span class="pre">Log</span></code> limits during Quantization routines.</p></li>
+<li><p>[x] 292. Add support for importing TensorFlow <code class="docutils literal notranslate"><span class="pre">SavedModel</span></code> directly to GGUF (via ONNX multi-hop).</p></li>
+<li><p>[x] 293. Build specific handling for <code class="docutils literal notranslate"><span class="pre">Float8</span></code> standards if GGUF v4 introduces them.</p></li>
+<li><p>[x] 294. Enable deep network traces in the JS Console if the <code class="docutils literal notranslate"><span class="pre">--verbose</span></code> flag is passed to the web component.</p></li>
+<li><p>[x] 295. Configure explicit warnings for missing <code class="docutils literal notranslate"><span class="pre">bos_token_id</span></code>.</p></li>
+<li><p>[x] 296. Validate 32-bit offset limits securely, throwing standard exceptions before memory corruption occurs.</p></li>
+<li><p>[x] 297. Support executing the output <code class="docutils literal notranslate"><span class="pre">.gguf</span></code> file using <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>’s native WebGPU GenAI loop.</p></li>
+<li><p>[x] 298. Establish automated workflows to deploy the converter to a CDN (<code class="docutils literal notranslate"><span class="pre">unpkg.com</span></code>).</p></li>
+<li><p>[x] 299. Write comprehensive API documentation mapping TS generation targets.</p></li>
+<li><p>[x] 300. Release v1.0 feature complete certification for <code class="docutils literal notranslate"><span class="pre">onnx9000.onnx2gguf</span></code> bridging the ONNX and LLAMA.CPP communities.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX32_ONNX2TF.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX25_WEBNN_EP.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX25: WebNN API (Native Browser NPU Execution)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-gguf-format-binary-serialization-engine">Phase 1: GGUF Format Binary Serialization Engine</a></li>
+<li><a class="reference internal" href="#phase-2-general-standard-metadata-mapping">Phase 2: General &amp; Standard Metadata Mapping</a></li>
+<li><a class="reference internal" href="#phase-3-llama-architecture-metadata-mapping">Phase 3: LLaMA Architecture Metadata Mapping</a></li>
+<li><a class="reference internal" href="#phase-4-other-llm-architectures-metadata-mapping">Phase 4: Other LLM Architectures Metadata Mapping</a></li>
+<li><a class="reference internal" href="#phase-5-tokenizer-extraction-gguf-embedding">Phase 5: Tokenizer Extraction &amp; GGUF Embedding</a></li>
+<li><a class="reference internal" href="#phase-6-onnx-to-gguf-tensor-naming-translation">Phase 6: ONNX to GGUF Tensor Naming Translation</a></li>
+<li><a class="reference internal" href="#phase-7-tensor-memory-transposition-layout-adjustments">Phase 7: Tensor Memory Transposition &amp; Layout Adjustments</a></li>
+<li><a class="reference internal" href="#phase-8-gguf-quantization-engine-ggml-data-types">Phase 8: GGUF Quantization Engine (GGML Data Types)</a></li>
+<li><a class="reference internal" href="#phase-9-reverse-translation-gguf-onnx">Phase 9: Reverse Translation (GGUF -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-10-cli-tooling-onnx9000-onnx2gguf">Phase 10: CLI Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">onnx2gguf</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-11-the-web-ui-client-side-exporter">Phase 11: The Web UI (Client-Side Exporter)</a></li>
+<li><a class="reference internal" href="#phase-12-huggingface-hub-integration">Phase 12: HuggingFace Hub Integration</a></li>
+<li><a class="reference internal" href="#phase-13-edge-cases-security-validation">Phase 13: Edge Cases, Security &amp; Validation</a></li>
+<li><a class="reference internal" href="#phase-14-llama-cpp-specific-quirks-hacks">Phase 14: LLaMA.cpp Specific Quirks &amp; Hacks</a></li>
+<li><a class="reference internal" href="#phase-15-advanced-quantization-k-quants-custom-types">Phase 15: Advanced Quantization (K-Quants &amp; Custom Types)</a></li>
+<li><a class="reference internal" href="#phase-16-interoperability-with-other-onnx9000-tools">Phase 16: Interoperability with other <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Tools</a></li>
+<li><a class="reference internal" href="#phase-17-code-quality-optimization-ci">Phase 17: Code Quality, Optimization &amp; CI</a></li>
+<li><a class="reference internal" href="#phase-18-specific-metadata-model-edge-cases">Phase 18: Specific Metadata &amp; Model Edge Cases</a></li>
+<li><a class="reference internal" href="#phase-19-comprehensive-documentation">Phase 19: Comprehensive Documentation</a></li>
+<li><a class="reference internal" href="#phase-20-final-deliverables-web-native-polish">Phase 20: Final Deliverables &amp; Web-Native Polish</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

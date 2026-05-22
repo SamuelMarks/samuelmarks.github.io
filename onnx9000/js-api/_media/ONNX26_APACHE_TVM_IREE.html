@@ -1,0 +1,972 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)" href="ONNX39_WEBNN_POLYFILL.html"><link rel="prev" title="ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)" href="ONNX21_ORT_GENAI.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX26_APACHE_TVM_IREE.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx26-apache-tvm-iree-wasm-native-mlir-compiler">
+<h1>ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)<a class="headerlink" href="#onnx26-apache-tvm-iree-wasm-native-mlir-compiler" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p>IREE (Intermediate Representation Execution Environment) is an end-to-end MLIR-based compiler and runtime built by Google and the open-source community. It was designed to replace heavy inference frameworks with a tiny, bare-metal capable runtime. It takes ML models (like ONNX or TensorFlow), lowers them through multiple dialects of MLIR (Linalg, Flow, HAL, VM), and compiles them into standalone CPU/GPU executables or FlatBuffer modules. It represents the pinnacle of “Ahead-of-Time” (AOT) compilation for Machine Learning, aggressively optimizing memory planning, kernel scheduling, and execution overhead down to kilobytes instead of megabytes.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p>Instead of relying on LLVM and Google’s massive C++ MLIR toolchain to compile models offline, <code class="docutils literal notranslate"><span class="pre">onnx9000.iree</span></code> introduces a lightweight, web-native MLIR equivalent directly within the monolith.</p>
+<ul class="simple">
+<li><p><strong>Web-MLIR Dialects:</strong> It implements its own subset of MLIR-like dialects (e.g., <code class="docutils literal notranslate"><span class="pre">web.linalg</span></code>, <code class="docutils literal notranslate"><span class="pre">web.hal</span></code>) written entirely in TypeScript and Python, bypassing LLVM.</p></li>
+<li><p><strong>Browser-Based Lowering:</strong> The entire lowering pipeline—from ONNX to Linalg, to Loops, to WebAssembly Text (WAT)/WGSL—can run directly in the browser.</p></li>
+<li><p><strong>Zero-Dependency Bytecode VM:</strong> Emits a tiny, specialized bytecode format (<code class="docutils literal notranslate"><span class="pre">.wvm</span></code> - Web Virtual Machine) that a minuscule (&lt;50kb) WASM interpreter can execute, bypassing the need for even the standard <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution engine on extreme edge devices.</p></li>
+<li><p><strong>AOT WebGPU Pre-compilation:</strong> IREE-style aggressive AOT planning pre-calculates every WebGPU buffer offset and shader dispatch order during the build phase, emitting a single, flat JavaScript execution queue with zero runtime overhead.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-high-level-dialect-web-mhlo-web-tensor">
+<h3>Phase 1: High-Level Dialect (<code class="docutils literal notranslate"><span class="pre">web.mhlo</span></code> / <code class="docutils literal notranslate"><span class="pre">web.tensor</span></code>)<a class="headerlink" href="#phase-1-high-level-dialect-web-mhlo-web-tensor" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Define base <code class="docutils literal notranslate"><span class="pre">Operation</span></code> class (op code, operands, results, attributes).</p></li>
+<li><p>[x] 2. Define <code class="docutils literal notranslate"><span class="pre">Region</span></code> and <code class="docutils literal notranslate"><span class="pre">Block</span></code> structures for MLIR-style nested control flow.</p></li>
+<li><p>[x] 3. Implement <code class="docutils literal notranslate"><span class="pre">web.tensor.extract</span></code> operation.</p></li>
+<li><p>[x] 4. Implement <code class="docutils literal notranslate"><span class="pre">web.tensor.insert</span></code> operation.</p></li>
+<li><p>[x] 5. Implement <code class="docutils literal notranslate"><span class="pre">web.tensor.splat</span></code> operation.</p></li>
+<li><p>[x] 6. Implement <code class="docutils literal notranslate"><span class="pre">web.tensor.pad</span></code> operation.</p></li>
+<li><p>[x] 7. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.add</span></code> (broadcastable addition).</p></li>
+<li><p>[x] 8. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.subtract</span></code>.</p></li>
+<li><p>[x] 9. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.multiply</span></code>.</p></li>
+<li><p>[x] 10. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.divide</span></code>.</p></li>
+<li><p>[x] 11. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.maximum</span></code>.</p></li>
+<li><p>[x] 12. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.minimum</span></code>.</p></li>
+<li><p>[x] 13. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.exponential</span></code>.</p></li>
+<li><p>[x] 14. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.log</span></code>.</p></li>
+<li><p>[x] 15. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.cosine</span></code>.</p></li>
+<li><p>[x] 16. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.sine</span></code>.</p></li>
+<li><p>[x] 17. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.dot</span></code> (matrix multiplication).</p></li>
+<li><p>[x] 18. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.convolution</span></code> (general N-D convolution).</p></li>
+<li><p>[x] 19. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.reduce</span></code> (general reduction with reducer block).</p></li>
+<li><p>[x] 20. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.reduce_window</span></code> (pooling).</p></li>
+<li><p>[x] 21. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.select</span></code> (ternary/where).</p></li>
+<li><p>[x] 22. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.broadcast_in_dim</span></code>.</p></li>
+<li><p>[x] 23. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.reshape</span></code>.</p></li>
+<li><p>[x] 24. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.transpose</span></code>.</p></li>
+<li><p>[x] 25. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.concatenate</span></code>.</p></li>
+<li><p>[x] 26. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.slice</span></code>.</p></li>
+<li><p>[x] 27. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.dynamic_slice</span></code>.</p></li>
+<li><p>[x] 28. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.gather</span></code>.</p></li>
+<li><p>[x] 29. Implement <code class="docutils literal notranslate"><span class="pre">web.mhlo.scatter</span></code>.</p></li>
+<li><p>[x] 30. Create the ONNX-to-MHLO lowering pass (mapping ONNX graphs to this dialect).</p></li>
+</ul>
+</section>
+<section id="phase-2-structural-dialect-web-linalg">
+<h3>Phase 2: Structural Dialect (<code class="docutils literal notranslate"><span class="pre">web.linalg</span></code>)<a class="headerlink" href="#phase-2-structural-dialect-web-linalg" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 31. Define <code class="docutils literal notranslate"><span class="pre">AffineMap</span></code> class (for iteration space mapping).</p></li>
+<li><p>[x] 32. Define <code class="docutils literal notranslate"><span class="pre">web.linalg.generic</span></code> operation.</p></li>
+<li><p>[x] 33. Support <code class="docutils literal notranslate"><span class="pre">iterator_types</span></code> attribute (parallel, reduction).</p></li>
+<li><p>[x] 34. Support <code class="docutils literal notranslate"><span class="pre">indexing_maps</span></code> attribute (mapping loops to tensor dimensions).</p></li>
+<li><p>[x] 35. Implement <code class="docutils literal notranslate"><span class="pre">web.linalg.matmul</span></code> named op.</p></li>
+<li><p>[x] 36. Implement <code class="docutils literal notranslate"><span class="pre">web.linalg.batch_matmul</span></code> named op.</p></li>
+<li><p>[x] 37. Implement <code class="docutils literal notranslate"><span class="pre">web.linalg.conv_2d_nhwc_hwcf</span></code> named op.</p></li>
+<li><p>[x] 38. Implement <code class="docutils literal notranslate"><span class="pre">web.linalg.pooling_nhwc_max</span></code> named op.</p></li>
+<li><p>[x] 39. Implement <code class="docutils literal notranslate"><span class="pre">web.linalg.fill</span></code> named op.</p></li>
+<li><p>[x] 40. Implement <code class="docutils literal notranslate"><span class="pre">web.linalg.yield</span></code> (terminator for linalg blocks).</p></li>
+<li><p>[x] 41. Create the MHLO-to-Linalg lowering pass.</p></li>
+<li><p>[x] 42. Translate <code class="docutils literal notranslate"><span class="pre">web.mhlo.add</span></code> to <code class="docutils literal notranslate"><span class="pre">web.linalg.generic</span></code> (parallel iterator).</p></li>
+<li><p>[x] 43. Translate <code class="docutils literal notranslate"><span class="pre">web.mhlo.reduce</span></code> to <code class="docutils literal notranslate"><span class="pre">web.linalg.generic</span></code> (reduction iterator).</p></li>
+<li><p>[x] 44. Implement pass: Linalg fusion on tensors (fusing elementwise ops into matmul/conv producers).</p></li>
+<li><p>[x] 45. Implement pass: Tiling (breaking large <code class="docutils literal notranslate"><span class="pre">linalg.generic</span></code> ops into smaller tile loops).</p></li>
+<li><p>[x] 46. Support custom tile sizes for WebGPU (e.g., 16x16, 64x64).</p></li>
+<li><p>[x] 47. Implement pass: Bufferization (lowering from value-semantics/tensors to memory-semantics/buffers).</p></li>
+<li><p>[x] 48. Implement <code class="docutils literal notranslate"><span class="pre">web.memref.alloc</span></code> operation.</p></li>
+<li><p>[x] 49. Implement <code class="docutils literal notranslate"><span class="pre">web.memref.dealloc</span></code> operation.</p></li>
+<li><p>[x] 50. Implement <code class="docutils literal notranslate"><span class="pre">web.memref.load</span></code> and <code class="docutils literal notranslate"><span class="pre">web.memref.store</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-3-hardware-abstraction-layer-dialect-web-hal">
+<h3>Phase 3: Hardware Abstraction Layer Dialect (<code class="docutils literal notranslate"><span class="pre">web.hal</span></code>)<a class="headerlink" href="#phase-3-hardware-abstraction-layer-dialect-web-hal" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 51. Define <code class="docutils literal notranslate"><span class="pre">web.hal.device</span></code> abstraction.</p></li>
+<li><p>[x] 52. Define <code class="docutils literal notranslate"><span class="pre">web.hal.buffer</span></code> abstraction.</p></li>
+<li><p>[x] 53. Define <code class="docutils literal notranslate"><span class="pre">web.hal.buffer_view</span></code> (buffer + shape + element type).</p></li>
+<li><p>[x] 54. Define <code class="docutils literal notranslate"><span class="pre">web.hal.command_buffer</span></code>.</p></li>
+<li><p>[x] 55. Define <code class="docutils literal notranslate"><span class="pre">web.hal.executable</span></code> (representing a compiled shader/WASM module).</p></li>
+<li><p>[x] 56. Implement <code class="docutils literal notranslate"><span class="pre">web.hal.command_buffer.dispatch</span></code> operation.</p></li>
+<li><p>[x] 57. Implement <code class="docutils literal notranslate"><span class="pre">web.hal.command_buffer.copy_buffer</span></code> operation.</p></li>
+<li><p>[x] 58. Implement <code class="docutils literal notranslate"><span class="pre">web.hal.command_buffer.fill_buffer</span></code> operation.</p></li>
+<li><p>[x] 59. Implement <code class="docutils literal notranslate"><span class="pre">web.hal.buffer.subspan</span></code> (aliasing memory).</p></li>
+<li><p>[x] 60. Create the Linalg-to-HAL lowering pass.</p></li>
+<li><p>[x] 61. Lower tiled <code class="docutils literal notranslate"><span class="pre">linalg.generic</span></code> into distinct <code class="docutils literal notranslate"><span class="pre">hal.executable</span></code> blocks.</p></li>
+<li><p>[x] 62. Generate 3D dispatch grids (Workgroups) for WebGPU targets.</p></li>
+<li><p>[x] 63. Extract kernel functions from the main control flow graph.</p></li>
+<li><p>[x] 64. Implement pass: Static memory planning (converting <code class="docutils literal notranslate"><span class="pre">alloc</span></code>/<code class="docutils literal notranslate"><span class="pre">dealloc</span></code> into static arena offsets).</p></li>
+<li><p>[x] 65. Emit <code class="docutils literal notranslate"><span class="pre">hal.buffer.subspan</span></code> based on the static arena layout.</p></li>
+<li><p>[x] 66. Implement pass: Command Buffer batching (grouping dispatches to minimize host overhead).</p></li>
+<li><p>[x] 67. Generate host-side synchronization points only when crossing hardware boundaries.</p></li>
+<li><p>[x] 68. Handle dynamic shapes using HAL symbolic variables (binding shapes at execution time).</p></li>
+<li><p>[x] 69. Support multiple target backends within the same HAL graph (e.g., WASM fallback).</p></li>
+<li><p>[x] 70. Implement HAL textual printer for debugging dispatch logic.</p></li>
+</ul>
+</section>
+<section id="phase-4-control-flow-vm-dialect-web-vm">
+<h3>Phase 4: Control Flow &amp; VM Dialect (<code class="docutils literal notranslate"><span class="pre">web.vm</span></code>)<a class="headerlink" href="#phase-4-control-flow-vm-dialect-web-vm" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 71. Define <code class="docutils literal notranslate"><span class="pre">web.vm.module</span></code>.</p></li>
+<li><p>[x] 72. Define <code class="docutils literal notranslate"><span class="pre">web.vm.func</span></code>.</p></li>
+<li><p>[x] 73. Define <code class="docutils literal notranslate"><span class="pre">web.vm.call</span></code>.</p></li>
+<li><p>[x] 74. Implement <code class="docutils literal notranslate"><span class="pre">web.vm.branch</span></code> (unconditional jump).</p></li>
+<li><p>[x] 75. Implement <code class="docutils literal notranslate"><span class="pre">web.vm.cond_branch</span></code> (conditional jump).</p></li>
+<li><p>[x] 76. Implement <code class="docutils literal notranslate"><span class="pre">web.vm.cmp</span></code> (integer/float comparison).</p></li>
+<li><p>[x] 77. Implement basic integer arithmetic (<code class="docutils literal notranslate"><span class="pre">vm.add.i32</span></code>, <code class="docutils literal notranslate"><span class="pre">vm.mul.i32</span></code>).</p></li>
+<li><p>[x] 78. Implement <code class="docutils literal notranslate"><span class="pre">web.vm.return</span></code>.</p></li>
+<li><p>[x] 79. Create the HAL-to-VM lowering pass.</p></li>
+<li><p>[x] 80. Convert HAL command buffer recording into a sequence of VM API calls.</p></li>
+<li><p>[x] 81. Translate MLIR <code class="docutils literal notranslate"><span class="pre">Block</span></code> structures into flat lists of basic blocks with explicit jumps.</p></li>
+<li><p>[x] 82. Implement pass: VM block layout optimization.</p></li>
+<li><p>[x] 83. Implement pass: VM register allocation (mapping SSA values to VM registers).</p></li>
+<li><p>[x] 84. Lower dynamic shape calculations entirely into VM integer math.</p></li>
+<li><p>[x] 85. Expose <code class="docutils literal notranslate"><span class="pre">vm.import</span></code> declarations for bridging to host JS functions (e.g., <code class="docutils literal notranslate"><span class="pre">console.log</span></code>).</p></li>
+<li><p>[x] 86. Implement a FlatBuffer-like schema for serializing the VM module.</p></li>
+<li><p>[x] 87. Build the <code class="docutils literal notranslate"><span class="pre">wvm</span></code> (Web Virtual Machine) Bytecode Emitter.</p></li>
+<li><p>[x] 88. Map VM instructions to custom binary opcodes.</p></li>
+<li><p>[x] 89. Encode literal constants (weights) directly into the <code class="docutils literal notranslate"><span class="pre">wvm</span></code> binary payload.</p></li>
+<li><p>[x] 90. Build a CLI disassembler to convert <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> binary back to text.</p></li>
+</ul>
+</section>
+<section id="phase-5-executable-translation-wasm-cpu">
+<h3>Phase 5: Executable Translation (WASM CPU)<a class="headerlink" href="#phase-5-executable-translation-wasm-cpu" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 91. Create the <code class="docutils literal notranslate"><span class="pre">hal.executable</span></code> to WASM translator.</p></li>
+<li><p>[x] 92. Define the <code class="docutils literal notranslate"><span class="pre">web.scf</span></code> (Structured Control Flow) dialect for nested loops.</p></li>
+<li><p>[x] 93. Lower <code class="docutils literal notranslate"><span class="pre">linalg.generic</span></code> inside the executable to <code class="docutils literal notranslate"><span class="pre">scf.for</span></code> loops.</p></li>
+<li><p>[x] 94. Lower <code class="docutils literal notranslate"><span class="pre">scf.for</span></code> loops to flat VM jumps or directly to WASM <code class="docutils literal notranslate"><span class="pre">loop</span></code>/<code class="docutils literal notranslate"><span class="pre">br</span></code>.</p></li>
+<li><p>[x] 95. Implement loop unrolling pass based on target heuristics.</p></li>
+<li><p>[x] 96. Implement vectorization pass (identifying contiguous memory accesses).</p></li>
+<li><p>[x] 97. Emit <code class="docutils literal notranslate"><span class="pre">v128</span></code> SIMD intrinsics for vectorized inner loops.</p></li>
+<li><p>[x] 98. Emit base WASM scalar operations for non-vectorizable loops.</p></li>
+<li><p>[x] 99. Generate an independent WASM module (the “kernel library”) containing all executables.</p></li>
+<li><p>[x] 100. Provide a stable ABI for the VM to call these WASM functions.</p></li>
+<li><p>[x] 101. Support shared linear memory between the VM and the WASM execution module.</p></li>
+<li><p>[x] 102. Compile the mathematical kernels to WAT (WebAssembly Text) string representation.</p></li>
+<li><p>[x] 103. Parse WAT into final WASM binary within the JS/TS compiler.</p></li>
+<li><p>[x] 104. Implement WASM threading via SharedArrayBuffer (generating thread-pool dispatchers).</p></li>
+<li><p>[x] 105. Optimize standard convolutions into optimized WASM Im2Col + MatMul sequences natively.</p></li>
+</ul>
+</section>
+<section id="phase-6-executable-translation-wgsl-webgpu">
+<h3>Phase 6: Executable Translation (WGSL WebGPU)<a class="headerlink" href="#phase-6-executable-translation-wgsl-webgpu" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 106. Create the <code class="docutils literal notranslate"><span class="pre">hal.executable</span></code> to WGSL translator.</p></li>
+<li><p>[x] 107. Map <code class="docutils literal notranslate"><span class="pre">hal.buffer</span></code> inputs to <code class="docutils literal notranslate"><span class="pre">var&lt;storage,</span> <span class="pre">read&gt;</span></code>.</p></li>
+<li><p>[x] 108. Map <code class="docutils literal notranslate"><span class="pre">hal.buffer</span></code> outputs to <code class="docutils literal notranslate"><span class="pre">var&lt;storage,</span> <span class="pre">read_write&gt;</span></code>.</p></li>
+<li><p>[x] 109. Map <code class="docutils literal notranslate"><span class="pre">hal.executable</span></code> dispatch shapes to <code class="docutils literal notranslate"><span class="pre">builtin(global_invocation_id)</span></code>.</p></li>
+<li><p>[x] 110. Translate inner loop bodies (from <code class="docutils literal notranslate"><span class="pre">linalg.generic</span></code>) to WGSL AST nodes.</p></li>
+<li><p>[x] 111. Resolve indexing maps to calculate flat 1D buffer offsets in WGSL.</p></li>
+<li><p>[x] 112. Implement memory coalescing optimizations explicitly in the WGSL generator.</p></li>
+<li><p>[x] 113. Emit Workgroup (Shared) Memory declarations for tiled MatMul kernels.</p></li>
+<li><p>[x] 114. Generate standard WebGPU pipelines directly from the compiled shader strings.</p></li>
+<li><p>[x] 115. Implement a standalone JS runner that executes the generated WGSL shaders precisely following the VM’s command buffer graph.</p></li>
+<li><p>[x] 116. Support mapping <code class="docutils literal notranslate"><span class="pre">hal</span></code> synchronization points to <code class="docutils literal notranslate"><span class="pre">device.queue.submit()</span></code>.</p></li>
+<li><p>[x] 117. Implement kernel fusion at the WGSL level (e.g., generating a single shader for MatMul+Relu).</p></li>
+<li><p>[x] 118. Handle FP16 WGSL extensions automatically if the HAL executable specifies fp16 math.</p></li>
+<li><p>[x] 119. Generate custom shader variations for different workgroup sizes during compilation.</p></li>
+<li><p>[x] 120. Strip all WGSL whitespace and minify variables for smaller payload delivery.</p></li>
+</ul>
+</section>
+<section id="phase-7-the-minimal-iree-style-runtime-vm-interpreter">
+<h3>Phase 7: The Minimal IREE-Style Runtime (VM Interpreter)<a class="headerlink" href="#phase-7-the-minimal-iree-style-runtime-vm-interpreter" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 121. Build a pure JavaScript <code class="docutils literal notranslate"><span class="pre">wvm</span></code> interpreter (&lt; 100kb).</p></li>
+<li><p>[x] 122. Build a pure WASM <code class="docutils literal notranslate"><span class="pre">wvm</span></code> interpreter (&lt; 50kb compiled).</p></li>
+<li><p>[x] 123. Define the runtime <code class="docutils literal notranslate"><span class="pre">Module</span></code> state (holding global variables and memory).</p></li>
+<li><p>[x] 124. Define the runtime <code class="docutils literal notranslate"><span class="pre">Context</span></code> (managing execution state and call stack).</p></li>
+<li><p>[x] 125. Implement the bytecode dispatch loop (<code class="docutils literal notranslate"><span class="pre">switch(opcode)</span></code>).</p></li>
+<li><p>[x] 126. Implement dynamic module loading (<code class="docutils literal notranslate"><span class="pre">vm.import</span></code> resolution).</p></li>
+<li><p>[x] 127. Bind the <code class="docutils literal notranslate"><span class="pre">web.hal</span></code> VM instructions to actual WebGPU API calls (<code class="docutils literal notranslate"><span class="pre">createBuffer</span></code>, <code class="docutils literal notranslate"><span class="pre">createComputePipeline</span></code>).</p></li>
+<li><p>[x] 128. Bind the <code class="docutils literal notranslate"><span class="pre">web.hal</span></code> VM instructions to standard WASM calls.</p></li>
+<li><p>[x] 129. Implement an asynchronous execution mode for the VM (yielding to the browser event loop).</p></li>
+<li><p>[x] 130. Implement a synchronous execution mode (for Web Workers).</p></li>
+<li><p>[x] 131. Support passing raw ArrayBuffers from JS directly into the VM state.</p></li>
+<li><p>[x] 132. Support retrieving output ArrayBuffers from the VM state.</p></li>
+<li><p>[x] 133. Provide strict validation of the <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> binary format during instantiation.</p></li>
+<li><p>[x] 134. Handle WebGPU context loss inside the VM gracefully, throwing a catchable VM error.</p></li>
+<li><p>[x] 135. Integrate a tiny Memory Allocator inside the runtime for resolving dynamic shapes if static planning failed.</p></li>
+</ul>
+</section>
+<section id="phase-8-static-standalone-web-generation-the-ultimate-export">
+<h3>Phase 8: Static Standalone Web Generation (The Ultimate Export)<a class="headerlink" href="#phase-8-static-standalone-web-generation-the-ultimate-export" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 136. Create an exporter that completely bypasses the <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> interpreter.</p></li>
+<li><p>[x] 137. Perform full loop-unrolling of the VM control flow graph.</p></li>
+<li><p>[x] 138. Emit a highly customized, standalone <code class="docutils literal notranslate"><span class="pre">index.js</span></code> file.</p></li>
+<li><p>[x] 139. Embed all compiled WGSL shaders directly as string literals in the JS.</p></li>
+<li><p>[x] 140. Embed the static buffer arena allocations natively in the JS logic.</p></li>
+<li><p>[x] 141. Emit explicit, hardcoded <code class="docutils literal notranslate"><span class="pre">device.queue.submit</span></code> sequences without any loops or branches (if the model is static).</p></li>
+<li><p>[x] 142. Produce an “Executable” size of roughly 5-10KB (plus weights), completely removing <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> from the loop.</p></li>
+<li><p>[x] 143. Support bundling weights securely via Fetch/CacheAPI directly within the generated <code class="docutils literal notranslate"><span class="pre">index.js</span></code>.</p></li>
+<li><p>[x] 144. Ensure the standalone script is strictly ES6 Module compliant.</p></li>
+<li><p>[x] 145. Create an HTML template combining the standalone script with an <code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;file&quot;&gt;</span></code> for instant local testing.</p></li>
+</ul>
+</section>
+<section id="phase-9-model-specific-mlir-optimization-passes">
+<h3>Phase 9: Model specific MLIR optimization passes<a class="headerlink" href="#phase-9-model-specific-mlir-optimization-passes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 146. Implement a pass to detect and optimize <code class="docutils literal notranslate"><span class="pre">Attention</span></code> patterns specifically at the <code class="docutils literal notranslate"><span class="pre">linalg</span></code> level.</p></li>
+<li><p>[x] 147. Map specific <code class="docutils literal notranslate"><span class="pre">linalg</span></code> patterns directly to emerging WebNN API calls (bypassing WGSL/WASM generation entirely).</p></li>
+<li><p>[x] 148. Implement specific padding removal passes (lowering padded Convolutions to valid Convolutions with manual boundary checks).</p></li>
+<li><p>[x] 149. Identify and fuse sequences of elementwise operations across multiple basic blocks.</p></li>
+<li><p>[x] 150. Optimize dynamic slice bounds by hoisting shape calculations outside of execution loops.</p></li>
+<li><p>[x] 151. Implement a peephole optimizer for the VM dialect (e.g., <code class="docutils literal notranslate"><span class="pre">vm.add</span> <span class="pre">x,</span> <span class="pre">0</span> <span class="pre">-&gt;</span> <span class="pre">x</span></code>).</p></li>
+<li><p>[x] 152. Perform global value numbering (GVN) for common subexpression elimination in the Linalg dialect.</p></li>
+<li><p>[x] 153. Implement dead code elimination specifically for unused MLIR attributes and regions.</p></li>
+<li><p>[x] 154. Support <code class="docutils literal notranslate"><span class="pre">linalg</span></code> vectorization specific to Apple Neural Engine constraints (if targeting WebNN fallback).</p></li>
+<li><p>[x] 155. Provide dynamic dimension size propagation down to the lowest HAL layer.</p></li>
+</ul>
+</section>
+<section id="phase-10-compiler-cli-tooling-onnx9000-iree">
+<h3>Phase 10: Compiler CLI &amp; Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000-iree</span></code>)<a class="headerlink" href="#phase-10-compiler-cli-tooling-onnx9000-iree" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 156. Implement <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">iree</span> <span class="pre">compile</span> <span class="pre">&lt;model.onnx&gt;</span></code> command.</p></li>
+<li><p>[x] 157. Support <code class="docutils literal notranslate"><span class="pre">--target-backend=wgsl</span></code> flag.</p></li>
+<li><p>[x] 158. Support <code class="docutils literal notranslate"><span class="pre">--target-backend=wasm</span></code> flag.</p></li>
+<li><p>[x] 159. Support <code class="docutils literal notranslate"><span class="pre">--target-backend=webnn</span></code> flag.</p></li>
+<li><p>[x] 160. Support <code class="docutils literal notranslate"><span class="pre">--target-backend=standalone-js</span></code> flag.</p></li>
+<li><p>[x] 161. Support <code class="docutils literal notranslate"><span class="pre">--dump-mlir</span></code> flag (saving all intermediate dialect steps to <code class="docutils literal notranslate"><span class="pre">.mlir</span></code> text files).</p></li>
+<li><p>[x] 162. Support <code class="docutils literal notranslate"><span class="pre">--optimize-level=O3</span></code> parameter mapping to specific IREE passes.</p></li>
+<li><p>[x] 163. Provide a graphical trace visualizer for the generated HAL command buffers.</p></li>
+<li><p>[x] 164. Generate an interactive HTML report mapping WGSL shaders back to original ONNX nodes.</p></li>
+<li><p>[x] 165. Provide an API to run the MLIR compiler entirely in the browser (via a heavy Web Worker).</p></li>
+<li><p>[x] 166. Establish a testing suite that compares native ORT output vs compiled <code class="docutils literal notranslate"><span class="pre">wvm</span></code> output.</p></li>
+<li><p>[x] 167. Enable debug logging of VM register states step-by-step.</p></li>
+<li><p>[x] 168. Package the compiler and runtime as separate NPM modules (<code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/iree-runtime</span></code>).</p></li>
+<li><p>[x] 169. Write tutorial: “Building a Zero-Dependency 10KB Image Classifier”.</p></li>
+<li><p>[x] 170. Write tutorial: “Understanding the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> MLIR Lowering Pipeline”.</p></li>
+</ul>
+</section>
+<section id="phase-11-end-to-end-validation-vision">
+<h3>Phase 11: End-to-End Validation (Vision)<a class="headerlink" href="#phase-11-end-to-end-validation-vision" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 171. Validate compilation and standalone execution of <strong>MNIST (CNN)</strong>.</p></li>
+<li><p>[x] 172. Validate compilation and standalone execution of <strong>MobileNetV2</strong>.</p></li>
+<li><p>[x] 173. Validate compilation and standalone execution of <strong>ResNet50</strong>.</p></li>
+<li><p>[x] 174. Validate compilation and standalone execution of <strong>SqueezeNet</strong>.</p></li>
+<li><p>[x] 175. Validate compilation and standalone execution of <strong>YOLOv8</strong> (Object Detection).</p></li>
+<li><p>[x] 176. Ensure post-processing bounding box logic can be baked directly into the <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> bytecode.</p></li>
+<li><p>[x] 177. Validate compilation of <strong>ViT</strong> (Vision Transformer).</p></li>
+<li><p>[x] 178. Validate memory planning on high-resolution image inputs (e.g., 1024x1024).</p></li>
+<li><p>[x] 179. Benchmark standalone JS initialization speed vs standard <code class="docutils literal notranslate"><span class="pre">onnxruntime-web</span></code>.</p></li>
+<li><p>[x] 180. Verify precise pixel matching across all vision model outputs.</p></li>
+</ul>
+</section>
+<section id="phase-12-end-to-end-validation-nlp-llms">
+<h3>Phase 12: End-to-End Validation (NLP &amp; LLMs)<a class="headerlink" href="#phase-12-end-to-end-validation-nlp-llms" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 181. Validate compilation of <strong>BERT</strong> into standalone WGSL/WVM.</p></li>
+<li><p>[x] 182. Validate compilation of <strong>DistilBERT</strong>.</p></li>
+<li><p>[x] 183. Validate compilation of <strong>GPT-2</strong>.</p></li>
+<li><p>[x] 184. Validate compilation of a miniature <strong>LLaMA</strong> block (e.g., TinyLlama).</p></li>
+<li><p>[x] 185. Handle autoregressive control flow (while-loops) explicitly via <code class="docutils literal notranslate"><span class="pre">web.vm.branch</span></code>.</p></li>
+<li><p>[x] 186. Pre-calculate KV cache memory layouts during the HAL bufferization pass.</p></li>
+<li><p>[x] 187. Bake BPE Tokenization dictionaries directly into the VM module as static read-only buffers.</p></li>
+<li><p>[x] 188. Ensure dynamic sequence lengths don’t trigger recompilation in the WGSL runners.</p></li>
+<li><p>[x] 189. Validate performance of compiled text generation vs ONNX Runtime GenAI.</p></li>
+<li><p>[x] 190. Handle extremely large tensor initialization payloads securely via separate weight chunks.</p></li>
+</ul>
+</section>
+<section id="phase-13-end-to-end-validation-audio">
+<h3>Phase 13: End-to-End Validation (Audio)<a class="headerlink" href="#phase-13-end-to-end-validation-audio" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 191. Validate compilation of <strong>Whisper</strong> (Encoder).</p></li>
+<li><p>[x] 192. Validate compilation of <strong>Whisper</strong> (Decoder).</p></li>
+<li><p>[x] 193. Implement cross-attention caching across the Encoder/Decoder boundary inside the VM.</p></li>
+<li><p>[x] 194. Validate compilation of <strong>Wav2Vec2</strong>.</p></li>
+<li><p>[x] 195. Verify Mel-Spectrogram feature extraction can be compiled directly into the VM graph.</p></li>
+<li><p>[x] 196. Support compiling streaming audio models utilizing ring buffers inside HAL.</p></li>
+<li><p>[x] 197. Validate numerical stability of FFT operations compiled to WGSL.</p></li>
+<li><p>[x] 198. Establish benchmark comparisons for real-time factor (RTF) in audio decoding.</p></li>
+<li><p>[x] 199. Integrate output of compiled audio graphs directly to Web Audio API Worklets.</p></li>
+<li><p>[x] 200. Debug and trace stateful RNN/LSTM cells executing over long audio sequences.</p></li>
+</ul>
+</section>
+<section id="phase-14-dynamic-quantization-lowering">
+<h3>Phase 14: Dynamic Quantization Lowering<a class="headerlink" href="#phase-14-dynamic-quantization-lowering" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 201. Support ONNX <code class="docutils literal notranslate"><span class="pre">DynamicQuantizeLinear</span></code> directly in the <code class="docutils literal notranslate"><span class="pre">web.mhlo</span></code> dialect.</p></li>
+<li><p>[x] 202. Lower dynamic quantization steps into explicit Linalg min/max/scale/cast operations.</p></li>
+<li><p>[x] 203. Optimize <code class="docutils literal notranslate"><span class="pre">linalg.generic</span></code> loops to perform quantization and matmul in a single pass (fusing scales).</p></li>
+<li><p>[x] 204. Validate 8-bit dynamic quantization executing entirely inside WebGPU WGSL.</p></li>
+<li><p>[x] 205. Support W4A16 (4-bit weight packing) lowering explicitly in the MLIR pipeline.</p></li>
+<li><p>[x] 206. Implement the shift/mask unpacking logic directly in the target WGSL executables.</p></li>
+<li><p>[x] 207. Handle sub-byte buffer indexing securely within the VM HAL dispatcher.</p></li>
+<li><p>[x] 208. Benchmark W4A16 WGSL executables against standard FP16 equivalents.</p></li>
+<li><p>[x] 209. Provide detailed size tracking showing binary size before and after lowering quantization.</p></li>
+<li><p>[x] 210. Map explicit mixed-precision topologies (some layers INT8, some FP16) seamlessly.</p></li>
+</ul>
+</section>
+<section id="phase-15-target-specific-autotuning-metaschedule-integration">
+<h3>Phase 15: Target-Specific Autotuning (MetaSchedule Integration)<a class="headerlink" href="#phase-15-target-specific-autotuning-metaschedule-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 211. Integrate the <code class="docutils literal notranslate"><span class="pre">onnx9000.tvm</span></code> auto-tuner (from ONNX18) into the IREE lowering pipeline.</p></li>
+<li><p>[x] 212. Allow the tuner to mutate the <code class="docutils literal notranslate"><span class="pre">linalg.generic</span></code> tiling sizes iteratively.</p></li>
+<li><p>[x] 213. Profile generated WGSL shaders rapidly using <code class="docutils literal notranslate"><span class="pre">device.createQuerySet</span></code>.</p></li>
+<li><p>[x] 214. Record optimal tile sizes and memory access patterns into an <code class="docutils literal notranslate"><span class="pre">iree_config.json</span></code>.</p></li>
+<li><p>[x] 215. Feed the configuration file back into the <code class="docutils literal notranslate"><span class="pre">Linalg-to-HAL</span></code> pass to lock in the optimal shapes.</p></li>
+<li><p>[x] 216. Autotune WebGPU <code class="docutils literal notranslate"><span class="pre">workgroup_size</span></code> mapping specifically for Apple M-Series GPUs.</p></li>
+<li><p>[x] 217. Autotune WebGPU <code class="docutils literal notranslate"><span class="pre">workgroup_size</span></code> mapping specifically for Nvidia discrete GPUs.</p></li>
+<li><p>[x] 218. Display a live tuning dashboard during compilation if <code class="docutils literal notranslate"><span class="pre">--autotune</span></code> is provided.</p></li>
+<li><p>[x] 219. Provide heuristic fallbacks if autotuning is skipped.</p></li>
+<li><p>[x] 220. Support tuning WASM SIMD unroll factors for optimal V8/SpiderMonkey compilation.</p></li>
+</ul>
+</section>
+<section id="phase-16-interoperability-import-export">
+<h3>Phase 16: Interoperability &amp; Import/Export<a class="headerlink" href="#phase-16-interoperability-import-export" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 221. Implement standard <code class="docutils literal notranslate"><span class="pre">.mlir</span></code> text file parser.</p></li>
+<li><p>[x] 222. Allow importing raw MLIR files generated by Google IREE and executing them on the <code class="docutils literal notranslate"><span class="pre">wvm</span></code>.</p></li>
+<li><p>[x] 223. Implement standard <code class="docutils literal notranslate"><span class="pre">.mlir</span></code> text file emitter.</p></li>
+<li><p>[x] 224. Support importing TensorFlow SavedModels via bridging through XLA to MHLO.</p></li>
+<li><p>[x] 225. Support importing PyTorch models via <code class="docutils literal notranslate"><span class="pre">torch-mlir</span></code>.</p></li>
+<li><p>[x] 226. Ensure the <code class="docutils literal notranslate"><span class="pre">web.mhlo</span></code> dialect accurately reflects standard <code class="docutils literal notranslate"><span class="pre">stablehlo</span></code> specification to maximize compatibility.</p></li>
+<li><p>[x] 227. Provide a conversion script between <code class="docutils literal notranslate"><span class="pre">stablehlo</span></code> and <code class="docutils literal notranslate"><span class="pre">web.mhlo</span></code> handling any unsupported discrepancies.</p></li>
+<li><p>[x] 228. Export the standalone JS bundles into an NPM-publishable format automatically.</p></li>
+<li><p>[x] 229. Expose source maps connecting <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> bytecode instructions back to specific ONNX node IDs.</p></li>
+<li><p>[x] 230. Integrate cleanly with <code class="docutils literal notranslate"><span class="pre">onnx9000.transformers</span></code> auto-classes to act as a hidden backend provider.</p></li>
+</ul>
+</section>
+<section id="phase-17-security-sandbox-and-stability">
+<h3>Phase 17: Security, Sandbox, and Stability<a class="headerlink" href="#phase-17-security-sandbox-and-stability" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 231. Ensure the generated <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> interpreter strictly confines memory access to its initialized ArrayBuffer.</p></li>
+<li><p>[x] 232. Prevent out-of-bounds reads/writes in the VM via explicit bound checks during development mode.</p></li>
+<li><p>[x] 233. In production mode, utilize WASM memory bounds implicitly to ensure zero-overhead security.</p></li>
+<li><p>[x] 234. Validate generated WGSL shaders against the WebGPU specification to prevent driver crashes.</p></li>
+<li><p>[x] 235. Sanitize model inputs passing through the <code class="docutils literal notranslate"><span class="pre">vm.import</span></code> boundaries.</p></li>
+<li><p>[x] 236. Prevent infinite loops by injecting watchdog counters in <code class="docutils literal notranslate"><span class="pre">web.vm.branch</span></code> instructions.</p></li>
+<li><p>[x] 237. Ensure execution determinism across multiple runs (assuming identical inputs and seeds).</p></li>
+<li><p>[x] 238. Validate VM robustness against corrupted or maliciously crafted <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> bytecode files.</p></li>
+<li><p>[x] 239. Handle WebGL context loss as a graceful fallback if WebGPU crashes due to OS issues.</p></li>
+<li><p>[x] 240. Implement comprehensive telemetry reporting specific pass times during compilation.</p></li>
+</ul>
+</section>
+<section id="phase-18-ecosystem-demos-examples">
+<h3>Phase 18: Ecosystem Demos &amp; Examples<a class="headerlink" href="#phase-18-ecosystem-demos-examples" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 241. Provide “Tiny LLM in 20KB JS” example repository.</p></li>
+<li><p>[x] 242. Provide “Webcam Object Detection without External Dependencies” example.</p></li>
+<li><p>[x] 243. Integrate the standalone JS output directly into an HTML Canvas element for instant visual feedback.</p></li>
+<li><p>[x] 244. Provide a Deno/Bun example executing <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> files purely via command line.</p></li>
+<li><p>[x] 245. Create an interactive “Compiler Explorer” (like godbolt.org) for ONNX -&gt; MLIR -&gt; WGSL.</p></li>
+<li><p>[x] 246. Provide examples of embedding a <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> binary directly inside a Chrome Extension service worker.</p></li>
+<li><p>[x] 247. Demonstrate cross-platform parity: running the exact same <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> file on Node.js and Browser.</p></li>
+<li><p>[x] 248. Write integration tests mapping <code class="docutils literal notranslate"><span class="pre">wvm</span></code> APIs to standard REST API server logic.</p></li>
+<li><p>[x] 249. Publish a gallery of pre-compiled <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> binaries for popular foundational models.</p></li>
+<li><p>[x] 250. Create detailed documentation explaining the transition from standard execution to AOT MLIR execution.</p></li>
+</ul>
+</section>
+<section id="phase-19-advanced-graph-diagnostics-tracing">
+<h3>Phase 19: Advanced Graph Diagnostics &amp; Tracing<a class="headerlink" href="#phase-19-advanced-graph-diagnostics-tracing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 251. Implement a Chrome Tracing (<code class="docutils literal notranslate"><span class="pre">.json</span></code>) generator for the compiler passes.</p></li>
+<li><p>[x] 252. Output detailed memory lifecycle graphs (showing peak memory vs active buffers over time).</p></li>
+<li><p>[x] 253. Provide a visualization of the HAL command buffers to identify synchronization bottlenecks.</p></li>
+<li><p>[x] 254. Track total WGSL shader string size and optimize minification strategies.</p></li>
+<li><p>[x] 255. Support injecting profiling counters into the generated WGSL to measure exact GPU ticks per kernel.</p></li>
+<li><p>[x] 256. Correlate GPU profiling data back to the original ONNX nodes.</p></li>
+<li><p>[x] 257. Provide a “diff” tool to compare the MLIR representation before and after a specific optimization pass.</p></li>
+<li><p>[x] 258. Expose all intermediate WGSL shaders to a debug directory during compilation.</p></li>
+<li><p>[x] 259. Implement a fallback execution mode that runs the exact graph structure on CPU for numerical debugging.</p></li>
+<li><p>[x] 260. Capture WebGPU validation errors and map them precisely to the faulty MLIR lowerings.</p></li>
+</ul>
+</section>
+<section id="phase-20-full-parity-future-hardening">
+<h3>Phase 20: Full Parity &amp; Future Hardening<a class="headerlink" href="#phase-20-full-parity-future-hardening" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 261. Achieve compilation success on the standard ONNX <code class="docutils literal notranslate"><span class="pre">model_zoo</span></code> (top 50 models).</p></li>
+<li><p>[x] 262. Verify standard compliance with MLIR upstream dialects where applicable.</p></li>
+<li><p>[x] 263. Implement robust error recovery during the parsing of complex <code class="docutils literal notranslate"><span class="pre">.mlir</span></code> text files.</p></li>
+<li><p>[x] 264. Support explicit multi-device execution within a single <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> module (e.g., Device 0 = WebGPU, Device 1 = CPU).</p></li>
+<li><p>[x] 265. Ensure correct topological sorting handles disconnected graph components appropriately.</p></li>
+<li><p>[x] 266. Provide deterministic pseudo-random number generation primitives within the VM dialect.</p></li>
+<li><p>[x] 267. Map specialized String handling ops from ONNX (if applicable) into the VM.</p></li>
+<li><p>[x] 268. Handle extreme edge-case tensor ranks (e.g., 6D or 7D tensors) gracefully.</p></li>
+<li><p>[x] 269. Compile the <code class="docutils literal notranslate"><span class="pre">wvm</span></code> interpreter specifically for Cloudflare Workers (minimizing startup latency).</p></li>
+<li><p>[x] 270. Create WebRTC broadcast utilities for distributing <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> tasks across a peer-to-peer browser network.</p></li>
+<li><p>[x] 271. Support dynamic dimension patching without recompiling the <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> module.</p></li>
+<li><p>[x] 272. Implement graph-level deduplication (merging identical subgraphs across different model partitions).</p></li>
+<li><p>[x] 273. Support loading external weights via memory mapping (mmap) equivalents in Node/Deno.</p></li>
+<li><p>[x] 274. Verify exact parity of INT8 outputs against ORT QLinearOps.</p></li>
+<li><p>[x] 275. Expand CLI flag support (<code class="docutils literal notranslate"><span class="pre">--emit-mlir</span></code>, <code class="docutils literal notranslate"><span class="pre">--emit-wgsl</span></code>, <code class="docutils literal notranslate"><span class="pre">--emit-wvm</span></code>, <code class="docutils literal notranslate"><span class="pre">--run</span></code>).</p></li>
+<li><p>[x] 276. Ensure the compiler respects <code class="docutils literal notranslate"><span class="pre">NODE_ENV=production</span></code> for minification vs debugging behaviors.</p></li>
+<li><p>[x] 277. Implement a strict “no eval” policy in the interpreter to satisfy rigorous Content Security Policies.</p></li>
+<li><p>[x] 278. Establish standard benchmarking CI jobs that block PRs if <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> execution time regresses.</p></li>
+<li><p>[x] 279. Prepare the architecture for future WebNN backend support via the HAL dialect.</p></li>
+<li><p>[x] 280. Handle <code class="docutils literal notranslate"><span class="pre">uint64</span></code> data types explicitly where WebGPU specifications restrict them.</p></li>
+<li><p>[x] 281. Build a custom VSCode extension to provide syntax highlighting for the <code class="docutils literal notranslate"><span class="pre">web.mlir</span></code> dialect.</p></li>
+<li><p>[x] 282. Ensure the VM correctly manages Promise resolutions when integrating asynchronous WebGPU readbacks.</p></li>
+<li><p>[x] 283. Support <code class="docutils literal notranslate"><span class="pre">hal.buffer.view</span></code> conversions that change data types safely (e.g., bitcasting).</p></li>
+<li><p>[x] 284. Handle extremely deeply nested MLIR regions without throwing JS Maximum Call Stack Exceeded errors.</p></li>
+<li><p>[x] 285. Provide explicit documentation on the memory safety guarantees of the <code class="docutils literal notranslate"><span class="pre">.wvm</span></code> architecture.</p></li>
+<li><p>[x] 286. Optimize the JSON serialization of MLIR ASTs for passing between Web Workers during compilation.</p></li>
+<li><p>[x] 287. Map ONNX <code class="docutils literal notranslate"><span class="pre">Loop</span></code> natively using <code class="docutils literal notranslate"><span class="pre">web.scf.while</span></code> control flow.</p></li>
+<li><p>[x] 288. Ensure <code class="docutils literal notranslate"><span class="pre">onnx9000-iree</span></code> can compile itself natively if run through a JS-to-WASM transpiler (meta-compilation).</p></li>
+<li><p>[x] 289. Support exporting the standalone scripts in UMD format for legacy browser integration.</p></li>
+<li><p>[x] 290. Provide a detailed roadmap for tracking upstream Google IREE feature implementations.</p></li>
+<li><p>[x] 291. Compile MobileBERT entirely into the standalone JS format.</p></li>
+<li><p>[x] 292. Compile TinyBERT entirely into the standalone JS format.</p></li>
+<li><p>[x] 293. Verify the generated Standalone JS executes offline with no network requests.</p></li>
+<li><p>[x] 294. Map explicit <code class="docutils literal notranslate"><span class="pre">isInf</span></code> and <code class="docutils literal notranslate"><span class="pre">isNaN</span></code> logic natively into WGSL primitives.</p></li>
+<li><p>[x] 295. Execute deep memory lifecycle analysis to prove there are zero memory leaks during a <code class="docutils literal notranslate"><span class="pre">wvm</span></code> generation loop.</p></li>
+<li><p>[x] 296. Maintain exact numeric parity with reference PyTorch models.</p></li>
+<li><p>[x] 297. Support <code class="docutils literal notranslate"><span class="pre">--disable-webgpu-fp16</span></code> for legacy devices.</p></li>
+<li><p>[x] 298. Validate precise execution under severe memory constraints (e.g., simulated 512MB RAM limits).</p></li>
+<li><p>[x] 299. Write comprehensive API documentation for the <code class="docutils literal notranslate"><span class="pre">wvm</span></code> interpreter.</p></li>
+<li><p>[x] 300. Release v1.0 feature complete certification for <code class="docutils literal notranslate"><span class="pre">onnx9000.iree</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX39_WEBNN_POLYFILL.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX21_ORT_GENAI.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-high-level-dialect-web-mhlo-web-tensor">Phase 1: High-Level Dialect (<code class="docutils literal notranslate"><span class="pre">web.mhlo</span></code> / <code class="docutils literal notranslate"><span class="pre">web.tensor</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-2-structural-dialect-web-linalg">Phase 2: Structural Dialect (<code class="docutils literal notranslate"><span class="pre">web.linalg</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-3-hardware-abstraction-layer-dialect-web-hal">Phase 3: Hardware Abstraction Layer Dialect (<code class="docutils literal notranslate"><span class="pre">web.hal</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-4-control-flow-vm-dialect-web-vm">Phase 4: Control Flow &amp; VM Dialect (<code class="docutils literal notranslate"><span class="pre">web.vm</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-5-executable-translation-wasm-cpu">Phase 5: Executable Translation (WASM CPU)</a></li>
+<li><a class="reference internal" href="#phase-6-executable-translation-wgsl-webgpu">Phase 6: Executable Translation (WGSL WebGPU)</a></li>
+<li><a class="reference internal" href="#phase-7-the-minimal-iree-style-runtime-vm-interpreter">Phase 7: The Minimal IREE-Style Runtime (VM Interpreter)</a></li>
+<li><a class="reference internal" href="#phase-8-static-standalone-web-generation-the-ultimate-export">Phase 8: Static Standalone Web Generation (The Ultimate Export)</a></li>
+<li><a class="reference internal" href="#phase-9-model-specific-mlir-optimization-passes">Phase 9: Model specific MLIR optimization passes</a></li>
+<li><a class="reference internal" href="#phase-10-compiler-cli-tooling-onnx9000-iree">Phase 10: Compiler CLI &amp; Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000-iree</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-11-end-to-end-validation-vision">Phase 11: End-to-End Validation (Vision)</a></li>
+<li><a class="reference internal" href="#phase-12-end-to-end-validation-nlp-llms">Phase 12: End-to-End Validation (NLP &amp; LLMs)</a></li>
+<li><a class="reference internal" href="#phase-13-end-to-end-validation-audio">Phase 13: End-to-End Validation (Audio)</a></li>
+<li><a class="reference internal" href="#phase-14-dynamic-quantization-lowering">Phase 14: Dynamic Quantization Lowering</a></li>
+<li><a class="reference internal" href="#phase-15-target-specific-autotuning-metaschedule-integration">Phase 15: Target-Specific Autotuning (MetaSchedule Integration)</a></li>
+<li><a class="reference internal" href="#phase-16-interoperability-import-export">Phase 16: Interoperability &amp; Import/Export</a></li>
+<li><a class="reference internal" href="#phase-17-security-sandbox-and-stability">Phase 17: Security, Sandbox, and Stability</a></li>
+<li><a class="reference internal" href="#phase-18-ecosystem-demos-examples">Phase 18: Ecosystem Demos &amp; Examples</a></li>
+<li><a class="reference internal" href="#phase-19-advanced-graph-diagnostics-tracing">Phase 19: Advanced Graph Diagnostics &amp; Tracing</a></li>
+<li><a class="reference internal" href="#phase-20-full-parity-future-hardening">Phase 20: Full Parity &amp; Future Hardening</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

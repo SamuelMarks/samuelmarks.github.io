@@ -1,0 +1,972 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX Runtime Training Replication &amp; Parity Tracker" href="ONNX02_ORT_TRAINING.html"><link rel="prev" title="ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)" href="ONNX43_DIFFUSERS.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX42: Triton Inference Server (Web-Native Edge Serving Engine) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX42_TRITON_SERVER.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx42-triton-inference-server-web-native-edge-serving-engine">
+<h1>ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)<a class="headerlink" href="#onnx42-triton-inference-server-web-native-edge-serving-engine" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p>NVIDIA’s <code class="docutils literal notranslate"><span class="pre">Triton</span> <span class="pre">Inference</span> <span class="pre">Server</span></code> (and the deprecated ONNX Runtime Server) are the industry standards for deploying machine learning models to production. They provide high-performance features like dynamic batching, model ensembling, concurrent execution, and strict gRPC/REST APIs (the KServe standard). However, these servers are massive, monolithic C++ applications. They require heavy Docker containers, specific CUDA host drivers, complex memory allocators, and generally cannot run in serverless or edge environments.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx9000.serve</span></code> completely reimagines ML model serving as a <strong>100% pure TypeScript, Edge-Native Application</strong>.</p>
+<ul class="simple">
+<li><p><strong>Serverless Edge Deployment:</strong> Designed natively for Vercel Edge, Cloudflare Workers, Deno Deploy, and Bun. You can deploy a globally distributed inference server without a single Docker container.</p></li>
+<li><p><strong>Event-Loop Dynamic Batching:</strong> Instead of complex C++ thread locking, it utilizes the native JavaScript asynchronous event loop to seamlessly debounce and batch incoming concurrent HTTP requests into single WebGPU tensor executions.</p></li>
+<li><p><strong>Zero-Dependency Monolith:</strong> Because it uses <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>’s internal pure-TS execution engine, there are no C++ binaries to install on the server. Models are JIT-compiled to WASM or WebGPU exactly as they are in the browser.</p></li>
+<li><p><strong>OpenAI &amp; KServe Parity:</strong> It natively exposes the KServe V2 standard (used by Triton) alongside the OpenAI REST API (for LLMs), making it a drop-in replacement for existing cloud infrastructure.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-core-server-architecture-protocol-handlers">
+<h3>Phase 1: Core Server Architecture &amp; Protocol Handlers<a class="headerlink" href="#phase-1-core-server-architecture-protocol-handlers" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 1. Implement high-performance core HTTP router natively in TypeScript.</p></li>
+<li><p>[x] [x] 2. Support generic <code class="docutils literal notranslate"><span class="pre">fetch</span></code> Event Listener interfaces for Edge runtimes.</p></li>
+<li><p>[x] [x] 3. Implement HTTP/1.1 REST API bindings.</p></li>
+<li><p>[x] [x] 4. Implement HTTP/2 multiplexed connections.</p></li>
+<li><p>[x] [x] 5. Implement gRPC protocol emulation over HTTP/2 natively in JS (via <code class="docutils literal notranslate"><span class="pre">bufbuild/connect</span></code> or similar).</p></li>
+<li><p>[x] [x] 6. Implement KServe / Triton V2 Inference Protocol natively.</p></li>
+<li><p>[x] [x] 7. Implement WebSocket (WS) endpoint for continuous bidirectional inference streams.</p></li>
+<li><p>[x] [x] 8. Implement Server-Sent Events (SSE) for token-by-token Generative AI streams.</p></li>
+<li><p>[x] [x] 9. Support multipart/form-data parsing for binary image/audio uploads.</p></li>
+<li><p>[x] [x] 10. Implement zero-copy ArrayBuffer extraction from HTTP request bodies.</p></li>
+<li><p>[x] [x] 11. Implement standard CORS (Cross-Origin Resource Sharing) middleware.</p></li>
+<li><p>[x] [x] 12. Expose <code class="docutils literal notranslate"><span class="pre">/v2/health/ready</span></code> endpoint.</p></li>
+<li><p>[x] [x] 13. Expose <code class="docutils literal notranslate"><span class="pre">/v2/health/live</span></code> endpoint.</p></li>
+<li><p>[x] [x] 14. Expose <code class="docutils literal notranslate"><span class="pre">/v2/models</span></code> repository index endpoint.</p></li>
+<li><p>[x] [x] 15. Expose <code class="docutils literal notranslate"><span class="pre">/v2/models/{model_name}</span></code> metadata endpoint.</p></li>
+</ul>
+</section>
+<section id="phase-2-edge-runtime-compatibility-cloudflare-bun-deno-node">
+<h3>Phase 2: Edge Runtime Compatibility (Cloudflare, Bun, Deno, Node)<a class="headerlink" href="#phase-2-edge-runtime-compatibility-cloudflare-bun-deno-node" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 16. Provide <code class="docutils literal notranslate"><span class="pre">Cloudflare</span> <span class="pre">Worker</span></code> specific entrypoint bindings.</p></li>
+<li><p>[x] [x] 17. Support Cloudflare WebGPU bindings (if available/experimental).</p></li>
+<li><p>[x] [x] 18. Support Cloudflare WASM bindings natively within the 50ms CPU limit.</p></li>
+<li><p>[x] [x] 19. Provide <code class="docutils literal notranslate"><span class="pre">Deno</span></code> specific entrypoint bindings (<code class="docutils literal notranslate"><span class="pre">Deno.serve</span></code>).</p></li>
+<li><p>[x] [x] 20. Provide <code class="docutils literal notranslate"><span class="pre">Bun</span></code> specific high-performance entrypoint (<code class="docutils literal notranslate"><span class="pre">Bun.serve</span></code>).</p></li>
+<li><p>[x] [x] 21. Provide <code class="docutils literal notranslate"><span class="pre">Node.js</span></code> specific entrypoint (<code class="docutils literal notranslate"><span class="pre">http</span></code> / <code class="docutils literal notranslate"><span class="pre">http2</span></code> / <code class="docutils literal notranslate"><span class="pre">Express</span></code> wrappers).</p></li>
+<li><p>[x] [x] 22. Prevent usage of standard Node.js <code class="docutils literal notranslate"><span class="pre">fs</span></code> module in core engine to ensure Edge compatibility.</p></li>
+<li><p>[x] [x] 23. Implement a virtual file system (VFS) for loading models from Cloudflare R2 / S3.</p></li>
+<li><p>[x] [x] 24. Handle Cloudflare’s strict memory limitations (128MB per isolate) gracefully via streaming inference.</p></li>
+<li><p>[x] [x] 25. Provide AWS Lambda native handler formats (<code class="docutils literal notranslate"><span class="pre">event,</span> <span class="pre">context</span></code>).</p></li>
+<li><p>[x] [x] 26. Provide Vercel Edge Function native bindings.</p></li>
+<li><p>[x] [x] 27. Gracefully catch specific runtime timeouts (e.g., Lambda 15min limit).</p></li>
+<li><p>[x] [x] 28. Export the server as a unified isomorphic NPM package (<code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/serve</span></code>).</p></li>
+<li><p>[x] [x] 29. Bypass completely any reliance on Node <code class="docutils literal notranslate"><span class="pre">child_process</span></code> natively.</p></li>
+<li><p>[x] [x] 30. Leverage JS <code class="docutils literal notranslate"><span class="pre">ReadableStream</span></code> and <code class="docutils literal notranslate"><span class="pre">WritableStream</span></code> universally across all runtimes.</p></li>
+</ul>
+</section>
+<section id="phase-3-dynamic-batching-event-loop-scheduling">
+<h3>Phase 3: Dynamic Batching &amp; Event Loop Scheduling<a class="headerlink" href="#phase-3-dynamic-batching-event-loop-scheduling" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 31. Implement the <code class="docutils literal notranslate"><span class="pre">DynamicBatcher</span></code> core class.</p></li>
+<li><p>[x] [x] 32. Configure <code class="docutils literal notranslate"><span class="pre">max_batch_size</span></code> parameters per model.</p></li>
+<li><p>[x] [x] 33. Configure <code class="docutils literal notranslate"><span class="pre">batch_timeout_ms</span></code> parameters per model (debouncing).</p></li>
+<li><p>[x] [x] 34. Trap asynchronous HTTP requests into an active batch queue.</p></li>
+<li><p>[x] [x] 35. Trigger ONNX execution dynamically when the queue reaches <code class="docutils literal notranslate"><span class="pre">max_batch_size</span></code>.</p></li>
+<li><p>[x] [x] 36. Trigger ONNX execution dynamically when <code class="docutils literal notranslate"><span class="pre">batch_timeout_ms</span></code> is reached.</p></li>
+<li><p>[x] [x] 37. Implement tensor concatenation across the batch dimension (<code class="docutils literal notranslate"><span class="pre">Axis</span> <span class="pre">0</span></code>) dynamically.</p></li>
+<li><p>[x] [x] 38. Pad variable-length sequence inputs automatically (e.g., text inputs) within the batch.</p></li>
+<li><p>[x] [x] 39. Generate dynamic <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code> tensors for padded sequences securely.</p></li>
+<li><p>[x] [x] 40. Split the single ONNX execution output back into isolated HTTP response promises.</p></li>
+<li><p>[x] [x] 41. Ensure strict ordering of responses matching the incoming queue exactly.</p></li>
+<li><p>[x] [x] 42. Implement Priority Queueing (prioritizing premium user requests over standard).</p></li>
+<li><p>[x] [x] 43. Handle batching failures (e.g., one request has invalid shapes) by isolating the failure and re-executing the valid subset.</p></li>
+<li><p>[x] [x] 44. Profile batching efficiency natively (Logging: “Batched 12 requests in 5ms”).</p></li>
+<li><p>[x] [x] 45. Support Continuous Batching for LLMs (inserting new requests into active autoregressive loops).</p></li>
+</ul>
+</section>
+<section id="phase-4-kserve-v2-triton-api-standard-compliance">
+<h3>Phase 4: KServe V2 / Triton API Standard Compliance<a class="headerlink" href="#phase-4-kserve-v2-triton-api-standard-compliance" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 46. Parse KServe V2 <code class="docutils literal notranslate"><span class="pre">InferenceRequest</span></code> JSON body format strictly.</p></li>
+<li><p>[x] [x] 47. Parse KServe V2 binary extension format (for zero-copy tensor transmission).</p></li>
+<li><p>[x] [x] 48. Format KServe V2 <code class="docutils literal notranslate"><span class="pre">InferenceResponse</span></code> JSON body perfectly.</p></li>
+<li><p>[x] [x] 49. Support explicit output tensor selection (only returning requested node outputs).</p></li>
+<li><p>[x] [x] 50. Validate input datatype strings (<code class="docutils literal notranslate"><span class="pre">FP32</span></code>, <code class="docutils literal notranslate"><span class="pre">INT64</span></code>, <code class="docutils literal notranslate"><span class="pre">BOOL</span></code>) against ONNX requirements.</p></li>
+<li><p>[x] [x] 51. Validate input shapes securely, rejecting mismatched shapes with HTTP 400 Bad Request.</p></li>
+<li><p>[x] [x] 52. Support Server-side Model Metadata querying (<code class="docutils literal notranslate"><span class="pre">/v2/models/{name}</span></code>).</p></li>
+<li><p>[x] [x] 53. Expose execution provider metrics in the metadata response.</p></li>
+<li><p>[x] [x] 54. Provide KServe compliant error objects with precise stack traces.</p></li>
+<li><p>[x] [x] 55. Validate endianness on incoming binary tensors, byte-swapping if the client requests it.</p></li>
+<li><p>[x] [x] 56. Support Model Versioning natively (<code class="docutils literal notranslate"><span class="pre">/v2/models/{name}/versions/{version}</span></code>).</p></li>
+<li><p>[x] [x] 57. Default to the highest available model version if omitted in the URL.</p></li>
+<li><p>[x] [x] 58. Support Triton’s specific Model Configuration (<code class="docutils literal notranslate"><span class="pre">config.pbtxt</span></code>) format conversion to ONNX9000 internal JSON configs.</p></li>
+<li><p>[x] [x] 59. Allow explicit batching flags inside the request payload.</p></li>
+<li><p>[x] [x] 60. Expose an automated tester to verify strict KServe spec compliance on deployment.</p></li>
+</ul>
+</section>
+<section id="phase-5-openai-rest-api-parity-for-llms-genai">
+<h3>Phase 5: OpenAI REST API Parity (For LLMs / GenAI)<a class="headerlink" href="#phase-5-openai-rest-api-parity-for-llms-genai" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 61. Implement <code class="docutils literal notranslate"><span class="pre">/v1/chat/completions</span></code> endpoint.</p></li>
+<li><p>[x] [x] 62. Implement <code class="docutils literal notranslate"><span class="pre">/v1/completions</span></code> endpoint.</p></li>
+<li><p>[x] [x] 63. Implement <code class="docutils literal notranslate"><span class="pre">/v1/embeddings</span></code> endpoint.</p></li>
+<li><p>[x] [x] 64. Implement <code class="docutils literal notranslate"><span class="pre">/v1/audio/transcriptions</span></code> endpoint (routing to Whisper models).</p></li>
+<li><p>[x] [x] 65. Parse standard OpenAI <code class="docutils literal notranslate"><span class="pre">messages</span></code> array natively.</p></li>
+<li><p>[x] [x] 66. Apply HuggingFace <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> chat templates dynamically to the messages array.</p></li>
+<li><p>[x] [x] 67. Support <code class="docutils literal notranslate"><span class="pre">stream=true</span></code> using HTTP Server-Sent Events (SSE).</p></li>
+<li><p>[x] [x] 68. Support <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">top_p</span></code>, <code class="docutils literal notranslate"><span class="pre">top_k</span></code> sampling parameters.</p></li>
+<li><p>[x] [x] 69. Support <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">presence_penalty</span></code>.</p></li>
+<li><p>[x] [x] 70. Support <code class="docutils literal notranslate"><span class="pre">stop</span></code> sequences (string arrays).</p></li>
+<li><p>[x] [x] 71. Implement exact JSON response schema matching OpenAI’s objects (id, object, created, model, choices).</p></li>
+<li><p>[x] [x] 72. Emit standard <code class="docutils literal notranslate"><span class="pre">[DONE]</span></code> marker at the end of SSE streams.</p></li>
+<li><p>[x] [x] 73. Track and return <code class="docutils literal notranslate"><span class="pre">usage</span></code> statistics (prompt_tokens, completion_tokens, total_tokens).</p></li>
+<li><p>[x] [x] 74. Map specific base models automatically to the OpenAI router (e.g., routing <code class="docutils literal notranslate"><span class="pre">llama-3</span></code> requests appropriately).</p></li>
+<li><p>[x] [x] 75. Support function calling / tools arrays by injecting JSON schema constraints into the GenAI loop.</p></li>
+</ul>
+</section>
+<section id="phase-6-model-pipelines-ensembles-dag-orchestration">
+<h3>Phase 6: Model Pipelines &amp; Ensembles (DAG Orchestration)<a class="headerlink" href="#phase-6-model-pipelines-ensembles-dag-orchestration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 76. Implement Model Ensemble routing.</p></li>
+<li><p>[x] [x] 77. Define <code class="docutils literal notranslate"><span class="pre">Ensemble</span></code> JSON configuration (Mapping Model A outputs to Model B inputs).</p></li>
+<li><p>[x] [x] 78. Support sequentially executing isolated ONNX models in memory without HTTP overhead.</p></li>
+<li><p>[x] [x] 79. Support executing multiple models in parallel if inputs are independent.</p></li>
+<li><p>[x] [x] 80. Implement custom “Business Logic” pipeline nodes (executing raw Javascript between models).</p></li>
+<li><p>[x] [x] 81. Example: Route <code class="docutils literal notranslate"><span class="pre">Image</span> <span class="pre">Upload</span> <span class="pre">-&gt;</span> <span class="pre">ResNet50</span> <span class="pre">-&gt;</span> <span class="pre">JS</span> <span class="pre">Logic</span> <span class="pre">-&gt;</span> <span class="pre">Text</span> <span class="pre">Model</span> <span class="pre">-&gt;</span> <span class="pre">JSON</span> <span class="pre">Response</span></code>.</p></li>
+<li><p>[x] [x] 82. Manage end-to-end memory buffers across the ensemble to ensure zero-copy bridging.</p></li>
+<li><p>[x] [x] 83. Support Conditional Routing inside an ensemble (e.g., if Image is Dark, run Enhancer Model, else run Standard Model).</p></li>
+<li><p>[x] [x] 84. Track latency individually across the ensemble steps.</p></li>
+<li><p>[x] [x] 85. Provide unified KServe API endpoint representing the entire Ensemble as a single model.</p></li>
+<li><p>[x] [x] 86. Automatically inject Tokenization as a pre-processing step inside the ensemble.</p></li>
+<li><p>[x] [x] 87. Automatically inject Post-Processing (NMS, ArgMax) inside the ensemble.</p></li>
+<li><p>[x] [x] 88. Prevent infinite routing loops within the ensemble definition natively.</p></li>
+<li><p>[x] [x] 89. Allow importing HuggingFace Pipelines (<code class="docutils literal notranslate"><span class="pre">transformers.js</span></code> parity) directly as server ensembles.</p></li>
+<li><p>[x] [x] 90. Support mapping isolated LoRA adapters dynamically across the ensemble stages.</p></li>
+</ul>
+</section>
+<section id="phase-7-memory-vram-resource-management">
+<h3>Phase 7: Memory &amp; VRAM Resource Management<a class="headerlink" href="#phase-7-memory-vram-resource-management" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 91. Track total active WebGPU VRAM natively inside the Node/Deno environment.</p></li>
+<li><p>[x] [x] 92. Track total active WASM linear memory usage dynamically.</p></li>
+<li><p>[x] [x] 93. Implement a Least Recently Used (LRU) Cache for loaded models.</p></li>
+<li><p>[x] [x] 94. Evict models gracefully from memory if a new request requires VRAM.</p></li>
+<li><p>[x] [x] 95. Implement graceful memory eviction limits (e.g., <code class="docutils literal notranslate"><span class="pre">MAX_RAM_PERCENT</span> <span class="pre">=</span> <span class="pre">0.85</span></code>).</p></li>
+<li><p>[x] [x] 96. Reject requests with HTTP 503 (Service Unavailable) if the server is severely OOM.</p></li>
+<li><p>[x] [x] 97. Provide global configuration for Max Concurrent Executions.</p></li>
+<li><p>[x] [x] 98. Utilize <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>’s static arena planner to refuse loading models that mathematically exceed the server’s RAM bounds.</p></li>
+<li><p>[x] [x] 99. Share weights natively across multiple instances of the same model (e.g., 4 Workers sharing 1 ArrayBuffer).</p></li>
+<li><p>[x] [x] 100. Force Javascript Garbage Collection (<code class="docutils literal notranslate"><span class="pre">global.gc()</span></code>) explicitly between massive batches if the runtime allows it.</p></li>
+</ul>
+</section>
+<section id="phase-8-hardware-acceleration-binding-webgpu-wasm">
+<h3>Phase 8: Hardware Acceleration Binding (WebGPU / WASM)<a class="headerlink" href="#phase-8-hardware-acceleration-binding-webgpu-wasm" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 101. Initialize Node.js WebGPU backend bindings (<code class="docutils literal notranslate"><span class="pre">&#64;webgpu/types</span></code> + native adapters).</p></li>
+<li><p>[x] [x] 102. Initialize Deno WebGPU backend natively.</p></li>
+<li><p>[x] [x] 103. Initialize Bun WebGPU / WASM adapters seamlessly.</p></li>
+<li><p>[x] [x] 104. Select high-performance GPU targets explicitly over integrated graphics.</p></li>
+<li><p>[x] [x] 105. Pin WASM threads to specific CPU cores if supported by the OS (using Node <code class="docutils literal notranslate"><span class="pre">worker_threads</span></code>).</p></li>
+<li><p>[x] [x] 106. Ensure asynchronous WebGPU shader submissions do not block the HTTP router thread.</p></li>
+<li><p>[x] [x] 107. Dynamically fall back from WebGPU to WASM if the model exceeds local GPU buffer constraints.</p></li>
+<li><p>[x] [x] 108. Enable Float16 WebGPU execution natively within the server limits.</p></li>
+<li><p>[x] [x] 109. Support multi-GPU setups logically (routing Model A to GPU 0, Model B to GPU 1).</p></li>
+<li><p>[x] [x] 110. Capture WebGPU Device Loss events and gracefully restart the internal worker without dropping the HTTP server.</p></li>
+</ul>
+</section>
+<section id="phase-9-kv-cache-distributed-state-llms">
+<h3>Phase 9: KV Cache &amp; Distributed State (LLMs)<a class="headerlink" href="#phase-9-kv-cache-distributed-state-llms" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 111. Maintain continuous <code class="docutils literal notranslate"><span class="pre">past_key_values</span></code> dynamically inside the WebGPU memory across multiple HTTP requests.</p></li>
+<li><p>[x] [x] 112. Assign a unique <code class="docutils literal notranslate"><span class="pre">session_id</span></code> to chat streams to route requests back to their active KV cache.</p></li>
+<li><p>[x] [x] 113. Implement a distributed KV cache synchronizer using Redis or Cloudflare KV (for scaling across multiple edge nodes).</p></li>
+<li><p>[x] [x] 114. Serialize KV Cache slices into binary strings for network persistence natively.</p></li>
+<li><p>[x] [x] 115. Deserialize KV Cache states and inject them directly back into the ONNX graph dynamically.</p></li>
+<li><p>[x] [x] 116. Support auto-eviction of idle KV Caches after <code class="docutils literal notranslate"><span class="pre">idle_timeout_ms</span></code> (e.g., 5 minutes of no chat response).</p></li>
+<li><p>[x] [x] 117. Implement Prompt Caching natively (sharing the KV cache of a large system prompt across thousands of users).</p></li>
+<li><p>[x] [x] 118. Detect identical request prefixes automatically to leverage shared caches.</p></li>
+<li><p>[x] [x] 119. Allocate Ring Buffers inside WASM/WebGPU to manage sliding-window attention seamlessly.</p></li>
+<li><p>[x] [x] 120. Provide API to explicitly flush the global server KV Cache.</p></li>
+</ul>
+</section>
+<section id="phase-10-multi-threading-worker-pools">
+<h3>Phase 10: Multi-threading &amp; Worker Pools<a class="headerlink" href="#phase-10-multi-threading-worker-pools" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 121. Implement a Web Worker Pool manager for processing isolated requests.</p></li>
+<li><p>[x] [x] 122. Support running the HTTP router on the Main Thread and all ONNX executions on Worker Threads.</p></li>
+<li><p>[x] [x] 123. Transmit tensors across threads natively using <code class="docutils literal notranslate"><span class="pre">SharedArrayBuffer</span></code> (zero-copy).</p></li>
+<li><p>[x] [x] 124. Translate standard Node <code class="docutils literal notranslate"><span class="pre">worker_threads</span></code> to Web standard <code class="docutils literal notranslate"><span class="pre">Worker</span></code> implementations based on environment.</p></li>
+<li><p>[x] [x] 125. Auto-scale the Worker Pool based on active CPU core counts (<code class="docutils literal notranslate"><span class="pre">os.cpus()</span></code>).</p></li>
+<li><p>[x] [x] 126. Handle Worker crashes gracefully, restarting the Worker and returning an HTTP 500 for the active request.</p></li>
+<li><p>[x] [x] 127. Provide explicit Model-to-Worker pinning (e.g., Worker 1 only runs BERT, Worker 2 only runs ResNet).</p></li>
+<li><p>[x] [x] 128. Support transferring WebGPU device ownership or sharing adapters across workers securely.</p></li>
+<li><p>[x] [x] 129. Implement Round-Robin request routing across the active worker pool.</p></li>
+<li><p>[x] [x] 130. Manage PM2 clustering compatibility gracefully (if users deploy via standard Node tooling).</p></li>
+</ul>
+</section>
+<section id="phase-11-metrics-prometheus-observability">
+<h3>Phase 11: Metrics, Prometheus, &amp; Observability<a class="headerlink" href="#phase-11-metrics-prometheus-observability" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 131. Expose <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> endpoint natively.</p></li>
+<li><p>[x] [x] 132. Implement standard Prometheus text-based metrics format.</p></li>
+<li><p>[x] [x] 133. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_inference_request_total</span></code> (Counter).</p></li>
+<li><p>[x] [x] 134. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_inference_request_duration_seconds</span></code> (Histogram).</p></li>
+<li><p>[x] [x] 135. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_inference_queue_duration_seconds</span></code> (Histogram).</p></li>
+<li><p>[x] [x] 136. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_gpu_memory_bytes</span></code> (Gauge).</p></li>
+<li><p>[x] [x] 137. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_cpu_memory_bytes</span></code> (Gauge).</p></li>
+<li><p>[x] [x] 138. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_active_requests</span></code> (Gauge).</p></li>
+<li><p>[x] [x] 139. Metric: <code class="docutils literal notranslate"><span class="pre">onnx9000_kv_cache_size_bytes</span></code> (Gauge).</p></li>
+<li><p>[x] [x] 140. Extract detailed breakdown of compilation time vs execution time natively.</p></li>
+<li><p>[x] [x] 141. Provide native OpenTelemetry traces (distributed tracing headers extraction).</p></li>
+<li><p>[x] [x] 142. Inject <code class="docutils literal notranslate"><span class="pre">traceparent</span></code> headers across Ensemble steps securely.</p></li>
+<li><p>[x] [x] 143. Support exporting logs to Datadog / NewRelic natively via HTTP POST.</p></li>
+<li><p>[x] [x] 144. Allow granular control of logging levels (<code class="docutils literal notranslate"><span class="pre">TRACE</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO</span></code>, <code class="docutils literal notranslate"><span class="pre">WARN</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>).</p></li>
+<li><p>[x] [x] 145. Provide a built-in interactive HTML dashboard available at <code class="docutils literal notranslate"><span class="pre">/v2/dashboard</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-12-security-rate-limiting-authentication">
+<h3>Phase 12: Security, Rate Limiting, &amp; Authentication<a class="headerlink" href="#phase-12-security-rate-limiting-authentication" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 146. Implement Bearer Token validation natively.</p></li>
+<li><p>[x] [x] 147. Expose an API to inject custom Auth Middlewares (e.g., JWT validation).</p></li>
+<li><p>[x] [x] 148. Implement IP-based Rate Limiting (Token Bucket algorithm natively in memory).</p></li>
+<li><p>[x] [x] 149. Support User-ID based Rate Limiting.</p></li>
+<li><p>[x] [x] 150. Throttle requests throwing HTTP 429 Too Many Requests seamlessly.</p></li>
+<li><p>[x] [x] 151. Reject excessively large payloads dynamically (e.g., protecting against 5GB memory bombs).</p></li>
+<li><p>[x] [x] 152. Validate ONNX files securely before loading (checking for magic byte anomalies).</p></li>
+<li><p>[x] [x] 153. Reject maliciously nested JSON request payloads.</p></li>
+<li><p>[x] [x] 154. Provide strict Content Security Policy (CSP) headers on the Dashboard interface.</p></li>
+<li><p>[x] [x] 155. Support SSL/TLS directly natively in Node/Deno (or assume reverse-proxy termination).</p></li>
+</ul>
+</section>
+<section id="phase-13-model-repository-hot-reloading">
+<h3>Phase 13: Model Repository &amp; Hot-Reloading<a class="headerlink" href="#phase-13-model-repository-hot-reloading" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 156. Implement local File System (FS) watcher natively in Node/Deno.</p></li>
+<li><p>[x] [x] 157. Detect new <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> models dropped into the <code class="docutils literal notranslate"><span class="pre">/models</span></code> directory and hot-load them instantly.</p></li>
+<li><p>[x] [x] 158. Detect removed models and evict them from memory safely.</p></li>
+<li><p>[x] [x] 159. Support fetching models directly from HuggingFace Hub via the repository path.</p></li>
+<li><p>[x] [x] 160. Sync remote repositories periodically (e.g., polling an S3 bucket every 5 minutes).</p></li>
+<li><p>[x] [x] 161. Enforce strict directory layouts matching Triton (<code class="docutils literal notranslate"><span class="pre">/models/my_model/1/model.onnx</span></code>).</p></li>
+<li><p>[x] [x] 162. Parse <code class="docutils literal notranslate"><span class="pre">config.pbtxt</span></code> or <code class="docutils literal notranslate"><span class="pre">config.json</span></code> automatically on folder ingest.</p></li>
+<li><p>[x] [x] 163. Handle zero-downtime deployments (loading Version 2 into memory before unloading Version 1).</p></li>
+<li><p>[x] [x] 164. Support explicit <code class="docutils literal notranslate"><span class="pre">.safetensors</span></code> weight loading seamlessly from the model directory.</p></li>
+<li><p>[x] [x] 165. Manage corrupted model downloads securely (falling back to the previous known good version).</p></li>
+</ul>
+</section>
+<section id="phase-14-vision-audio-specific-data-ingestion">
+<h3>Phase 14: Vision &amp; Audio specific Data Ingestion<a class="headerlink" href="#phase-14-vision-audio-specific-data-ingestion" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 166. Handle Base64 encoded image strings in the KServe JSON payload securely.</p></li>
+<li><p>[x] [x] 167. Handle raw binary JPEG/PNG bytes passed via multipart forms.</p></li>
+<li><p>[x] [x] 168. Inject <code class="docutils literal notranslate"><span class="pre">onnx9000.image.decode</span></code> natively to convert the binary payload to an ONNX Tensor automatically based on model hints.</p></li>
+<li><p>[x] [x] 169. Automatically resize images to match the Model’s required dimensions (e.g., forcing 224x224).</p></li>
+<li><p>[x] [x] 170. Apply standard ImageNet normalization natively before execution.</p></li>
+<li><p>[x] [x] 171. Accept raw <code class="docutils literal notranslate"><span class="pre">.wav</span></code> or <code class="docutils literal notranslate"><span class="pre">.mp3</span></code> bytes for Whisper models.</p></li>
+<li><p>[x] [x] 172. Extract Mel Spectrograms automatically inside the request pipeline.</p></li>
+<li><p>[x] [x] 173. Return bounding box structures nicely formatted as JSON dictionaries instead of raw arrays.</p></li>
+<li><p>[x] [x] 174. Format Segmentation Maps into Base64 PNGs natively for direct display in web clients.</p></li>
+<li><p>[x] [x] 175. Allow defining these custom Data Transformers declaratively in the <code class="docutils literal notranslate"><span class="pre">config.json</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-15-load-balancing-multi-node-routing">
+<h3>Phase 15: Load Balancing &amp; Multi-Node Routing<a class="headerlink" href="#phase-15-load-balancing-multi-node-routing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 176. Implement a native Serverless Hash-Ring router for mapping specific users to specific Edge Nodes.</p></li>
+<li><p>[x] [x] 177. If Node A doesn’t have <code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">X</span></code> in memory, transparently proxy the request to Node B.</p></li>
+<li><p>[x] [x] 178. Maintain a global peer-to-peer registry of loaded models across a server cluster natively in JS.</p></li>
+<li><p>[x] [x] 179. Support generic round-robin load balancing in front of multiple Worker threads.</p></li>
+<li><p>[x] [x] 180. Forward HTTP client IPs perfectly via <code class="docutils literal notranslate"><span class="pre">X-Forwarded-For</span></code> across proxy bounces.</p></li>
+</ul>
+</section>
+<section id="phase-16-cli-deployment-tooling-onnx9000-serve">
+<h3>Phase 16: CLI &amp; Deployment Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">serve</span></code>)<a class="headerlink" href="#phase-16-cli-deployment-tooling-onnx9000-serve" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 181. Implement CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">serve</span> <span class="pre">--model-repository</span> <span class="pre">./models</span> <span class="pre">--port</span> <span class="pre">8080</span></code>.</p></li>
+<li><p>[x] [x] 182. Support <code class="docutils literal notranslate"><span class="pre">--log-verbose</span></code> flag.</p></li>
+<li><p>[x] [x] 183. Support <code class="docutils literal notranslate"><span class="pre">--max-batch-size</span> <span class="pre">32</span></code> global override flag.</p></li>
+<li><p>[x] [x] 184. Support <code class="docutils literal notranslate"><span class="pre">--enable-prometheus</span></code> flag.</p></li>
+<li><p>[x] [x] 185. Support <code class="docutils literal notranslate"><span class="pre">--gpu-only</span></code> flag throwing errors if WASM CPU fallback triggers.</p></li>
+<li><p>[x] [x] 186. Provide <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> template specifically optimized for the TS execution environment.</p></li>
+<li><p>[x] [x] 187. Provide <code class="docutils literal notranslate"><span class="pre">wrangler.toml</span></code> template for instantaneous Cloudflare deployment.</p></li>
+<li><p>[x] [x] 188. Support exporting the entire Server code as a single minified <code class="docutils literal notranslate"><span class="pre">server.js</span></code> payload via ESBuild.</p></li>
+<li><p>[x] [x] 189. Provide <code class="docutils literal notranslate"><span class="pre">.env</span></code> parsing natively for secrets and API keys.</p></li>
+<li><p>[x] [x] 190. Handle strict graceful shutdown signals (<code class="docutils literal notranslate"><span class="pre">SIGINT</span></code>, <code class="docutils literal notranslate"><span class="pre">SIGTERM</span></code>), draining the active batch queues before exiting.</p></li>
+</ul>
+</section>
+<section id="phase-17-load-simulation-benchmarking">
+<h3>Phase 17: Load Simulation &amp; Benchmarking<a class="headerlink" href="#phase-17-load-simulation-benchmarking" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 191. Implement a load tester tool natively: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">perf-analyzer</span></code>.</p></li>
+<li><p>[x] [x] 192. Simulate 100 concurrent users hitting the REST API.</p></li>
+<li><p>[x] [x] 193. Simulate 1000 concurrent users using WebSockets.</p></li>
+<li><p>[x] [x] 194. Extract and print detailed P50, P90, P95, P99 latency percentiles.</p></li>
+<li><p>[x] [x] 195. Verify that Dynamic Batching increases throughput linearly as load increases.</p></li>
+<li><p>[x] [x] 196. Test memory leak absence under 24 hours of sustained load in Node.js.</p></li>
+<li><p>[x] [x] 197. Validate correct batch padding execution under highly variable sequence lengths natively.</p></li>
+<li><p>[x] [x] 198. Print memory allocation limits during the benchmark.</p></li>
+<li><p>[x] [x] 199. Compare throughput precisely against official Nvidia Triton Server C++ deployments.</p></li>
+<li><p>[x] [x] 200. Publish interactive charts comparing Edge Deployment latency against centralized Cloud latency.</p></li>
+</ul>
+</section>
+<section id="phase-18-testing-parity">
+<h3>Phase 18: Testing &amp; Parity<a class="headerlink" href="#phase-18-testing-parity" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 201. Unit Test: Boot server, load ResNet, process KServe JSON request, return KServe JSON response.</p></li>
+<li><p>[x] [x] 202. Unit Test: Boot server, load TinyLlama, process OpenAI Chat Completion, return SSE stream.</p></li>
+<li><p>[x] [x] 203. Unit Test: Execute 5 simultaneous requests natively and ensure batching triggers exactly once.</p></li>
+<li><p>[x] [x] 204. Validate JSON parsing strictness.</p></li>
+<li><p>[x] [x] 205. Catch invalid model paths natively.</p></li>
+<li><p>[x] [x] 206. Ensure execution fails gracefully if a custom operator is not registered.</p></li>
+<li><p>[x] [x] 207. Validate the Prometheus metrics formatting against official scraping standards.</p></li>
+<li><p>[x] [x] 208. Test memory eviction natively (forcing the server to load 10 models when it only has RAM for 5).</p></li>
+<li><p>[x] [x] 209. Verify WebSockets disconnect cleanly if the client drops the connection mid-generation.</p></li>
+<li><p>[x] [x] 210. Validate strict Cross-Platform execution across Windows, Mac, and Linux via Node.js.</p></li>
+</ul>
+</section>
+<section id="phase-19-framework-integrations-langchain-llamaindex">
+<h3>Phase 19: Framework Integrations (Langchain / LlamaIndex)<a class="headerlink" href="#phase-19-framework-integrations-langchain-llamaindex" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 211. Ensure the OpenAI API shim works flawlessly with <code class="docutils literal notranslate"><span class="pre">langchain</span></code> Python package.</p></li>
+<li><p>[x] [x] 212. Ensure the OpenAI API shim works flawlessly with <code class="docutils literal notranslate"><span class="pre">langchain.js</span></code> NPM package.</p></li>
+<li><p>[x] [x] 213. Ensure integration with <code class="docutils literal notranslate"><span class="pre">LlamaIndex</span></code> natively.</p></li>
+<li><p>[x] [x] 214. Ensure integration with <code class="docutils literal notranslate"><span class="pre">Open</span> <span class="pre">Interpreter</span></code> or general agentic frameworks.</p></li>
+<li><p>[x] [x] 215. Expose specific tool-calling (function calling) capabilities seamlessly by injecting system prompts.</p></li>
+<li><p>[x] [x] 216. Ensure tokenization lengths returned match exact specification for downstream chunking tools.</p></li>
+<li><p>[x] [x] 217. Guarantee SSE streaming exactly mirrors OpenAI’s token deltas natively.</p></li>
+<li><p>[x] [x] 218. Supply generic embedding models (e.g., <code class="docutils literal notranslate"><span class="pre">bge-small-en</span></code>) natively mapping to the <code class="docutils literal notranslate"><span class="pre">/v1/embeddings</span></code> endpoint.</p></li>
+<li><p>[x] [x] 219. Ensure Cosine Similarity scores are mathematically sound across batches.</p></li>
+<li><p>[x] [x] 220. Output the embedding responses natively packed as Base64 strings if the client requests bandwidth optimizations.</p></li>
+</ul>
+</section>
+<section id="phase-20-delivery-documentation">
+<h3>Phase 20: Delivery &amp; Documentation<a class="headerlink" href="#phase-20-delivery-documentation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] [x] 221. Write Tutorial: “Deploying a Global AI Server on Cloudflare Workers for $0”.</p></li>
+<li><p>[x] [x] 222. Write Tutorial: “Replacing Nvidia Triton with <code class="docutils literal notranslate"><span class="pre">onnx9000.serve</span></code>”.</p></li>
+<li><p>[x] [x] 223. Provide OpenAPI (Swagger) <code class="docutils literal notranslate"><span class="pre">swagger.json</span></code> specification for the server.</p></li>
+<li><p>[x] [x] 224. Mount an interactive Swagger UI automatically at <code class="docutils literal notranslate"><span class="pre">/docs</span></code>.</p></li>
+<li><p>[x] [x] 225. Establish automated NPM publish pipelines for <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/serve</span></code>.</p></li>
+<li><p>[x] [x] 226. Ensure TypeScript definition files (<code class="docutils literal notranslate"><span class="pre">.d.ts</span></code>) accurately reflect the server extensions.</p></li>
+<li><p>[x] [x] 227. Validate code formatting securely via ESLint / Prettier.</p></li>
+<li><p>[x] [x] 228. Provide explicit diagnostic logs dynamically upon boot (e.g., <code class="docutils literal notranslate"><span class="pre">WebGPU</span> <span class="pre">detected.</span> <span class="pre">Max</span> <span class="pre">RAM:</span> <span class="pre">4GB</span></code>).</p></li>
+<li><p>[x] [x] 229. Allow custom <code class="docutils literal notranslate"><span class="pre">tflite</span></code> model execution natively via the <code class="docutils literal notranslate"><span class="pre">onnx2tf</span></code> translation layer seamlessly.</p></li>
+<li><p>[x] [x] 230. Guarantee final v1.0 feature parity with Triton / KServe specifications natively in TS/WASM.</p></li>
+<li><p>[x] [x] 231. Handle exact Endianness checks natively on Edge Runtimes.</p></li>
+<li><p>[x] [x] 232. Parse specific PyTorch model exports securely via <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> JIT hooks if required.</p></li>
+<li><p>[x] [x] 233. Map explicit <code class="docutils literal notranslate"><span class="pre">String</span></code> manipulations dynamically inside the server payload parsing.</p></li>
+<li><p>[x] [x] 234. Avoid generating excessive JS Heap sizes on 10,000 token inputs.</p></li>
+<li><p>[x] [x] 235. Extract multi-dimensional slices securely if bounding HTTP responses.</p></li>
+<li><p>[x] [x] 236. Generate <code class="docutils literal notranslate"><span class="pre">Float16</span></code> bounds checking natively for WebGPU compatibility.</p></li>
+<li><p>[x] [x] 237. Evaluate static variables completely to avoid GC lockups during active batches.</p></li>
+<li><p>[x] [x] 238. Compile generic caching utilities natively.</p></li>
+<li><p>[x] [x] 239. Handle explicit overlapping <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> reads/writes safely.</p></li>
+<li><p>[x] [x] 240. Validate precision outputs identically.</p></li>
+<li><p>[x] [x] 241. Provide fallback mapping for <code class="docutils literal notranslate"><span class="pre">Softplus</span></code> if target is an older CPU via WASM.</p></li>
+<li><p>[x] [x] 242. Translate <code class="docutils literal notranslate"><span class="pre">tf.cumsum</span></code> natively if parsing generic graphs.</p></li>
+<li><p>[x] [x] 243. Allow editing server configurations immediately via hot-reload.</p></li>
+<li><p>[x] [x] 244. Manage active WebSocket arrays exactly.</p></li>
+<li><p>[x] [x] 245. Validate precise execution limits cleanly.</p></li>
+<li><p>[x] [x] 246. Ensure flawless generation of state-of-the-art WebGPU shaders across all edge nodes.</p></li>
+<li><p>[x] [x] 247. Provide explicit configuration for Specific Deno instances.</p></li>
+<li><p>[x] [x] 248. Support overriding specific execution providers dynamically per-request.</p></li>
+<li><p>[x] [x] 249. Write comprehensive API documentation.</p></li>
+<li><p>[x] [x] 250. Handle specific multi-modal LLM routing exactly.</p></li>
+<li><p>[x] [x] 251. Handle specific <code class="docutils literal notranslate"><span class="pre">ONNX</span></code> dynamic axes parsing dynamically.</p></li>
+<li><p>[x] [x] 252. Map specific <code class="docutils literal notranslate"><span class="pre">Range</span></code> operator array boundaries dynamically.</p></li>
+<li><p>[x] [x] 253. Create UI hooks for importing multiple models via the Web Dashboard simultaneously.</p></li>
+<li><p>[x] [x] 254. Support <code class="docutils literal notranslate"><span class="pre">GridSample</span></code> custom mathematical approximation bounds safely.</p></li>
+<li><p>[x] [x] 255. Handle specific MoE routing distributions dynamically across different Edge Nodes.</p></li>
+<li><p>[x] [x] 256. Provide visual feedback during the model loading phase inside the CLI natively.</p></li>
+<li><p>[x] [x] 257. Catch explicitly nested tuples <code class="docutils literal notranslate"><span class="pre">((A,</span> <span class="pre">B),</span> <span class="pre">C)</span></code> during validation correctly.</p></li>
+<li><p>[x] [x] 258. Support tracing <code class="docutils literal notranslate"><span class="pre">dict</span></code> inputs safely across REST endpoints.</p></li>
+<li><p>[x] [x] 259. Map PyTorch specific export markers natively into dynamic bounds.</p></li>
+<li><p>[x] [x] 260. Manage <code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_OUT_OF_MEMORY</span></code> equivalents gracefully by logging standard KServe errors.</p></li>
+<li><p>[x] [x] 261. Expose interactive HTML Flamegraphs natively via a hidden debugging port.</p></li>
+<li><p>[x] [x] 262. Support dynamic checking of WebNN endpoints directly.</p></li>
+<li><p>[x] [x] 263. Establish a testing pipeline for standard Vision architectures via HTTP natively.</p></li>
+<li><p>[x] [x] 264. Enable “Append” mode testing over gRPC streams natively.</p></li>
+<li><p>[x] [x] 265. Output <code class="docutils literal notranslate"><span class="pre">__metadata__</span></code> length natively before parsing standard payloads.</p></li>
+<li><p>[x] [x] 266. Ensure JSON serialization of ASTs for passing between Web Workers.</p></li>
+<li><p>[x] [x] 267. Handle <code class="docutils literal notranslate"><span class="pre">uint32</span></code> data types explicitly where WebGPU specifications restrict them.</p></li>
+<li><p>[x] [x] 268. Maintain rigorous parity checks against KServe standard updates.</p></li>
+<li><p>[x] [x] 269. Support evaluating raw WebGPU safely directly inside the browser / server.</p></li>
+<li><p>[x] [x] 270. Handle <code class="docutils literal notranslate"><span class="pre">NaN</span></code> propagation specifically and catch before emitting to user.</p></li>
+<li><p>[x] [x] 271. Build fallback dynamic arena sizing validation.</p></li>
+<li><p>[x] [x] 272. Add custom metrics output directly within the internal loggers.</p></li>
+<li><p>[x] [x] 273. Establish specific error boundaries for missing payload arguments.</p></li>
+<li><p>[x] [x] 274. Verify memory bounds checking natively.</p></li>
+<li><p>[x] [x] 275. Develop <code class="docutils literal notranslate"><span class="pre">np.polyfit</span></code> routines (optional internal math).</p></li>
+<li><p>[x] [x] 276. Handle ONNX Sequence Outputs correctly returning as JSON arrays.</p></li>
+<li><p>[x] [x] 277. Render graph connections dynamically in console UI.</p></li>
+<li><p>[x] [x] 278. Add specific support for creating an RTOS-friendly sparse task executor for TinyML.</p></li>
+<li><p>[x] [x] 279. Support dynamic checking of WebNN sparse matrix multiplication APIs (if spec introduces them).</p></li>
+<li><p>[x] [x] 280. Establish a standard interface for custom block-sparse headers.</p></li>
+<li><p>[x] [x] 281. Support <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> explicitly unrolled.</p></li>
+<li><p>[x] [x] 282. Ensure deterministic float formatting across all HTTP responses.</p></li>
+<li><p>[x] [x] 283. Provide array compression algorithms specifically for JSON transmissions.</p></li>
+<li><p>[x] [x] 284. Handle exact INT64 overflow protections statically.</p></li>
+<li><p>[x] [x] 285. Extract 1D vectors seamlessly via SIMD hooks.</p></li>
+<li><p>[x] [x] 286. Render multidimensional indices properly mapped to flat C/JS arrays.</p></li>
+<li><p>[x] [x] 287. Map ONNX <code class="docutils literal notranslate"><span class="pre">Shape</span></code> natively.</p></li>
+<li><p>[x] [x] 288. Manage explicit <code class="docutils literal notranslate"><span class="pre">Less</span></code> / <code class="docutils literal notranslate"><span class="pre">Greater</span></code> ops inside flawlessly.</p></li>
+<li><p>[x] [x] 289. Catch explicitly nested JSON definitions safely.</p></li>
+<li><p>[x] [x] 290. Extract string values safely out of promises natively.</p></li>
+<li><p>[x] [x] 291. Manage ArrayBuffer Detachment explicitly upon tensor disposal.</p></li>
+<li><p>[x] [x] 292. Add support for creating a Web Worker dedicated specifically to active batching streams.</p></li>
+<li><p>[x] [x] 293. Build interactive examples demonstrating the exact same server code running on Node and Cloudflare simultaneously.</p></li>
+<li><p>[x] [x] 294. Validate memory leak absence in 1,000,000+ operation loops.</p></li>
+<li><p>[x] [x] 295. Configure explicit fallback logic for unsupported HTTP frameworks safely.</p></li>
+<li><p>[x] [x] 296. Validate execution cleanly in Deno.</p></li>
+<li><p>[x] [x] 297. Support conversion directly to <code class="docutils literal notranslate"><span class="pre">onnx9000.genai</span></code> outputs.</p></li>
+<li><p>[x] [x] 298. Validate precise execution under explicit memory bounds checking on Bun.</p></li>
+<li><p>[x] [x] 299. Write comprehensive API documentation mapping Triton to ONNX Server REST.</p></li>
+<li><p>[x] [x] 300. Release v1.0 feature complete certification for <code class="docutils literal notranslate"><span class="pre">onnx9000.serve</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX02_ORT_TRAINING.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX Runtime Training Replication &amp; Parity Tracker</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX43_DIFFUSERS.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-core-server-architecture-protocol-handlers">Phase 1: Core Server Architecture &amp; Protocol Handlers</a></li>
+<li><a class="reference internal" href="#phase-2-edge-runtime-compatibility-cloudflare-bun-deno-node">Phase 2: Edge Runtime Compatibility (Cloudflare, Bun, Deno, Node)</a></li>
+<li><a class="reference internal" href="#phase-3-dynamic-batching-event-loop-scheduling">Phase 3: Dynamic Batching &amp; Event Loop Scheduling</a></li>
+<li><a class="reference internal" href="#phase-4-kserve-v2-triton-api-standard-compliance">Phase 4: KServe V2 / Triton API Standard Compliance</a></li>
+<li><a class="reference internal" href="#phase-5-openai-rest-api-parity-for-llms-genai">Phase 5: OpenAI REST API Parity (For LLMs / GenAI)</a></li>
+<li><a class="reference internal" href="#phase-6-model-pipelines-ensembles-dag-orchestration">Phase 6: Model Pipelines &amp; Ensembles (DAG Orchestration)</a></li>
+<li><a class="reference internal" href="#phase-7-memory-vram-resource-management">Phase 7: Memory &amp; VRAM Resource Management</a></li>
+<li><a class="reference internal" href="#phase-8-hardware-acceleration-binding-webgpu-wasm">Phase 8: Hardware Acceleration Binding (WebGPU / WASM)</a></li>
+<li><a class="reference internal" href="#phase-9-kv-cache-distributed-state-llms">Phase 9: KV Cache &amp; Distributed State (LLMs)</a></li>
+<li><a class="reference internal" href="#phase-10-multi-threading-worker-pools">Phase 10: Multi-threading &amp; Worker Pools</a></li>
+<li><a class="reference internal" href="#phase-11-metrics-prometheus-observability">Phase 11: Metrics, Prometheus, &amp; Observability</a></li>
+<li><a class="reference internal" href="#phase-12-security-rate-limiting-authentication">Phase 12: Security, Rate Limiting, &amp; Authentication</a></li>
+<li><a class="reference internal" href="#phase-13-model-repository-hot-reloading">Phase 13: Model Repository &amp; Hot-Reloading</a></li>
+<li><a class="reference internal" href="#phase-14-vision-audio-specific-data-ingestion">Phase 14: Vision &amp; Audio specific Data Ingestion</a></li>
+<li><a class="reference internal" href="#phase-15-load-balancing-multi-node-routing">Phase 15: Load Balancing &amp; Multi-Node Routing</a></li>
+<li><a class="reference internal" href="#phase-16-cli-deployment-tooling-onnx9000-serve">Phase 16: CLI &amp; Deployment Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">serve</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-17-load-simulation-benchmarking">Phase 17: Load Simulation &amp; Benchmarking</a></li>
+<li><a class="reference internal" href="#phase-18-testing-parity">Phase 18: Testing &amp; Parity</a></li>
+<li><a class="reference internal" href="#phase-19-framework-integrations-langchain-llamaindex">Phase 19: Framework Integrations (Langchain / LlamaIndex)</a></li>
+<li><a class="reference internal" href="#phase-20-delivery-documentation">Phase 20: Delivery &amp; Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

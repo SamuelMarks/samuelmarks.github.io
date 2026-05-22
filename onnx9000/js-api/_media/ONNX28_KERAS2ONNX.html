@@ -1,0 +1,972 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)" href="ONNX41_OPENVINO.html"><link rel="prev" title="ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)" href="ONNX29_ONNX_MODIFIER.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX28_KERAS2ONNX.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx28-keras2onnx-tfjs-to-onnx-web-native-keras-converter">
+<h1>ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)<a class="headerlink" href="#onnx28-keras2onnx-tfjs-to-onnx-web-native-keras-converter" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">keras2onnx</span></code> (and its underlying dependencies like <code class="docutils literal notranslate"><span class="pre">tf2onnx</span></code>) is a Python-based conversion tool that translates Keras and TensorFlow models into the standard ONNX format. It parses Keras <code class="docutils literal notranslate"><span class="pre">.h5</span></code>, <code class="docutils literal notranslate"><span class="pre">.keras</span></code>, or SavedModel files, extracting the computational graph and weight tensors, and meticulously maps Keras layer semantics (which default to NHWC layout) into ONNX operator semantics (which default to NCHW layout). It requires a heavy, full-scale Python installation with TensorFlow and ONNX pip packages installed.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx9000.keras</span></code> eliminates the Python dependency completely, offering a <strong>pure TypeScript/WebAssembly converter</strong>.</p>
+<ul class="simple">
+<li><p><strong>Browser-Based Conversion:</strong> Developers can drag and drop a Keras <code class="docutils literal notranslate"><span class="pre">.h5</span></code> file or a TensorFlow.js <code class="docutils literal notranslate"><span class="pre">model.json</span></code> directly into the browser, and <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> will output a <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> file instantly, strictly client-side.</p></li>
+<li><p><strong>Dual-Format Ingestion:</strong> Natively parses both Keras HDF5 (<code class="docutils literal notranslate"><span class="pre">.h5</span></code>) via a pure-JS HDF5 reader, and TensorFlow.js formats (<code class="docutils literal notranslate"><span class="pre">LayersModel</span></code> and <code class="docutils literal notranslate"><span class="pre">GraphModel</span></code>), providing an automatic bridge from the JS ecosystem to ONNX.</p></li>
+<li><p><strong>Zero-Copy Weight Transposition:</strong> Translating Keras weight layouts (e.g., <code class="docutils literal notranslate"><span class="pre">[H,</span> <span class="pre">W,</span> <span class="pre">In,</span> <span class="pre">Out]</span></code>) to ONNX layouts (<code class="docutils literal notranslate"><span class="pre">[Out,</span> <span class="pre">In,</span> <span class="pre">H,</span> <span class="pre">W]</span></code>) is performed by highly optimized WASM kernels to prevent browser tab crashes on massive models.</p></li>
+<li><p><strong>Direct Execution Pipeline:</strong> Converted models can be instantly routed into the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution backend (WebGPU/WASM), allowing a user to <code class="docutils literal notranslate"><span class="pre">await</span> <span class="pre">onnx9000.keras.load('model.json')</span></code> and run it as if it were a native ONNX model.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-ingestion-format-parsing-tf-js-keras-h5">
+<h3>Phase 1: Ingestion &amp; Format Parsing (TF.js &amp; Keras H5)<a class="headerlink" href="#phase-1-ingestion-format-parsing-tf-js-keras-h5" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Implement <code class="docutils literal notranslate"><span class="pre">tfjs.LayersModel</span></code> (<code class="docutils literal notranslate"><span class="pre">model.json</span></code>) JSON schema parser.</p></li>
+<li><p>[x] 2. Implement <code class="docutils literal notranslate"><span class="pre">tfjs.GraphModel</span></code> JSON schema parser.</p></li>
+<li><p>[x] 3. Implement external binary weight shard downloader/parser for TF.js.</p></li>
+<li><p>[x] 4. Combine chunked <code class="docutils literal notranslate"><span class="pre">.bin</span></code> shards into a contiguous ArrayBuffer.</p></li>
+<li><p>[x] 5. Map TF.js weight manifests to specific layer variables.</p></li>
+<li><p>[x] 6. Implement pure-JS HDF5 (<code class="docutils literal notranslate"><span class="pre">.h5</span></code>) file reader.</p></li>
+<li><p>[x] 7. Parse Keras <code class="docutils literal notranslate"><span class="pre">model_config</span></code> JSON strings embedded within HDF5 files.</p></li>
+<li><p>[x] 8. Extract layer weights sequentially from HDF5 datasets.</p></li>
+<li><p>[x] 9. Implement parser for the newer Keras 3 <code class="docutils literal notranslate"><span class="pre">.keras</span></code> zip-based format.</p></li>
+<li><p>[x] 10. Support reading from local <code class="docutils literal notranslate"><span class="pre">File</span></code>/<code class="docutils literal notranslate"><span class="pre">Blob</span></code> objects in the browser.</p></li>
+<li><p>[x] 11. Support fetching from remote URLs (with CORS handling).</p></li>
+<li><p>[x] 12. Extract input specifications (shapes, names, types) from Keras config.</p></li>
+<li><p>[x] 13. Extract output specifications from Keras config.</p></li>
+<li><p>[x] 14. Identify multi-input / multi-output model topologies.</p></li>
+<li><p>[x] 15. Build an internal abstract graph of Keras layers before ONNX translation.</p></li>
+</ul>
+</section>
+<section id="phase-2-core-layout-translation-engine-nhwc-to-nchw">
+<h3>Phase 2: Core Layout Translation Engine (NHWC to NCHW)<a class="headerlink" href="#phase-2-core-layout-translation-engine-nhwc-to-nchw" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 16. Build the NHWC (Channels Last) to NCHW (Channels First) shape translator.</p></li>
+<li><p>[x] 17. Build the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Transpose WASM kernel for 4D Image weights (Conv2D: <code class="docutils literal notranslate"><span class="pre">[H,</span> <span class="pre">W,</span> <span class="pre">I,</span> <span class="pre">O]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[O,</span> <span class="pre">I,</span> <span class="pre">H,</span> <span class="pre">W]</span></code>).</p></li>
+<li><p>[x] 18. Build the Transpose WASM kernel for 3D Sequence weights.</p></li>
+<li><p>[x] 19. Build the Transpose WASM kernel for 5D Video weights (Conv3D).</p></li>
+<li><p>[x] 20. Transpose Keras <code class="docutils literal notranslate"><span class="pre">Dense</span></code> weights (<code class="docutils literal notranslate"><span class="pre">[In,</span> <span class="pre">Out]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[Out,</span> <span class="pre">In]</span></code>) where ONNX requires explicit GEMM mapping.</p></li>
+<li><p>[x] 21. Track layout states dynamically (inserting ONNX <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> ops dynamically if a Keras layer explicitly assumes NHWC data).</p></li>
+<li><p>[x] 22. Implement a layout optimizer pass to remove redundant <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">NCHW-&gt;NHWC-&gt;NCHW</span></code> collapses).</p></li>
+<li><p>[x] 23. Handle Keras <code class="docutils literal notranslate"><span class="pre">data_format=&quot;channels_first&quot;</span></code> layers gracefully (bypassing transpose injection).</p></li>
+<li><p>[x] 24. Resolve Spatial padding discrepancies between Keras and ONNX.</p></li>
+<li><p>[x] 25. Convert explicit TF <code class="docutils literal notranslate"><span class="pre">padding=&quot;SAME&quot;</span></code> behavior to explicit ONNX padding values.</p></li>
+<li><p>[x] 26. Convert explicit TF <code class="docutils literal notranslate"><span class="pre">padding=&quot;VALID&quot;</span></code> behavior to ONNX padding values.</p></li>
+</ul>
+</section>
+<section id="phase-3-core-keras-layers-mapping-onnx-emitters">
+<h3>Phase 3: Core Keras Layers Mapping (ONNX Emitters)<a class="headerlink" href="#phase-3-core-keras-layers-mapping-onnx-emitters" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 27. Map <code class="docutils literal notranslate"><span class="pre">InputLayer</span></code> to ONNX Graph Inputs.</p></li>
+<li><p>[x] 28. Map <code class="docutils literal notranslate"><span class="pre">Dense</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code> (Bias) or <code class="docutils literal notranslate"><span class="pre">Gemm</span></code>.</p></li>
+<li><p>[x] 29. Extract <code class="docutils literal notranslate"><span class="pre">Dense</span></code> activation and append matching ONNX activation node.</p></li>
+<li><p>[x] 30. Map <code class="docutils literal notranslate"><span class="pre">Activation</span></code> layer directly.</p></li>
+<li><p>[x] 31. Map <code class="docutils literal notranslate"><span class="pre">ReLU</span></code> activation.</p></li>
+<li><p>[x] 32. Map <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> activation (handling axis conversions).</p></li>
+<li><p>[x] 33. Map <code class="docutils literal notranslate"><span class="pre">LeakyReLU</span></code> activation.</p></li>
+<li><p>[x] 34. Map <code class="docutils literal notranslate"><span class="pre">PReLU</span></code> activation (handling shared axes constraints).</p></li>
+<li><p>[x] 35. Map <code class="docutils literal notranslate"><span class="pre">ELU</span></code> activation.</p></li>
+<li><p>[x] 36. Map <code class="docutils literal notranslate"><span class="pre">ThresholdedReLU</span></code> activation.</p></li>
+<li><p>[x] 37. Map <code class="docutils literal notranslate"><span class="pre">Softplus</span></code> activation.</p></li>
+<li><p>[x] 38. Map <code class="docutils literal notranslate"><span class="pre">Softsign</span></code> activation.</p></li>
+<li><p>[x] 39. Map <code class="docutils literal notranslate"><span class="pre">HardSigmoid</span></code> activation.</p></li>
+<li><p>[x] 40. Map <code class="docutils literal notranslate"><span class="pre">Swish</span></code> / <code class="docutils literal notranslate"><span class="pre">SiLU</span></code> activation.</p></li>
+<li><p>[x] 41. Map <code class="docutils literal notranslate"><span class="pre">GELU</span></code> activation (handling approx vs exact flags).</p></li>
+<li><p>[x] 42. Map <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Identity</span></code> (or drop entirely for inference).</p></li>
+<li><p>[x] 43. Map <code class="docutils literal notranslate"><span class="pre">SpatialDropout1D</span></code>, <code class="docutils literal notranslate"><span class="pre">SpatialDropout2D</span></code>, <code class="docutils literal notranslate"><span class="pre">SpatialDropout3D</span></code> to <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+<li><p>[x] 44. Map <code class="docutils literal notranslate"><span class="pre">GaussianDropout</span></code> to <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+<li><p>[x] 45. Map <code class="docutils literal notranslate"><span class="pre">GaussianNoise</span></code> to <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+<li><p>[x] 46. Map <code class="docutils literal notranslate"><span class="pre">ActivityRegularization</span></code> to <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+<li><p>[x] 47. Map <code class="docutils literal notranslate"><span class="pre">AlphaDropout</span></code> to <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-4-convolutional-layers-mapping">
+<h3>Phase 4: Convolutional Layers Mapping<a class="headerlink" href="#phase-4-convolutional-layers-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 48. Map <code class="docutils literal notranslate"><span class="pre">Conv1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 49. Map <code class="docutils literal notranslate"><span class="pre">Conv2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 50. Map <code class="docutils literal notranslate"><span class="pre">Conv3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 51. Parse and apply <code class="docutils literal notranslate"><span class="pre">strides</span></code> tuple to ONNX.</p></li>
+<li><p>[x] 52. Parse and apply <code class="docutils literal notranslate"><span class="pre">dilation_rate</span></code> tuple to ONNX.</p></li>
+<li><p>[x] 53. Parse and apply <code class="docutils literal notranslate"><span class="pre">groups</span></code> attribute.</p></li>
+<li><p>[x] 54. Map <code class="docutils literal notranslate"><span class="pre">SeparableConv1D</span></code> to Depthwise <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + Pointwise <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 55. Map <code class="docutils literal notranslate"><span class="pre">SeparableConv2D</span></code> to Depthwise <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + Pointwise <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 56. Map <code class="docutils literal notranslate"><span class="pre">DepthwiseConv2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> with <code class="docutils literal notranslate"><span class="pre">groups</span> <span class="pre">=</span> <span class="pre">in_channels</span></code>.</p></li>
+<li><p>[x] 57. Map <code class="docutils literal notranslate"><span class="pre">Conv1DTranspose</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code>.</p></li>
+<li><p>[x] 58. Map <code class="docutils literal notranslate"><span class="pre">Conv2DTranspose</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code>.</p></li>
+<li><p>[x] 59. Map <code class="docutils literal notranslate"><span class="pre">Conv3DTranspose</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code>.</p></li>
+<li><p>[x] 60. Calculate ONNX <code class="docutils literal notranslate"><span class="pre">output_padding</span></code> dynamically to match Keras shape inference for Transpose Convs.</p></li>
+</ul>
+</section>
+<section id="phase-5-pooling-layers-mapping">
+<h3>Phase 5: Pooling Layers Mapping<a class="headerlink" href="#phase-5-pooling-layers-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 61. Map <code class="docutils literal notranslate"><span class="pre">MaxPooling1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code>.</p></li>
+<li><p>[x] 62. Map <code class="docutils literal notranslate"><span class="pre">MaxPooling2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code>.</p></li>
+<li><p>[x] 63. Map <code class="docutils literal notranslate"><span class="pre">MaxPooling3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code>.</p></li>
+<li><p>[x] 64. Map <code class="docutils literal notranslate"><span class="pre">AveragePooling1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 65. Map <code class="docutils literal notranslate"><span class="pre">AveragePooling2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 66. Map <code class="docutils literal notranslate"><span class="pre">AveragePooling3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 67. Map <code class="docutils literal notranslate"><span class="pre">GlobalMaxPooling1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code>.</p></li>
+<li><p>[x] 68. Map <code class="docutils literal notranslate"><span class="pre">GlobalMaxPooling2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code>.</p></li>
+<li><p>[x] 69. Map <code class="docutils literal notranslate"><span class="pre">GlobalMaxPooling3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code>.</p></li>
+<li><p>[x] 70. Map <code class="docutils literal notranslate"><span class="pre">GlobalAveragePooling1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code>.</p></li>
+<li><p>[x] 71. Map <code class="docutils literal notranslate"><span class="pre">GlobalAveragePooling2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code>.</p></li>
+<li><p>[x] 72. Map <code class="docutils literal notranslate"><span class="pre">GlobalAveragePooling3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code>.</p></li>
+<li><p>[x] 73. Handle Keras <code class="docutils literal notranslate"><span class="pre">keepdims=False</span></code> (default in GlobalPools) by inserting ONNX <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-6-recurrent-layers-rnn-lstm-gru-mapping">
+<h3>Phase 6: Recurrent Layers (RNN/LSTM/GRU) Mapping<a class="headerlink" href="#phase-6-recurrent-layers-rnn-lstm-gru-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 74. Map <code class="docutils literal notranslate"><span class="pre">SimpleRNN</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">RNN</span></code>.</p></li>
+<li><p>[x] 75. Transpose and pack Keras RNN weights (<code class="docutils literal notranslate"><span class="pre">kernel</span></code>, <code class="docutils literal notranslate"><span class="pre">recurrent_kernel</span></code>, <code class="docutils literal notranslate"><span class="pre">bias</span></code>) into ONNX RNN combined weights <code class="docutils literal notranslate"><span class="pre">W</span></code> and <code class="docutils literal notranslate"><span class="pre">R</span></code>.</p></li>
+<li><p>[x] 76. Handle Keras <code class="docutils literal notranslate"><span class="pre">return_sequences=True</span></code> (outputting full sequence).</p></li>
+<li><p>[x] 77. Handle Keras <code class="docutils literal notranslate"><span class="pre">return_sequences=False</span></code> (outputting last state, slicing ONNX output).</p></li>
+<li><p>[x] 78. Handle Keras <code class="docutils literal notranslate"><span class="pre">return_state=True</span></code> (outputting hidden states).</p></li>
+<li><p>[x] 79. Map <code class="docutils literal notranslate"><span class="pre">LSTM</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">LSTM</span></code>.</p></li>
+<li><p>[x] 80. Convert Keras LSTM weight gate order (i, f, c, o) to ONNX LSTM gate order (i, o, f, c).</p></li>
+<li><p>[x] 81. Map <code class="docutils literal notranslate"><span class="pre">GRU</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GRU</span></code>.</p></li>
+<li><p>[x] 82. Convert Keras GRU weight gate order (z, r, h) to ONNX GRU gate order (z, r, h).</p></li>
+<li><p>[x] 83. Handle GRU <code class="docutils literal notranslate"><span class="pre">reset_after</span></code> flag (mapping to linear_before_reset in ONNX).</p></li>
+<li><p>[x] 84. Map <code class="docutils literal notranslate"><span class="pre">Bidirectional</span></code> wrapper for RNN/LSTM/GRU.</p></li>
+<li><p>[x] 85. Combine forward and backward Keras weights into ONNX multi-directional weights.</p></li>
+<li><p>[x] 86. Implement <code class="docutils literal notranslate"><span class="pre">merge_mode='concat'</span></code> for Bidirectional outputs.</p></li>
+<li><p>[x] 87. Implement <code class="docutils literal notranslate"><span class="pre">merge_mode='sum'</span></code> for Bidirectional outputs.</p></li>
+<li><p>[x] 88. Implement <code class="docutils literal notranslate"><span class="pre">merge_mode='mul'</span></code> for Bidirectional outputs.</p></li>
+<li><p>[x] 89. Implement <code class="docutils literal notranslate"><span class="pre">merge_mode='ave'</span></code> for Bidirectional outputs.</p></li>
+<li><p>[x] 90. Handle initial state inputs securely for stateful sequence models.</p></li>
+</ul>
+</section>
+<section id="phase-7-merge-layers-mapping">
+<h3>Phase 7: Merge Layers Mapping<a class="headerlink" href="#phase-7-merge-layers-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 91. Map <code class="docutils literal notranslate"><span class="pre">Add</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code> (with multi-input accumulation).</p></li>
+<li><p>[x] 92. Map <code class="docutils literal notranslate"><span class="pre">Subtract</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Sub</span></code>.</p></li>
+<li><p>[x] 93. Map <code class="docutils literal notranslate"><span class="pre">Multiply</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code> (with multi-input accumulation).</p></li>
+<li><p>[x] 94. Map <code class="docutils literal notranslate"><span class="pre">Average</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Mean</span></code>.</p></li>
+<li><p>[x] 95. Map <code class="docutils literal notranslate"><span class="pre">Maximum</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Max</span></code>.</p></li>
+<li><p>[x] 96. Map <code class="docutils literal notranslate"><span class="pre">Minimum</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Min</span></code>.</p></li>
+<li><p>[x] 97. Map <code class="docutils literal notranslate"><span class="pre">Concatenate</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 98. Resolve negative <code class="docutils literal notranslate"><span class="pre">axis</span></code> properly for <code class="docutils literal notranslate"><span class="pre">Concatenate</span></code> within the NHWC -&gt; NCHW translation context.</p></li>
+<li><p>[x] 99. Map <code class="docutils literal notranslate"><span class="pre">Dot</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (handling explicit axes parameters via Transpose injections).</p></li>
+<li><p>[x] 100. Handle implicit broadcasting differences between Keras and ONNX during merge operations.</p></li>
+</ul>
+</section>
+<section id="phase-8-advanced-attention-layers">
+<h3>Phase 8: Advanced &amp; Attention Layers<a class="headerlink" href="#phase-8-advanced-attention-layers" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 101. Map <code class="docutils literal notranslate"><span class="pre">Attention</span></code> to explicit ONNX Subgraph (MatMul + Softmax + MatMul).</p></li>
+<li><p>[x] 102. Handle causal masks dynamically inside <code class="docutils literal notranslate"><span class="pre">Attention</span></code> mapping.</p></li>
+<li><p>[x] 103. Map <code class="docutils literal notranslate"><span class="pre">AdditiveAttention</span></code> (Bahdanau) to ONNX explicit Ops.</p></li>
+<li><p>[x] 104. Map Keras 3 <code class="docutils literal notranslate"><span class="pre">MultiHeadAttention</span></code> to ONNX explicitly (or map to specific ONNX <code class="docutils literal notranslate"><span class="pre">Attention</span></code> op if supported by opset).</p></li>
+<li><p>[x] 105. Split multi-head weights out of the Keras dense representations.</p></li>
+<li><p>[x] 106. Handle <code class="docutils literal notranslate"><span class="pre">use_causal_mask</span></code> for MHA.</p></li>
+<li><p>[x] 107. Map Keras <code class="docutils literal notranslate"><span class="pre">Embedding</span></code> layer to ONNX <code class="docutils literal notranslate"><span class="pre">Gather</span></code>.</p></li>
+<li><p>[x] 108. Support <code class="docutils literal notranslate"><span class="pre">mask_zero=True</span></code> in <code class="docutils literal notranslate"><span class="pre">Embedding</span></code> by emitting an explicit boolean mask output.</p></li>
+<li><p>[x] 109. Map <code class="docutils literal notranslate"><span class="pre">ConvLSTM1D</span></code> to explicit sequence of Conv + LSTM logic.</p></li>
+<li><p>[x] 110. Map <code class="docutils literal notranslate"><span class="pre">ConvLSTM2D</span></code> to explicit sequence.</p></li>
+<li><p>[x] 111. Map <code class="docutils literal notranslate"><span class="pre">ConvLSTM3D</span></code> to explicit sequence.</p></li>
+<li><p>[x] 112. Map Keras <code class="docutils literal notranslate"><span class="pre">TimeDistributed</span></code> wrapper by reshaping <code class="docutils literal notranslate"><span class="pre">[batch,</span> <span class="pre">time,</span> <span class="pre">...]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[batch</span> <span class="pre">*</span> <span class="pre">time,</span> <span class="pre">...]</span></code> -&gt; Apply Layer -&gt; Reshape back.</p></li>
+</ul>
+</section>
+<section id="phase-9-normalization-reshaping-layers">
+<h3>Phase 9: Normalization &amp; Reshaping Layers<a class="headerlink" href="#phase-9-normalization-reshaping-layers" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 113. Map <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code>.</p></li>
+<li><p>[x] 114. Extract moving mean, moving variance, beta, and gamma.</p></li>
+<li><p>[x] 115. Map <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> or <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">Sub</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">Pow</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">Add</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">Div</span></code> if ONNX opset is too low.</p></li>
+<li><p>[x] 116. Handle <code class="docutils literal notranslate"><span class="pre">axis</span></code> mapping for <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code>.</p></li>
+<li><p>[x] 117. Map <code class="docutils literal notranslate"><span class="pre">UnitNormalization</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">LpNormalization</span></code>.</p></li>
+<li><p>[x] 118. Map <code class="docutils literal notranslate"><span class="pre">GroupNormalization</span></code> to ONNX standard operations.</p></li>
+<li><p>[x] 119. Map <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code>.</p></li>
+<li><p>[x] 120. Translate Keras implicit <code class="docutils literal notranslate"><span class="pre">-1</span></code> batch dimension inside <code class="docutils literal notranslate"><span class="pre">Reshape</span></code>.</p></li>
+<li><p>[x] 121. Map <code class="docutils literal notranslate"><span class="pre">Flatten</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Flatten</span></code>.</p></li>
+<li><p>[x] 122. Handle <code class="docutils literal notranslate"><span class="pre">data_format</span></code> correctly inside <code class="docutils literal notranslate"><span class="pre">Flatten</span></code>.</p></li>
+<li><p>[x] 123. Map <code class="docutils literal notranslate"><span class="pre">RepeatVector</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Expand</span></code> or <code class="docutils literal notranslate"><span class="pre">Tile</span></code>.</p></li>
+<li><p>[x] 124. Map <code class="docutils literal notranslate"><span class="pre">Permute</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Transpose</span></code>.</p></li>
+<li><p>[x] 125. Map <code class="docutils literal notranslate"><span class="pre">ZeroPadding1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Pad</span></code>.</p></li>
+<li><p>[x] 126. Map <code class="docutils literal notranslate"><span class="pre">ZeroPadding2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Pad</span></code>.</p></li>
+<li><p>[x] 127. Map <code class="docutils literal notranslate"><span class="pre">ZeroPadding3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Pad</span></code>.</p></li>
+<li><p>[x] 128. Map <code class="docutils literal notranslate"><span class="pre">Cropping1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code>.</p></li>
+<li><p>[x] 129. Map <code class="docutils literal notranslate"><span class="pre">Cropping2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code>.</p></li>
+<li><p>[x] 130. Map <code class="docutils literal notranslate"><span class="pre">Cropping3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code>.</p></li>
+<li><p>[x] 131. Map <code class="docutils literal notranslate"><span class="pre">UpSampling1D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code> (Nearest/Bilinear).</p></li>
+<li><p>[x] 132. Map <code class="docutils literal notranslate"><span class="pre">UpSampling2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+<li><p>[x] 133. Map <code class="docutils literal notranslate"><span class="pre">UpSampling3D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-10-tf-js-graphmodel-specific-ops-tf-equivalents">
+<h3>Phase 10: TF.js GraphModel Specific Ops (tf.* equivalents)<a class="headerlink" href="#phase-10-tf-js-graphmodel-specific-ops-tf-equivalents" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 134. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.add</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code>.</p></li>
+<li><p>[x] 135. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.sub</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Sub</span></code>.</p></li>
+<li><p>[x] 136. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.mul</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code>.</p></li>
+<li><p>[x] 137. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.div</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Div</span></code>.</p></li>
+<li><p>[x] 138. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.matMul</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code>.</p></li>
+<li><p>[x] 139. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.square</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Pow</span></code> (exponent 2).</p></li>
+<li><p>[x] 140. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.sqrt</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code>.</p></li>
+<li><p>[x] 141. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.exp</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Exp</span></code>.</p></li>
+<li><p>[x] 142. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.log</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Log</span></code>.</p></li>
+<li><p>[x] 143. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.maximum</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Max</span></code>.</p></li>
+<li><p>[x] 144. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.minimum</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Min</span></code>.</p></li>
+<li><p>[x] 145. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.sum</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code>.</p></li>
+<li><p>[x] 146. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.mean</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code>.</p></li>
+<li><p>[x] 147. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.max</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code>.</p></li>
+<li><p>[x] 148. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.min</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code>.</p></li>
+<li><p>[x] 149. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.argMax</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code>.</p></li>
+<li><p>[x] 150. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.argMin</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ArgMin</span></code>.</p></li>
+<li><p>[x] 151. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.split</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Split</span></code>.</p></li>
+<li><p>[x] 152. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.concat</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 153. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.slice</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code>.</p></li>
+<li><p>[x] 154. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.stridedSlice</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code> (translating end masks).</p></li>
+<li><p>[x] 155. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.gather</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Gather</span></code>.</p></li>
+<li><p>[x] 156. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.gatherNd</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">GatherND</span></code>.</p></li>
+<li><p>[x] 157. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.where</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Where</span></code>.</p></li>
+<li><p>[x] 158. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.tensorScatterUpdate</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code>.</p></li>
+<li><p>[x] 159. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.image.resizeBilinear</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+<li><p>[x] 160. Map TF.js <code class="docutils literal notranslate"><span class="pre">tf.image.resizeNearestNeighbor</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-11-end-to-end-validation-vision-architectures">
+<h3>Phase 11: End-to-End Validation (Vision Architectures)<a class="headerlink" href="#phase-11-end-to-end-validation-vision-architectures" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 161. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">MobileNetV1</span></code>.</p></li>
+<li><p>[x] 162. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">MobileNetV2</span></code>.</p></li>
+<li><p>[x] 163. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">MobileNetV3</span></code>.</p></li>
+<li><p>[x] 164. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">ResNet50</span></code>.</p></li>
+<li><p>[x] 165. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">ResNet101</span></code>.</p></li>
+<li><p>[x] 166. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">InceptionV3</span></code>.</p></li>
+<li><p>[x] 167. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">Xception</span></code>.</p></li>
+<li><p>[x] 168. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">VGG16</span></code>.</p></li>
+<li><p>[x] 169. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">VGG19</span></code>.</p></li>
+<li><p>[x] 170. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">EfficientNetB0</span></code> through <code class="docutils literal notranslate"><span class="pre">B7</span></code>.</p></li>
+<li><p>[x] 171. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">DenseNet121</span></code>.</p></li>
+<li><p>[x] 172. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">NASNetMobile</span></code>.</p></li>
+<li><p>[x] 173. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">PoseNet</span></code>.</p></li>
+<li><p>[x] 174. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">BodyPix</span></code>.</p></li>
+<li><p>[x] 175. Verify 100% equivalent spatial output matrices against native TF.js execution (tolerance 1e-5).</p></li>
+</ul>
+</section>
+<section id="phase-12-end-to-end-validation-nlp-sequence-architectures">
+<h3>Phase 12: End-to-End Validation (NLP &amp; Sequence Architectures)<a class="headerlink" href="#phase-12-end-to-end-validation-nlp-sequence-architectures" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 176. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">Universal</span> <span class="pre">Sentence</span> <span class="pre">Encoder</span></code> (USE).</p></li>
+<li><p>[x] 177. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">Transformer</span></code> implementation (MultiHeadAttention).</p></li>
+<li><p>[x] 178. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">Toxicity</span></code> text classifier.</p></li>
+<li><p>[x] 179. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">LSTM</span></code> character-level generator.</p></li>
+<li><p>[x] 180. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">GRU</span></code> sequence-to-sequence model.</p></li>
+<li><p>[x] 181. Verify dynamic sequence lengths compile cleanly to ONNX dynamic axes.</p></li>
+<li><p>[x] 182. Handle Keras Embedding weights loading properly into ONNX Gather initializers.</p></li>
+<li><p>[x] 183. Check precise parity of Bidirectional states outputs against TF.js.</p></li>
+</ul>
+</section>
+<section id="phase-13-end-to-end-validation-generative-audio">
+<h3>Phase 13: End-to-End Validation (Generative &amp; Audio)<a class="headerlink" href="#phase-13-end-to-end-validation-generative-audio" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 184. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">DCGAN</span></code> generator.</p></li>
+<li><p>[x] 185. Convert and validate Keras <code class="docutils literal notranslate"><span class="pre">VAE</span></code> (Variational Autoencoder) decoding blocks.</p></li>
+<li><p>[x] 186. Convert and validate TF.js <code class="docutils literal notranslate"><span class="pre">SpeechCommands</span></code> audio classifier.</p></li>
+<li><p>[x] 187. Validate 1D Convolution outputs on raw audio sequences.</p></li>
+<li><p>[x] 188. Check 2D Convolution on Mel-spectrogram input formats.</p></li>
+<li><p>[x] 189. Validate UpSampling/Conv2DTranspose artifacts match TF.js completely.</p></li>
+</ul>
+</section>
+<section id="phase-14-subgraphs-custom-layers-control-flow">
+<h3>Phase 14: Subgraphs, Custom Layers &amp; Control Flow<a class="headerlink" href="#phase-14-subgraphs-custom-layers-control-flow" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 190. Handle Keras <code class="docutils literal notranslate"><span class="pre">Lambda</span></code> layers. (Provide clear errors if un-translatable Python code is found, skip if JS equivalents exist).</p></li>
+<li><p>[x] 191. Attempt to trace JS closures in TF.js GraphModels and map them to ONNX subgraphs.</p></li>
+<li><p>[x] 192. Parse TF.js <code class="docutils literal notranslate"><span class="pre">ControlFlow</span></code> ops (<code class="docutils literal notranslate"><span class="pre">Switch</span></code>, <code class="docutils literal notranslate"><span class="pre">Merge</span></code>, <code class="docutils literal notranslate"><span class="pre">Enter</span></code>, <code class="docutils literal notranslate"><span class="pre">Exit</span></code>, <code class="docutils literal notranslate"><span class="pre">NextIteration</span></code>).</p></li>
+<li><p>[x] 193. Map TF.js <code class="docutils literal notranslate"><span class="pre">Loop</span></code> constructs to ONNX <code class="docutils literal notranslate"><span class="pre">Loop</span></code>.</p></li>
+<li><p>[x] 194. Map TF.js <code class="docutils literal notranslate"><span class="pre">Cond</span></code> constructs to ONNX <code class="docutils literal notranslate"><span class="pre">If</span></code>.</p></li>
+<li><p>[x] 195. Implement a registry for users to inject custom JS converters for their proprietary layers.</p></li>
+<li><p>[x] 196. Provide <code class="docutils literal notranslate"><span class="pre">registerConverter('MyCustomLayer',</span> <span class="pre">(node,</span> <span class="pre">builder)</span> <span class="pre">=&gt;</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">})</span></code> API.</p></li>
+<li><p>[x] 197. Handle sub-models (Keras models nested within Keras models) correctly by flattening the graph.</p></li>
+<li><p>[x] 198. Extract <code class="docutils literal notranslate"><span class="pre">keras_version</span></code> and <code class="docutils literal notranslate"><span class="pre">backend</span></code> information and embed into ONNX <code class="docutils literal notranslate"><span class="pre">producer_name</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-15-browser-api-ui-and-packaging">
+<h3>Phase 15: Browser API, UI, and Packaging<a class="headerlink" href="#phase-15-browser-api-ui-and-packaging" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 199. Expose TypeScript library API: <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">onnxBytes</span> <span class="pre">=</span> <span class="pre">await</span> <span class="pre">keras2onnx(modelJson,</span> <span class="pre">weightsBin)</span></code>.</p></li>
+<li><p>[x] 200. Build a Node.js CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">keras</span> <span class="pre">convert</span> <span class="pre">my_model.h5</span> <span class="pre">--output</span> <span class="pre">my_model.onnx</span></code>.</p></li>
+<li><p>[x] 201. Support CLI format auto-detection (inferring TF.js vs HDF5 from file signatures).</p></li>
+<li><p>[x] 202. Build the visual drag-and-drop web converter interface.</p></li>
+<li><p>[x] 203. Provide real-time conversion progress callbacks for UI updates.</p></li>
+<li><p>[x] 204. Handle memory-efficient ArrayBuffer transfers using JS <code class="docutils literal notranslate"><span class="pre">Transferable</span></code> objects.</p></li>
+<li><p>[x] 205. Validate final generated ONNX Protobuf structure using the internal <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> linting tool.</p></li>
+<li><p>[x] 206. Export the converter logic as an isolated NPM package <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/tfjs-converter</span></code>.</p></li>
+<li><p>[x] 207. Create an automated migration script mapping standard <code class="docutils literal notranslate"><span class="pre">tfjs-converter</span></code> args to <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-16-optimizations-graph-rewriting">
+<h3>Phase 16: Optimizations &amp; Graph Rewriting<a class="headerlink" href="#phase-16-optimizations-graph-rewriting" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 208. Implement TF.js explicit <code class="docutils literal notranslate"><span class="pre">FusedBatchNorm</span></code> un-fusing if targeting low ONNX opsets.</p></li>
+<li><p>[x] 209. Map TF.js <code class="docutils literal notranslate"><span class="pre">_FusedConv2D</span></code> explicitly to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">Relu</span></code> or <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">Bias</span></code> + <code class="docutils literal notranslate"><span class="pre">Relu</span></code>.</p></li>
+<li><p>[x] 210. Map TF.js <code class="docutils literal notranslate"><span class="pre">_FusedMatMul</span></code> to ONNX explicitly.</p></li>
+<li><p>[x] 211. Remove TF.js explicit <code class="docutils literal notranslate"><span class="pre">Identity</span></code> chains injected by SavedModel builders.</p></li>
+<li><p>[x] 212. Resolve static subgraphs (e.g., <code class="docutils literal notranslate"><span class="pre">Shape</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Slice</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Concat</span></code>) into static initializers to minimize ONNX payload.</p></li>
+<li><p>[x] 213. Rewrite explicit channel transposes out of the graph by swapping weight dimension ordering on standard ops.</p></li>
+<li><p>[x] 214. Clean up <code class="docutils literal notranslate"><span class="pre">StopGradient</span></code> nodes (removing them entirely as ONNX is inference-only).</p></li>
+</ul>
+</section>
+<section id="phase-17-precision-quantization">
+<h3>Phase 17: Precision &amp; Quantization<a class="headerlink" href="#phase-17-precision-quantization" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 215. Parse TF.js <code class="docutils literal notranslate"><span class="pre">float16</span></code> weights natively (handling DataView buffers correctly in JS).</p></li>
+<li><p>[x] 216. Parse TF.js <code class="docutils literal notranslate"><span class="pre">uint8</span></code> quantized weights natively.</p></li>
+<li><p>[x] 217. Read TF.js quantization scale/min/max metadata and embed into ONNX <code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code>.</p></li>
+<li><p>[x] 218. Provide an option to cast all weights to <code class="docutils literal notranslate"><span class="pre">float16</span></code> during conversion to save space (<code class="docutils literal notranslate"><span class="pre">--fp16</span></code>).</p></li>
+<li><p>[x] 219. Provide an option to perform W8A16 or W4A16 quantization immediately during conversion.</p></li>
+<li><p>[x] 220. Ensure <code class="docutils literal notranslate"><span class="pre">int64</span></code> tensors in TF.js are gracefully downcast to <code class="docutils literal notranslate"><span class="pre">int32</span></code> for better WebGPU support down the line.</p></li>
+</ul>
+</section>
+<section id="phase-18-ecosystem-parity-interoperability">
+<h3>Phase 18: Ecosystem Parity &amp; Interoperability<a class="headerlink" href="#phase-18-ecosystem-parity-interoperability" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 221. Establish CI pipeline matching official <code class="docutils literal notranslate"><span class="pre">tf2onnx</span></code> regression tests.</p></li>
+<li><p>[x] 222. Maintain exact equivalence with <code class="docutils literal notranslate"><span class="pre">tf2onnx</span></code> opset 13-19 standards.</p></li>
+<li><p>[x] 223. Convert HuggingFace standard Keras/TF models dynamically via Hub URLs.</p></li>
+<li><p>[x] 224. Support reading <code class="docutils literal notranslate"><span class="pre">.pb</span></code> (Protobuf) TensorFlow SavedModels via a WASM flatbuffer parser.</p></li>
+<li><p>[x] 225. Support parsing TensorFlow Hub URLs directly (<code class="docutils literal notranslate"><span class="pre">https://tfhub.dev/...</span></code>).</p></li>
+<li><p>[x] 226. Produce ONNX models that perfectly load into standard Python <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> (not just <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>).</p></li>
+<li><p>[x] 227. Export a <code class="docutils literal notranslate"><span class="pre">metadata.json</span></code> sidecar preserving Keras training history, class labels, and dictionaries.</p></li>
+</ul>
+</section>
+<section id="phase-19-edge-cases-quirks-and-telemetry">
+<h3>Phase 19: Edge Cases, Quirks, and Telemetry<a class="headerlink" href="#phase-19-edge-cases-quirks-and-telemetry" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 228. Detect and warn on Keras <code class="docutils literal notranslate"><span class="pre">input_shape</span></code> missing dimensions (e.g., completely dynamic models without defined ranks).</p></li>
+<li><p>[x] 229. Handle <code class="docutils literal notranslate"><span class="pre">SpaceToBatchND</span></code> and <code class="docutils literal notranslate"><span class="pre">BatchToSpaceND</span></code> operations efficiently (often used in dilated convs).</p></li>
+<li><p>[x] 230. Map TF.js <code class="docutils literal notranslate"><span class="pre">NonMaxSuppressionV3/V4/V5</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code>.</p></li>
+<li><p>[x] 231. Translate YOLO-specific custom darknet layers if represented in TF.js format.</p></li>
+<li><p>[x] 232. Handle unsupported opcodes by creating custom domains <code class="docutils literal notranslate"><span class="pre">ai.onnx.contrib.tfjs</span></code>.</p></li>
+<li><p>[x] 233. Provide clear error diagnostics displaying the exact node/layer that failed conversion.</p></li>
+<li><p>[x] 234. Avoid “Maximum Call Stack Size Exceeded” when traversing TF.js graphs with 10,000+ nodes.</p></li>
+<li><p>[x] 235. Track specific operator translation failures and report aggregate telemetry.</p></li>
+</ul>
+</section>
+<section id="phase-20-documentation-final-delivery">
+<h3>Phase 20: Documentation &amp; Final Delivery<a class="headerlink" href="#phase-20-documentation-final-delivery" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 236. Create tutorial: “Migrating from TensorFlow.js to WebGPU ONNX in 5 minutes”.</p></li>
+<li><p>[x] 237. Create tutorial: “Converting Keras H5 models directly in the Browser”.</p></li>
+<li><p>[x] 238. Write detailed API specs for the TS conversion hooks.</p></li>
+<li><p>[x] 239. Include a compatibility matrix mapping Keras Layer versions to supported ONNX opsets.</p></li>
+<li><p>[x] 240. Publish an interactive CodeSandbox template integrating the converter.</p></li>
+<li><p>[x] 241. Add explicit support for <code class="docutils literal notranslate"><span class="pre">tf.keras.applications.*</span></code> extraction tests.</p></li>
+<li><p>[x] 242. Configure memory bounds checking on Web Worker processes to prevent Out Of Memory crashes.</p></li>
+<li><p>[x] 243. Add support for multiple ONNX domains natively.</p></li>
+<li><p>[x] 244. Implement graph cloning utilities for isolated subgraph testing.</p></li>
+<li><p>[x] 245. Track and propagate ONNX type constraints securely during the AST build.</p></li>
+<li><p>[x] 246. Ensure strict JSON sanitization for malicious TF.js manifests.</p></li>
+<li><p>[x] 247. Validate that dynamic batching (Axis 0) propagates correctly globally.</p></li>
+<li><p>[x] 248. Support explicit conversion targets (e.g., optimizing the resulting ONNX specifically for <code class="docutils literal notranslate"><span class="pre">webnn</span></code>).</p></li>
+<li><p>[x] 249. Embed the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> logo and conversion timestamp inside the generated ONNX metadata.</p></li>
+<li><p>[x] 250. Map Keras <code class="docutils literal notranslate"><span class="pre">.keras</span></code> zip structure weights dynamically without unzipping fully to disk (streaming unzip).</p></li>
+<li><p>[x] 251. Validate conversion of <code class="docutils literal notranslate"><span class="pre">tf.einsum</span></code> correctly into explicit ONNX math.</p></li>
+<li><p>[x] 252. Map <code class="docutils literal notranslate"><span class="pre">tf.complex64</span></code> types (used in audio FFT models) cleanly if opset supports it, or split to real/imaginary floats.</p></li>
+<li><p>[x] 253. Translate boolean masking logic (<code class="docutils literal notranslate"><span class="pre">tf.boolean_mask</span></code>) to ONNX explicit <code class="docutils literal notranslate"><span class="pre">Where</span></code> and <code class="docutils literal notranslate"><span class="pre">NonZero</span></code>.</p></li>
+<li><p>[x] 254. Ensure <code class="docutils literal notranslate"><span class="pre">String</span></code> tensors in TF.js (e.g., Universal Sentence Encoder text inputs) map perfectly to ONNX STRING inputs.</p></li>
+<li><p>[x] 255. Map TF.js <code class="docutils literal notranslate"><span class="pre">StringSplit</span></code> and <code class="docutils literal notranslate"><span class="pre">StringToHashBucket</span></code> to explicit ONNX sequence structures or fallback JS ops.</p></li>
+<li><p>[x] 256. Handle <code class="docutils literal notranslate"><span class="pre">RaggedTensors</span></code> (common in modern TF NLP models) by translating to padded dense ONNX tensors dynamically.</p></li>
+<li><p>[x] 257. Verify that multiple input layers with varying types (e.g., Image + String) translate safely.</p></li>
+<li><p>[x] 258. Support <code class="docutils literal notranslate"><span class="pre">Keras</span> <span class="pre">3.x</span></code> backend-agnostic topologies.</p></li>
+<li><p>[x] 259. Map custom loss functions inside <code class="docutils literal notranslate"><span class="pre">.h5</span></code> files into pure ONNX if <code class="docutils literal notranslate"><span class="pre">--export-training</span></code> is specified (future proofing).</p></li>
+<li><p>[x] 260. Release final v1.0 parity matching the Python <code class="docutils literal notranslate"><span class="pre">keras2onnx</span></code> capabilities exactly.</p></li>
+<li><p>[x] 261. Add testing for TF.js specific quantization (Float16) models.</p></li>
+<li><p>[x] 262. Support models with dynamic rank (uncommon but supported in TF.js).</p></li>
+<li><p>[x] 263. Properly handle TF.js <code class="docutils literal notranslate"><span class="pre">BroadcastTo</span></code> with ONNX <code class="docutils literal notranslate"><span class="pre">Expand</span></code>.</p></li>
+<li><p>[x] 264. Properly handle TF.js <code class="docutils literal notranslate"><span class="pre">TensorArray</span></code> operations (used in LSTMs).</p></li>
+<li><p>[x] 265. Implement memory limits for the ArrayBuffer loader.</p></li>
+<li><p>[x] 266. Enable progressive loading of weight shards to show loading bars.</p></li>
+<li><p>[x] 267. Map TF.js <code class="docutils literal notranslate"><span class="pre">Relu6</span></code> specifically to ONNX <code class="docutils literal notranslate"><span class="pre">Clip</span></code>.</p></li>
+<li><p>[x] 268. Handle Keras <code class="docutils literal notranslate"><span class="pre">SeparableConv1D</span></code> correctly (differing from 2D logic).</p></li>
+<li><p>[x] 269. Support extraction of Keras <code class="docutils literal notranslate"><span class="pre">Masking</span></code> layer.</p></li>
+<li><p>[x] 270. Handle TF.js <code class="docutils literal notranslate"><span class="pre">Unpack</span></code> and <code class="docutils literal notranslate"><span class="pre">Pack</span></code> operations.</p></li>
+<li><p>[x] 271. Handle TF.js <code class="docutils literal notranslate"><span class="pre">Fill</span></code> operations safely.</p></li>
+<li><p>[x] 272. Process custom initializers gracefully.</p></li>
+<li><p>[x] 273. Support <code class="docutils literal notranslate"><span class="pre">LeCunNormal</span></code>, <code class="docutils literal notranslate"><span class="pre">GlorotUniform</span></code> extraction accurately.</p></li>
+<li><p>[x] 274. Handle <code class="docutils literal notranslate"><span class="pre">tf.pad</span></code> modes (<code class="docutils literal notranslate"><span class="pre">CONSTANT</span></code>, <code class="docutils literal notranslate"><span class="pre">REFLECT</span></code>, <code class="docutils literal notranslate"><span class="pre">SYMMETRIC</span></code>).</p></li>
+<li><p>[x] 275. Map TF.js <code class="docutils literal notranslate"><span class="pre">SpaceToDepth</span></code> directly.</p></li>
+<li><p>[x] 276. Map TF.js <code class="docutils literal notranslate"><span class="pre">DepthToSpace</span></code> directly.</p></li>
+<li><p>[x] 277. Ensure Keras 3 <code class="docutils literal notranslate"><span class="pre">EinsumDense</span></code> is supported.</p></li>
+<li><p>[x] 278. Add conversion validation for Vision Transformers in TF.js.</p></li>
+<li><p>[x] 279. Add specific tests for TF.js Object Detection API exports.</p></li>
+<li><p>[x] 280. Handle <code class="docutils literal notranslate"><span class="pre">tf.round</span></code> explicitly.</p></li>
+<li><p>[x] 281. Handle <code class="docutils literal notranslate"><span class="pre">tf.floor</span></code> and <code class="docutils literal notranslate"><span class="pre">tf.ceil</span></code>.</p></li>
+<li><p>[x] 282. Convert <code class="docutils literal notranslate"><span class="pre">tf.clipByValue</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Clip</span></code>.</p></li>
+<li><p>[x] 283. Map <code class="docutils literal notranslate"><span class="pre">tf.squaredDifference</span></code>.</p></li>
+<li><p>[x] 284. Map <code class="docutils literal notranslate"><span class="pre">tf.reciprocal</span></code>.</p></li>
+<li><p>[x] 285. Map <code class="docutils literal notranslate"><span class="pre">tf.sign</span></code>.</p></li>
+<li><p>[x] 286. Handle <code class="docutils literal notranslate"><span class="pre">tf.logicalNot</span></code>, <code class="docutils literal notranslate"><span class="pre">tf.logicalAnd</span></code>, <code class="docutils literal notranslate"><span class="pre">tf.logicalOr</span></code>.</p></li>
+<li><p>[x] 287. Translate <code class="docutils literal notranslate"><span class="pre">tf.oneHot</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">OneHot</span></code>.</p></li>
+<li><p>[x] 288. Translate <code class="docutils literal notranslate"><span class="pre">tf.cumsum</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">CumSum</span></code>.</p></li>
+<li><p>[x] 289. Ensure valid error when processing multi-device TF.js models.</p></li>
+<li><p>[x] 290. Parse training state configurations and strip them from inference payload.</p></li>
+<li><p>[x] 291. Translate <code class="docutils literal notranslate"><span class="pre">tf.linspace</span></code> and <code class="docutils literal notranslate"><span class="pre">tf.range</span></code>.</p></li>
+<li><p>[x] 292. Map <code class="docutils literal notranslate"><span class="pre">tf.diag</span></code> and <code class="docutils literal notranslate"><span class="pre">tf.diagPart</span></code>.</p></li>
+<li><p>[x] 293. Support complex matrices (eigen value/vector ops) fallback.</p></li>
+<li><p>[x] 294. Fully integrate Web Worker thread pooling for Transpose operations.</p></li>
+<li><p>[x] 295. Set up dedicated memory cleanup functions (preventing Blob leak).</p></li>
+<li><p>[x] 296. Publish benchmarking metrics comparing TF.js inference vs ONNX WebGPU inference for the same model.</p></li>
+<li><p>[x] 297. Support conversion to specialized target optimizations via CLI <code class="docutils literal notranslate"><span class="pre">--optimize</span></code>.</p></li>
+<li><p>[x] 298. Validate complete <code class="docutils literal notranslate"><span class="pre">tf2onnx</span></code> CLI parity.</p></li>
+<li><p>[x] 299. Create specific issue templates for failed model conversions.</p></li>
+<li><p>[x] 300. Maintain continuous deployment to <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/keras</span></code> NPM.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX41_OPENVINO.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX29_ONNX_MODIFIER.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-ingestion-format-parsing-tf-js-keras-h5">Phase 1: Ingestion &amp; Format Parsing (TF.js &amp; Keras H5)</a></li>
+<li><a class="reference internal" href="#phase-2-core-layout-translation-engine-nhwc-to-nchw">Phase 2: Core Layout Translation Engine (NHWC to NCHW)</a></li>
+<li><a class="reference internal" href="#phase-3-core-keras-layers-mapping-onnx-emitters">Phase 3: Core Keras Layers Mapping (ONNX Emitters)</a></li>
+<li><a class="reference internal" href="#phase-4-convolutional-layers-mapping">Phase 4: Convolutional Layers Mapping</a></li>
+<li><a class="reference internal" href="#phase-5-pooling-layers-mapping">Phase 5: Pooling Layers Mapping</a></li>
+<li><a class="reference internal" href="#phase-6-recurrent-layers-rnn-lstm-gru-mapping">Phase 6: Recurrent Layers (RNN/LSTM/GRU) Mapping</a></li>
+<li><a class="reference internal" href="#phase-7-merge-layers-mapping">Phase 7: Merge Layers Mapping</a></li>
+<li><a class="reference internal" href="#phase-8-advanced-attention-layers">Phase 8: Advanced &amp; Attention Layers</a></li>
+<li><a class="reference internal" href="#phase-9-normalization-reshaping-layers">Phase 9: Normalization &amp; Reshaping Layers</a></li>
+<li><a class="reference internal" href="#phase-10-tf-js-graphmodel-specific-ops-tf-equivalents">Phase 10: TF.js GraphModel Specific Ops (tf.* equivalents)</a></li>
+<li><a class="reference internal" href="#phase-11-end-to-end-validation-vision-architectures">Phase 11: End-to-End Validation (Vision Architectures)</a></li>
+<li><a class="reference internal" href="#phase-12-end-to-end-validation-nlp-sequence-architectures">Phase 12: End-to-End Validation (NLP &amp; Sequence Architectures)</a></li>
+<li><a class="reference internal" href="#phase-13-end-to-end-validation-generative-audio">Phase 13: End-to-End Validation (Generative &amp; Audio)</a></li>
+<li><a class="reference internal" href="#phase-14-subgraphs-custom-layers-control-flow">Phase 14: Subgraphs, Custom Layers &amp; Control Flow</a></li>
+<li><a class="reference internal" href="#phase-15-browser-api-ui-and-packaging">Phase 15: Browser API, UI, and Packaging</a></li>
+<li><a class="reference internal" href="#phase-16-optimizations-graph-rewriting">Phase 16: Optimizations &amp; Graph Rewriting</a></li>
+<li><a class="reference internal" href="#phase-17-precision-quantization">Phase 17: Precision &amp; Quantization</a></li>
+<li><a class="reference internal" href="#phase-18-ecosystem-parity-interoperability">Phase 18: Ecosystem Parity &amp; Interoperability</a></li>
+<li><a class="reference internal" href="#phase-19-edge-cases-quirks-and-telemetry">Phase 19: Edge Cases, Quirks, and Telemetry</a></li>
+<li><a class="reference internal" href="#phase-20-documentation-final-delivery">Phase 20: Documentation &amp; Final Delivery</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

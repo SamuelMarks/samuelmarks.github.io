@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ONNX Script Demo</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        color: #333;
+      }
+      h1 {
+        color: #0056b3;
+      }
+      .panel {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #f9f9f9;
+      }
+      textarea {
+        width: 100%;
+        height: 150px;
+        font-family: monospace;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        box-sizing: border-box;
+      }
+      button {
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+      button:hover {
+        background-color: #004494;
+      }
+      #output {
+        white-space: pre-wrap;
+        background-color: #eee;
+        padding: 1rem;
+        border-radius: 4px;
+        font-family: monospace;
+        min-height: 50px;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-MF2e940X.js"></script>
+  </head>
+  <body>
+    <h1>ONNX Script / Fluent Scripting Demo</h1>
+    <p>This demo shows how to construct ONNX graphs using a fluent scripting API in the browser.</p>
+    
+    <div class="panel">
+      <h3>Script Input</h3>
+      <textarea id="scriptInput">
+// Construct a simple graph using fluent API
+const g = new Graph('MyFluentGraph');
+
+// Add Inputs
+const inputInfo = { name: 'x', shape: [1, 10], dtype: 'float32' };
+g.inputs.push(inputInfo);
+
+// Add Initializers
+g.tensors['w'] = { name: 'w', shape: [10, 5], dtype: 'float32', data: new Float32Array(50).fill(0.1) };
+g.initializers.push('w');
+
+g.tensors['b'] = { name: 'b', shape: [5], dtype: 'float32', data: new Float32Array(5).fill(0.5) };
+g.initializers.push('b');
+
+// Add Nodes
+g.nodes.push({ name: 'matmul_node', opType: 'MatMul', inputs: ['x', 'w'], outputs: ['out1'], attributes: {} });
+g.nodes.push({ name: 'add_node', opType: 'Add', inputs: ['out1', 'b'], outputs: ['y'], attributes: {} });
+
+// Add Outputs
+g.outputs.push({ name: 'y', shape: [1, 5], dtype: 'float32' });
+
+return g;
+      </textarea>
+      <button id="runBtn">Run Script</button>
+    </div>
+
+    <div class="panel">
+      <h3>Output</h3>
+      <div id="output">Waiting to run...</div>
+    </div>
+
+  </body>
+</html>

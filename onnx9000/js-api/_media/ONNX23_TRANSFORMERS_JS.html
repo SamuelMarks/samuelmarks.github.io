@@ -1,0 +1,954 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX18: Apache TVM (Ahead-of-Time Web Compiler)" href="ONNX20_TVM_COMPILER.html"><link rel="prev" title="ONNX Standard Compliance &amp; Testing Tracker" href="ONNX01_COMPLIANCE.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX20: Transformers.js (WASM-Native Auto-Pipelines) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX23_TRANSFORMERS_JS.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx20-transformers-js-wasm-native-auto-pipelines">
+<h1>ONNX20: Transformers.js (WASM-Native Auto-Pipelines)<a class="headerlink" href="#onnx20-transformers-js-wasm-native-auto-pipelines" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p>Transformers.js is a wildly popular JavaScript port of Hugging Face’s <code class="docutils literal notranslate"><span class="pre">transformers</span></code> Python library. It enables developers to run pre-trained models (text, vision, audio, multimodal) directly in the browser or Node.js. It achieves this by combining <code class="docutils literal notranslate"><span class="pre">onnxruntime-web</span></code> for tensor execution with pure-JavaScript implementations of tokenizers, feature extractors, and data processors. It abstracts away the complexity of model execution by providing the <code class="docutils literal notranslate"><span class="pre">pipeline()</span></code> API, allowing users to perform tasks like sentiment analysis, image classification, or speech recognition with just a few lines of code.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p>Instead of acting as a JavaScript wrapper around a massive compiled C++ runtime (<code class="docutils literal notranslate"><span class="pre">onnxruntime-web</span></code>) and relying on slow pure-JS data processors, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> integrates the Transformers ecosystem natively into its AOT/WASM core.</p>
+<ul class="simple">
+<li><p><strong>WASM-Accelerated Processors:</strong> Image resizing, Mel-spectrogram generation, and BPE tokenization are implemented as highly optimized WASM modules rather than pure JS, preventing UI thread blocking and offering near-native data preparation speeds.</p></li>
+<li><p><strong>Zero-Overhead Inference:</strong> Uses <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>’s lightweight runtime or AOT-compiled WebGPU shaders instead of a 2MB-5MB generic execution provider.</p></li>
+<li><p><strong>Unified AutoClasses:</strong> The Python and TypeScript/Browser codebases share the same architectural logic via the monolith, meaning a model supported in Python <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> is instantly available in the browser via <code class="docutils literal notranslate"><span class="pre">onnx9000.transformers</span></code>.</p></li>
+<li><p><strong>WebGPU First:</strong> All Vision and Audio processing tensors seamlessly share memory spaces with the execution backend (WebGPU), eliminating expensive CPU-to-GPU memory copying during pipeline execution.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-pipeline-api-task-orchestration">
+<h3>Phase 1: Pipeline API &amp; Task Orchestration<a class="headerlink" href="#phase-1-pipeline-api-task-orchestration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Implement the base <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> class.</p></li>
+<li><p>[x] 2. Implement the <code class="docutils literal notranslate"><span class="pre">pipeline(task,</span> <span class="pre">model,</span> <span class="pre">...)</span></code> factory function.</p></li>
+<li><p>[x] 3. Support <code class="docutils literal notranslate"><span class="pre">feature-extraction</span></code> pipeline (getting hidden states).</p></li>
+<li><p>[x] 4. Support <code class="docutils literal notranslate"><span class="pre">text-classification</span></code> pipeline (e.g., sentiment analysis).</p></li>
+<li><p>[x] 5. Support <code class="docutils literal notranslate"><span class="pre">token-classification</span></code> pipeline (e.g., NER, POS tagging).</p></li>
+<li><p>[x] 6. Support <code class="docutils literal notranslate"><span class="pre">question-answering</span></code> pipeline.</p></li>
+<li><p>[x] 7. Support <code class="docutils literal notranslate"><span class="pre">zero-shot-classification</span></code> pipeline.</p></li>
+<li><p>[x] 8. Support <code class="docutils literal notranslate"><span class="pre">translation</span></code> pipeline.</p></li>
+<li><p>[x] 9. Support <code class="docutils literal notranslate"><span class="pre">summarization</span></code> pipeline.</p></li>
+<li><p>[x] 10. Support <code class="docutils literal notranslate"><span class="pre">text-generation</span></code> pipeline (integrating with ONNX19 GenAI).</p></li>
+<li><p>[x] 11. Support <code class="docutils literal notranslate"><span class="pre">text2text-generation</span></code> pipeline.</p></li>
+<li><p>[x] 12. Support <code class="docutils literal notranslate"><span class="pre">fill-mask</span></code> pipeline.</p></li>
+<li><p>[x] 13. Support <code class="docutils literal notranslate"><span class="pre">image-classification</span></code> pipeline.</p></li>
+<li><p>[x] 14. Support <code class="docutils literal notranslate"><span class="pre">object-detection</span></code> pipeline.</p></li>
+<li><p>[x] 15. Support <code class="docutils literal notranslate"><span class="pre">zero-shot-image-classification</span></code> pipeline.</p></li>
+<li><p>[x] 16. Support <code class="docutils literal notranslate"><span class="pre">image-segmentation</span></code> pipeline.</p></li>
+<li><p>[x] 17. Support <code class="docutils literal notranslate"><span class="pre">depth-estimation</span></code> pipeline.</p></li>
+<li><p>[x] 18. Support <code class="docutils literal notranslate"><span class="pre">image-to-image</span></code> pipeline.</p></li>
+<li><p>[x] 19. Support <code class="docutils literal notranslate"><span class="pre">audio-classification</span></code> pipeline.</p></li>
+<li><p>[x] 20. Support <code class="docutils literal notranslate"><span class="pre">automatic-speech-recognition</span></code> (ASR) pipeline.</p></li>
+<li><p>[x] 21. Support <code class="docutils literal notranslate"><span class="pre">text-to-speech</span></code> (TTS) pipeline.</p></li>
+<li><p>[x] 22. Support <code class="docutils literal notranslate"><span class="pre">document-question-answering</span></code> pipeline.</p></li>
+<li><p>[x] 23. Support <code class="docutils literal notranslate"><span class="pre">visual-question-answering</span></code> pipeline.</p></li>
+<li><p>[x] 24. Support <code class="docutils literal notranslate"><span class="pre">image-feature-extraction</span></code> pipeline.</p></li>
+<li><p>[x] 25. Support pipeline batching (<code class="docutils literal notranslate"><span class="pre">[input1,</span> <span class="pre">input2]</span></code>).</p></li>
+<li><p>[x] 26. Implement <code class="docutils literal notranslate"><span class="pre">top_k</span></code> argument parsing in classification pipelines.</p></li>
+<li><p>[x] 27. Implement thresholding arguments in detection pipelines.</p></li>
+<li><p>[x] 28. Support generic <code class="docutils literal notranslate"><span class="pre">device</span></code> flag (mapping to WebGPU/WASM).</p></li>
+<li><p>[x] 29. Support <code class="docutils literal notranslate"><span class="pre">dtype</span></code> casting in pipelines (fp32, fp16, int8).</p></li>
+<li><p>[x] 30. Implement progressive callbacks in pipelines (for streaming or download progress).</p></li>
+<li><p>[x] 31. Implement pipeline pooling (keeping models hot in memory).</p></li>
+<li><p>[x] 32. Allow custom pre_process step overriding in pipelines.</p></li>
+<li><p>[x] 33. Allow custom post_process step overriding in pipelines.</p></li>
+<li><p>[x] 34. Allow forward step overriding in pipelines.</p></li>
+<li><p>[x] 35. Ensure structured error throwing for unsupported pipeline/model combos.</p></li>
+</ul>
+</section>
+<section id="phase-2-tokenizer-engine-full-hf-compatibility">
+<h3>Phase 2: Tokenizer Engine (Full HF Compatibility)<a class="headerlink" href="#phase-2-tokenizer-engine-full-hf-compatibility" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 36. Define <code class="docutils literal notranslate"><span class="pre">PreTrainedTokenizer</span></code> base class.</p></li>
+<li><p>[x] 37. Define <code class="docutils literal notranslate"><span class="pre">PreTrainedTokenizerFast</span></code> base class (WASM backed).</p></li>
+<li><p>[x] 38. Support loading <code class="docutils literal notranslate"><span class="pre">tokenizer_config.json</span></code>.</p></li>
+<li><p>[x] 39. Support loading <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> (the fast tokenizer format).</p></li>
+<li><p>[x] 40. Implement WASM BPE (Byte-Pair Encoding) implementation.</p></li>
+<li><p>[x] 41. Implement WASM WordPiece implementation.</p></li>
+<li><p>[x] 42. Implement WASM Unigram implementation.</p></li>
+<li><p>[x] 43. Handle <code class="docutils literal notranslate"><span class="pre">padding=&quot;max_length&quot;</span></code> keyword argument.</p></li>
+<li><p>[x] 44. Handle <code class="docutils literal notranslate"><span class="pre">padding=&quot;longest&quot;</span></code> keyword argument.</p></li>
+<li><p>[x] 45. Handle <code class="docutils literal notranslate"><span class="pre">padding=False</span></code> keyword argument.</p></li>
+<li><p>[x] 46. Handle <code class="docutils literal notranslate"><span class="pre">truncation=True</span></code> keyword argument.</p></li>
+<li><p>[x] 47. Handle <code class="docutils literal notranslate"><span class="pre">truncation=&quot;only_first&quot;</span></code> keyword argument.</p></li>
+<li><p>[x] 48. Handle <code class="docutils literal notranslate"><span class="pre">truncation=&quot;only_second&quot;</span></code> keyword argument.</p></li>
+<li><p>[x] 49. Handle <code class="docutils literal notranslate"><span class="pre">truncation=&quot;longest_first&quot;</span></code> keyword argument.</p></li>
+<li><p>[x] 50. Handle <code class="docutils literal notranslate"><span class="pre">max_length</span></code> keyword argument.</p></li>
+<li><p>[x] 51. Handle <code class="docutils literal notranslate"><span class="pre">stride</span></code> keyword argument for overlapping contexts.</p></li>
+<li><p>[x] 52. Handle <code class="docutils literal notranslate"><span class="pre">return_tensors</span></code> (“np”, “pt”, “tf”, “ort”, “webgpu”).</p></li>
+<li><p>[x] 53. Handle <code class="docutils literal notranslate"><span class="pre">return_attention_mask</span></code> keyword argument.</p></li>
+<li><p>[x] 54. Handle <code class="docutils literal notranslate"><span class="pre">return_token_type_ids</span></code> keyword argument.</p></li>
+<li><p>[x] 55. Handle <code class="docutils literal notranslate"><span class="pre">return_overflowing_tokens</span></code> keyword argument.</p></li>
+<li><p>[x] 56. Handle <code class="docutils literal notranslate"><span class="pre">return_special_tokens_mask</span></code> keyword argument.</p></li>
+<li><p>[x] 57. Handle <code class="docutils literal notranslate"><span class="pre">return_offsets_mapping</span></code> keyword argument.</p></li>
+<li><p>[x] 58. Implement word to token ID mapping (<code class="docutils literal notranslate"><span class="pre">word_ids()</span></code>).</p></li>
+<li><p>[x] 59. Implement character to token ID mapping (<code class="docutils literal notranslate"><span class="pre">char_to_token()</span></code>).</p></li>
+<li><p>[x] 60. Implement token to character mapping (<code class="docutils literal notranslate"><span class="pre">token_to_chars()</span></code>).</p></li>
+<li><p>[x] 61. Support text pairs (Sentence A, Sentence B).</p></li>
+<li><p>[x] 62. Implement special token addition logic.</p></li>
+<li><p>[x] 63. Handle <code class="docutils literal notranslate"><span class="pre">bos_token</span></code>, <code class="docutils literal notranslate"><span class="pre">eos_token</span></code>, <code class="docutils literal notranslate"><span class="pre">unk_token</span></code>, <code class="docutils literal notranslate"><span class="pre">sep_token</span></code>, <code class="docutils literal notranslate"><span class="pre">pad_token</span></code>, <code class="docutils literal notranslate"><span class="pre">cls_token</span></code>, <code class="docutils literal notranslate"><span class="pre">mask_token</span></code>.</p></li>
+<li><p>[x] 64. Process complex <code class="docutils literal notranslate"><span class="pre">AddedToken</span></code> configurations (lstrip, rstrip, single_word).</p></li>
+<li><p>[x] 65. Implement <code class="docutils literal notranslate"><span class="pre">decode()</span></code> and <code class="docutils literal notranslate"><span class="pre">batch_decode()</span></code>.</p></li>
+<li><p>[x] 66. Support <code class="docutils literal notranslate"><span class="pre">skip_special_tokens</span></code> in decoding.</p></li>
+<li><p>[x] 67. Support <code class="docutils literal notranslate"><span class="pre">clean_up_tokenization_spaces</span></code> in decoding.</p></li>
+<li><p>[x] 68. Implement regex-based pre-tokenizers in WASM.</p></li>
+<li><p>[x] 69. Implement byte-level pre-tokenizers.</p></li>
+<li><p>[x] 70. Implement Metaspace pre-tokenizers.</p></li>
+<li><p>[x] 71. Implement punctuation splitting pre-tokenizers.</p></li>
+<li><p>[x] 72. Implement decoders (ByteLevel, WordPiece, Metaspace).</p></li>
+<li><p>[x] 73. Provide a fallback JS implementation for non-WASM environments.</p></li>
+<li><p>[x] 74. Implement chat templates using a lightweight JS Jinja engine.</p></li>
+<li><p>[x] 75. Validate inputs (strings, lists of strings, nested lists).</p></li>
+</ul>
+</section>
+<section id="phase-3-vision-processors-image-handling">
+<h3>Phase 3: Vision Processors &amp; Image Handling<a class="headerlink" href="#phase-3-vision-processors-image-handling" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 76. Define <code class="docutils literal notranslate"><span class="pre">BaseImageProcessor</span></code> interface.</p></li>
+<li><p>[x] 77. Create <code class="docutils literal notranslate"><span class="pre">onnx9000.Image</span></code> object wrapper (handling Canvas/ImageData/Blob/URL).</p></li>
+<li><p>[x] 78. Support loading images directly from URLs natively.</p></li>
+<li><p>[x] 79. Support loading images from base64 strings.</p></li>
+<li><p>[x] 80. Implement <code class="docutils literal notranslate"><span class="pre">do_resize</span></code> logic.</p></li>
+<li><p>[x] 81. Implement WASM-accelerated bilinear interpolation resizing.</p></li>
+<li><p>[x] 82. Implement WASM-accelerated bicubic interpolation resizing.</p></li>
+<li><p>[x] 83. Implement WASM-accelerated nearest-neighbor interpolation resizing.</p></li>
+<li><p>[x] 84. Implement <code class="docutils literal notranslate"><span class="pre">do_center_crop</span></code> logic.</p></li>
+<li><p>[x] 85. Implement <code class="docutils literal notranslate"><span class="pre">do_random_crop</span></code> logic.</p></li>
+<li><p>[x] 86. Implement <code class="docutils literal notranslate"><span class="pre">do_pad</span></code> logic (constant, reflect, edge padding).</p></li>
+<li><p>[x] 87. Implement <code class="docutils literal notranslate"><span class="pre">do_rescale</span></code> (e.g., multiplying by 1/255).</p></li>
+<li><p>[x] 88. Implement <code class="docutils literal notranslate"><span class="pre">do_normalize</span></code> (subtracting mean, dividing by std).</p></li>
+<li><p>[x] 89. Support custom <code class="docutils literal notranslate"><span class="pre">image_mean</span></code> and <code class="docutils literal notranslate"><span class="pre">image_std</span></code> parameters.</p></li>
+<li><p>[x] 90. Handle layout conversion (HWC to CHW format).</p></li>
+<li><p>[x] 91. Implement <code class="docutils literal notranslate"><span class="pre">ImageProcessor</span></code> batching (lists of images).</p></li>
+<li><p>[x] 92. Support <code class="docutils literal notranslate"><span class="pre">return_tensors</span></code> specifically for WebGPU image uploads.</p></li>
+<li><p>[x] 93. Create specialized <code class="docutils literal notranslate"><span class="pre">ViTImageProcessor</span></code>.</p></li>
+<li><p>[x] 94. Create specialized <code class="docutils literal notranslate"><span class="pre">CLIPImageProcessor</span></code>.</p></li>
+<li><p>[x] 95. Create specialized <code class="docutils literal notranslate"><span class="pre">DeiTImageProcessor</span></code>.</p></li>
+<li><p>[x] 96. Create specialized <code class="docutils literal notranslate"><span class="pre">DetrImageProcessor</span></code>.</p></li>
+<li><p>[x] 97. Create specialized <code class="docutils literal notranslate"><span class="pre">YolosImageProcessor</span></code>.</p></li>
+<li><p>[x] 98. Implement bounding box drawing utilities on HTML Canvas.</p></li>
+<li><p>[x] 99. Implement segmentation mask drawing utilities on HTML Canvas.</p></li>
+<li><p>[x] 100. Write WebGPU shaders for on-device image normalization to bypass CPU.</p></li>
+<li><p>[x] 101. Write WebGPU shaders for on-device image resizing.</p></li>
+<li><p>[x] 102. Support Exif orientation correction before processing.</p></li>
+<li><p>[x] 103. Handle RGBA to RGB conversion.</p></li>
+<li><p>[x] 104. Handle Grayscale to RGB conversion.</p></li>
+<li><p>[x] 105. Optimize raw pixel array copying into WASM heap.</p></li>
+</ul>
+</section>
+<section id="phase-4-audio-processors-feature-extractors">
+<h3>Phase 4: Audio Processors (Feature Extractors)<a class="headerlink" href="#phase-4-audio-processors-feature-extractors" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 106. Define <code class="docutils literal notranslate"><span class="pre">SequenceFeatureExtractor</span></code> base class.</p></li>
+<li><p>[x] 107. Create <code class="docutils literal notranslate"><span class="pre">onnx9000.Audio</span></code> object wrapper.</p></li>
+<li><p>[x] 108. Support loading audio from URLs.</p></li>
+<li><p>[x] 109. Support loading audio from Blob/File objects.</p></li>
+<li><p>[x] 110. Integrate <code class="docutils literal notranslate"><span class="pre">AudioContext</span></code> for in-browser audio decoding.</p></li>
+<li><p>[x] 111. Implement WASM-accelerated 1D audio resampling.</p></li>
+<li><p>[x] 112. Implement <code class="docutils literal notranslate"><span class="pre">do_pad</span></code> for audio (zero padding, reflection).</p></li>
+<li><p>[x] 113. Implement <code class="docutils literal notranslate"><span class="pre">do_truncate</span></code> for audio sequence lengths.</p></li>
+<li><p>[x] 114. Support <code class="docutils literal notranslate"><span class="pre">return_attention_mask</span></code> for padded audio sequences.</p></li>
+<li><p>[x] 115. Implement Short-Time Fourier Transform (STFT) in WASM.</p></li>
+<li><p>[x] 116. Implement Windowing functions (Hann, Hamming, Mel) in WASM.</p></li>
+<li><p>[x] 117. Implement Mel-filterbank matrix generation.</p></li>
+<li><p>[x] 118. Implement Mel-spectrogram computation pipeline (STFT -&gt; Power -&gt; Mel).</p></li>
+<li><p>[x] 119. Implement log10 application for log-mel spectrograms.</p></li>
+<li><p>[x] 120. Create specialized <code class="docutils literal notranslate"><span class="pre">WhisperFeatureExtractor</span></code>.</p></li>
+<li><p>[x] 121. Create specialized <code class="docutils literal notranslate"><span class="pre">Wav2Vec2FeatureExtractor</span></code>.</p></li>
+<li><p>[x] 122. Create specialized <code class="docutils literal notranslate"><span class="pre">SpeechT5FeatureExtractor</span></code>.</p></li>
+<li><p>[x] 123. Implement raw waveform chunking (for long-form audio processing).</p></li>
+<li><p>[x] 124. Handle multi-channel audio (downmixing to mono).</p></li>
+<li><p>[x] 125. Normalize audio amplitude arrays (zero mean, unit variance).</p></li>
+<li><p>[x] 126. Support Voice Activity Detection (VAD) pre-processing (optional extension).</p></li>
+<li><p>[x] 127. Implement Web Audio API Worklet for streaming feature extraction.</p></li>
+<li><p>[x] 128. Optimize memory usage during large Mel-spectrogram generation.</p></li>
+<li><p>[x] 129. Implement audio output formatters (Float32Array to WAV blob).</p></li>
+<li><p>[x] 130. Ensure floating point determinism across JS, WASM, and WebGPU for audio ops.</p></li>
+</ul>
+</section>
+<section id="phase-5-auto-classes-hub-integration">
+<h3>Phase 5: Auto Classes &amp; Hub Integration<a class="headerlink" href="#phase-5-auto-classes-hub-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 131. Implement <code class="docutils literal notranslate"><span class="pre">AutoConfig.from_pretrained()</span></code>.</p></li>
+<li><p>[x] 132. Implement <code class="docutils literal notranslate"><span class="pre">AutoTokenizer.from_pretrained()</span></code>.</p></li>
+<li><p>[x] 133. Implement <code class="docutils literal notranslate"><span class="pre">AutoFeatureExtractor.from_pretrained()</span></code>.</p></li>
+<li><p>[x] 134. Implement <code class="docutils literal notranslate"><span class="pre">AutoProcessor.from_pretrained()</span></code>.</p></li>
+<li><p>[x] 135. Implement <code class="docutils literal notranslate"><span class="pre">AutoModel.from_pretrained()</span></code>.</p></li>
+<li><p>[x] 136. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForSequenceClassification</span></code>.</p></li>
+<li><p>[x] 137. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForTokenClassification</span></code>.</p></li>
+<li><p>[x] 138. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForQuestionAnswering</span></code>.</p></li>
+<li><p>[x] 139. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForCausalLM</span></code>.</p></li>
+<li><p>[x] 140. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForMaskedLM</span></code>.</p></li>
+<li><p>[x] 141. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForSeq2SeqLM</span></code>.</p></li>
+<li><p>[x] 142. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForImageClassification</span></code>.</p></li>
+<li><p>[x] 143. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForObjectDetection</span></code>.</p></li>
+<li><p>[x] 144. Implement <code class="docutils literal notranslate"><span class="pre">AutoModelForSpeechSeq2Seq</span></code>.</p></li>
+<li><p>[x] 145. Implement fetching from <code class="docutils literal notranslate"><span class="pre">hf.co</span></code> Hub REST API.</p></li>
+<li><p>[x] 146. Support custom Hub endpoints/mirrors.</p></li>
+<li><p>[x] 147. Implement API Key authentication for private models.</p></li>
+<li><p>[x] 148. Support <code class="docutils literal notranslate"><span class="pre">revision</span></code> flag (fetching specific branches/commits).</p></li>
+<li><p>[x] 149. Support resolving ONNX filenames (<code class="docutils literal notranslate"><span class="pre">model.onnx</span></code>, <code class="docutils literal notranslate"><span class="pre">model_quantized.onnx</span></code>).</p></li>
+<li><p>[x] 150. Implement IndexedDB caching via CacheStorage API for models.</p></li>
+<li><p>[x] 151. Implement ETag checking to prevent redundant model downloads.</p></li>
+<li><p>[x] 152. Implement concurrent multipart file downloading for large models.</p></li>
+<li><p>[x] 153. Implement fallback caching strategies for Node.js (<code class="docutils literal notranslate"><span class="pre">fs</span></code>).</p></li>
+<li><p>[x] 154. Support reading models from local directory paths.</p></li>
+<li><p>[x] 155. Provide an API to clear/manage the downloaded model cache.</p></li>
+</ul>
+</section>
+<section id="phase-6-core-model-execution-wrappers">
+<h3>Phase 6: Core Model Execution Wrappers<a class="headerlink" href="#phase-6-core-model-execution-wrappers" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 156. Define <code class="docutils literal notranslate"><span class="pre">PreTrainedModel</span></code> base class.</p></li>
+<li><p>[x] 157. Connect <code class="docutils literal notranslate"><span class="pre">PreTrainedModel</span></code> to the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution backend.</p></li>
+<li><p>[x] 158. Implement model initialization logic (loading weights into WebGPU/WASM).</p></li>
+<li><p>[x] 159. Parse <code class="docutils literal notranslate"><span class="pre">config.json</span></code> to configure model input/output layers dynamically.</p></li>
+<li><p>[x] 160. Manage <code class="docutils literal notranslate"><span class="pre">session_options</span></code> (threads, execution providers).</p></li>
+<li><p>[x] 161. Implement the <code class="docutils literal notranslate"><span class="pre">__call__</span></code> / <code class="docutils literal notranslate"><span class="pre">forward</span></code> method abstracting the inference session.</p></li>
+<li><p>[x] 162. Handle dynamic batch size resolution prior to graph execution.</p></li>
+<li><p>[x] 163. Map model-specific input names (e.g., <code class="docutils literal notranslate"><span class="pre">input_ids</span></code>, <code class="docutils literal notranslate"><span class="pre">pixel_values</span></code>).</p></li>
+<li><p>[x] 164. Map model-specific output names (e.g., <code class="docutils literal notranslate"><span class="pre">logits</span></code>, <code class="docutils literal notranslate"><span class="pre">last_hidden_state</span></code>).</p></li>
+<li><p>[x] 165. Support external data format files (<code class="docutils literal notranslate"><span class="pre">model.onnx_data</span></code>).</p></li>
+<li><p>[x] 166. Implement automatic input casting (e.g., BigInt64 to Int32 for WASM).</p></li>
+<li><p>[x] 167. Handle <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code> application internally if required by specific ops.</p></li>
+<li><p>[x] 168. Attach the <code class="docutils literal notranslate"><span class="pre">GenerationMixin</span></code> for text-generative models.</p></li>
+<li><p>[x] 169. Provide explicit memory disposal methods (<code class="docutils literal notranslate"><span class="pre">model.dispose()</span></code>).</p></li>
+<li><p>[x] 170. Create debugging mode to trace input/output shapes per execution step.</p></li>
+</ul>
+</section>
+<section id="phase-7-post-processing-output-generation">
+<h3>Phase 7: Post-Processing &amp; Output Generation<a class="headerlink" href="#phase-7-post-processing-output-generation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 171. Implement generic <code class="docutils literal notranslate"><span class="pre">post_process</span></code> hooks.</p></li>
+<li><p>[x] 172. Implement post-processing for Text Classification (applying Softmax, indexing <code class="docutils literal notranslate"><span class="pre">id2label</span></code>).</p></li>
+<li><p>[x] 173. Implement post-processing for Token Classification (aggregating sub-words, aligning offsets).</p></li>
+<li><p>[x] 174. Implement post-processing for Question Answering (finding max start/end logits, span extraction).</p></li>
+<li><p>[x] 175. Implement post-processing for Zero-Shot Classification (NLI entailment/contradiction mapping).</p></li>
+<li><p>[x] 176. Implement post-processing for Image Classification (Softmax -&gt; Top K).</p></li>
+<li><p>[x] 177. Implement post-processing for Object Detection.</p></li>
+<li><p>[x] 178. Build Non-Maximum Suppression (NMS) in WASM.</p></li>
+<li><p>[x] 179. Build bounding box denormalization (cx,cy,w,h to xmin,ymin,xmax,ymax).</p></li>
+<li><p>[x] 180. Implement post-processing for Semantic Segmentation (argmax over spatial dims).</p></li>
+<li><p>[x] 181. Support chunked output decoding for ASR (Whisper timestamps processing).</p></li>
+<li><p>[x] 182. Construct <code class="docutils literal notranslate"><span class="pre">ModelOutput</span></code> classes (similar to HF dictionaries).</p></li>
+<li><p>[x] 183. Support raw output returning (<code class="docutils literal notranslate"><span class="pre">return_tensors=True</span></code> on pipelines).</p></li>
+<li><p>[x] 184. Support streaming generation responses (Generators/AsyncIterators).</p></li>
+</ul>
+</section>
+<section id="phase-8-nlp-architecture-support-validation">
+<h3>Phase 8: NLP Architecture Support (Validation)<a class="headerlink" href="#phase-8-nlp-architecture-support-validation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 185. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">BERT</span></code> pipeline.</p></li>
+<li><p>[x] 186. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">RoBERTa</span></code> pipeline.</p></li>
+<li><p>[x] 187. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">DistilBERT</span></code> pipeline.</p></li>
+<li><p>[x] 188. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">ALBERT</span></code> pipeline.</p></li>
+<li><p>[x] 189. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">DeBERTa</span></code> pipeline.</p></li>
+<li><p>[x] 190. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">MobileBERT</span></code> pipeline.</p></li>
+<li><p>[x] 191. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">T5</span></code> pipeline.</p></li>
+<li><p>[x] 192. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">BART</span></code> pipeline.</p></li>
+<li><p>[x] 193. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">MarianMT</span></code> pipeline.</p></li>
+<li><p>[x] 194. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">GPT-2</span></code> pipeline.</p></li>
+<li><p>[x] 195. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">LLaMA</span></code> pipeline (integrating GenAI capabilities).</p></li>
+<li><p>[x] 196. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Mistral</span></code> pipeline.</p></li>
+<li><p>[x] 197. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Gemma</span></code> pipeline.</p></li>
+<li><p>[x] 198. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Phi</span></code> pipeline.</p></li>
+<li><p>[x] 199. Handle missing token type IDs cleanly for architectures that ignore them.</p></li>
+<li><p>[x] 200. Ensure position ID injection works for models without internal generators.</p></li>
+</ul>
+</section>
+<section id="phase-9-vision-audio-architecture-support-validation">
+<h3>Phase 9: Vision &amp; Audio Architecture Support (Validation)<a class="headerlink" href="#phase-9-vision-audio-architecture-support-validation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 201. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">ViT</span></code> (Vision Transformer) pipeline.</p></li>
+<li><p>[x] 202. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">ResNet</span></code> pipeline.</p></li>
+<li><p>[x] 203. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Swin</span></code> Transformer pipeline.</p></li>
+<li><p>[x] 204. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">MobileNetV2</span></code> pipeline.</p></li>
+<li><p>[x] 205. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">ConvNeXT</span></code> pipeline.</p></li>
+<li><p>[x] 206. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">DETR</span></code> pipeline.</p></li>
+<li><p>[x] 207. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">YOLOS</span></code> pipeline.</p></li>
+<li><p>[x] 208. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">SegFormer</span></code> pipeline.</p></li>
+<li><p>[x] 209. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">CLIP</span></code> pipeline (Image + Text).</p></li>
+<li><p>[x] 210. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">OwlViT</span></code> pipeline.</p></li>
+<li><p>[x] 211. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">BLIP</span></code> pipeline.</p></li>
+<li><p>[x] 212. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">TrOCR</span></code> pipeline.</p></li>
+<li><p>[x] 213. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Whisper</span></code> pipeline (ASR).</p></li>
+<li><p>[x] 214. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Wav2Vec2</span></code> pipeline (ASR).</p></li>
+<li><p>[x] 215. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">SpeechT5</span></code> pipeline (TTS).</p></li>
+<li><p>[x] 216. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Hubert</span></code> pipeline.</p></li>
+<li><p>[x] 217. Validate end-to-end <code class="docutils literal notranslate"><span class="pre">Clap</span></code> pipeline.</p></li>
+</ul>
+</section>
+<section id="phase-10-utility-math-tensor-interop">
+<h3>Phase 10: Utility, Math &amp; Tensor Interop<a class="headerlink" href="#phase-10-utility-math-tensor-interop" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 218. Implement <code class="docutils literal notranslate"><span class="pre">softmax(tensor,</span> <span class="pre">axis)</span></code> utility.</p></li>
+<li><p>[x] 219. Implement <code class="docutils literal notranslate"><span class="pre">log_softmax(tensor,</span> <span class="pre">axis)</span></code> utility.</p></li>
+<li><p>[x] 220. Implement <code class="docutils literal notranslate"><span class="pre">sigmoid(tensor)</span></code> utility.</p></li>
+<li><p>[x] 221. Implement <code class="docutils literal notranslate"><span class="pre">get_top_k(tensor,</span> <span class="pre">k)</span></code> utility.</p></li>
+<li><p>[x] 222. Implement <code class="docutils literal notranslate"><span class="pre">cosine_similarity(a,</span> <span class="pre">b)</span></code> utility.</p></li>
+<li><p>[x] 223. Implement <code class="docutils literal notranslate"><span class="pre">dot_product(a,</span> <span class="pre">b)</span></code> utility.</p></li>
+<li><p>[x] 224. Ensure utilities auto-dispatch to WASM/WebGPU for large tensors.</p></li>
+<li><p>[x] 225. Expose tensor shape manipulation (<code class="docutils literal notranslate"><span class="pre">view</span></code>, <code class="docutils literal notranslate"><span class="pre">reshape</span></code>, <code class="docutils literal notranslate"><span class="pre">transpose</span></code>).</p></li>
+<li><p>[x] 226. Provide bi-directional conversion: <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code> &lt;-&gt; <code class="docutils literal notranslate"><span class="pre">Float32Array</span></code>.</p></li>
+<li><p>[x] 227. Provide bi-directional conversion: <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code> &lt;-&gt; standard JSON arrays.</p></li>
+<li><p>[x] 228. Handle multi-dimensional array slicing syntaxes in TS.</p></li>
+<li><p>[x] 229. Support strided array access logic in JS wrappers.</p></li>
+<li><p>[x] 230. Implement <code class="docutils literal notranslate"><span class="pre">Math.erf</span></code> polyfills if necessary.</p></li>
+</ul>
+</section>
+<section id="phase-11-export-tooling-python-parity">
+<h3>Phase 11: Export Tooling &amp; Python Parity<a class="headerlink" href="#phase-11-export-tooling-python-parity" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 231. Ensure Python API <code class="docutils literal notranslate"><span class="pre">onnx9000.transformers.pipeline()</span></code> matches JS API perfectly.</p></li>
+<li><p>[x] 232. Implement auto-conversion script (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">transformers</span> <span class="pre">export</span> <span class="pre">&lt;model_id&gt;</span></code>).</p></li>
+<li><p>[x] 233. Generate <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> files targeting optimal WebGPU topologies during export.</p></li>
+<li><p>[x] 234. Generate optimized <code class="docutils literal notranslate"><span class="pre">tokenizer.json</span></code> files.</p></li>
+<li><p>[x] 235. Extract and format <code class="docutils literal notranslate"><span class="pre">preprocessor_config.json</span></code>.</p></li>
+<li><p>[x] 236. Extract and format <code class="docutils literal notranslate"><span class="pre">generation_config.json</span></code>.</p></li>
+<li><p>[x] 237. Bundle pipeline configurations into <code class="docutils literal notranslate"><span class="pre">onnx9000-pipeline.json</span></code> for rapid loading.</p></li>
+<li><p>[x] 238. Provide INT8 dynamic quantization during export.</p></li>
+<li><p>[x] 239. Provide FP16 casting during export.</p></li>
+<li><p>[x] 240. Publish an equivalent to <code class="docutils literal notranslate"><span class="pre">optimum-cli</span></code> natively within <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-12-worker-web-native-optimizations">
+<h3>Phase 12: Worker &amp; Web-Native Optimizations<a class="headerlink" href="#phase-12-worker-web-native-optimizations" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 241. Implement <code class="docutils literal notranslate"><span class="pre">WorkerPipeline</span></code> wrapper to execute pipelines entirely in a Web Worker.</p></li>
+<li><p>[x] 242. Support Zero-Copy transfer of <code class="docutils literal notranslate"><span class="pre">Float32Array</span></code> buffers between main thread and workers.</p></li>
+<li><p>[x] 243. Create message passing interface for streaming worker text generation.</p></li>
+<li><p>[x] 244. Implement <code class="docutils literal notranslate"><span class="pre">SharedArrayBuffer</span></code> support for multi-threading if CORS/COOP allows.</p></li>
+<li><p>[x] 245. Expose memory limit configurations (e.g., throwing error instead of crashing browser).</p></li>
+<li><p>[x] 246. Support off-thread image decoding using <code class="docutils literal notranslate"><span class="pre">createImageBitmap</span></code>.</p></li>
+<li><p>[x] 247. Prevent main thread blocking during large model compilation (WebGPU async pipeline creation).</p></li>
+<li><p>[x] 248. Support Service Workers to preload pipelines for completely offline PWA experiences.</p></li>
+<li><p>[x] 249. Integrate <code class="docutils literal notranslate"><span class="pre">requestIdleCallback</span></code> for non-blocking background model initialization.</p></li>
+<li><p>[x] 250. Provide detailed performance tracing API (Network vs Compilation vs Inference time).</p></li>
+</ul>
+</section>
+<section id="phase-13-edge-case-handling">
+<h3>Phase 13: Edge Case Handling<a class="headerlink" href="#phase-13-edge-case-handling" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 251. Handle inputs exceeding maximum sequence length gracefully (auto-truncation).</p></li>
+<li><p>[x] 252. Manage WebGPU context loss and restore without application crash.</p></li>
+<li><p>[x] 253. Handle completely empty text inputs.</p></li>
+<li><p>[x] 254. Handle empty/zero-dimension images.</p></li>
+<li><p>[x] 255. Catch and log unhandled exceptions securely without leaking internal paths.</p></li>
+<li><p>[x] 256. Handle missing properties in older <code class="docutils literal notranslate"><span class="pre">config.json</span></code> revisions.</p></li>
+<li><p>[x] 257. Provide graceful fallbacks for models without <code class="docutils literal notranslate"><span class="pre">generation_config</span></code>.</p></li>
+<li><p>[x] 258. Support environments without IndexedDB (e.g., Incognito Mode).</p></li>
+<li><p>[x] 259. Support environments without <code class="docutils literal notranslate"><span class="pre">fetch</span></code> API (Node.js fallback).</p></li>
+<li><p>[x] 260. Manage circular dependencies in pipeline module loading.</p></li>
+</ul>
+</section>
+<section id="phase-14-quality-assurance-testing">
+<h3>Phase 14: Quality Assurance &amp; Testing<a class="headerlink" href="#phase-14-quality-assurance-testing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 261. Achieve 100% API compatibility with Hugging Face’s <code class="docutils literal notranslate"><span class="pre">transformers.js</span></code> v2/v3 syntax.</p></li>
+<li><p>[x] 262. Create CI tests comparing Python HF outputs with TS <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> outputs.</p></li>
+<li><p>[x] 263. Establish a daily test suite running against the top 100 HF models.</p></li>
+<li><p>[x] 264. Unit test every tokenizer configuration option independently.</p></li>
+<li><p>[x] 265. Unit test WASM image resizing against standard Pillow/OpenCV outputs.</p></li>
+<li><p>[x] 266. Unit test WASM STFT/Mel outputs against librosa outputs.</p></li>
+<li><p>[x] 267. Track memory leaks using Chrome DevTools automated puppeteer tests.</p></li>
+<li><p>[x] 268. Maintain benchmarking dashboards comparing <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> vs <code class="docutils literal notranslate"><span class="pre">onnxruntime-web</span></code>.</p></li>
+<li><p>[x] 269. Enforce strict TypeScript typing for all public APIs and Config objects.</p></li>
+<li><p>[x] 270. Create interactive notebook tutorials (Jupyter/Observable) demonstrating usage.</p></li>
+</ul>
+</section>
+<section id="phase-15-developer-experience-ecosystem">
+<h3>Phase 15: Developer Experience &amp; Ecosystem<a class="headerlink" href="#phase-15-developer-experience-ecosystem" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 271. Provide Vanilla HTML/JS boilerplate template using <code class="docutils literal notranslate"><span class="pre">onnx9000.transformers</span></code>.</p></li>
+<li><p>[x] 272. Provide Vanilla HTML/JS boilerplate template.</p></li>
+<li><p>[x] 273. Provide Chrome Extension boilerplate utilizing background scripts.</p></li>
+<li><p>[x] 274. Create comprehensive documentation for migrating from <code class="docutils literal notranslate"><span class="pre">transformers.js</span></code>.</p></li>
+<li><p>[x] 275. Support importing from CDNs (unpkg, jsdelivr) as an ES Module.</p></li>
+<li><p>[x] 276. Build an interactive web playground (like HF Spaces) exclusively running <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>.</p></li>
+<li><p>[x] 277. Implement a CLI tool to start a local REST API mimicking Hugging Face Inference Endpoints.</p></li>
+<li><p>[x] 278. Implement a Node.js C++ addon bridge as a fallback for ultra-heavy models.</p></li>
+<li><p>[x] 279. Support direct integration with <code class="docutils literal notranslate"><span class="pre">LangChain.js</span></code> tools and embeddings.</p></li>
+<li><p>[x] 280. Integrate with the <code class="docutils literal notranslate"><span class="pre">Gradio</span></code> Python library.</p></li>
+</ul>
+</section>
+<section id="phase-16-extended-pipeline-features">
+<h3>Phase 16: Extended Pipeline Features<a class="headerlink" href="#phase-16-extended-pipeline-features" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 281. Support returning probabilities for all classes in classification pipelines.</p></li>
+<li><p>[x] 282. Add sentiment scores mapping (1 star to 5 star conversions).</p></li>
+<li><p>[x] 283. Support multi-label classification post-processing (sigmoid instead of softmax).</p></li>
+<li><p>[x] 284. Allow providing a custom <code class="docutils literal notranslate"><span class="pre">id2label</span></code> dictionary at runtime.</p></li>
+<li><p>[x] 285. Implement context aggregation in Question Answering for long documents.</p></li>
+<li><p>[x] 286. Handle batch generation padding dynamically.</p></li>
+<li><p>[x] 287. Implement image tiling for high-resolution object detection.</p></li>
+<li><p>[x] 288. Add vocal isolation/stemming capabilities to audio pipelines.</p></li>
+<li><p>[x] 289. Add face detection specific utilities (wrapping generic object detection).</p></li>
+<li><p>[x] 290. Support semantic search utilities (cosine similarity wrappers over feature extraction).</p></li>
+</ul>
+</section>
+<section id="phase-17-security-reliability">
+<h3>Phase 17: Security &amp; Reliability<a class="headerlink" href="#phase-17-security-reliability" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 291. Validate all model tensors to ensure bounds checking.</p></li>
+<li><p>[x] 292. Implement a safe-loading mode that refuses to execute models with custom code.</p></li>
+<li><p>[x] 293. Sandbox Web Workers executing untrusted user models.</p></li>
+<li><p>[x] 294. Secure cache storage against cross-site scripting (XSS) extraction.</p></li>
+<li><p>[x] 295. Implement resource-limit quotas for auto-downloading models.</p></li>
+<li><p>[x] 296. Enforce strict Content Security Policy (CSP) guidelines in generated boilerplate.</p></li>
+<li><p>[x] 297. Support offline-only mode (throwing errors instead of reaching out to network).</p></li>
+<li><p>[x] 298. Validate digital signatures of official ONNX model binaries.</p></li>
+<li><p>[x] 299. Prevent prototype pollution in configuration parsers.</p></li>
+<li><p>[x] 300. Release v1.0 feature complete certification.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX20_TVM_COMPILER.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX01_COMPLIANCE.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX Standard Compliance &amp; Testing Tracker</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-pipeline-api-task-orchestration">Phase 1: Pipeline API &amp; Task Orchestration</a></li>
+<li><a class="reference internal" href="#phase-2-tokenizer-engine-full-hf-compatibility">Phase 2: Tokenizer Engine (Full HF Compatibility)</a></li>
+<li><a class="reference internal" href="#phase-3-vision-processors-image-handling">Phase 3: Vision Processors &amp; Image Handling</a></li>
+<li><a class="reference internal" href="#phase-4-audio-processors-feature-extractors">Phase 4: Audio Processors (Feature Extractors)</a></li>
+<li><a class="reference internal" href="#phase-5-auto-classes-hub-integration">Phase 5: Auto Classes &amp; Hub Integration</a></li>
+<li><a class="reference internal" href="#phase-6-core-model-execution-wrappers">Phase 6: Core Model Execution Wrappers</a></li>
+<li><a class="reference internal" href="#phase-7-post-processing-output-generation">Phase 7: Post-Processing &amp; Output Generation</a></li>
+<li><a class="reference internal" href="#phase-8-nlp-architecture-support-validation">Phase 8: NLP Architecture Support (Validation)</a></li>
+<li><a class="reference internal" href="#phase-9-vision-audio-architecture-support-validation">Phase 9: Vision &amp; Audio Architecture Support (Validation)</a></li>
+<li><a class="reference internal" href="#phase-10-utility-math-tensor-interop">Phase 10: Utility, Math &amp; Tensor Interop</a></li>
+<li><a class="reference internal" href="#phase-11-export-tooling-python-parity">Phase 11: Export Tooling &amp; Python Parity</a></li>
+<li><a class="reference internal" href="#phase-12-worker-web-native-optimizations">Phase 12: Worker &amp; Web-Native Optimizations</a></li>
+<li><a class="reference internal" href="#phase-13-edge-case-handling">Phase 13: Edge Case Handling</a></li>
+<li><a class="reference internal" href="#phase-14-quality-assurance-testing">Phase 14: Quality Assurance &amp; Testing</a></li>
+<li><a class="reference internal" href="#phase-15-developer-experience-ecosystem">Phase 15: Developer Experience &amp; Ecosystem</a></li>
+<li><a class="reference internal" href="#phase-16-extended-pipeline-features">Phase 16: Extended Pipeline Features</a></li>
+<li><a class="reference internal" href="#phase-17-security-reliability">Phase 17: Security &amp; Reliability</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

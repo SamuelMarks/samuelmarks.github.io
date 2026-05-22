@@ -1,0 +1,972 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX27: coremltools (Web-Native Apple Silicon Bridge)" href="ONNX27_COREMLTOOLS.html"><link rel="prev" title="ONNX GraphSurgeon Replication &amp; Parity Tracker" href="ONNX14_GRAPHSURGEON.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX31_MMDNN.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx31-mmdnn-web-native-n-to-n-neural-network-converter">
+<h1>ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)<a class="headerlink" href="#onnx31-mmdnn-web-native-n-to-n-neural-network-converter" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">MMdnn</span></code> is a comprehensive, open-source, N-to-N converter and framework created by Microsoft. It allows developers to convert neural network models between a massive variety of different frameworks (Caffe, Keras, MXNet, TensorFlow, CNTK, PyTorch, CoreML, and ONNX). It operates by converting the source framework’s model into a unified Intermediate Representation (IR), and then translating that IR into the target framework’s format. It is a heavy, Python-based toolset that requires the installation of the specific framework dependencies (e.g., Caffe binaries) to properly extract and compile models.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx9000.mmdnn</span></code> reimagines this universal translator as a <strong>client-side, browser-native conversion tool</strong>.</p>
+<ul class="simple">
+<li><p><strong>ONNX as the Universal IR:</strong> Instead of using a proprietary MMdnn IR, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> uses standard ONNX as the absolute source of truth. Every legacy format is converted <em>to</em> ONNX, and every export target is generated <em>from</em> ONNX.</p></li>
+<li><p><strong>Zero Native Dependencies:</strong> Developers do not need to install dead frameworks like Caffe or CNTK to extract their models. <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> implements pure TypeScript/WASM parsers for the underlying protobuf/json/binary weight files of these legacy formats.</p></li>
+<li><p><strong>Browser-Based Resurrection:</strong> It allows users to drag-and-drop a 10-year-old <code class="docutils literal notranslate"><span class="pre">.caffemodel</span></code> into a webpage and instantly run it using modern WebGPU, rescuing legacy architectures from software rot without touching a command line.</p></li>
+<li><p><strong>Code Generation:</strong> Instead of just outputting binary files, <code class="docutils literal notranslate"><span class="pre">onnx9000.mmdnn</span></code> can generate raw PyTorch or TensorFlow.js code from an ONNX file, allowing developers to mathematically recreate models natively in modern frameworks.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-core-architecture-onnx-hub">
+<h3>Phase 1: Core Architecture &amp; ONNX Hub<a class="headerlink" href="#phase-1-core-architecture-onnx-hub" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Establish ONNX as the central IR for all N-to-N conversions.</p></li>
+<li><p>[x] 2. Define the unified <code class="docutils literal notranslate"><span class="pre">onnx9000.convert(source,</span> <span class="pre">target)</span></code> API.</p></li>
+<li><p>[x] 3. Implement memory-mapped file loading for processing massive model binaries in the browser.</p></li>
+<li><p>[x] 4. Create a unified warning/error reporting system for unsupported operations across frameworks.</p></li>
+<li><p>[x] 5. Implement a robust topological sorter ensuring acyclic graphs before any translation begins.</p></li>
+<li><p>[x] 6. Build a shape inference engine that runs <em>during</em> the conversion process (required for frameworks lacking static shapes).</p></li>
+<li><p>[x] 7. Implement automatic data layout tracking (e.g., tracking <code class="docutils literal notranslate"><span class="pre">NCHW</span></code> vs <code class="docutils literal notranslate"><span class="pre">NHWC</span></code> states throughout the graph).</p></li>
+<li><p>[x] 8. Implement a global node-fusion registry (e.g., automatically fusing Batch Norm into Convolutions during import to simplify the IR).</p></li>
+</ul>
+</section>
+<section id="phase-2-caffe-importer-caffe-onnx">
+<h3>Phase 2: Caffe Importer (Caffe -&gt; ONNX)<a class="headerlink" href="#phase-2-caffe-importer-caffe-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 9. Implement a pure TypeScript parser for <code class="docutils literal notranslate"><span class="pre">caffe.proto</span></code>.</p></li>
+<li><p>[x] 10. Parse Caffe <code class="docutils literal notranslate"><span class="pre">.prototxt</span></code> (model architecture) files natively.</p></li>
+<li><p>[x] 11. Parse Caffe <code class="docutils literal notranslate"><span class="pre">.caffemodel</span></code> (binary weight) files natively.</p></li>
+<li><p>[x] 12. Map Caffe <code class="docutils literal notranslate"><span class="pre">Convolution</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 13. Map Caffe <code class="docutils literal notranslate"><span class="pre">InnerProduct</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code>.</p></li>
+<li><p>[x] 14. Map Caffe <code class="docutils literal notranslate"><span class="pre">ReLU</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code>.</p></li>
+<li><p>[x] 15. Map Caffe <code class="docutils literal notranslate"><span class="pre">Pooling</span></code> (MAX, AVE) to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> / <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 16. Map Caffe <code class="docutils literal notranslate"><span class="pre">LRN</span></code> (Local Response Normalization) to ONNX <code class="docutils literal notranslate"><span class="pre">LRN</span></code>.</p></li>
+<li><p>[x] 17. Map Caffe <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code>.</p></li>
+<li><p>[x] 18. Map Caffe <code class="docutils literal notranslate"><span class="pre">Eltwise</span></code> (PROD, SUM, MAX) to ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code>, <code class="docutils literal notranslate"><span class="pre">Add</span></code>, <code class="docutils literal notranslate"><span class="pre">Max</span></code>.</p></li>
+<li><p>[x] 19. Map Caffe <code class="docutils literal notranslate"><span class="pre">Concat</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 20. Map Caffe <code class="docutils literal notranslate"><span class="pre">Scale</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code>.</p></li>
+<li><p>[x] 21. Map Caffe <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code>.</p></li>
+<li><p>[x] 22. Extract Caffe moving average statistics into ONNX initializers.</p></li>
+<li><p>[x] 23. Map Caffe <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> or <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+<li><p>[x] 24. Map Caffe <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code>.</p></li>
+<li><p>[x] 25. Map Caffe <code class="docutils literal notranslate"><span class="pre">Flatten</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Flatten</span></code>.</p></li>
+<li><p>[x] 26. Map Caffe <code class="docutils literal notranslate"><span class="pre">Split</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Split</span></code>.</p></li>
+<li><p>[x] 27. Map Caffe <code class="docutils literal notranslate"><span class="pre">Slice</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code>.</p></li>
+<li><p>[x] 28. Resolve legacy Caffe padding conventions natively to ONNX explicit pads.</p></li>
+</ul>
+</section>
+<section id="phase-3-mxnet-importer-mxnet-onnx">
+<h3>Phase 3: MXNet Importer (MXNet -&gt; ONNX)<a class="headerlink" href="#phase-3-mxnet-importer-mxnet-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 29. Implement parser for MXNet <code class="docutils literal notranslate"><span class="pre">.json</span></code> (symbol) architecture files.</p></li>
+<li><p>[x] 30. Implement pure TypeScript parser for MXNet <code class="docutils literal notranslate"><span class="pre">.params</span></code> (NDArray binary) weight files.</p></li>
+<li><p>[x] 31. Map MXNet <code class="docutils literal notranslate"><span class="pre">Convolution</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 32. Map MXNet <code class="docutils literal notranslate"><span class="pre">FullyConnected</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code>.</p></li>
+<li><p>[x] 33. Map MXNet <code class="docutils literal notranslate"><span class="pre">Activation</span></code> (relu, sigmoid, tanh, softrelu) to ONNX equivalents.</p></li>
+<li><p>[x] 34. Map MXNet <code class="docutils literal notranslate"><span class="pre">Pooling</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> / <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 35. Map MXNet <code class="docutils literal notranslate"><span class="pre">BatchNorm</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code>.</p></li>
+<li><p>[x] 36. Map MXNet <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Identity</span></code>.</p></li>
+<li><p>[x] 37. Map MXNet <code class="docutils literal notranslate"><span class="pre">Flatten</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Flatten</span></code>.</p></li>
+<li><p>[x] 38. Map MXNet <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code>.</p></li>
+<li><p>[x] 39. Map MXNet <code class="docutils literal notranslate"><span class="pre">Concat</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 40. Map MXNet <code class="docutils literal notranslate"><span class="pre">elemwise_add</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code>.</p></li>
+<li><p>[x] 41. Map MXNet <code class="docutils literal notranslate"><span class="pre">elemwise_sub</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Sub</span></code>.</p></li>
+<li><p>[x] 42. Map MXNet <code class="docutils literal notranslate"><span class="pre">elemwise_mul</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code>.</p></li>
+<li><p>[x] 43. Map MXNet <code class="docutils literal notranslate"><span class="pre">broadcast_add</span></code>, <code class="docutils literal notranslate"><span class="pre">broadcast_mul</span></code> to standard ONNX math.</p></li>
+<li><p>[x] 44. Map MXNet <code class="docutils literal notranslate"><span class="pre">SoftmaxOutput</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code>.</p></li>
+<li><p>[x] 45. Map MXNet <code class="docutils literal notranslate"><span class="pre">LeakyReLU</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code>.</p></li>
+<li><p>[x] 46. Map MXNet <code class="docutils literal notranslate"><span class="pre">UpSampling</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+<li><p>[x] 47. Resolve MXNet’s implicit shapes by running a pre-inference shape calculation pass.</p></li>
+</ul>
+</section>
+<section id="phase-4-cntk-importer-cntk-onnx">
+<h3>Phase 4: CNTK Importer (CNTK -&gt; ONNX)<a class="headerlink" href="#phase-4-cntk-importer-cntk-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 48. Implement parser for CNTK <code class="docutils literal notranslate"><span class="pre">Dictionary</span></code> V2 model format.</p></li>
+<li><p>[x] 49. Map CNTK <code class="docutils literal notranslate"><span class="pre">Convolution</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 50. Map CNTK <code class="docutils literal notranslate"><span class="pre">Plus</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code>.</p></li>
+<li><p>[x] 51. Map CNTK <code class="docutils literal notranslate"><span class="pre">Minus</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Sub</span></code>.</p></li>
+<li><p>[x] 52. Map CNTK <code class="docutils literal notranslate"><span class="pre">ElementTimes</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code>.</p></li>
+<li><p>[x] 53. Map CNTK <code class="docutils literal notranslate"><span class="pre">Times</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code>.</p></li>
+<li><p>[x] 54. Map CNTK <code class="docutils literal notranslate"><span class="pre">RectifiedLinear</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code>.</p></li>
+<li><p>[x] 55. Map CNTK <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code>.</p></li>
+<li><p>[x] 56. Map CNTK <code class="docutils literal notranslate"><span class="pre">Tanh</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Tanh</span></code>.</p></li>
+<li><p>[x] 57. Map CNTK <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code>.</p></li>
+<li><p>[x] 58. Map CNTK <code class="docutils literal notranslate"><span class="pre">Pooling</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> / <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 59. Map CNTK <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code>.</p></li>
+<li><p>[x] 60. Map CNTK <code class="docutils literal notranslate"><span class="pre">Splice</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 61. Map CNTK <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code>.</p></li>
+<li><p>[x] 62. Map CNTK <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Transpose</span></code>.</p></li>
+<li><p>[x] 63. Handle CNTK’s implicit dynamic batch and sequence axes explicitly via ONNX dynamic shapes.</p></li>
+</ul>
+</section>
+<section id="phase-5-pytorch-code-generation-onnx-pytorch">
+<h3>Phase 5: PyTorch Code Generation (ONNX -&gt; PyTorch)<a class="headerlink" href="#phase-5-pytorch-code-generation-onnx-pytorch" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 64. Implement an AST generator that produces raw Python <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> classes from an ONNX graph.</p></li>
+<li><p>[x] 65. Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> to <code class="docutils literal notranslate"><span class="pre">nn.Conv1d</span></code>, <code class="docutils literal notranslate"><span class="pre">nn.Conv2d</span></code>, <code class="docutils literal notranslate"><span class="pre">nn.Conv3d</span></code> string declarations.</p></li>
+<li><p>[x] 66. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> / <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> to <code class="docutils literal notranslate"><span class="pre">nn.Linear</span></code> string declarations.</p></li>
+<li><p>[x] 67. Map ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> to <code class="docutils literal notranslate"><span class="pre">nn.MaxPool2d</span></code> string declarations.</p></li>
+<li><p>[x] 68. Map ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> to <code class="docutils literal notranslate"><span class="pre">nn.AvgPool2d</span></code> string declarations.</p></li>
+<li><p>[x] 69. Map ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to <code class="docutils literal notranslate"><span class="pre">nn.BatchNorm2d</span></code> string declarations.</p></li>
+<li><p>[x] 70. Generate the Python <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method, instantiating all stateful layers.</p></li>
+<li><p>[x] 71. Generate the Python <code class="docutils literal notranslate"><span class="pre">forward(self,</span> <span class="pre">x)</span></code> method, defining the exact execution topology.</p></li>
+<li><p>[x] 72. Map ONNX math ops (<code class="docutils literal notranslate"><span class="pre">Add</span></code>, <code class="docutils literal notranslate"><span class="pre">Mul</span></code>) to native PyTorch tensor operations (<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code>).</p></li>
+<li><p>[x] 73. Map ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code>, <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code>, <code class="docutils literal notranslate"><span class="pre">Tanh</span></code> to <code class="docutils literal notranslate"><span class="pre">torch.nn.functional</span></code> calls.</p></li>
+<li><p>[x] 74. Map ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code> to <code class="docutils literal notranslate"><span class="pre">torch.cat</span></code>.</p></li>
+<li><p>[x] 75. Map ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to <code class="docutils literal notranslate"><span class="pre">torch.reshape</span></code> or <code class="docutils literal notranslate"><span class="pre">x.view()</span></code>.</p></li>
+<li><p>[x] 76. Map ONNX <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> to <code class="docutils literal notranslate"><span class="pre">torch.transpose</span></code> or <code class="docutils literal notranslate"><span class="pre">x.permute()</span></code>.</p></li>
+<li><p>[x] 77. Create a utility to export ONNX weights directly into a PyTorch <code class="docutils literal notranslate"><span class="pre">.pth</span></code> / <code class="docutils literal notranslate"><span class="pre">.pt</span></code> <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> using a WASM Pickle serializer.</p></li>
+<li><p>[x] 78. Handle nested topologies by generating nested <code class="docutils literal notranslate"><span class="pre">nn.Sequential</span></code> blocks where possible for cleaner code.</p></li>
+<li><p>[x] 79. Ensure generated PyTorch code adheres to PEP8 styling standards.</p></li>
+<li><p>[x] 80. Build a live web UI tab showing the PyTorch code updating in real-time as the user drops an ONNX model.</p></li>
+</ul>
+</section>
+<section id="phase-6-tensorflow-js-code-generation-onnx-tf-js">
+<h3>Phase 6: TensorFlow.js Code Generation (ONNX -&gt; TF.js)<a class="headerlink" href="#phase-6-tensorflow-js-code-generation-onnx-tf-js" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 81. Implement an AST generator that produces raw JavaScript TensorFlow.js code from an ONNX graph.</p></li>
+<li><p>[x] 82. Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> to <code class="docutils literal notranslate"><span class="pre">tf.layers.conv2d</span></code>.</p></li>
+<li><p>[x] 83. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> to <code class="docutils literal notranslate"><span class="pre">tf.layers.dense</span></code>.</p></li>
+<li><p>[x] 84. Map ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> to <code class="docutils literal notranslate"><span class="pre">tf.layers.maxPooling2d</span></code>.</p></li>
+<li><p>[x] 85. Map ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> to <code class="docutils literal notranslate"><span class="pre">tf.layers.averagePooling2d</span></code>.</p></li>
+<li><p>[x] 86. Map ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to <code class="docutils literal notranslate"><span class="pre">tf.layers.batchNormalization</span></code>.</p></li>
+<li><p>[x] 87. Support emitting the TF.js <code class="docutils literal notranslate"><span class="pre">Sequential</span></code> API for straight-line models.</p></li>
+<li><p>[x] 88. Support emitting the TF.js <code class="docutils literal notranslate"><span class="pre">Model</span></code> API (functional) for branching models (ResNets, etc).</p></li>
+<li><p>[x] 89. Extract ONNX weights and generate a compatible <code class="docutils literal notranslate"><span class="pre">weights.bin</span></code> and <code class="docutils literal notranslate"><span class="pre">model.json</span></code> structure natively in the browser.</p></li>
+<li><p>[x] 90. Perform automatic data layout transposition (NCHW -&gt; NHWC) during the code generation, as TF.js strongly prefers NHWC.</p></li>
+<li><p>[x] 91. Inject <code class="docutils literal notranslate"><span class="pre">tf.transpose</span></code> calls dynamically if exact weight packing is bypassed.</p></li>
+<li><p>[x] 92. Verify the generated JS code is syntactically valid by running it through an internal JS parser.</p></li>
+</ul>
+</section>
+<section id="phase-7-keras-importer-extending-onnx28">
+<h3>Phase 7: Keras Importer (Extending ONNX28)<a class="headerlink" href="#phase-7-keras-importer-extending-onnx28" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 93. Integrate <code class="docutils literal notranslate"><span class="pre">onnx9000.keras</span></code> (ONNX28) directly into the <code class="docutils literal notranslate"><span class="pre">MMdnn</span></code> pipeline as a first-class source.</p></li>
+<li><p>[x] 94. Support <code class="docutils literal notranslate"><span class="pre">Keras</span> <span class="pre">(H5)</span> <span class="pre">-&gt;</span> <span class="pre">ONNX</span> <span class="pre">-&gt;</span> <span class="pre">PyTorch</span></code> multi-hop translation.</p></li>
+<li><p>[x] 95. Support <code class="docutils literal notranslate"><span class="pre">Keras</span> <span class="pre">(H5)</span> <span class="pre">-&gt;</span> <span class="pre">ONNX</span> <span class="pre">-&gt;</span> <span class="pre">CoreML</span></code> multi-hop translation.</p></li>
+<li><p>[x] 96. Ensure Keras custom layers translate cleanly across the multi-hop boundary.</p></li>
+</ul>
+</section>
+<section id="phase-8-coreml-importer-extending-onnx27">
+<h3>Phase 8: CoreML Importer (Extending ONNX27)<a class="headerlink" href="#phase-8-coreml-importer-extending-onnx27" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 97. Integrate <code class="docutils literal notranslate"><span class="pre">onnx9000.coreml</span></code> (ONNX27) directly into the <code class="docutils literal notranslate"><span class="pre">MMdnn</span></code> pipeline.</p></li>
+<li><p>[x] 98. Support <code class="docutils literal notranslate"><span class="pre">CoreML</span> <span class="pre">-&gt;</span> <span class="pre">ONNX</span> <span class="pre">-&gt;</span> <span class="pre">TF.js</span></code> multi-hop translation.</p></li>
+<li><p>[x] 99. Support <code class="docutils literal notranslate"><span class="pre">CoreML</span> <span class="pre">-&gt;</span> <span class="pre">ONNX</span> <span class="pre">-&gt;</span> <span class="pre">PyTorch</span> <span class="pre">Code</span></code> translation.</p></li>
+</ul>
+</section>
+<section id="phase-9-darknet-yolo-importer-darknet-onnx">
+<h3>Phase 9: Darknet / YOLO Importer (Darknet -&gt; ONNX)<a class="headerlink" href="#phase-9-darknet-yolo-importer-darknet-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 100. Implement parser for Darknet <code class="docutils literal notranslate"><span class="pre">.cfg</span></code> architecture files.</p></li>
+<li><p>[x] 101. Implement parser for Darknet <code class="docutils literal notranslate"><span class="pre">.weights</span></code> binary files.</p></li>
+<li><p>[x] 102. Map Darknet <code class="docutils literal notranslate"><span class="pre">[convolutional]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> + <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code>.</p></li>
+<li><p>[x] 103. Map Darknet <code class="docutils literal notranslate"><span class="pre">[maxpool]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code>.</p></li>
+<li><p>[x] 104. Map Darknet <code class="docutils literal notranslate"><span class="pre">[avgpool]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 105. Map Darknet <code class="docutils literal notranslate"><span class="pre">[connected]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code>.</p></li>
+<li><p>[x] 106. Map Darknet <code class="docutils literal notranslate"><span class="pre">[shortcut]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code>.</p></li>
+<li><p>[x] 107. Map Darknet <code class="docutils literal notranslate"><span class="pre">[route]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code> or Slice depending on syntax.</p></li>
+<li><p>[x] 108. Map Darknet <code class="docutils literal notranslate"><span class="pre">[upsample]</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+<li><p>[x] 109. Map Darknet <code class="docutils literal notranslate"><span class="pre">[yolo]</span></code> layer to standard ONNX tensor outputs (leaving NMS post-processing to the user).</p></li>
+<li><p>[x] 110. Handle Darknet’s implicit weight indexing natively in the WASM array builder.</p></li>
+</ul>
+</section>
+<section id="phase-10-ncnn-importer-tencent-ncnn-onnx">
+<h3>Phase 10: NCNN Importer (Tencent NCNN -&gt; ONNX)<a class="headerlink" href="#phase-10-ncnn-importer-tencent-ncnn-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 111. Implement parser for NCNN <code class="docutils literal notranslate"><span class="pre">.param</span></code> text files.</p></li>
+<li><p>[x] 112. Implement parser for NCNN <code class="docutils literal notranslate"><span class="pre">.bin</span></code> weight files.</p></li>
+<li><p>[x] 113. Map NCNN <code class="docutils literal notranslate"><span class="pre">Convolution</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 114. Map NCNN <code class="docutils literal notranslate"><span class="pre">Pooling</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> / <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 115. Map NCNN <code class="docutils literal notranslate"><span class="pre">InnerProduct</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code>.</p></li>
+<li><p>[x] 116. Map NCNN <code class="docutils literal notranslate"><span class="pre">ReLU</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code>.</p></li>
+<li><p>[x] 117. Map NCNN <code class="docutils literal notranslate"><span class="pre">Eltwise</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code> / <code class="docutils literal notranslate"><span class="pre">Mul</span></code>.</p></li>
+<li><p>[x] 118. Map NCNN <code class="docutils literal notranslate"><span class="pre">Concat</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 119. Map NCNN <code class="docutils literal notranslate"><span class="pre">Split</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Split</span></code> / Identity routing.</p></li>
+<li><p>[x] 120. Extract NCNN specific <code class="docutils literal notranslate"><span class="pre">INT8</span></code> quantized topologies and map them back up to ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-11-paddlepaddle-importer-paddle-onnx">
+<h3>Phase 11: PaddlePaddle Importer (Paddle -&gt; ONNX)<a class="headerlink" href="#phase-11-paddlepaddle-importer-paddle-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 121. Implement parser for PaddlePaddle <code class="docutils literal notranslate"><span class="pre">__model__</span></code> protobuf structures.</p></li>
+<li><p>[x] 122. Implement parser for PaddlePaddle binary weight formats.</p></li>
+<li><p>[x] 123. Map Paddle <code class="docutils literal notranslate"><span class="pre">conv2d</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 124. Map Paddle <code class="docutils literal notranslate"><span class="pre">pool2d</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> / <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code>.</p></li>
+<li><p>[x] 125. Map Paddle <code class="docutils literal notranslate"><span class="pre">elementwise_add</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code>.</p></li>
+<li><p>[x] 126. Map Paddle <code class="docutils literal notranslate"><span class="pre">relu</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code>.</p></li>
+<li><p>[x] 127. Map Paddle <code class="docutils literal notranslate"><span class="pre">batch_norm</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code>.</p></li>
+<li><p>[x] 128. Map Paddle <code class="docutils literal notranslate"><span class="pre">mul</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code>.</p></li>
+<li><p>[x] 129. Map Paddle <code class="docutils literal notranslate"><span class="pre">concat</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code>.</p></li>
+<li><p>[x] 130. Translate Paddle dynamic <code class="docutils literal notranslate"><span class="pre">lod_tensor</span></code> shapes to ONNX dynamic axes correctly.</p></li>
+</ul>
+</section>
+<section id="phase-12-graph-verification-normalization">
+<h3>Phase 12: Graph Verification &amp; Normalization<a class="headerlink" href="#phase-12-graph-verification-normalization" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 131. Build an “ONNX Normalizer” pass that runs after any import.</p></li>
+<li><p>[x] 132. Remove all Framework-specific proprietary opcodes by decomposing them into standard ONNX ops.</p></li>
+<li><p>[x] 133. Ensure input/output names are sanitized to match valid C-style identifiers for downstream code generation.</p></li>
+<li><p>[x] 134. Convert <code class="docutils literal notranslate"><span class="pre">float64</span></code> weights to <code class="docutils literal notranslate"><span class="pre">float32</span></code> globally upon import.</p></li>
+<li><p>[x] 135. Detect and remove unconnected subgraphs (“islands”) automatically.</p></li>
+<li><p>[x] 136. Verify absolute parity by compiling the imported graph instantly to WebGPU and running a dummy input.</p></li>
+<li><p>[x] 137. Allow users to provide a reference output tensor from their original framework to prove identical execution.</p></li>
+</ul>
+</section>
+<section id="phase-13-browser-based-ui-the-universal-converter">
+<h3>Phase 13: Browser-Based UI (The Universal Converter)<a class="headerlink" href="#phase-13-browser-based-ui-the-universal-converter" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 138. Create a “Source Framework” dropdown menu.</p></li>
+<li><p>[x] 139. Create a “Target Framework” dropdown menu.</p></li>
+<li><p>[x] 140. Implement a drag-and-drop zone that conditionally accepts multiple files (e.g., requires both <code class="docutils literal notranslate"><span class="pre">.prototxt</span></code> and <code class="docutils literal notranslate"><span class="pre">.caffemodel</span></code> if Caffe is selected).</p></li>
+<li><p>[x] 141. Provide visual conversion logs (e.g., “Importing Conv_1… Mapping to MatMul…”).</p></li>
+<li><p>[x] 142. Display a 3D visual graph preview (via <code class="docutils literal notranslate"><span class="pre">onnx9000.modifier</span></code>) of the intermediate ONNX structure.</p></li>
+<li><p>[x] 143. Support downloading the final target binary or source code directly via Blob URLs.</p></li>
+<li><p>[x] 144. Allow editing the intermediate ONNX model manually before exporting to the final target framework.</p></li>
+</ul>
+</section>
+<section id="phase-14-node-js-cli-integration-onnx9000-convert">
+<h3>Phase 14: Node.js &amp; CLI Integration (<code class="docutils literal notranslate"><span class="pre">onnx9000-convert</span></code>)<a class="headerlink" href="#phase-14-node-js-cli-integration-onnx9000-convert" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 145. Expose CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">convert</span> <span class="pre">--src</span> <span class="pre">caffe</span> <span class="pre">--dst</span> <span class="pre">pytorch_code</span> <span class="pre">model.prototxt</span> <span class="pre">model.caffemodel</span></code>.</p></li>
+<li><p>[x] 146. Expose CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">convert</span> <span class="pre">--src</span> <span class="pre">mxnet</span> <span class="pre">--dst</span> <span class="pre">onnx</span> <span class="pre">model-symbol.json</span> <span class="pre">model-0000.params</span></code>.</p></li>
+<li><p>[x] 147. Expose CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">convert</span> <span class="pre">--src</span> <span class="pre">darknet</span> <span class="pre">--dst</span> <span class="pre">tfjs</span> <span class="pre">yolov3.cfg</span> <span class="pre">yolov3.weights</span></code>.</p></li>
+<li><p>[x] 148. Support automated batch conversion over a directory of models.</p></li>
+<li><p>[x] 149. Publish Node.js NPM API: <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">{</span> <span class="pre">convert</span> <span class="pre">}</span> <span class="pre">from</span> <span class="pre">'&#64;onnx9000/mmdnn'</span></code>.</p></li>
+<li><p>[x] 150. Handle massive file conversions via streaming buffers in Node.js to avoid Heap exhaustion.</p></li>
+</ul>
+</section>
+<section id="phase-15-validation-caffe-parity">
+<h3>Phase 15: Validation (Caffe Parity)<a class="headerlink" href="#phase-15-validation-caffe-parity" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 151. Validate conversion of Caffe <code class="docutils literal notranslate"><span class="pre">AlexNet</span></code>.</p></li>
+<li><p>[x] 152. Validate conversion of Caffe <code class="docutils literal notranslate"><span class="pre">VGG16</span></code> / <code class="docutils literal notranslate"><span class="pre">VGG19</span></code>.</p></li>
+<li><p>[x] 153. Validate conversion of Caffe <code class="docutils literal notranslate"><span class="pre">GoogLeNet</span></code>.</p></li>
+<li><p>[x] 154. Validate conversion of Caffe <code class="docutils literal notranslate"><span class="pre">ResNet-50</span></code>.</p></li>
+<li><p>[x] 155. Validate conversion of Caffe <code class="docutils literal notranslate"><span class="pre">SqueezeNet</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-16-validation-mxnet-parity">
+<h3>Phase 16: Validation (MXNet Parity)<a class="headerlink" href="#phase-16-validation-mxnet-parity" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 156. Validate conversion of MXNet <code class="docutils literal notranslate"><span class="pre">Inception-v3</span></code>.</p></li>
+<li><p>[x] 157. Validate conversion of MXNet <code class="docutils literal notranslate"><span class="pre">MobileNet</span></code>.</p></li>
+<li><p>[x] 158. Validate conversion of MXNet <code class="docutils literal notranslate"><span class="pre">ResNet-152</span></code>.</p></li>
+<li><p>[x] 159. Validate conversion of MXNet <code class="docutils literal notranslate"><span class="pre">SqueezeNet</span></code>.</p></li>
+<li><p>[x] 160. Validate conversion of MXNet <code class="docutils literal notranslate"><span class="pre">VGG</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-17-validation-darknet-parity">
+<h3>Phase 17: Validation (Darknet Parity)<a class="headerlink" href="#phase-17-validation-darknet-parity" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 161. Validate conversion of Darknet <code class="docutils literal notranslate"><span class="pre">YOLO</span> <span class="pre">v2</span></code>.</p></li>
+<li><p>[x] 162. Validate conversion of Darknet <code class="docutils literal notranslate"><span class="pre">YOLO</span> <span class="pre">v3</span></code>.</p></li>
+<li><p>[x] 163. Validate conversion of Darknet <code class="docutils literal notranslate"><span class="pre">YOLO</span> <span class="pre">v4</span></code>.</p></li>
+<li><p>[x] 164. Validate conversion of Darknet <code class="docutils literal notranslate"><span class="pre">Tiny-YOLO</span></code>.</p></li>
+<li><p>[x] 165. Verify that Darknet custom anchors are correctly serialized into the target format or metadata.</p></li>
+</ul>
+</section>
+<section id="phase-18-testing-continuous-integration">
+<h3>Phase 18: Testing &amp; Continuous Integration<a class="headerlink" href="#phase-18-testing-continuous-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 166. Establish a standard model zoo containing tiny test models from all 8 supported legacy frameworks.</p></li>
+<li><p>[x] 167. Automate conversion of the entire zoo on every PR.</p></li>
+<li><p>[x] 168. Compare the generated <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> files against a known-good golden standard to prevent regression.</p></li>
+<li><p>[x] 169. Compare generated PyTorch code by executing it in a Python CI step and validating the output tensor against the JS evaluation.</p></li>
+<li><p>[x] 170. Validate that the UI accurately catches unsupported file types cleanly.</p></li>
+</ul>
+</section>
+<section id="phase-19-edge-cases-legacy-quirks">
+<h3>Phase 19: Edge Cases &amp; Legacy Quirks<a class="headerlink" href="#phase-19-edge-cases-legacy-quirks" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 171. Handle Caffe’s infamous 0-padding quirks dynamically.</p></li>
+<li><p>[x] 172. Translate CNTK’s dynamic axis broadcast rules properly into ONNX static ops.</p></li>
+<li><p>[x] 173. Resolve MXNet’s specific <code class="docutils literal notranslate"><span class="pre">Flatten</span></code> behaviors which occasionally differ from ONNX depending on rank.</p></li>
+<li><p>[x] 174. Strip unused training phase nodes (e.g., Accuracy, Loss) automatically from Caffe <code class="docutils literal notranslate"><span class="pre">.prototxt</span></code>.</p></li>
+<li><p>[x] 175. Emulate Caffe <code class="docutils literal notranslate"><span class="pre">ROIPooling</span></code> layer if possible via complex ONNX ops, or warn user.</p></li>
+</ul>
+</section>
+<section id="phase-20-future-frameworks-ecosystem-expansion">
+<h3>Phase 20: Future Frameworks &amp; Ecosystem Expansion<a class="headerlink" href="#phase-20-future-frameworks-ecosystem-expansion" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 176. Implement parser for specific TensorFlow Lite <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> flatbuffers to ONNX.</p></li>
+<li><p>[x] 177. Map <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> <code class="docutils literal notranslate"><span class="pre">CONV_2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 178. Map <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> <code class="docutils literal notranslate"><span class="pre">DEPTHWISE_CONV_2D</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 179. Extract <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> asymmetric quantized tensors and map them natively to <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code>.</p></li>
+<li><p>[x] 180. Allow exporting ONNX models back down to <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> format for legacy Android compatibility.</p></li>
+<li><p>[x] 181. Support importing raw Keras <code class="docutils literal notranslate"><span class="pre">SavedModel</span></code> directories strictly via the browser File API (processing multiple files simultaneously).</p></li>
+<li><p>[x] 182. Produce JAX code generation as an alternative to PyTorch (<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">jax.numpy</span> <span class="pre">as</span> <span class="pre">jnp</span></code>).</p></li>
+<li><p>[x] 183. Generate raw WebGPU WGSL shaders as an export target (bypassing the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution engine entirely for pure graphics programming).</p></li>
+<li><p>[x] 184. Implement an export to raw C++ arrays (header files) for microcontroller deployments (Arduino).</p></li>
+<li><p>[x] 185. Support embedding base64 encoded ONNX models directly into a generated JS file for easy sharing.</p></li>
+<li><p>[x] 186. Render the generated PyTorch / TF.js code utilizing Monaco Editor for syntax highlighting in the UI.</p></li>
+<li><p>[x] 187. Ensure strict handling of little-endian vs big-endian binary float parsing when importing legacy model formats across different host systems.</p></li>
+<li><p>[x] 188. Support importing NNEF (Neural Network Exchange Format) if encountered.</p></li>
+<li><p>[x] 189. Add user warnings when a generated PyTorch file exceeds standard text-editor limits (e.g., a file with 10,000 layer initializations).</p></li>
+<li><p>[x] 190. Extract specific <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> variables correctly from all formats.</p></li>
+<li><p>[x] 191. Implement string manipulation sanitization on layer names to avoid Python syntax errors during PyTorch code gen.</p></li>
+<li><p>[x] 192. Produce raw JSON configuration mappings for external framework integration.</p></li>
+<li><p>[x] 193. Build a “Model Size Analyzer” showing how memory footprints differ across the formats (Caffe vs ONNX).</p></li>
+<li><p>[x] 194. Execute dynamic shape patching if a user forces a specific input dimension during conversion.</p></li>
+<li><p>[x] 195. Add fallback math mapping for un-mappable activation functions.</p></li>
+<li><p>[x] 196. Render interactive graphs detailing topological changes during the <code class="docutils literal notranslate"><span class="pre">Source</span> <span class="pre">-&gt;</span> <span class="pre">ONNX</span></code> phase.</p></li>
+<li><p>[x] 197. Render interactive graphs detailing changes during the <code class="docutils literal notranslate"><span class="pre">ONNX</span> <span class="pre">-&gt;</span> <span class="pre">Target</span></code> phase.</p></li>
+<li><p>[x] 198. Establish a unified metadata dictionary that tracks framework provenance (e.g., <code class="docutils literal notranslate"><span class="pre">original_framework:</span> <span class="pre">'caffe'</span></code>).</p></li>
+<li><p>[x] 199. Support multi-threading large binary weights unpacking in browser via Web Workers.</p></li>
+<li><p>[x] 200. Execute performance profiling on the AST generation phase.</p></li>
+<li><p>[x] 201. Expose explicit chunking configurations for weight downloads.</p></li>
+<li><p>[x] 202. Handle Caffe <code class="docutils literal notranslate"><span class="pre">Power</span></code> layers gracefully.</p></li>
+<li><p>[x] 203. Handle Caffe <code class="docutils literal notranslate"><span class="pre">Threshold</span></code> layers.</p></li>
+<li><p>[x] 204. Implement MXNet <code class="docutils literal notranslate"><span class="pre">SliceChannel</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Split</span></code>.</p></li>
+<li><p>[x] 205. Implement MXNet <code class="docutils literal notranslate"><span class="pre">Crop</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code>.</p></li>
+<li><p>[x] 206. Map MXNet <code class="docutils literal notranslate"><span class="pre">Deconvolution</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code>.</p></li>
+<li><p>[x] 207. Map CNTK <code class="docutils literal notranslate"><span class="pre">AveragePooling</span></code> explicit differences.</p></li>
+<li><p>[x] 208. Implement TF.js specific code gen for <code class="docutils literal notranslate"><span class="pre">tf.layers.flatten</span></code>.</p></li>
+<li><p>[x] 209. Map Paddle <code class="docutils literal notranslate"><span class="pre">split</span></code> natively.</p></li>
+<li><p>[x] 210. Map Paddle <code class="docutils literal notranslate"><span class="pre">matmul</span></code> natively.</p></li>
+<li><p>[x] 211. Add specific support for Caffe custom Vision transforms.</p></li>
+<li><p>[x] 212. Create fallback paths for unrecognized Caffe layers using standard ONNX domains.</p></li>
+<li><p>[x] 213. Produce comprehensive error traces natively inside the browser console.</p></li>
+<li><p>[x] 214. Configure UI alerts to handle WebGL initialization errors if the previewer fails.</p></li>
+<li><p>[x] 215. Validate conversion of Darknet custom activation layers.</p></li>
+<li><p>[x] 216. Automate checking of the <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">convert</span></code> command using GitHub Actions.</p></li>
+<li><p>[x] 217. Guarantee determinism in PyTorch code generation (same graph = same string).</p></li>
+<li><p>[x] 218. Support custom formatting options for code generation (e.g., 2 spaces vs 4 spaces).</p></li>
+<li><p>[x] 219. Map ONNX <code class="docutils literal notranslate"><span class="pre">Pad</span></code> to PyTorch <code class="docutils literal notranslate"><span class="pre">nn.ZeroPad2d</span></code> or <code class="docutils literal notranslate"><span class="pre">F.pad</span></code> dynamically.</p></li>
+<li><p>[x] 220. Handle PyTorch custom <code class="docutils literal notranslate"><span class="pre">eps</span></code> constraints on Batch Norm generation.</p></li>
+<li><p>[x] 221. Verify PyTorch dropout logic matches the original topological intent.</p></li>
+<li><p>[x] 222. Create TF.js code that gracefully handles missing shape dimensions dynamically.</p></li>
+<li><p>[x] 223. Support TFLite quantized <code class="docutils literal notranslate"><span class="pre">INT8</span></code> specifically.</p></li>
+<li><p>[x] 224. Support TFLite sparse tensors.</p></li>
+<li><p>[x] 225. Handle legacy NCNN versions smoothly.</p></li>
+<li><p>[x] 226. Produce warning metadata when exporting out of ONNX into a lower-fidelity target.</p></li>
+<li><p>[x] 227. Support Darknet <code class="docutils literal notranslate"><span class="pre">[shortcut]</span></code> with custom activation logic.</p></li>
+<li><p>[x] 228. Implement mapping for CNTK specifically grouped convolutions.</p></li>
+<li><p>[x] 229. Enable export to <code class="docutils literal notranslate"><span class="pre">onnx9000.array</span></code> format (outputting raw JS arrays).</p></li>
+<li><p>[x] 230. Establish a testing pipeline for PaddlePaddle vision model parity.</p></li>
+<li><p>[x] 231. Handle edge cases involving 1D tensor representations in Caffe.</p></li>
+<li><p>[x] 232. Support importing Caffe2 protocols natively.</p></li>
+<li><p>[x] 233. Generate specific “Requires TF.js 3.0+” metadata headers.</p></li>
+<li><p>[x] 234. Create fallback conversion parameters for incompatible operators.</p></li>
+<li><p>[x] 235. Validate memory safety of the TFLite flatbuffer parsing routines in TS.</p></li>
+<li><p>[x] 236. Allow manual overriding of inferred shapes during the import phase.</p></li>
+<li><p>[x] 237. Configure memory thresholds for <code class="docutils literal notranslate"><span class="pre">Blob</span></code> serialization.</p></li>
+<li><p>[x] 238. Write tutorial: “Rescuing Caffe Models with WebGPU”.</p></li>
+<li><p>[x] 239. Write tutorial: “Converting ONNX to raw PyTorch Code”.</p></li>
+<li><p>[x] 240. Ensure all internal modules correctly depend on the central <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> AST package.</p></li>
+<li><p>[x] 241. Display parsing time in the web UI.</p></li>
+<li><p>[x] 242. Display code generation time in the web UI.</p></li>
+<li><p>[x] 243. Provide “Copy to Clipboard” functionality for generated code targets.</p></li>
+<li><p>[x] 244. Create downloadable <code class="docutils literal notranslate"><span class="pre">.zip</span></code> bundles containing code and binary weight formats simultaneously.</p></li>
+<li><p>[x] 245. Validate conversion on Windows, macOS, and Linux CLI environments natively.</p></li>
+<li><p>[x] 246. Establish strict linting on the generated PyTorch code using <code class="docutils literal notranslate"><span class="pre">flake8</span></code> or <code class="docutils literal notranslate"><span class="pre">black</span></code> definitions.</p></li>
+<li><p>[x] 247. Provide mapping capabilities for Caffe <code class="docutils literal notranslate"><span class="pre">Scale</span></code> specifically onto <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code>.</p></li>
+<li><p>[x] 248. Create UI hooks for importing multiple <code class="docutils literal notranslate"><span class="pre">.h5</span></code> parts simultaneously.</p></li>
+<li><p>[x] 249. Integrate tightly with <code class="docutils literal notranslate"><span class="pre">onnx9000.modifier</span></code> to visualize the translated graph in real-time.</p></li>
+<li><p>[x] 250. Export the conversion engine as a standalone UMD bundle.</p></li>
+<li><p>[x] 251. Handle MXNet nested symbolic structures safely.</p></li>
+<li><p>[x] 252. Add a <code class="docutils literal notranslate"><span class="pre">validate()</span></code> function bridging the generated code directly into a Python worker via Pyodide.</p></li>
+<li><p>[x] 253. Prevent cyclic recursion during the topological mapping phase.</p></li>
+<li><p>[x] 254. Handle PaddlePaddle <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> types if encountered.</p></li>
+<li><p>[x] 255. Support MXNet specific activation strings (<code class="docutils literal notranslate"><span class="pre">softrelu</span></code>).</p></li>
+<li><p>[x] 256. Handle PyTorch specific indexing when outputting code from <code class="docutils literal notranslate"><span class="pre">Gather</span></code> operations.</p></li>
+<li><p>[x] 257. Verify accuracy of specific padding conversions between CNTK and ONNX.</p></li>
+<li><p>[x] 258. Develop custom loaders for multi-file MXNet payloads.</p></li>
+<li><p>[x] 259. Develop support for downloading raw GitHub repositories directly through the UI.</p></li>
+<li><p>[x] 260. Output proper tensor dimensionality warnings inside PyTorch code comments.</p></li>
+<li><p>[x] 261. Support overriding the target <code class="docutils literal notranslate"><span class="pre">tf.js</span></code> version explicitly during code generation.</p></li>
+<li><p>[x] 262. Include custom metrics trackers inside the UI to log how many layers were successfully imported.</p></li>
+<li><p>[x] 263. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> to standard PyTorch <code class="docutils literal notranslate"><span class="pre">torch.mean()</span></code>.</p></li>
+<li><p>[x] 264. Map ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> to <code class="docutils literal notranslate"><span class="pre">torch.nn.Softmax()</span></code>.</p></li>
+<li><p>[x] 265. Map ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code> to Python slice notation <code class="docutils literal notranslate"><span class="pre">x[:,</span> <span class="pre">1:5,</span> <span class="pre">...]</span></code>.</p></li>
+<li><p>[x] 266. Enable robust logging levels (INFO, DEBUG, ERROR) via CLI flags.</p></li>
+<li><p>[x] 267. Handle multi-GPU specifications in legacy formats by collapsing them to single-device ONNX graphs.</p></li>
+<li><p>[x] 268. Manage multi-head architectures seamlessly.</p></li>
+<li><p>[x] 269. Support exporting the PyTorch weights as standard <code class="docutils literal notranslate"><span class="pre">safetensors</span></code>.</p></li>
+<li><p>[x] 270. Create specific issue templates on GitHub for conversion failures.</p></li>
+<li><p>[x] 271. Implement specific memory management routines for handling string arrays.</p></li>
+<li><p>[x] 272. Map specific Darknet layer normalizations gracefully.</p></li>
+<li><p>[x] 273. Establish specific error boundaries to prevent full app crashes on invalid <code class="docutils literal notranslate"><span class="pre">.caffemodel</span></code> inputs.</p></li>
+<li><p>[x] 274. Verify accurate extraction of legacy bias values.</p></li>
+<li><p>[x] 275. Render ONNX <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code> natively into target code blocks.</p></li>
+<li><p>[x] 276. Export raw <code class="docutils literal notranslate"><span class="pre">TF</span> <span class="pre">SavedModel</span></code> directories specifically.</p></li>
+<li><p>[x] 277. Render visual graph connections in real-time during translation.</p></li>
+<li><p>[x] 278. Add specific CLI flags limiting output verbosity.</p></li>
+<li><p>[x] 279. Automate <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">publish</span></code> workflows specifically for <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/mmdnn</span></code>.</p></li>
+<li><p>[x] 280. Handle specific Caffe <code class="docutils literal notranslate"><span class="pre">Eltwise</span></code> configurations.</p></li>
+<li><p>[x] 281. Convert specific NCNN scaling factors correctly.</p></li>
+<li><p>[x] 282. Map specific PaddlePaddle normalization types.</p></li>
+<li><p>[x] 283. Display final memory footprint statistics inside the conversion UI.</p></li>
+<li><p>[x] 284. Allow user configuration of default code spacing.</p></li>
+<li><p>[x] 285. Develop detailed JSON output metadata mapping formats.</p></li>
+<li><p>[x] 286. Handle ONNX custom domains gracefully during Code Generation (emitting comments instead of failing).</p></li>
+<li><p>[x] 287. Publish interactive Web Component for importing models easily into any Web app.</p></li>
+<li><p>[x] 288. Emulate missing MXNet operations safely.</p></li>
+<li><p>[x] 289. Map Python <code class="docutils literal notranslate"><span class="pre">__call__</span></code> specifically to <code class="docutils literal notranslate"><span class="pre">forward()</span></code> equivalents.</p></li>
+<li><p>[x] 290. Provide specific parsing configurations for highly custom Caffe variants.</p></li>
+<li><p>[x] 291. Build interactive AST viewer specifically for the imported structures.</p></li>
+<li><p>[x] 292. Add custom Web Workers specifically mapped to the code generation phase.</p></li>
+<li><p>[x] 293. Verify all code paths are explicitly typed using TypeScript decorators.</p></li>
+<li><p>[x] 294. Catch OutOfBounds memory reads during FlatBuffer parsing.</p></li>
+<li><p>[x] 295. Configure explicit fallback logic for Darknet custom anchors.</p></li>
+<li><p>[x] 296. Validate TFLite string payloads cleanly.</p></li>
+<li><p>[x] 297. Support conversion from <code class="docutils literal notranslate"><span class="pre">.h5</span></code> natively via <code class="docutils literal notranslate"><span class="pre">onnx9000.keras</span></code> linking.</p></li>
+<li><p>[x] 298. Validate precise execution under explicit memory bounds checking.</p></li>
+<li><p>[x] 299. Write comprehensive API documentation mapping all N-to-N supported pathways.</p></li>
+<li><p>[x] 300. Release v1.0 feature complete certification for <code class="docutils literal notranslate"><span class="pre">onnx9000.mmdnn</span></code> replacing Microsoft’s original Python repo.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX27_COREMLTOOLS.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX14_GRAPHSURGEON.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX GraphSurgeon Replication &amp; Parity Tracker</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-core-architecture-onnx-hub">Phase 1: Core Architecture &amp; ONNX Hub</a></li>
+<li><a class="reference internal" href="#phase-2-caffe-importer-caffe-onnx">Phase 2: Caffe Importer (Caffe -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-3-mxnet-importer-mxnet-onnx">Phase 3: MXNet Importer (MXNet -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-4-cntk-importer-cntk-onnx">Phase 4: CNTK Importer (CNTK -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-5-pytorch-code-generation-onnx-pytorch">Phase 5: PyTorch Code Generation (ONNX -&gt; PyTorch)</a></li>
+<li><a class="reference internal" href="#phase-6-tensorflow-js-code-generation-onnx-tf-js">Phase 6: TensorFlow.js Code Generation (ONNX -&gt; TF.js)</a></li>
+<li><a class="reference internal" href="#phase-7-keras-importer-extending-onnx28">Phase 7: Keras Importer (Extending ONNX28)</a></li>
+<li><a class="reference internal" href="#phase-8-coreml-importer-extending-onnx27">Phase 8: CoreML Importer (Extending ONNX27)</a></li>
+<li><a class="reference internal" href="#phase-9-darknet-yolo-importer-darknet-onnx">Phase 9: Darknet / YOLO Importer (Darknet -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-10-ncnn-importer-tencent-ncnn-onnx">Phase 10: NCNN Importer (Tencent NCNN -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-11-paddlepaddle-importer-paddle-onnx">Phase 11: PaddlePaddle Importer (Paddle -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-12-graph-verification-normalization">Phase 12: Graph Verification &amp; Normalization</a></li>
+<li><a class="reference internal" href="#phase-13-browser-based-ui-the-universal-converter">Phase 13: Browser-Based UI (The Universal Converter)</a></li>
+<li><a class="reference internal" href="#phase-14-node-js-cli-integration-onnx9000-convert">Phase 14: Node.js &amp; CLI Integration (<code class="docutils literal notranslate"><span class="pre">onnx9000-convert</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-15-validation-caffe-parity">Phase 15: Validation (Caffe Parity)</a></li>
+<li><a class="reference internal" href="#phase-16-validation-mxnet-parity">Phase 16: Validation (MXNet Parity)</a></li>
+<li><a class="reference internal" href="#phase-17-validation-darknet-parity">Phase 17: Validation (Darknet Parity)</a></li>
+<li><a class="reference internal" href="#phase-18-testing-continuous-integration">Phase 18: Testing &amp; Continuous Integration</a></li>
+<li><a class="reference internal" href="#phase-19-edge-cases-legacy-quirks">Phase 19: Edge Cases &amp; Legacy Quirks</a></li>
+<li><a class="reference internal" href="#phase-20-future-frameworks-ecosystem-expansion">Phase 20: Future Frameworks &amp; Ecosystem Expansion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

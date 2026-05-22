@@ -1,0 +1,906 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="onnx-tool Replication &amp; Parity Tracker" href="ONNX17_ONNX_TOOL.html"><link rel="prev" title="Supported Frameworks Coverage" href="SUPPORTED_PER_FRAMEWORK.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX Simplifier Replication &amp; Parity Tracker - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX07_ONNX_SIMPLIFIER.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx-simplifier-replication-parity-tracker">
+<h1>ONNX Simplifier Replication &amp; Parity Tracker<a class="headerlink" href="#onnx-simplifier-replication-parity-tracker" title="Link to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>This document tracks the complete reimplementation of <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> within the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> ecosystem.
+The original <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> infers shapes and folds constants by spinning up a heavy C++ <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> session to evaluate subgraphs of constant nodes.
+Our <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> implementation achieves identical or superior graph simplification entirely in pure Python. By embedding a lightweight, mathematically exact tensor execution engine, it evaluates constant nodes natively using NumPy or JS TypedArrays. Coupled with advanced algebraic rewriting (e.g., <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">1</span> <span class="pre">-&gt;</span> <span class="pre">A</span></code>, <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">+</span> <span class="pre">0</span> <span class="pre">-&gt;</span> <span class="pre">A</span></code>), symbolic shape inference, and aggressive Dead Code Elimination (DCE), this zero-dependency simplifier can operate instantly inside Web Browsers (WASM), Serverless functions (AWS Lambda), and standard CI/CD pipelines without compiling external native libraries.</p>
+</section>
+<section id="exhaustive-parity-checklist">
+<h2>Exhaustive Parity Checklist<a class="headerlink" href="#exhaustive-parity-checklist" title="Link to this heading">¶</a></h2>
+<section id="core-simplification-engine-architecture-35-items">
+<h3>1. Core Simplification Engine &amp; Architecture (35+ items)<a class="headerlink" href="#core-simplification-engine-architecture-35-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement pure-Python <code class="docutils literal notranslate"><span class="pre">simplify(model)</span></code> API parity</p></li>
+<li><p>[x] Implement zero-dependency <code class="docutils literal notranslate"><span class="pre">ModelProto</span></code> parsing and serialization</p></li>
+<li><p>[x] Maintain a strict Topological Sort during simplification passes</p></li>
+<li><p>[x] Implement multi-pass architecture (Iterate passes until graph converges/stops changing)</p></li>
+<li><p>[x] Detect and break infinite optimization loops automatically (max iterations limit)</p></li>
+<li><p>[x] Extract dynamically all subgraphs consisting entirely of <code class="docutils literal notranslate"><span class="pre">Constant</span></code> / <code class="docutils literal notranslate"><span class="pre">Initializer</span></code> nodes</p></li>
+<li><p>[x] Execute constant subgraphs natively in Python memory to produce new folded constants</p></li>
+<li><p>[x] Replace executed subgraphs with single <code class="docutils literal notranslate"><span class="pre">Constant</span></code> nodes</p></li>
+<li><p>[x] Bypass <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> dependency completely for constant subgraph execution</p></li>
+<li><p>[x] Support dynamic custom dimensions (<code class="docutils literal notranslate"><span class="pre">dynamic_axes</span></code>) preservation</p></li>
+<li><p>[x] Parse explicitly requested input shape overrides (e.g., <code class="docutils literal notranslate"><span class="pre">--input-shape</span> <span class="pre">&quot;x:1,3,224,224&quot;</span></code>)</p></li>
+<li><p>[x] Parse explicitly requested tensor type overrides</p></li>
+<li><p>[x] Check explicit model size limits before and after simplification</p></li>
+<li><p>[x] Support large models (&gt;2GB) utilizing external data <code class="docutils literal notranslate"><span class="pre">.bin</span></code> loading and saving natively</p></li>
+<li><p>[x] Emulate <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> strict adherence to ONNX Opset standard topologies</p></li>
+<li><p>[x] Update standard <code class="docutils literal notranslate"><span class="pre">ValueInfoProto</span></code> automatically with inferred shapes/types</p></li>
+<li><p>[x] Provide explicit skips for specific optimization rules via configuration dicts</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">skip_constant_folding</span></code> flag</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">skip_shape_inference</span></code> flag</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">skip_fuse_bn</span></code> flag</p></li>
+<li><p>[x] Output a rich JSON summary of nodes removed, folded, and simplified</p></li>
+<li><p>[x] Preserve the model’s original <code class="docutils literal notranslate"><span class="pre">doc_string</span></code> and <code class="docutils literal notranslate"><span class="pre">producer_name</span></code> (or append simplifier signature safely)</p></li>
+<li><p>[x] Ensure Graph inputs (<code class="docutils literal notranslate"><span class="pre">ModelProto.graph.input</span></code>) maintain their exact order and names</p></li>
+<li><p>[x] Ensure Graph outputs maintain exact order and names</p></li>
+<li><p>[x] Automatically upgrade older opsets (e.g. Opset 9) to a target opset (e.g. Opset 13) before simplification if requested</p></li>
+<li><p>[x] Automatically downgrade to target opsets if structurally compatible</p></li>
+<li><p>[x] Preserve all un-recognized <code class="docutils literal notranslate"><span class="pre">CustomOp</span></code> nodes gracefully without crashing</p></li>
+<li><p>[x] Skip constant folding on <code class="docutils literal notranslate"><span class="pre">CustomOp</span></code> nodes to prevent mathematical divergence</p></li>
+<li><p>[x] Allow users to register custom pure-Python execution kernels for <code class="docutils literal notranslate"><span class="pre">CustomOp</span></code> constant folding</p></li>
+<li><p>[x] Run seamlessly inside Pyodide / WASM without C++ extensions</p></li>
+<li><p>[x] Run seamlessly inside Node.js without C++ native addons</p></li>
+<li><p>[x] Ensure peak RAM usage during simplification doesn’t exceed 2x the model size (preventing OOMs)</p></li>
+<li><p>[x] Profile execution time of each simplification pass individually</p></li>
+<li><p>[x] Support handling models with multiple disjoint/disconnected subgraphs properly</p></li>
+<li><p>[x] Extract and embed the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution engine footprint securely within Cloudflare limits</p></li>
+</ul>
+</section>
+<section id="algebraic-rewriting-simplification-45-items">
+<h3>2. Algebraic Rewriting &amp; Simplification (45+ items)<a class="headerlink" href="#algebraic-rewriting-simplification-45-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Add(X,</span> <span class="pre">0)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Identity Addition)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Add(0,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Sub(X,</span> <span class="pre">0)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Identity Subtraction)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Sub(X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Constant(0)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Mul(X,</span> <span class="pre">1)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Identity Multiplication)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Mul(1,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Mul(X,</span> <span class="pre">0)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Constant(0)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Mul(0,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Constant(0)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Div(X,</span> <span class="pre">1)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Identity Division)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Div(X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Constant(1)</span></code> (Assuming X != 0)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Pow(X,</span> <span class="pre">1)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Pow(X,</span> <span class="pre">0)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Constant(1)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Neg(Neg(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Double negation)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Abs(Abs(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Abs(X)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Exp(Log(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Log(Exp(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Sqrt(Pow(X,</span> <span class="pre">2))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Abs(X)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Cast(Cast(X,</span> <span class="pre">typeA),</span> <span class="pre">typeA)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Cast(X,</span> <span class="pre">typeA)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Cast(X,</span> <span class="pre">typeX)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Identity Cast)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">ReduceSum(X)</span></code> (when X is scalar) -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">ReduceMean(X)</span></code> (when X is scalar) -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Concat([X])</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Concat of a single tensor)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Max(X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Min(X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">And(X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Or(X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Not(Not(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Where(True,</span> <span class="pre">X,</span> <span class="pre">Y)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Where(False,</span> <span class="pre">X,</span> <span class="pre">Y)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Y</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Where(Cond,</span> <span class="pre">X,</span> <span class="pre">X)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Slice(X,</span> <span class="pre">0,</span> <span class="pre">MAX_INT)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Full slice)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Pad(X,</span> <span class="pre">0)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Zero padding)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Reshape(X,</span> <span class="pre">Shape(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Redundant reshape)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Reshape(Reshape(X,</span> <span class="pre">shape1),</span> <span class="pre">shape2)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reshape(X,</span> <span class="pre">shape2)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Transpose(Transpose(X,</span> <span class="pre">perm1),</span> <span class="pre">perm2)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Transpose(X,</span> <span class="pre">perm_combined)</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Transpose(X,</span> <span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">3])</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (Identity Permutation)</p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Expand(X,</span> <span class="pre">Shape(X))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Tile(X,</span> <span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1])</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Squeeze(Unsqueeze(X,</span> <span class="pre">axis),</span> <span class="pre">axis)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code></p></li>
+<li><p>[x] Rewrite <code class="docutils literal notranslate"><span class="pre">Unsqueeze(Squeeze(X,</span> <span class="pre">axis),</span> <span class="pre">axis)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">X</span></code> (If rank is known)</p></li>
+<li><p>[x] Fold sequential <code class="docutils literal notranslate"><span class="pre">Add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Add</span></code> into a single <code class="docutils literal notranslate"><span class="pre">Add</span></code> with folded constants</p></li>
+<li><p>[x] Fold sequential <code class="docutils literal notranslate"><span class="pre">Mul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mul</span></code> into a single <code class="docutils literal notranslate"><span class="pre">Mul</span></code> with folded constants</p></li>
+<li><p>[x] Implement algebraic distribution <code class="docutils literal notranslate"><span class="pre">Mul(Add(X,</span> <span class="pre">C1),</span> <span class="pre">C2)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Add(Mul(X,</span> <span class="pre">C2),</span> <span class="pre">C1*C2)</span></code> (if profitable)</p></li>
+<li><p>[x] Eliminate <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> entirely in eval models (Ratio=0 or Train=False)</p></li>
+<li><p>[x] Eliminate <code class="docutils literal notranslate"><span class="pre">Identity</span></code> nodes natively and rewire connections</p></li>
+</ul>
+</section>
+<section id="structural-constant-folding-math-45-items">
+<h3>3. Structural &amp; Constant Folding (Math) (45+ items)<a class="headerlink" href="#structural-constant-folding-math-45-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Add</span></code> (Constants only) natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Sub</span></code> (Constants only) natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Mul</span></code> (Constants only) natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Div</span></code> (Constants only) natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Pow</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Exp</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Log</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Sin</span></code>, <code class="docutils literal notranslate"><span class="pre">Cos</span></code>, <code class="docutils literal notranslate"><span class="pre">Tan</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Asin</span></code>, <code class="docutils literal notranslate"><span class="pre">Acos</span></code>, <code class="docutils literal notranslate"><span class="pre">Atan</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Sinh</span></code>, <code class="docutils literal notranslate"><span class="pre">Cosh</span></code>, <code class="docutils literal notranslate"><span class="pre">Tanh</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Abs</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Neg</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Sign</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Ceil</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Floor</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Round</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Mod</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Max</span></code>, <code class="docutils literal notranslate"><span class="pre">Min</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Clip</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">And</span></code>, <code class="docutils literal notranslate"><span class="pre">Or</span></code>, <code class="docutils literal notranslate"><span class="pre">Not</span></code>, <code class="docutils literal notranslate"><span class="pre">Xor</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, <code class="docutils literal notranslate"><span class="pre">Greater</span></code>, <code class="docutils literal notranslate"><span class="pre">Less</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">GreaterOrEqual</span></code>, <code class="docutils literal notranslate"><span class="pre">LessOrEqual</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">BitShift</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">BitwiseAnd</span></code>, <code class="docutils literal notranslate"><span class="pre">BitwiseOr</span></code>, <code class="docutils literal notranslate"><span class="pre">BitwiseNot</span></code>, <code class="docutils literal notranslate"><span class="pre">BitwiseXor</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">IsInf</span></code>, <code class="docutils literal notranslate"><span class="pre">IsNaN</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Erf</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Relu</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code>, <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReduceProd</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReduceL1</span></code>, <code class="docutils literal notranslate"><span class="pre">ReduceL2</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReduceLogSum</span></code>, <code class="docutils literal notranslate"><span class="pre">ReduceLogSumExp</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Cast</span></code> natively (safely applying precision bounds)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">CastLike</span></code> natively</p></li>
+<li><p>[x] Handle explicit FP16 constant folding without overflowing in pure Python</p></li>
+<li><p>[x] Handle explicit BF16 constant folding natively</p></li>
+<li><p>[x] Handle explicit INT8 constant folding natively</p></li>
+<li><p>[x] Handle explicit INT64 constant folding seamlessly</p></li>
+<li><p>[x] Prevent division by zero during <code class="docutils literal notranslate"><span class="pre">Div</span></code> constant folding (bypass fold)</p></li>
+<li><p>[x] Prevent <code class="docutils literal notranslate"><span class="pre">NaN</span></code> propagation dynamically (if node generates <code class="docutils literal notranslate"><span class="pre">NaN</span></code>, skip folding)</p></li>
+<li><p>[x] Validate mathematically that folded constant arrays exactly match C++ ORT output (atol=1e-5)</p></li>
+<li><p>[x] Extract scalar constants explicitly (converting <code class="docutils literal notranslate"><span class="pre">1D</span></code> array of size 1 to <code class="docutils literal notranslate"><span class="pre">0D</span></code> scalar if topological rules allow)</p></li>
+</ul>
+</section>
+<section id="structural-constant-folding-tensors-nn-40-items">
+<h3>4. Structural &amp; Constant Folding (Tensors &amp; NN) (40+ items)<a class="headerlink" href="#structural-constant-folding-tensors-nn-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> (Constants only) natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Flatten</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Concat</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Split</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Slice</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Gather</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">GatherElements</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">GatherND</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Scatter</span></code> / <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Tile</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Expand</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Pad</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Where</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">NonZero</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">TopK</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Unique</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">CumSum</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">ReverseSequence</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Compress</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Trilu</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Shape</span></code> natively (crucial for dynamic to static resolution)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Size</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Conv</span></code> natively (If inputs AND weights are constants, e.g., in feature extractors)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> natively (If inputs AND weights are constants)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> natively (If inputs AND weights are constants)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> natively (If all inputs are constants)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">InstanceNormalization</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> natively</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> natively</p></li>
+<li><p>[x] Fuse <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> into preceding <code class="docutils literal notranslate"><span class="pre">Conv</span></code> weights</p></li>
+<li><p>[x] Fuse <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> into preceding <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> weights</p></li>
+<li><p>[x] Strip purely constant subgraphs feeding into unused dynamic nodes</p></li>
+<li><p>[x] Evaluate <code class="docutils literal notranslate"><span class="pre">SequenceConstruct</span></code> natively</p></li>
+<li><p>[x] Evaluate <code class="docutils literal notranslate"><span class="pre">SequenceAt</span></code> natively</p></li>
+</ul>
+</section>
+<section id="control-flow-advanced-dead-code-elimination-30-items">
+<h3>5. Control Flow &amp; Advanced Dead Code Elimination (30+ items)<a class="headerlink" href="#control-flow-advanced-dead-code-elimination-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement Graph-wide Dead Code Elimination (DCE)</p></li>
+<li><p>[x] Prune Nodes with zero consumer edges</p></li>
+<li><p>[x] Prune Initializers with zero consumer edges</p></li>
+<li><p>[x] Prune Graph Inputs dynamically if explicitly specified</p></li>
+<li><p>[x] Retain Graph Outputs strictly (even if fed by constants)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">If</span></code> node natively if the <code class="docutils literal notranslate"><span class="pre">cond</span></code> input is a <code class="docutils literal notranslate"><span class="pre">Constant</span></code> (injecting the True/False subgraph directly into parent)</p></li>
+<li><p>[x] Prune the un-executed branch of a folded <code class="docutils literal notranslate"><span class="pre">If</span></code> node</p></li>
+<li><p>[x] Connect internal subgraph outputs smoothly to the <code class="docutils literal notranslate"><span class="pre">If</span></code> node consumers</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Loop</span></code> node if <code class="docutils literal notranslate"><span class="pre">max_trip_count</span></code> is <code class="docutils literal notranslate"><span class="pre">Constant(0)</span></code> (Prune loop body, route initial states to outputs)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Loop</span></code> node if <code class="docutils literal notranslate"><span class="pre">max_trip_count</span></code> is <code class="docutils literal notranslate"><span class="pre">Constant(1)</span></code> (Inject loop body directly into parent graph)</p></li>
+<li><p>[x] Unroll <code class="docutils literal notranslate"><span class="pre">Loop</span></code> natively if <code class="docutils literal notranslate"><span class="pre">max_trip_count</span></code> is a small constant (e.g. &lt; 10)</p></li>
+<li><p>[x] Resolve dynamic sequence lengths inside unrolled <code class="docutils literal notranslate"><span class="pre">Loop</span></code> instances</p></li>
+<li><p>[x] Ensure sub-graph <code class="docutils literal notranslate"><span class="pre">Initializer</span></code> scopes are promoted to the parent graph seamlessly when injecting</p></li>
+<li><p>[x] Re-map internal topological names to prevent collisions during subgraph injection</p></li>
+<li><p>[x] Eliminate <code class="docutils literal notranslate"><span class="pre">SequenceEmpty</span></code> if unused</p></li>
+<li><p>[x] Evaluate <code class="docutils literal notranslate"><span class="pre">If</span></code> conditions mathematically if preceded by constant folding (e.g., <code class="docutils literal notranslate"><span class="pre">Greater(5,</span> <span class="pre">2)</span> <span class="pre">-&gt;</span> <span class="pre">True</span> <span class="pre">-&gt;</span> <span class="pre">Fold</span> <span class="pre">If</span></code>)</p></li>
+<li><p>[x] Check <code class="docutils literal notranslate"><span class="pre">Scan</span></code> nodes for dead-code pruning dynamically</p></li>
+<li><p>[x] Sweep disconnected components (entire islands of nodes that don’t reach outputs)</p></li>
+<li><p>[x] Output total number of parameters eliminated during DCE in JSON logs</p></li>
+<li><p>[x] Warn explicitly if an Output node becomes entirely disconnected from all Inputs (Constant Output)</p></li>
+<li><p>[x] Provide an API to preserve intermediate nodes explicitly (preventing DCE on specific debug probes)</p></li>
+<li><p>[x] Sweep unused <code class="docutils literal notranslate"><span class="pre">ValueInfo</span></code> properties dynamically</p></li>
+<li><p>[x] Remove <code class="docutils literal notranslate"><span class="pre">CustomOp</span></code> nodes safely if they have no consumers</p></li>
+<li><p>[x] Detect implicit cyclical dependencies (invalid ONNX) and break cleanly</p></li>
+<li><p>[x] Support DCE inside nested sub-graphs recursively (<code class="docutils literal notranslate"><span class="pre">If</span></code> inside <code class="docutils literal notranslate"><span class="pre">Loop</span></code>)</p></li>
+<li><p>[x] Fold shape dimensions explicitly inside Subgraphs (propagating known shapes down)</p></li>
+<li><p>[x] Flatten nested <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> operations if statically bounded</p></li>
+<li><p>[x] Avoid unrolling loops if it explodes the <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> graph size past a user-defined threshold</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">--no-large-tensor</span></code> flag to prevent evaluating constants larger than a threshold (e.g. 10MB)</p></li>
+<li><p>[x] Track memory of in-flight constant evaluations explicitly to avoid RAM spikes</p></li>
+</ul>
+</section>
+<section id="advanced-shape-type-inference-30-items">
+<h3>6. Advanced Shape &amp; Type Inference (30+ items)<a class="headerlink" href="#advanced-shape-type-inference-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement fully native <code class="docutils literal notranslate"><span class="pre">onnx9000.shape_inference</span></code> passes (bypassing ONNX C++ <code class="docutils literal notranslate"><span class="pre">infer_shapes</span></code>)</p></li>
+<li><p>[x] Resolve unknown dimensions symbolically (e.g., <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>, <code class="docutils literal notranslate"><span class="pre">seq_len</span></code>)</p></li>
+<li><p>[x] Apply mathematical constraints to symbols (<code class="docutils literal notranslate"><span class="pre">seq_len</span> <span class="pre">*</span> <span class="pre">2</span></code>)</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> tensor dimension alignment exactly</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">Conv</span></code> padding and stride calculations exactly</p></li>
+<li><p>[x] Propagate shape constraints through <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> when <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">-1</span></code> are used</p></li>
+<li><p>[x] Propagate shape constraints through <code class="docutils literal notranslate"><span class="pre">Slice</span></code> with dynamic axes</p></li>
+<li><p>[x] Propagate types (<code class="docutils literal notranslate"><span class="pre">Float32</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>) strictly through elementwise ops</p></li>
+<li><p>[x] Catch explicitly invalid typings (e.g., <code class="docutils literal notranslate"><span class="pre">Float32</span></code> fed into <code class="docutils literal notranslate"><span class="pre">And</span></code> operator)</p></li>
+<li><p>[x] Infer output types for <code class="docutils literal notranslate"><span class="pre">Cast</span></code> nodes</p></li>
+<li><p>[x] Infer types for implicit promotions (if required by older opsets)</p></li>
+<li><p>[x] Resolve shapes for <code class="docutils literal notranslate"><span class="pre">Gather</span></code> dynamically based on indices length</p></li>
+<li><p>[x] Resolve shapes for <code class="docutils literal notranslate"><span class="pre">Split</span></code> natively</p></li>
+<li><p>[x] Resolve shapes for <code class="docutils literal notranslate"><span class="pre">Concat</span></code> cleanly</p></li>
+<li><p>[x] Infer explicit <code class="docutils literal notranslate"><span class="pre">ValueInfo</span></code> for <code class="docutils literal notranslate"><span class="pre">Loop</span></code> body outputs</p></li>
+<li><p>[x] Infer explicit <code class="docutils literal notranslate"><span class="pre">ValueInfo</span></code> for <code class="docutils literal notranslate"><span class="pre">If</span></code> branch outputs</p></li>
+<li><p>[x] Merge <code class="docutils literal notranslate"><span class="pre">If</span></code> branch output shapes natively (promoting to dynamic if shapes differ)</p></li>
+<li><p>[x] Expose an API to manually inject shape hints to aid inference (<code class="docutils literal notranslate"><span class="pre">--input-shape</span> <span class="pre">&quot;images:1,3,512,512&quot;</span></code>)</p></li>
+<li><p>[x] Expose an API to lock dynamic axes to static dimensions (e.g., locking <code class="docutils literal notranslate"><span class="pre">batch_size=1</span></code> to allow massive folding)</p></li>
+<li><p>[x] Propagate exact <code class="docutils literal notranslate"><span class="pre">BFloat16</span></code> and <code class="docutils literal notranslate"><span class="pre">Float16</span></code> typings</p></li>
+<li><p>[x] Update <code class="docutils literal notranslate"><span class="pre">ModelProto.graph.value_info</span></code> array dynamically</p></li>
+<li><p>[x] Remove old <code class="docutils literal notranslate"><span class="pre">ValueInfo</span></code> entries for nodes deleted during DCE</p></li>
+<li><p>[x] Prevent shape inference loops on recursive models natively</p></li>
+<li><p>[x] Ensure shape inference matches <code class="docutils literal notranslate"><span class="pre">onnx.checker</span></code> structural rules perfectly</p></li>
+<li><p>[x] Strip out explicitly conflicting shape metadata</p></li>
+<li><p>[x] Re-calculate <code class="docutils literal notranslate"><span class="pre">onnx.checker.check_model</span></code> using pure Python alternative natively</p></li>
+<li><p>[x] Analyze dynamic sizes (e.g. <code class="docutils literal notranslate"><span class="pre">NonZero</span></code>) by propagating <code class="docutils literal notranslate"><span class="pre">Unknown</span></code> shape tokens</p></li>
+<li><p>[x] Expose bounding values for <code class="docutils literal notranslate"><span class="pre">Unknown</span></code> shapes (e.g., <code class="docutils literal notranslate"><span class="pre">max_size=1000</span></code>)</p></li>
+<li><p>[x] Fallback gracefully when encountering un-inferable <code class="docutils literal notranslate"><span class="pre">CustomOp</span></code> domains</p></li>
+<li><p>[x] Log every successful and failed shape inference derivation for debugging</p></li>
+</ul>
+</section>
+<section id="environment-cli-web-integrations-25-items">
+<h3>7. Environment, CLI &amp; Web Integrations (25+ items)<a class="headerlink" href="#environment-cli-web-integrations-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Expose pure Python CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">simplify</span> <span class="pre">model.onnx</span> <span class="pre">model_sim.onnx</span></code></p></li>
+<li><p>[x] Expose JS/TypeScript API: <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">simplifiedModel</span> <span class="pre">=</span> <span class="pre">await</span> <span class="pre">onnx9000.simplify(modelBuffer)</span></code></p></li>
+<li><p>[x] Provide WebWorker wrapper natively in JS to prevent UI freezing during large simplifies</p></li>
+<li><p>[x] Integrate seamlessly with <code class="docutils literal notranslate"><span class="pre">Netron</span></code> reimplementation (Button: “Simplify Graph”)</p></li>
+<li><p>[x] Run seamlessly in Node.js pipelines</p></li>
+<li><p>[x] Provide strict JSON logging for automated CI/CD integration metrics</p></li>
+<li><p>[x] Output Markdown table summarization of simplification (Before/After Node Counts, Sizes)</p></li>
+<li><p>[x] Allow streaming of &gt;2GB models via Python <code class="docutils literal notranslate"><span class="pre">mmap</span></code> parsing</p></li>
+<li><p>[x] Do not require <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnx</span></code> natively (Zero-dependency)</p></li>
+<li><p>[x] Do not require <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime</span></code> natively</p></li>
+<li><p>[x] Emulate official <code class="docutils literal notranslate"><span class="pre">onnxsim</span></code> CLI arguments perfectly (<code class="docutils literal notranslate"><span class="pre">--input-shape</span></code>, <code class="docutils literal notranslate"><span class="pre">--skip-fuse-bn</span></code>, etc.)</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">--custom-ops</span></code> definitions dynamically</p></li>
+<li><p>[x] Prevent file overwrites implicitly (unless <code class="docutils literal notranslate"><span class="pre">--overwrite</span></code> is specified)</p></li>
+<li><p>[x] Validate standard ONNX file magic bytes safely</p></li>
+<li><p>[x] Expose API to simplify an already loaded <code class="docutils literal notranslate"><span class="pre">onnx9000.Graph</span></code> object directly in memory</p></li>
+<li><p>[x] Implement auto-fallback: If an optimization throws a math exception, rollback the graph and continue safely</p></li>
+<li><p>[x] Output human-readable error traces when encountering fundamentally broken ONNX topologies</p></li>
+<li><p>[x] Support reading models from AWS S3 / HTTP endpoints dynamically</p></li>
+<li><p>[x] Support generating optimized <code class="docutils literal notranslate"><span class="pre">safetensors</span></code> mappings immediately post-simplification</p></li>
+<li><p>[x] Compress the JS transpiled simplifier to &lt; 1MB (minified)</p></li>
+<li><p>[x] Validate Cloudflare Worker integration natively</p></li>
+<li><p>[x] Validate AWS Lambda integration natively</p></li>
+<li><p>[x] Run perfectly within Pyodide strict WASM memory constraints</p></li>
+<li><p>[x] Inject WebGPU compute bounds validation explicitly if requested</p></li>
+<li><p>[x] Verify standard Python 3.9 through 3.12 compatibility</p></li>
+</ul>
+</section>
+<section id="testing-compliance-edge-cases-30-items">
+<h3>8. Testing, Compliance &amp; Edge Cases (30+ items)<a class="headerlink" href="#testing-compliance-edge-cases-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Unit Test: Simplify purely arithmetic graph (<code class="docutils literal notranslate"><span class="pre">Add(2,</span> <span class="pre">Mul(3,</span> <span class="pre">4))</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Constant(14)</span></code>)</p></li>
+<li><p>[x] Unit Test: Simplify redundant <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> nodes on standard ResNet</p></li>
+<li><p>[x] Unit Test: Fold <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> natively on standard MobileNet</p></li>
+<li><p>[x] Unit Test: Lock batch size on BERT and evaluate <code class="docutils literal notranslate"><span class="pre">Shape</span></code> constant folding cascading effects</p></li>
+<li><p>[x] Unit Test: Prune unused multi-head attention outputs natively</p></li>
+<li><p>[x] Unit Test: Evaluate <code class="docutils literal notranslate"><span class="pre">Slice</span></code> folding on text tokenizer bounds</p></li>
+<li><p>[x] Unit Test: Execute <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> canonical tests and achieve identical structural node counts</p></li>
+<li><p>[x] Unit Test: Compare resulting mathematical output against original unsimplified graph using PyTorch (atol=1e-5)</p></li>
+<li><p>[x] Test folding of massive matrices (100MB+ constants) natively without OOM</p></li>
+<li><p>[x] Handle models with exactly zero parameters (math-only graphs) natively</p></li>
+<li><p>[x] Handle models with exactly zero graph inputs (pure constant generators) natively</p></li>
+<li><p>[x] Catch explicitly invalid <code class="docutils literal notranslate"><span class="pre">input_shape</span></code> argument strings cleanly</p></li>
+<li><p>[x] Support evaluating <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> into pure constants if inputs are constants</p></li>
+<li><p>[x] Catch numerical underflow when folding <code class="docutils literal notranslate"><span class="pre">Exp</span></code> with massive negative inputs</p></li>
+<li><p>[x] Catch numerical overflow when folding <code class="docutils literal notranslate"><span class="pre">Exp</span></code> with massive positive inputs (replace with <code class="docutils literal notranslate"><span class="pre">Inf</span></code>)</p></li>
+<li><p>[x] Maintain <code class="docutils literal notranslate"><span class="pre">NaN</span></code> outputs logically if folded math results in undefined values</p></li>
+<li><p>[x] Verify <code class="docutils literal notranslate"><span class="pre">BitShift</span></code> edge cases (shifting beyond 32/64 bits) match Python/C++ exactly</p></li>
+<li><p>[x] Fold boolean logic (<code class="docutils literal notranslate"><span class="pre">And</span></code>, <code class="docutils literal notranslate"><span class="pre">Or</span></code>) cleanly matching Python’s short-circuit logic</p></li>
+<li><p>[x] Handle models containing <code class="docutils literal notranslate"><span class="pre">Float64</span></code> precision without silent downcasting to <code class="docutils literal notranslate"><span class="pre">Float32</span></code></p></li>
+<li><p>[x] Verify <code class="docutils literal notranslate"><span class="pre">Round</span></code> constant folding matches “Round half to even” (Banker’s rounding) natively</p></li>
+<li><p>[x] Optimize the traversal sorting sequence (DFS/BFS) to process cascades in O(N) time</p></li>
+<li><p>[x] Test the simplifier on highly complex generative LLMs (GPT-J, Llama 2)</p></li>
+<li><p>[x] Track simplifier latency on 1000+ node graphs (target &lt; 100ms)</p></li>
+<li><p>[x] Ensure Graph Outputs mapped directly from Constants are serialized correctly</p></li>
+<li><p>[x] Verify all <code class="docutils literal notranslate"><span class="pre">ValueInfo</span></code> shapes use <code class="docutils literal notranslate"><span class="pre">-1</span></code> or named string symbols natively for dynamic boundaries</p></li>
+<li><p>[x] Catch explicitly duplicated topological names during <code class="docutils literal notranslate"><span class="pre">If</span></code>/<code class="docutils literal notranslate"><span class="pre">Loop</span></code> extraction</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">onnx9000.shape_inference</span></code> handles <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml</span></code> domain topologies seamlessly</p></li>
+<li><p>[x] Prevent topological loops fundamentally inside the rewrite engine</p></li>
+<li><p>[x] Emulate <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> strict Type constraints (e.g. <code class="docutils literal notranslate"><span class="pre">Where</span></code> condition must be Bool)</p></li>
+<li><p>[x] Emit detailed warning if simplifier encounters unsupported custom ops breaking the cascade</p></li>
+</ul>
+</section>
+<section id="advanced-edge-cases-operator-specifics-tooling-30-items">
+<h3>9. Advanced Edge Cases, Operator Specifics, &amp; Tooling (30+ items)<a class="headerlink" href="#advanced-edge-cases-operator-specifics-tooling-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Evaluate <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code> if all inputs (boxes, scores, max_output) are constants</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code> where shape is an empty tensor <code class="docutils literal notranslate"><span class="pre">[]</span></code> correctly (generating a scalar)</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code> where shape contains <code class="docutils literal notranslate"><span class="pre">0</span></code> correctly (generating an empty tensor)</p></li>
+<li><p>[x] Prevent folding <code class="docutils literal notranslate"><span class="pre">RandomUniform</span></code> and <code class="docutils literal notranslate"><span class="pre">RandomNormal</span></code> (must remain dynamic)</p></li>
+<li><p>[x] Prevent folding <code class="docutils literal notranslate"><span class="pre">RandomUniformLike</span></code> and <code class="docutils literal notranslate"><span class="pre">RandomNormalLike</span></code></p></li>
+<li><p>[x] Prevent folding <code class="docutils literal notranslate"><span class="pre">Multinomial</span></code> (must remain dynamic)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Range</span></code> natively if <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>, and <code class="docutils literal notranslate"><span class="pre">delta</span></code> are constants</p></li>
+<li><p>[x] Evaluate <code class="docutils literal notranslate"><span class="pre">OneHot</span></code> natively if <code class="docutils literal notranslate"><span class="pre">indices</span></code>, <code class="docutils literal notranslate"><span class="pre">depth</span></code>, and <code class="docutils literal notranslate"><span class="pre">values</span></code> are constants</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> on massive constants natively (subtracting max before exp)</p></li>
+<li><p>[x] Support handling specific <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> packing and unpacking natively in pure Python if <code class="docutils literal notranslate"><span class="pre">torch</span></code> is absent</p></li>
+<li><p>[x] Prevent massive memory spikes by implementing a <code class="docutils literal notranslate"><span class="pre">--size-limit</span></code> flag for constant folding (e.g., skip folding if result &gt; 200MB)</p></li>
+<li><p>[x] Inject <code class="docutils literal notranslate"><span class="pre">Identity</span></code> node temporarily if an output is directly wired to a constant, then resolve according to ONNX spec rules</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.ArrayFeatureExtractor</span></code> shapes recursively</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.LinearClassifier</span></code> shapes recursively</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.TreeEnsembleClassifier</span></code> shapes recursively</p></li>
+<li><p>[x] Map PyTorch exported <code class="docutils literal notranslate"><span class="pre">aten::arange</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Range</span></code> and fold if statically known</p></li>
+<li><p>[x] Highlight un-foldable branches specifically in the console output (e.g., “Branch blocked by dynamic Shape”)</p></li>
+<li><p>[x] Provide an explicit <code class="docutils literal notranslate"><span class="pre">--check-n=3</span></code> flag (like <code class="docutils literal notranslate"><span class="pre">onnxsim</span></code>) to run the simplified model N times and verify output consistency</p></li>
+<li><p>[x] Evaluate <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> into explicit pure constants natively (if equation is valid)</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">CumSum</span></code> natively in Python/JS if inputs are constants</p></li>
+<li><p>[x] Fold <code class="docutils literal notranslate"><span class="pre">Trilu</span></code> (upper/lower triangle extraction) natively</p></li>
+<li><p>[x] Prevent <code class="docutils literal notranslate"><span class="pre">SplitToSequence</span></code> from folding into massive arrays if length is unbound</p></li>
+<li><p>[x] Optimize sequential <code class="docutils literal notranslate"><span class="pre">Expand</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Expand</span></code> operations cleanly</p></li>
+<li><p>[x] Clean up redundant <code class="docutils literal notranslate"><span class="pre">Cast</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">CastLike</span></code> combinations</p></li>
+<li><p>[x] Explicitly test Simplifier stability on models with <code class="docutils literal notranslate"><span class="pre">dim_param</span></code> nested inside subgraph values</p></li>
+<li><p>[x] Ensure output <code class="docutils literal notranslate"><span class="pre">ValueInfoProto</span></code> arrays are strictly sorted alphabetically if requested</p></li>
+<li><p>[x] Strip ONNX <code class="docutils literal notranslate"><span class="pre">ModelProto.metadata_props</span></code> if explicitly requested (to save space)</p></li>
+<li><p>[x] Maintain <code class="docutils literal notranslate"><span class="pre">ModelProto.opset_import</span></code> strictly, deleting domains that are fully eliminated during DCE</p></li>
+<li><p>[x] Fallback gracefully when <code class="docutils literal notranslate"><span class="pre">Float16</span></code> constant folding overflows, leaving the node unfolded rather than corrupting the graph</p></li>
+<li><p>[x] Output a visual DAG difference (<code class="docutils literal notranslate"><span class="pre">A.onnx</span></code> vs <code class="docutils literal notranslate"><span class="pre">B.onnx</span></code>) JSON file for external visualizers to diff before/after topological changes</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX17_ONNX_TOOL.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">onnx-tool Replication &amp; Parity Tracker</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="SUPPORTED_PER_FRAMEWORK.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Supported Frameworks Coverage</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX Simplifier Replication &amp; Parity Tracker</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#exhaustive-parity-checklist">Exhaustive Parity Checklist</a><ul>
+<li><a class="reference internal" href="#core-simplification-engine-architecture-35-items">1. Core Simplification Engine &amp; Architecture (35+ items)</a></li>
+<li><a class="reference internal" href="#algebraic-rewriting-simplification-45-items">2. Algebraic Rewriting &amp; Simplification (45+ items)</a></li>
+<li><a class="reference internal" href="#structural-constant-folding-math-45-items">3. Structural &amp; Constant Folding (Math) (45+ items)</a></li>
+<li><a class="reference internal" href="#structural-constant-folding-tensors-nn-40-items">4. Structural &amp; Constant Folding (Tensors &amp; NN) (40+ items)</a></li>
+<li><a class="reference internal" href="#control-flow-advanced-dead-code-elimination-30-items">5. Control Flow &amp; Advanced Dead Code Elimination (30+ items)</a></li>
+<li><a class="reference internal" href="#advanced-shape-type-inference-30-items">6. Advanced Shape &amp; Type Inference (30+ items)</a></li>
+<li><a class="reference internal" href="#environment-cli-web-integrations-25-items">7. Environment, CLI &amp; Web Integrations (25+ items)</a></li>
+<li><a class="reference internal" href="#testing-compliance-edge-cases-30-items">8. Testing, Compliance &amp; Edge Cases (30+ items)</a></li>
+<li><a class="reference internal" href="#advanced-edge-cases-operator-specifics-tooling-30-items">9. Advanced Edge Cases, Operator Specifics, &amp; Tooling (30+ items)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

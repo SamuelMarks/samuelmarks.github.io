@@ -1,0 +1,971 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="transformers/src" href="../transformers/src.html"><link rel="prev" title="ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker" href="ONNX09_ORT_NATIVE.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX37_TENSORRT.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx37-onnx-tensorrt-zero-build-trt-ffi-parser">
+<h1>ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)<a class="headerlink" href="#onnx37-onnx-tensorrt-zero-build-trt-ffi-parser" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">onnx-tensorrt</span></code> project is NVIDIA’s open-source C++ parser that translates ONNX models into TensorRT <code class="docutils literal notranslate"><span class="pre">INetworkDefinition</span></code> graphs. TensorRT uses this definition to perform rigorous kernel auto-tuning and generates a highly optimized execution engine (<code class="docutils literal notranslate"><span class="pre">.plan</span></code> / <code class="docutils literal notranslate"><span class="pre">.trt</span></code> file) tailored for the specific local NVIDIA GPU. Historically, using this parser requires a heavy C++ toolchain, strict alignment of CUDA/cuDNN/TensorRT header versions, and compiling massive native binaries just to ingest an ONNX file.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx9000.tensorrt</span></code> eliminates the C++ compilation requirement completely by offering a <strong>100% pure Python and Node.js FFI (Foreign Function Interface) parser</strong>.</p>
+<ul class="simple">
+<li><p><strong>Zero-Build Compilation:</strong> Instead of building a C++ ONNX parser, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> reads the ONNX AST using its own zero-dependency engine and directly invokes the native TensorRT C-API (<code class="docutils literal notranslate"><span class="pre">libnvinfer.so</span></code> / <code class="docutils literal notranslate"><span class="pre">nvinfer.dll</span></code>) via <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> or <code class="docutils literal notranslate"><span class="pre">node-ffi-napi</span></code>.</p></li>
+<li><p><strong>Dynamic Polyglot Deployment:</strong> A Node.js backend server can ingest an ONNX file, translate it natively to a TRT engine using the local GPU driver, and instantly serve inferences without ever invoking Python or C++.</p></li>
+<li><p><strong>Deep Memory Control:</strong> By handling the parsing in Python/JS, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> can inject custom weight layouts, apply AST-level fusions (e.g., packing W4A16), or dynamically partition the graph <em>before</em> handing it over to TensorRT, bypassing many of the strict limitations in NVIDIA’s native ONNX parser.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-core-ffi-architecture-libnvinfer-loading">
+<h3>Phase 1: Core FFI Architecture &amp; LibNVInfer Loading<a class="headerlink" href="#phase-1-core-ffi-architecture-libnvinfer-loading" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 1. Detect <code class="docutils literal notranslate"><span class="pre">libnvinfer.so</span></code> (Linux) dynamically via <code class="docutils literal notranslate"><span class="pre">ctypes.util.find_library</span></code>.</p></li>
+<li><p>[x][x] 2. Detect <code class="docutils literal notranslate"><span class="pre">nvinfer.dll</span></code> (Windows) dynamically.</p></li>
+<li><p>[x][x] 3. Extract TensorRT API version natively (e.g., 8.6, 10.0) from the shared library.</p></li>
+<li><p>[x][x] 4. Establish FFI fallback policies if different TRT versions expose different function signatures.</p></li>
+<li><p>[x][x] 5. Implement <code class="docutils literal notranslate"><span class="pre">ILogger</span></code> C-callback natively in Python to intercept TRT diagnostic messages.</p></li>
+<li><p>[x][x] 6. Route TRT <code class="docutils literal notranslate"><span class="pre">ILogger</span></code> <code class="docutils literal notranslate"><span class="pre">kINFO</span></code>, <code class="docutils literal notranslate"><span class="pre">kWARNING</span></code>, <code class="docutils literal notranslate"><span class="pre">kERROR</span></code> events directly to standard Python/JS loggers.</p></li>
+<li><p>[x][x] 7. Provide dynamic memory management across the FFI boundary to prevent C-side segfaults.</p></li>
+<li><p>[x][x] 8. Implement a global registry of active TRT pointers to ensure explicit destruction (<code class="docutils literal notranslate"><span class="pre">__del__</span></code> / <code class="docutils literal notranslate"><span class="pre">FinalizationRegistry</span></code>).</p></li>
+<li><p>[x][x] 9. Implement <code class="docutils literal notranslate"><span class="pre">createInferBuilder_INTERNAL</span></code> FFI binding.</p></li>
+<li><p>[x][x] 10. Support explicitly destroying builders via <code class="docutils literal notranslate"><span class="pre">destroy()</span></code> bindings.</p></li>
+<li><p>[x][x] 11. Implement <code class="docutils literal notranslate"><span class="pre">node-ffi-napi</span></code> bindings for equivalent Node.js server execution.</p></li>
+<li><p>[x][x] 12. Map C <code class="docutils literal notranslate"><span class="pre">enum</span></code> values specifically to Python <code class="docutils literal notranslate"><span class="pre">IntEnum</span></code> structures for precise TRT configurations.</p></li>
+<li><p>[x][x] 13. Catch C-level hardware errors and surface them as readable Python <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> exceptions.</p></li>
+<li><p>[x][x] 14. Support detecting <code class="docutils literal notranslate"><span class="pre">libnvinfer_plugin.so</span></code> automatically for custom operator extensions.</p></li>
+<li><p>[x][x] 15. Expose <code class="docutils literal notranslate"><span class="pre">cudaGetDeviceProperties</span></code> via FFI to query GPU compute capability automatically.</p></li>
+</ul>
+</section>
+<section id="phase-2-tensorrt-builder-network-definition">
+<h3>Phase 2: TensorRT Builder &amp; Network Definition<a class="headerlink" href="#phase-2-tensorrt-builder-network-definition" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 16. Initialize <code class="docutils literal notranslate"><span class="pre">IBuilder</span></code> explicitly.</p></li>
+<li><p>[x][x] 17. Initialize <code class="docutils literal notranslate"><span class="pre">INetworkDefinition</span></code> (Explicit Batch flag required for ONNX).</p></li>
+<li><p>[x][x] 18. Initialize <code class="docutils literal notranslate"><span class="pre">IBuilderConfig</span></code>.</p></li>
+<li><p>[x][x] 19. Implement <code class="docutils literal notranslate"><span class="pre">addInput(name,</span> <span class="pre">type,</span> <span class="pre">dims)</span></code> mapping ONNX Inputs to TRT.</p></li>
+<li><p>[x][x] 20. Implement <code class="docutils literal notranslate"><span class="pre">markOutput(tensor)</span></code> mapping ONNX Outputs to TRT.</p></li>
+<li><p>[x][x] 21. Translate ONNX <code class="docutils literal notranslate"><span class="pre">FLOAT32</span></code> to <code class="docutils literal notranslate"><span class="pre">DataType::kFLOAT</span></code>.</p></li>
+<li><p>[x][x] 22. Translate ONNX <code class="docutils literal notranslate"><span class="pre">FLOAT16</span></code> to <code class="docutils literal notranslate"><span class="pre">DataType::kHALF</span></code>.</p></li>
+<li><p>[x][x] 23. Translate ONNX <code class="docutils literal notranslate"><span class="pre">INT32</span></code> to <code class="docutils literal notranslate"><span class="pre">DataType::kINT32</span></code>.</p></li>
+<li><p>[x][x] 24. Translate ONNX <code class="docutils literal notranslate"><span class="pre">INT8</span></code> to <code class="docutils literal notranslate"><span class="pre">DataType::kINT8</span></code>.</p></li>
+<li><p>[x][x] 25. Translate ONNX <code class="docutils literal notranslate"><span class="pre">BOOL</span></code> to <code class="docutils literal notranslate"><span class="pre">DataType::kBOOL</span></code>.</p></li>
+<li><p>[x][x] 26. Emulate <code class="docutils literal notranslate"><span class="pre">INT64</span></code> support by explicitly injecting <code class="docutils literal notranslate"><span class="pre">Cast</span></code> nodes (TRT historically lacks strict int64 support).</p></li>
+<li><p>[x][x] 27. Map ONNX dimensional arrays <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">3,</span> <span class="pre">224,</span> <span class="pre">224]</span></code> to TRT <code class="docutils literal notranslate"><span class="pre">Dims</span></code> structs in C memory.</p></li>
+<li><p>[x][x] 28. Map ONNX dynamic axes (<code class="docutils literal notranslate"><span class="pre">-1</span></code>) to TRT dynamic dimensions correctly.</p></li>
+<li><p>[x][x] 29. Track the mapping between ONNX <code class="docutils literal notranslate"><span class="pre">NodeArg</span></code> strings and TRT <code class="docutils literal notranslate"><span class="pre">ITensor</span></code> pointers dynamically in a dictionary.</p></li>
+<li><p>[x][x] 30. Configure explicit memory pools (<code class="docutils literal notranslate"><span class="pre">config-&gt;setMemoryPoolLimit(MemoryPoolType::kWORKSPACE,</span> <span class="pre">size)</span></code>).</p></li>
+</ul>
+</section>
+<section id="phase-3-constant-weight-translation">
+<h3>Phase 3: Constant &amp; Weight Translation<a class="headerlink" href="#phase-3-constant-weight-translation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 31. Implement <code class="docutils literal notranslate"><span class="pre">addConstant(dims,</span> <span class="pre">weights)</span></code> mapping ONNX Initializers to TRT.</p></li>
+<li><p>[x][x] 32. Pass Python NumPy pointers directly into <code class="docutils literal notranslate"><span class="pre">Weights</span></code> structs securely (<code class="docutils literal notranslate"><span class="pre">data_ptr</span></code>).</p></li>
+<li><p>[x][x] 33. Ensure weights outlive the Engine building phase by pinning Python arrays in memory.</p></li>
+<li><p>[x][x] 34. Extract scalar ONNX constants correctly to 0-D TRT constants.</p></li>
+<li><p>[x][x] 35. Embed large external weights (<code class="docutils literal notranslate"><span class="pre">.bin</span></code>) seamlessly by mapping their raw bytes via <code class="docutils literal notranslate"><span class="pre">mmap</span></code> into the TRT <code class="docutils literal notranslate"><span class="pre">Weights</span></code> struct.</p></li>
+<li><p>[x][x] 36. Handle Endianness requirements natively before passing buffers to <code class="docutils literal notranslate"><span class="pre">addConstant</span></code>.</p></li>
+<li><p>[x][x] 37. Bypass zero-sized constants natively.</p></li>
+<li><p>[x][x] 38. Collapse constant chains explicitly in <code class="docutils literal notranslate"><span class="pre">onnx9000.modifier</span></code> before passing them to TRT to save build time.</p></li>
+<li><p>[x][x] 39. Emit specific warnings if a Constant exceeds TRT dimension size maximums.</p></li>
+<li><p>[x][x] 40. Prevent memory leaks by explicitly unpinning weight arrays once the <code class="docutils literal notranslate"><span class="pre">buildSerializedNetwork</span></code> call completes.</p></li>
+</ul>
+</section>
+<section id="phase-4-core-math-matrix-operations-ielementwiselayer">
+<h3>Phase 4: Core Math &amp; Matrix Operations (<code class="docutils literal notranslate"><span class="pre">IElementWiseLayer</span></code>)<a class="headerlink" href="#phase-4-core-math-matrix-operations-ielementwiselayer" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 41. Map ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code> to <code class="docutils literal notranslate"><span class="pre">addElementWise(a,</span> <span class="pre">b,</span> <span class="pre">ElementWiseOperation::kSUM)</span></code>.</p></li>
+<li><p>[x][x] 42. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sub</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kSUB</span></code>.</p></li>
+<li><p>[x][x] 43. Map ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kPROD</span></code>.</p></li>
+<li><p>[x][x] 44. Map ONNX <code class="docutils literal notranslate"><span class="pre">Div</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kDIV</span></code>.</p></li>
+<li><p>[x][x] 45. Map ONNX <code class="docutils literal notranslate"><span class="pre">Max</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kMAX</span></code>.</p></li>
+<li><p>[x][x] 46. Map ONNX <code class="docutils literal notranslate"><span class="pre">Min</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kMIN</span></code>.</p></li>
+<li><p>[x][x] 47. Map ONNX <code class="docutils literal notranslate"><span class="pre">Pow</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kPOW</span></code>.</p></li>
+<li><p>[x][x] 48. Map ONNX <code class="docutils literal notranslate"><span class="pre">Equal</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kEQUAL</span></code>.</p></li>
+<li><p>[x][x] 49. Map ONNX <code class="docutils literal notranslate"><span class="pre">Less</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kLESS</span></code>.</p></li>
+<li><p>[x][x] 50. Map ONNX <code class="docutils literal notranslate"><span class="pre">Greater</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kGREATER</span></code>.</p></li>
+<li><p>[x][x] 51. Handle ONNX implicit broadcasting manually by injecting <code class="docutils literal notranslate"><span class="pre">IShuffleLayer</span></code> or TRT broadacast flags if required.</p></li>
+<li><p>[x][x] 52. Map ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> to <code class="docutils literal notranslate"><span class="pre">addMatrixMultiply(a,</span> <span class="pre">opA,</span> <span class="pre">b,</span> <span class="pre">opB)</span></code>.</p></li>
+<li><p>[x][x] 53. Handle <code class="docutils literal notranslate"><span class="pre">MatrixOperation::kTRANSPOSE</span></code> natively based on ONNX transpose structures.</p></li>
+<li><p>[x][x] 54. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> to <code class="docutils literal notranslate"><span class="pre">addFullyConnected()</span></code> if applicable, or decomposed <code class="docutils literal notranslate"><span class="pre">MatrixMultiply</span></code> + <code class="docutils literal notranslate"><span class="pre">ElementWise</span></code>.</p></li>
+<li><p>[x][x] 55. Validate multi-dimensional batched MatMul dimensions explicitly.</p></li>
+</ul>
+</section>
+<section id="phase-5-convolution-pooling-layers">
+<h3>Phase 5: Convolution &amp; Pooling Layers<a class="headerlink" href="#phase-5-convolution-pooling-layers" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 56. Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> (2D) to <code class="docutils literal notranslate"><span class="pre">addConvolutionNd(input,</span> <span class="pre">numOutputs,</span> <span class="pre">kernelSize,</span> <span class="pre">weights,</span> <span class="pre">bias)</span></code>.</p></li>
+<li><p>[x][x] 57. Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> (3D) to <code class="docutils literal notranslate"><span class="pre">addConvolutionNd</span></code>.</p></li>
+<li><p>[x][x] 58. Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> (1D) to <code class="docutils literal notranslate"><span class="pre">addConvolutionNd</span></code> (Emulating via 2D if required by older TRT versions).</p></li>
+<li><p>[x][x] 59. Set TRT <code class="docutils literal notranslate"><span class="pre">Stride</span></code> explicitly from ONNX attributes.</p></li>
+<li><p>[x][x] 60. Set TRT <code class="docutils literal notranslate"><span class="pre">Padding</span></code> (pre/post) explicitly.</p></li>
+<li><p>[x][x] 61. Set TRT <code class="docutils literal notranslate"><span class="pre">Dilation</span></code> explicitly.</p></li>
+<li><p>[x][x] 62. Set TRT <code class="docutils literal notranslate"><span class="pre">NumGroups</span></code> explicitly for Depthwise Convolution mapping.</p></li>
+<li><p>[x][x] 63. Map ONNX <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code> to <code class="docutils literal notranslate"><span class="pre">addDeconvolutionNd()</span></code>.</p></li>
+<li><p>[x][x] 64. Map ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> to <code class="docutils literal notranslate"><span class="pre">addPoolingNd(input,</span> <span class="pre">PoolingType::kMAX,</span> <span class="pre">windowSize)</span></code>.</p></li>
+<li><p>[x][x] 65. Map ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> to <code class="docutils literal notranslate"><span class="pre">PoolingType::kAVERAGE</span></code>.</p></li>
+<li><p>[x][x] 66. Support <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> <code class="docutils literal notranslate"><span class="pre">count_include_pad</span></code> attribute mapping.</p></li>
+<li><p>[x][x] 67. Set pooling <code class="docutils literal notranslate"><span class="pre">Stride</span></code>, <code class="docutils literal notranslate"><span class="pre">Padding</span></code>, and <code class="docutils literal notranslate"><span class="pre">BlendFactor</span></code> dynamically.</p></li>
+<li><p>[x][x] 68. Map ONNX <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code> to <code class="docutils literal notranslate"><span class="pre">addPoolingNd</span></code> spanning the entire spatial dimension.</p></li>
+<li><p>[x][x] 69. Map ONNX <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code> to <code class="docutils literal notranslate"><span class="pre">addPoolingNd</span></code>.</p></li>
+<li><p>[x][x] 70. Handle asymmetric padding safely via TRT <code class="docutils literal notranslate"><span class="pre">setPaddingMode</span></code> or explicit <code class="docutils literal notranslate"><span class="pre">IPaddingLayer</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-6-activation-normalization-unary-ops">
+<h3>Phase 6: Activation, Normalization, &amp; Unary Ops<a class="headerlink" href="#phase-6-activation-normalization-unary-ops" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 71. Map ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code> to <code class="docutils literal notranslate"><span class="pre">addActivation(input,</span> <span class="pre">ActivationType::kRELU)</span></code>.</p></li>
+<li><p>[x][x] 72. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kSIGMOID</span></code>.</p></li>
+<li><p>[x][x] 73. Map ONNX <code class="docutils literal notranslate"><span class="pre">Tanh</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kTANH</span></code>.</p></li>
+<li><p>[x][x] 74. Map ONNX <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kLEAKY_RELU</span></code> (setting <code class="docutils literal notranslate"><span class="pre">alpha</span></code>).</p></li>
+<li><p>[x][x] 75. Map ONNX <code class="docutils literal notranslate"><span class="pre">Elu</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kELU</span></code>.</p></li>
+<li><p>[x][x] 76. Map ONNX <code class="docutils literal notranslate"><span class="pre">Selu</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kSELU</span></code>.</p></li>
+<li><p>[x][x] 77. Map ONNX <code class="docutils literal notranslate"><span class="pre">Softplus</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kSOFTPLUS</span></code>.</p></li>
+<li><p>[x][x] 78. Map ONNX <code class="docutils literal notranslate"><span class="pre">Clip</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kCLIP</span></code> (setting <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code>).</p></li>
+<li><p>[x][x] 79. Map ONNX <code class="docutils literal notranslate"><span class="pre">HardSigmoid</span></code> to <code class="docutils literal notranslate"><span class="pre">ActivationType::kHARD_SIGMOID</span></code>.</p></li>
+<li><p>[x][x] 80. Map ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> to <code class="docutils literal notranslate"><span class="pre">addSoftMax(input)</span></code>.</p></li>
+<li><p>[x][x] 81. Map Softmax <code class="docutils literal notranslate"><span class="pre">axis</span></code> cleanly.</p></li>
+<li><p>[x][x] 82. Map ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to <code class="docutils literal notranslate"><span class="pre">addScale(input,</span> <span class="pre">ScaleMode::kCHANNEL,</span> <span class="pre">shift,</span> <span class="pre">scale,</span> <span class="pre">power)</span></code>.</p></li>
+<li><p>[x][x] 83. Pre-calculate Batch Norm scale/shift values offline in Python before passing to TRT <code class="docutils literal notranslate"><span class="pre">ScaleLayer</span></code>.</p></li>
+<li><p>[x][x] 84. Map ONNX <code class="docutils literal notranslate"><span class="pre">InstanceNormalization</span></code> to <code class="docutils literal notranslate"><span class="pre">addScaleNd</span></code> or native TRT Plugin.</p></li>
+<li><p>[x][x] 85. Map ONNX <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> to <code class="docutils literal notranslate"><span class="pre">addNormalization()</span></code> (TRT 10+).</p></li>
+<li><p>[x][x] 86. Map Unary <code class="docutils literal notranslate"><span class="pre">Exp</span></code> to <code class="docutils literal notranslate"><span class="pre">addUnaryOperation(input,</span> <span class="pre">UnaryOperation::kEXP)</span></code>.</p></li>
+<li><p>[x][x] 87. Map Unary <code class="docutils literal notranslate"><span class="pre">Log</span></code> to <code class="docutils literal notranslate"><span class="pre">UnaryOperation::kLOG</span></code>.</p></li>
+<li><p>[x][x] 88. Map Unary <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code> to <code class="docutils literal notranslate"><span class="pre">UnaryOperation::kSQRT</span></code>.</p></li>
+<li><p>[x][x] 89. Map Unary <code class="docutils literal notranslate"><span class="pre">Abs</span></code> to <code class="docutils literal notranslate"><span class="pre">UnaryOperation::kABS</span></code>.</p></li>
+<li><p>[x][x] 90. Map Unary <code class="docutils literal notranslate"><span class="pre">Neg</span></code> to <code class="docutils literal notranslate"><span class="pre">UnaryOperation::kNEG</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-7-dimension-manipulation-routing">
+<h3>Phase 7: Dimension Manipulation &amp; Routing<a class="headerlink" href="#phase-7-dimension-manipulation-routing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 91. Map ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to <code class="docutils literal notranslate"><span class="pre">addShuffle(input)</span></code>.</p></li>
+<li><p>[x][x] 92. Handle <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> dynamic dimensions via <code class="docutils literal notranslate"><span class="pre">setReshapeDimensions</span></code>.</p></li>
+<li><p>[x][x] 93. Map ONNX <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> to <code class="docutils literal notranslate"><span class="pre">IShuffleLayer</span></code> via <code class="docutils literal notranslate"><span class="pre">setFirstTranspose(perm)</span></code>.</p></li>
+<li><p>[x][x] 94. Map ONNX <code class="docutils literal notranslate"><span class="pre">Flatten</span></code> to <code class="docutils literal notranslate"><span class="pre">addShuffle</span></code> with flattened dims.</p></li>
+<li><p>[x][x] 95. Map ONNX <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code> to <code class="docutils literal notranslate"><span class="pre">addShuffle</span></code>.</p></li>
+<li><p>[x][x] 96. Map ONNX <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code> to <code class="docutils literal notranslate"><span class="pre">addShuffle</span></code>.</p></li>
+<li><p>[x][x] 97. Map ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code> to <code class="docutils literal notranslate"><span class="pre">addConcatenation(tensors,</span> <span class="pre">numTensors)</span></code>.</p></li>
+<li><p>[x][x] 98. Handle <code class="docutils literal notranslate"><span class="pre">Concat</span></code> axis parameter natively.</p></li>
+<li><p>[x][x] 99. Map ONNX <code class="docutils literal notranslate"><span class="pre">Split</span></code> to <code class="docutils literal notranslate"><span class="pre">addSlice()</span></code> dynamically allocating individual output tensors.</p></li>
+<li><p>[x][x] 100. Map ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code> to <code class="docutils literal notranslate"><span class="pre">addSlice(input,</span> <span class="pre">start,</span> <span class="pre">size,</span> <span class="pre">stride)</span></code>.</p></li>
+<li><p>[x][x] 101. Process negative indices in <code class="docutils literal notranslate"><span class="pre">Slice</span></code> dynamically.</p></li>
+<li><p>[x][x] 102. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gather</span></code> to <code class="docutils literal notranslate"><span class="pre">addGather(data,</span> <span class="pre">indices,</span> <span class="pre">axis)</span></code>.</p></li>
+<li><p>[x][x] 103. Map ONNX <code class="docutils literal notranslate"><span class="pre">GatherND</span></code> to <code class="docutils literal notranslate"><span class="pre">addGatherNd</span></code>.</p></li>
+<li><p>[x][x] 104. Map ONNX <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code> to <code class="docutils literal notranslate"><span class="pre">addScatter</span></code>.</p></li>
+<li><p>[x][x] 105. Map ONNX <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code> to <code class="docutils literal notranslate"><span class="pre">addScatter</span></code>.</p></li>
+<li><p>[x][x] 106. Map ONNX <code class="docutils literal notranslate"><span class="pre">Shape</span></code> to <code class="docutils literal notranslate"><span class="pre">addShape(input)</span></code>.</p></li>
+<li><p>[x][x] 107. Map ONNX <code class="docutils literal notranslate"><span class="pre">Expand</span></code> to <code class="docutils literal notranslate"><span class="pre">IShuffleLayer</span></code> broadcast mechanisms.</p></li>
+<li><p>[x][x] 108. Map ONNX <code class="docutils literal notranslate"><span class="pre">Tile</span></code> to TRT equivalents (or nested loops if unsupported).</p></li>
+<li><p>[x][x] 109. Map ONNX <code class="docutils literal notranslate"><span class="pre">Pad</span></code> to <code class="docutils literal notranslate"><span class="pre">addPaddingNd</span></code> natively.</p></li>
+<li><p>[x][x] 110. Evaluate explicit TRT dynamic shape bounds prior to mapping slice/gather.</p></li>
+</ul>
+</section>
+<section id="phase-8-reduction-logical-operators">
+<h3>Phase 8: Reduction &amp; Logical Operators<a class="headerlink" href="#phase-8-reduction-logical-operators" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 111. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> to <code class="docutils literal notranslate"><span class="pre">addReduce(input,</span> <span class="pre">ReduceOperation::kAVG,</span> <span class="pre">keepAxes,</span> <span class="pre">keepDims)</span></code>.</p></li>
+<li><p>[x][x] 112. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> to <code class="docutils literal notranslate"><span class="pre">ReduceOperation::kSUM</span></code>.</p></li>
+<li><p>[x][x] 113. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code> to <code class="docutils literal notranslate"><span class="pre">ReduceOperation::kMAX</span></code>.</p></li>
+<li><p>[x][x] 114. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code> to <code class="docutils literal notranslate"><span class="pre">ReduceOperation::kMIN</span></code>.</p></li>
+<li><p>[x][x] 115. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceProd</span></code> to <code class="docutils literal notranslate"><span class="pre">ReduceOperation::kPROD</span></code>.</p></li>
+<li><p>[x][x] 116. Map ONNX <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code> to <code class="docutils literal notranslate"><span class="pre">addTopK(input,</span> <span class="pre">TopKOperation::kMAX,</span> <span class="pre">1,</span> <span class="pre">axes)</span></code> + Gather.</p></li>
+<li><p>[x][x] 117. Map ONNX <code class="docutils literal notranslate"><span class="pre">ArgMin</span></code> to <code class="docutils literal notranslate"><span class="pre">TopKOperation::kMIN</span></code>.</p></li>
+<li><p>[x][x] 118. Map ONNX <code class="docutils literal notranslate"><span class="pre">TopK</span></code> directly to <code class="docutils literal notranslate"><span class="pre">addTopK()</span></code>.</p></li>
+<li><p>[x][x] 119. Map ONNX <code class="docutils literal notranslate"><span class="pre">Not</span></code> to <code class="docutils literal notranslate"><span class="pre">UnaryOperation::kNOT</span></code>.</p></li>
+<li><p>[x][x] 120. Map ONNX <code class="docutils literal notranslate"><span class="pre">And</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kAND</span></code>.</p></li>
+<li><p>[x][x] 121. Map ONNX <code class="docutils literal notranslate"><span class="pre">Or</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kOR</span></code>.</p></li>
+<li><p>[x][x] 122. Map ONNX <code class="docutils literal notranslate"><span class="pre">Xor</span></code> to <code class="docutils literal notranslate"><span class="pre">ElementWiseOperation::kXOR</span></code>.</p></li>
+<li><p>[x][x] 123. Map ONNX <code class="docutils literal notranslate"><span class="pre">Where</span></code> to <code class="docutils literal notranslate"><span class="pre">addSelect(condition,</span> <span class="pre">thenInput,</span> <span class="pre">elseInput)</span></code>.</p></li>
+<li><p>[x][x] 124. Map ONNX <code class="docutils literal notranslate"><span class="pre">NonZero</span></code> to TRT <code class="docutils literal notranslate"><span class="pre">addNonZero</span></code> (Dynamic Output Shape).</p></li>
+<li><p>[x][x] 125. Process boolean casting seamlessly for logic gates.</p></li>
+</ul>
+</section>
+<section id="phase-9-advanced-control-flow-subgraphs">
+<h3>Phase 9: Advanced Control Flow &amp; Subgraphs<a class="headerlink" href="#phase-9-advanced-control-flow-subgraphs" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 126. Map ONNX <code class="docutils literal notranslate"><span class="pre">If</span></code> to TRT <code class="docutils literal notranslate"><span class="pre">IIfConditional</span></code>.</p></li>
+<li><p>[x][x] 127. Parse True Branch graph into <code class="docutils literal notranslate"><span class="pre">IIfConditional-&gt;setTrue()</span></code>.</p></li>
+<li><p>[x][x] 128. Parse False Branch graph into <code class="docutils literal notranslate"><span class="pre">IIfConditional-&gt;setFalse()</span></code>.</p></li>
+<li><p>[x][x] 129. Bind Subgraph inputs logically using <code class="docutils literal notranslate"><span class="pre">IIfConditionalInputLayer</span></code>.</p></li>
+<li><p>[x][x] 130. Extract outputs logically using <code class="docutils literal notranslate"><span class="pre">IIfConditionalOutputLayer</span></code>.</p></li>
+<li><p>[x][x] 131. Map ONNX <code class="docutils literal notranslate"><span class="pre">Loop</span></code> to TRT <code class="docutils literal notranslate"><span class="pre">ILoop</span></code>.</p></li>
+<li><p>[x][x] 132. Implement loop state variables via <code class="docutils literal notranslate"><span class="pre">addRecurrenceLayer</span></code>.</p></li>
+<li><p>[x][x] 133. Implement sequence lengths via <code class="docutils literal notranslate"><span class="pre">addTripLimit</span></code>.</p></li>
+<li><p>[x][x] 134. Handle iterators dynamically inside the TRT loop block.</p></li>
+<li><p>[x][x] 135. Manage loop body outputs securely.</p></li>
+</ul>
+</section>
+<section id="phase-10-dynamic-shapes-optimization-profiles">
+<h3>Phase 10: Dynamic Shapes &amp; Optimization Profiles<a class="headerlink" href="#phase-10-dynamic-shapes-optimization-profiles" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 136. Detect dynamic axes (<code class="docutils literal notranslate"><span class="pre">-1</span></code>) across all Graph Inputs dynamically.</p></li>
+<li><p>[x][x] 137. Create <code class="docutils literal notranslate"><span class="pre">IOptimizationProfile</span></code> explicitly via <code class="docutils literal notranslate"><span class="pre">builder-&gt;createOptimizationProfile()</span></code>.</p></li>
+<li><p>[x][x] 138. Expose Python API <code class="docutils literal notranslate"><span class="pre">set_dynamic_shape(input_name,</span> <span class="pre">min_shape,</span> <span class="pre">opt_shape,</span> <span class="pre">max_shape)</span></code>.</p></li>
+<li><p>[x][x] 139. Set Min dimensions via <code class="docutils literal notranslate"><span class="pre">profile-&gt;setDimensions(inputName,</span> <span class="pre">OptProfileSelector::kMIN,</span> <span class="pre">dims)</span></code>.</p></li>
+<li><p>[x][x] 140. Set Opt (Optimal) dimensions via <code class="docutils literal notranslate"><span class="pre">OptProfileSelector::kOPT</span></code>.</p></li>
+<li><p>[x][x] 141. Set Max dimensions via <code class="docutils literal notranslate"><span class="pre">OptProfileSelector::kMAX</span></code>.</p></li>
+<li><p>[x][x] 142. Add profile to config via <code class="docutils literal notranslate"><span class="pre">config-&gt;addOptimizationProfile(profile)</span></code>.</p></li>
+<li><p>[x][x] 143. Support adding multiple distinct optimization profiles for varying batch sizes.</p></li>
+<li><p>[x][x] 144. Validate Min &lt;= Opt &lt;= Max rules natively in Python before calling TRT to prevent cryptic C++ crashes.</p></li>
+<li><p>[x][x] 145. Evaluate dynamic constraints globally to auto-generate opt shapes if user omits them.</p></li>
+</ul>
+</section>
+<section id="phase-11-quantization-precision-control">
+<h3>Phase 11: Quantization &amp; Precision Control<a class="headerlink" href="#phase-11-quantization-precision-control" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 146. Enable FP16 execution globally (<code class="docutils literal notranslate"><span class="pre">config-&gt;setFlag(BuilderFlag::kFP16)</span></code>).</p></li>
+<li><p>[x][x] 147. Enable INT8 execution globally (<code class="docutils literal notranslate"><span class="pre">config-&gt;setFlag(BuilderFlag::kINT8)</span></code>).</p></li>
+<li><p>[x][x] 148. Set explicit layer precisions (<code class="docutils literal notranslate"><span class="pre">layer-&gt;setPrecision(DataType::kINT8)</span></code>).</p></li>
+<li><p>[x][x] 149. Map ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> and <code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code> (QDQ) structures dynamically to TRT implicit INT8 processing.</p></li>
+<li><p>[x][x] 150. Emulate Post-Training Quantization (PTQ) Calibration interfaces.</p></li>
+<li><p>[x][x] 151. Implement <code class="docutils literal notranslate"><span class="pre">IInt8EntropyCalibrator2</span></code> entirely using Python C-Callbacks.</p></li>
+<li><p>[x][x] 152. Implement <code class="docutils literal notranslate"><span class="pre">IInt8MinMaxCalibrator</span></code> via Python callbacks.</p></li>
+<li><p>[x][x] 153. Supply calibration dataset batches securely from Python Generators into the TRT C-API pointer buffers.</p></li>
+<li><p>[x][x] 154. Read and Write TRT calibration cache files natively.</p></li>
+<li><p>[x][x] 155. Enforce strict FP32 types on specific sensitive layers (e.g., Softmax) natively via API hooks.</p></li>
+<li><p>[x][x] 156. Handle Web-Native <code class="docutils literal notranslate"><span class="pre">W4A16</span></code> configurations, extracting packed INT4 weights and exposing them as explicit TRT structures if supported, or unpacking to FP16 dynamically.</p></li>
+<li><p>[x][x] 157. Toggle <code class="docutils literal notranslate"><span class="pre">BuilderFlag::kOBEY_PRECISION_CONSTRAINTS</span></code> if strict mode is requested.</p></li>
+<li><p>[x][x] 158. Enable <code class="docutils literal notranslate"><span class="pre">BuilderFlag::kTF32</span></code> explicitly for Ampere+ hardware.</p></li>
+<li><p>[x][x] 159. Enable <code class="docutils literal notranslate"><span class="pre">BuilderFlag::kFP8</span></code> explicitly for Hopper+ hardware.</p></li>
+<li><p>[x][x] 160. Parse and extract Dynamic Range attributes directly from ONNX schemas if provided.</p></li>
+</ul>
+</section>
+<section id="phase-12-custom-plugins-extensibility-ipluginv2">
+<h3>Phase 12: Custom Plugins &amp; Extensibility (<code class="docutils literal notranslate"><span class="pre">IPluginV2</span></code>)<a class="headerlink" href="#phase-12-custom-plugins-extensibility-ipluginv2" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 161. Detect <code class="docutils literal notranslate"><span class="pre">ai.onnx.contrib</span></code> or unknown operators.</p></li>
+<li><p>[x][x] 162. Implement <code class="docutils literal notranslate"><span class="pre">IPluginCreator</span></code> bindings.</p></li>
+<li><p>[x][x] 163. Map ONNX <code class="docutils literal notranslate"><span class="pre">GridSample</span></code> to TRT standard <code class="docutils literal notranslate"><span class="pre">GridSamplePlugin</span></code>.</p></li>
+<li><p>[x][x] 164. Map ONNX <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code> to TRT <code class="docutils literal notranslate"><span class="pre">BatchedNMSDynamic_TRT</span></code> plugin natively.</p></li>
+<li><p>[x][x] 165. Map ONNX <code class="docutils literal notranslate"><span class="pre">RoiAlign</span></code> to TRT <code class="docutils literal notranslate"><span class="pre">ROIAlign_TRT</span></code> plugin.</p></li>
+<li><p>[x][x] 166. Handle serialization of plugin configuration variables (<code class="docutils literal notranslate"><span class="pre">PluginFieldCollection</span></code>) via ctypes structs.</p></li>
+<li><p>[x][x] 167. Bind explicitly written Python/CUDA custom extensions natively into the TRT build process.</p></li>
+<li><p>[x][x] 168. Ensure custom plugin <code class="docutils literal notranslate"><span class="pre">getSerializationSize()</span></code> matches exactly with the provided FFI structs.</p></li>
+<li><p>[x][x] 169. Provide fallback implementations: if a node lacks a Plugin, replace it mathematically using standard ONNX ops (e.g., <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> expansion).</p></li>
+<li><p>[x][x] 170. Load <code class="docutils literal notranslate"><span class="pre">libnvinfer_plugin.so</span></code> automatically via <code class="docutils literal notranslate"><span class="pre">initLibNvInferPlugins</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-13-engine-serialization-caching">
+<h3>Phase 13: Engine Serialization &amp; Caching<a class="headerlink" href="#phase-13-engine-serialization-caching" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 171. Trigger <code class="docutils literal notranslate"><span class="pre">buildSerializedNetwork(network,</span> <span class="pre">config)</span></code>.</p></li>
+<li><p>[x][x] 172. Output progress logs continuously during the massive compilation loop.</p></li>
+<li><p>[x][x] 173. Catch Out-Of-Memory limits securely during the builder phase.</p></li>
+<li><p>[x][x] 174. Extract the compiled Engine byte payload (<code class="docutils literal notranslate"><span class="pre">IHostMemory</span></code>).</p></li>
+<li><p>[x][x] 175. Stream the engine bytes natively to a <code class="docutils literal notranslate"><span class="pre">.trt</span></code> / <code class="docutils literal notranslate"><span class="pre">.engine</span></code> / <code class="docutils literal notranslate"><span class="pre">.plan</span></code> file.</p></li>
+<li><p>[x][x] 176. Implement zero-copy buffer views returning the Engine byte payload directly to Python RAM.</p></li>
+<li><p>[x][x] 177. Instantiate <code class="docutils literal notranslate"><span class="pre">IRuntime</span></code> explicitly.</p></li>
+<li><p>[x][x] 178. Deserialize the Engine (<code class="docutils literal notranslate"><span class="pre">runtime-&gt;deserializeCudaEngine(data,</span> <span class="pre">size)</span></code>).</p></li>
+<li><p>[x][x] 179. Set the Device Index natively (<code class="docutils literal notranslate"><span class="pre">cudaSetDevice</span></code>) before deserialization.</p></li>
+<li><p>[x][x] 180. Track hardware environment constraints (TRT engines are hardware-specific; fail safely if attempting to load an engine built on A100 into a T4).</p></li>
+</ul>
+</section>
+<section id="phase-14-engine-execution-context-runtime">
+<h3>Phase 14: Engine Execution Context &amp; Runtime<a class="headerlink" href="#phase-14-engine-execution-context-runtime" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 181. Instantiate <code class="docutils literal notranslate"><span class="pre">IExecutionContext</span></code> from the Engine.</p></li>
+<li><p>[x][x] 182. Implement dynamic shape allocation (<code class="docutils literal notranslate"><span class="pre">context-&gt;setBindingDimensions(index,</span> <span class="pre">dims)</span></code>).</p></li>
+<li><p>[x][x] 183. Resolve exact output dimensions dynamically using <code class="docutils literal notranslate"><span class="pre">context-&gt;getBindingDimensions(index)</span></code>.</p></li>
+<li><p>[x][x] 184. Extract total required Workspace Size dynamically.</p></li>
+<li><p>[x][x] 185. Provide native CUDA memory allocation wrappers (<code class="docutils literal notranslate"><span class="pre">cudaMalloc</span></code>, <code class="docutils literal notranslate"><span class="pre">cudaFree</span></code>) in Python via ctypes.</p></li>
+<li><p>[x][x] 186. Support creating CUDA Streams explicitly (<code class="docutils literal notranslate"><span class="pre">cudaStreamCreate</span></code>).</p></li>
+<li><p>[x][x] 187. Implement asynchronous enqueue (<code class="docutils literal notranslate"><span class="pre">context-&gt;enqueueV3(stream)</span></code>).</p></li>
+<li><p>[x][x] 188. Support legacy <code class="docutils literal notranslate"><span class="pre">enqueueV2</span></code> for backward compatibility.</p></li>
+<li><p>[x][x] 189. Synchronize explicitly (<code class="docutils literal notranslate"><span class="pre">cudaStreamSynchronize</span></code>).</p></li>
+<li><p>[x][x] 190. Wrap the execution context securely inside Python Context Managers (<code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">trt_session:</span></code>) to guarantee cleanup.</p></li>
+</ul>
+</section>
+<section id="phase-15-zero-copy-dlpack-integration-pytorch-cupy-bridge">
+<h3>Phase 15: Zero-Copy DLPack Integration (PyTorch / CuPy Bridge)<a class="headerlink" href="#phase-15-zero-copy-dlpack-integration-pytorch-cupy-bridge" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 191. Implement <code class="docutils literal notranslate"><span class="pre">__dlpack__</span></code> ingestor explicitly for TRT bindings.</p></li>
+<li><p>[x][x] 192. Accept PyTorch <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> residing in CUDA memory natively as execution inputs.</p></li>
+<li><p>[x][x] 193. Accept CuPy <code class="docutils literal notranslate"><span class="pre">cp.ndarray</span></code> residing in CUDA memory natively.</p></li>
+<li><p>[x][x] 194. Extract device pointers seamlessly (<code class="docutils literal notranslate"><span class="pre">tensor.data_ptr()</span></code>).</p></li>
+<li><p>[x][x] 195. Create empty PyTorch output tensors on the identical CUDA device dynamically based on <code class="docutils literal notranslate"><span class="pre">getBindingDimensions</span></code>.</p></li>
+<li><p>[x][x] 196. Execute TRT engine directly over the PyTorch pre-allocated pointers (True Zero-Copy).</p></li>
+<li><p>[x][x] 197. Hook the TRT execution natively into standard PyTorch CUDA Streams.</p></li>
+<li><p>[x][x] 198. Ensure asynchronous non-blocking launches return immediately to the Python event loop.</p></li>
+<li><p>[x][x] 199. Handle continuous batching setups by swapping input pointer bindings asynchronously.</p></li>
+<li><p>[x][x] 200. Evaluate latency bounds natively (comparing C++ TRT exec vs Python FFI TRT exec; target &lt;5% overhead).</p></li>
+</ul>
+</section>
+<section id="phase-16-integration-with-onnx9000-core-ecosystem">
+<h3>Phase 16: Integration with <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Core Ecosystem<a class="headerlink" href="#phase-16-integration-with-onnx9000-core-ecosystem" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 201. Define <code class="docutils literal notranslate"><span class="pre">TensorrtExecutionProvider</span></code> natively within <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>.</p></li>
+<li><p>[x][x] 202. Implement automated Sub-Graph partitioning (Send supported nodes to TRT, keep unsupported nodes in WebGPU/CPU).</p></li>
+<li><p>[x][x] 203. Execute <code class="docutils literal notranslate"><span class="pre">cudaMemcpy</span></code> automatically when crossing Execution Provider boundaries.</p></li>
+<li><p>[x][x] 204. Enable user flag: <code class="docutils literal notranslate"><span class="pre">--trt-fallback</span></code> to determine strict vs relaxed execution.</p></li>
+<li><p>[x][x] 205. Store compiled <code class="docutils literal notranslate"><span class="pre">TRT</span></code> subgraphs in <code class="docutils literal notranslate"><span class="pre">~/.cache/onnx9000/trt_engines/</span></code>.</p></li>
+<li><p>[x][x] 206. Read cached engines automatically on session reload based on Model Hash and Node topology.</p></li>
+<li><p>[x][x] 207. Generate comprehensive Optimization Fusions natively in <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> (Level 3) <em>before</em> TRT to speed up TRT compilation times.</p></li>
+<li><p>[x][x] 208. Strip Dropout and Identity nodes out of the graph natively before submitting to TRT.</p></li>
+<li><p>[x][x] 209. Inject dynamic shapes exclusively around known variable dimensions (Batch, SeqLen).</p></li>
+<li><p>[x][x] 210. Expose standard <code class="docutils literal notranslate"><span class="pre">InferenceSession</span></code> APIs globally over the TRT backend.</p></li>
+</ul>
+</section>
+<section id="phase-17-python-api-cli-tooling-onnx9000-trt">
+<h3>Phase 17: Python API &amp; CLI Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">trt</span></code>)<a class="headerlink" href="#phase-17-python-api-cli-tooling-onnx9000-trt" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 211. Provide CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">trt</span> <span class="pre">build</span> <span class="pre">model.onnx</span> <span class="pre">-o</span> <span class="pre">model.engine</span></code>.</p></li>
+<li><p>[x][x] 212. Support flag: <code class="docutils literal notranslate"><span class="pre">--fp16</span></code>.</p></li>
+<li><p>[x][x] 213. Support flag: <code class="docutils literal notranslate"><span class="pre">--int8</span></code>.</p></li>
+<li><p>[x][x] 214. Support flag: <code class="docutils literal notranslate"><span class="pre">--dynamic-batch</span> <span class="pre">min:opt:max</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">1:8:32</span></code>).</p></li>
+<li><p>[x][x] 215. Support flag: <code class="docutils literal notranslate"><span class="pre">--workspace-size</span> <span class="pre">&lt;MB&gt;</span></code>.</p></li>
+<li><p>[x][x] 216. Provide CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">trt</span> <span class="pre">run</span> <span class="pre">model.engine</span> <span class="pre">--inputs</span> <span class="pre">data.json</span></code>.</p></li>
+<li><p>[x][x] 217. Expose an equivalent utility to <code class="docutils literal notranslate"><span class="pre">trtexec</span></code> providing raw performance metrics (Latency, Throughput, GPU mem).</p></li>
+<li><p>[x][x] 218. Generate detailed timeline traces natively in Python matching the execution timeline.</p></li>
+<li><p>[x][x] 219. Expose an API specifically for loading and running pre-built <code class="docutils literal notranslate"><span class="pre">.engine</span></code> files without needing the original ONNX.</p></li>
+<li><p>[x][x] 220. Support logging output directly to a file (<code class="docutils literal notranslate"><span class="pre">--log-file</span> <span class="pre">trt_build.log</span></code>).</p></li>
+</ul>
+</section>
+<section id="phase-18-node-js-serverless-api-integration">
+<h3>Phase 18: Node.js / Serverless API Integration<a class="headerlink" href="#phase-18-node-js-serverless-api-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 221. Replicate the FFI binding layer identically using <code class="docutils literal notranslate"><span class="pre">node-ffi-napi</span></code>.</p></li>
+<li><p>[x][x] 222. Expose JS asynchronous API: <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">engine</span> <span class="pre">=</span> <span class="pre">await</span> <span class="pre">trt.build(onnxBuffer,</span> <span class="pre">{</span> <span class="pre">fp16:</span> <span class="pre">true</span> <span class="pre">})</span></code>.</p></li>
+<li><p>[x][x] 223. Run the TRT Builder explicitly off the main JS thread using libuv worker pools to prevent blocking incoming HTTP requests.</p></li>
+<li><p>[x][x] 224. Wrap <code class="docutils literal notranslate"><span class="pre">cudaStreamSynchronize</span></code> as an asynchronous Javascript Promise.</p></li>
+<li><p>[x][x] 225. Support Node.js <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> objects seamlessly translating into CUDA memory via pinned host allocations.</p></li>
+<li><p>[x][x] 226. Ensure JS garbage collection successfully triggers <code class="docutils literal notranslate"><span class="pre">engine-&gt;destroy()</span></code> safely.</p></li>
+<li><p>[x][x] 227. Export an Express.js / Fastify middleware wrapper deploying TRT engines dynamically for REST APIs.</p></li>
+<li><p>[x][x] 228. Handle strict Endianness validation natively in Javascript when translating tensors.</p></li>
+<li><p>[x][x] 229. Expose <code class="docutils literal notranslate"><span class="pre">TRTLogger</span></code> callbacks directly into <code class="docutils literal notranslate"><span class="pre">console.log</span></code>.</p></li>
+<li><p>[x][x] 230. Distribute the Node.js package independently as <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/tensorrt</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-19-edge-cases-specific-architecture-optimizations">
+<h3>Phase 19: Edge Cases &amp; Specific Architecture Optimizations<a class="headerlink" href="#phase-19-edge-cases-specific-architecture-optimizations" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 231. Handle extremely large LLMs (e.g., Llama-3 70B) by partitioning the builder explicitly across multiple GPUs natively.</p></li>
+<li><p>[x][x] 232. Support Weight-Only Quantization building explicitly (<code class="docutils literal notranslate"><span class="pre">W4A16</span></code> TRT equivalents).</p></li>
+<li><p>[x][x] 233. Handle 1D Tensors reliably (TRT historically forced <code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">C,</span> <span class="pre">1,</span> <span class="pre">1]</span></code>, map this cleanly).</p></li>
+<li><p>[x][x] 234. Map PyTorch specific export markers flawlessly into TRT dynamic bounds.</p></li>
+<li><p>[x][x] 235. Automatically correct ONNX <code class="docutils literal notranslate"><span class="pre">Gather</span></code> negative axis parameters to positive, as TRT gathers fail on negative indices in some versions.</p></li>
+<li><p>[x][x] 236. Fallback from <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> to explicit explicit matmuls natively inside <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> before TRT submission, as TRT <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> support is notoriously fragile.</p></li>
+<li><p>[x][x] 237. Handle ONNX <code class="docutils literal notranslate"><span class="pre">Cast</span></code> from <code class="docutils literal notranslate"><span class="pre">float32</span></code> to <code class="docutils literal notranslate"><span class="pre">bool</span></code> cleanly.</p></li>
+<li><p>[x][x] 238. Detect and patch <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> on massive sequence dimensions natively to prevent <code class="docutils literal notranslate"><span class="pre">NaN</span></code> during TRT FP16 execution.</p></li>
+<li><p>[x][x] 239. Fix generic Pad structures dynamically since TRT occasionally rejects asymmetric constants.</p></li>
+<li><p>[x][x] 240. Manage multiple Optimization Profiles dynamically inside the Inference Execution.</p></li>
+</ul>
+</section>
+<section id="phase-20-performance-parity-validation-checks">
+<h3>Phase 20: Performance Parity &amp; Validation Checks<a class="headerlink" href="#phase-20-performance-parity-validation-checks" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x][x] 241. Unit Test: Build pure <code class="docutils literal notranslate"><span class="pre">Add</span></code> ONNX, execute via TRT, validate output.</p></li>
+<li><p>[x][x] 242. Unit Test: Build <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> ONNX, validate output accuracy.</p></li>
+<li><p>[x][x] 243. Unit Test: Build <code class="docutils literal notranslate"><span class="pre">Conv2D</span></code> ONNX, validate output accuracy.</p></li>
+<li><p>[x][x] 244. Integration Test: Convert MNIST CNN, execute via TRT natively, evaluate latency.</p></li>
+<li><p>[x][x] 245. Integration Test: Convert MobileNetV2, evaluate exact FPS.</p></li>
+<li><p>[x][x] 246. Integration Test: Convert YOLOv8, evaluate exact bounding box tolerances (atol=1e-3) under FP16.</p></li>
+<li><p>[x][x] 247. Validate execution natively across TensorRT 8.4, 8.5, and 8.6+ versions dynamically.</p></li>
+<li><p>[x][x] 248. Assert Memory Leak absence during 100+ sequential inference requests.</p></li>
+<li><p>[x][x] 249. Compare execution throughput natively against official C++ <code class="docutils literal notranslate"><span class="pre">trtexec</span></code> (Must achieve &gt;98% relative throughput).</p></li>
+<li><p>[x][x] 250. Handle out-of-bounds pointer allocations safely without hard-crashing the host process.</p></li>
+<li><p>[x][x] 251. Validate multi-threading (calling <code class="docutils literal notranslate"><span class="pre">.enqueueV3()</span></code> from multiple Python threads concurrently).</p></li>
+<li><p>[x][x] 252. Validate multi-model multi-session execution natively.</p></li>
+<li><p>[x][x] 253. Compile explicit CNN benchmarks directly natively.</p></li>
+<li><p>[x][x] 254. Support reading <code class="docutils literal notranslate"><span class="pre">.safetensors</span></code> external data natively during the builder process.</p></li>
+<li><p>[x][x] 255. Evaluate LayerNorm numerical drift extensively.</p></li>
+<li><p>[x][x] 256. Provide clear visual reports during optimization loops.</p></li>
+<li><p>[x][x] 257. Emit a structural graph report identical to TRT’s Engine Inspector format.</p></li>
+<li><p>[x][x] 258. Identify Subnormal floats natively.</p></li>
+<li><p>[x][x] 259. Validate that standard ONNX compliance tests pass natively under TRT execution.</p></li>
+<li><p>[x][x] 260. Manage exact execution determinism correctly.</p></li>
+<li><p>[x][x] 261. Expose interactive CLI commands for profiling subgraphs natively.</p></li>
+<li><p>[x][x] 262. Check specific dimension limits natively in Python before C++ invokes exceptions.</p></li>
+<li><p>[x][x] 263. Emulate unsupported CustomOps gracefully.</p></li>
+<li><p>[x][x] 264. Compile Transformer MultiHeadAttention safely.</p></li>
+<li><p>[x][x] 265. Emulate <code class="docutils literal notranslate"><span class="pre">GatherElements</span></code> securely.</p></li>
+<li><p>[x][x] 266. Manage exact padding requirements for <code class="docutils literal notranslate"><span class="pre">Conv</span></code> native execution.</p></li>
+<li><p>[x][x] 267. Handle dynamic looping structures inside LLMs correctly.</p></li>
+<li><p>[x][x] 268. Extract 1D vectors seamlessly via SIMD hooks if used concurrently.</p></li>
+<li><p>[x][x] 269. Render interactive trace reports cleanly natively.</p></li>
+<li><p>[x][x] 270. Add support for creating parallel engine instances on the same GPU.</p></li>
+<li><p>[x][x] 271. Implement specific memory layouts for HWC image buffering into TRT.</p></li>
+<li><p>[x][x] 272. Evaluate exact bounds checking natively.</p></li>
+<li><p>[x][x] 273. Validate execution parity natively.</p></li>
+<li><p>[x][x] 274. Create custom issue templates mapping TRT failures.</p></li>
+<li><p>[x][x] 275. Render graph connections dynamically in console UI.</p></li>
+<li><p>[x][x] 276. Ensure all generated pointers are explicitly typed using <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> annotations.</p></li>
+<li><p>[x][x] 277. Write comprehensive API documentation mapping TRT configurations.</p></li>
+<li><p>[x][x] 278. Establish automated workflows to test compilation locally.</p></li>
+<li><p>[x][x] 279. Support generating <code class="docutils literal notranslate"><span class="pre">.safetensors</span></code> explicitly during the debug phases.</p></li>
+<li><p>[x][x] 280. Validate complete <code class="docutils literal notranslate"><span class="pre">--help</span></code> documentation parity against <code class="docutils literal notranslate"><span class="pre">trtexec</span></code>.</p></li>
+<li><p>[x][x] 281. Develop specific bounds tracking for variable dimensions.</p></li>
+<li><p>[x][x] 282. Track peak VRAM usage natively across hardware explicitly.</p></li>
+<li><p>[x][x] 283. Support executing <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> unrolled directly in Python before TRT dispatch.</p></li>
+<li><p>[x][x] 284. Extract strings as <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char*</span></code> strictly.</p></li>
+<li><p>[x][x] 285. Support <code class="docutils literal notranslate"><span class="pre">--builder-optimization-level</span></code> natively (TRT 10.0+).</p></li>
+<li><p>[x][x] 286. Handle dynamic sequence generation (LLM autoregressive loop) utilizing a continuous TRT session natively.</p></li>
+<li><p>[x][x] 287. Provide memory footprint checks warning the user before initiating massive compilation.</p></li>
+<li><p>[x][x] 288. Manage explicitly unknown spatial sizes safely natively.</p></li>
+<li><p>[x][x] 289. Map explicit <code class="docutils literal notranslate"><span class="pre">Less</span></code> / <code class="docutils literal notranslate"><span class="pre">Greater</span></code> ops inside TRT flawlessly.</p></li>
+<li><p>[x][x] 290. Extract specific INT8 quantized execution topologies successfully.</p></li>
+<li><p>[x][x] 291. Validate exact mathematical equivalence of <code class="docutils literal notranslate"><span class="pre">Exp</span></code> / <code class="docutils literal notranslate"><span class="pre">Log</span></code> natively.</p></li>
+<li><p>[x][x] 292. Enable Python <code class="docutils literal notranslate"><span class="pre">__call__</span></code> explicit binding.</p></li>
+<li><p>[x][x] 293. Map Python <code class="docutils literal notranslate"><span class="pre">__del__</span></code> safely across the GC boundary.</p></li>
+<li><p>[x][x] 294. Create standard Github Actions for TRT integration checks securely.</p></li>
+<li><p>[x][x] 295. Configure explicit fallback logic for missing CUDA dependencies cleanly natively.</p></li>
+<li><p>[x][x] 296. Catch memory allocation errors (OOM) explicitly during the context initialization natively.</p></li>
+<li><p>[x][x] 297. Support overriding standard configurations explicitly natively.</p></li>
+<li><p>[x][x] 298. Validate precise execution under explicit memory bounds checking on massive GPU architectures natively.</p></li>
+<li><p>[x][x] 299. Write comprehensive API documentation matching TRT execution targets natively.</p></li>
+<li><p>[x][x] 300. Release v1.0 feature complete certification for <code class="docutils literal notranslate"><span class="pre">onnx9000.tensorrt</span></code> allowing zero-build TRT parsing natively.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../transformers/src.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">transformers/src</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX09_ORT_NATIVE.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-core-ffi-architecture-libnvinfer-loading">Phase 1: Core FFI Architecture &amp; LibNVInfer Loading</a></li>
+<li><a class="reference internal" href="#phase-2-tensorrt-builder-network-definition">Phase 2: TensorRT Builder &amp; Network Definition</a></li>
+<li><a class="reference internal" href="#phase-3-constant-weight-translation">Phase 3: Constant &amp; Weight Translation</a></li>
+<li><a class="reference internal" href="#phase-4-core-math-matrix-operations-ielementwiselayer">Phase 4: Core Math &amp; Matrix Operations (<code class="docutils literal notranslate"><span class="pre">IElementWiseLayer</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-5-convolution-pooling-layers">Phase 5: Convolution &amp; Pooling Layers</a></li>
+<li><a class="reference internal" href="#phase-6-activation-normalization-unary-ops">Phase 6: Activation, Normalization, &amp; Unary Ops</a></li>
+<li><a class="reference internal" href="#phase-7-dimension-manipulation-routing">Phase 7: Dimension Manipulation &amp; Routing</a></li>
+<li><a class="reference internal" href="#phase-8-reduction-logical-operators">Phase 8: Reduction &amp; Logical Operators</a></li>
+<li><a class="reference internal" href="#phase-9-advanced-control-flow-subgraphs">Phase 9: Advanced Control Flow &amp; Subgraphs</a></li>
+<li><a class="reference internal" href="#phase-10-dynamic-shapes-optimization-profiles">Phase 10: Dynamic Shapes &amp; Optimization Profiles</a></li>
+<li><a class="reference internal" href="#phase-11-quantization-precision-control">Phase 11: Quantization &amp; Precision Control</a></li>
+<li><a class="reference internal" href="#phase-12-custom-plugins-extensibility-ipluginv2">Phase 12: Custom Plugins &amp; Extensibility (<code class="docutils literal notranslate"><span class="pre">IPluginV2</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-13-engine-serialization-caching">Phase 13: Engine Serialization &amp; Caching</a></li>
+<li><a class="reference internal" href="#phase-14-engine-execution-context-runtime">Phase 14: Engine Execution Context &amp; Runtime</a></li>
+<li><a class="reference internal" href="#phase-15-zero-copy-dlpack-integration-pytorch-cupy-bridge">Phase 15: Zero-Copy DLPack Integration (PyTorch / CuPy Bridge)</a></li>
+<li><a class="reference internal" href="#phase-16-integration-with-onnx9000-core-ecosystem">Phase 16: Integration with <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Core Ecosystem</a></li>
+<li><a class="reference internal" href="#phase-17-python-api-cli-tooling-onnx9000-trt">Phase 17: Python API &amp; CLI Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">trt</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-18-node-js-serverless-api-integration">Phase 18: Node.js / Serverless API Integration</a></li>
+<li><a class="reference internal" href="#phase-19-edge-cases-specific-architecture-optimizations">Phase 19: Edge Cases &amp; Specific Architecture Optimizations</a></li>
+<li><a class="reference internal" href="#phase-20-performance-parity-validation-checks">Phase 20: Performance Parity &amp; Validation Checks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

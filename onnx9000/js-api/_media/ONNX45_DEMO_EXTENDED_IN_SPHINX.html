@@ -1,0 +1,886 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX Standard Compliance &amp; Testing Tracker" href="ONNX01_COMPLIANCE.html"><link rel="prev" title="skl2onnx Replication &amp; Parity Tracker" href="ONNX12_SKL2ONNX.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX45_DEMO_EXTENDED_IN_SPHINX.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx45-extended-demo-in-sphinx-multi-step-pipelines">
+<h1>ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)<a class="headerlink" href="#onnx45-extended-demo-in-sphinx-multi-step-pipelines" title="Link to this heading">¶</a></h1>
+<section id="problem-description">
+<h2>Problem Description<a class="headerlink" href="#problem-description" title="Link to this heading">¶</a></h2>
+<p>Following the successful implementation of the 1-Step Source-to-Target pipeline (Phase 1-11), we need to expose the deep capabilities of the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> ecosystem. This includes optimization, quantization, MLIR lowering, C/C++ transpilation, and live in-browser execution using WASM and WebNN.</p>
+<p>To avoid cluttering the UI, we are introducing a <strong>Progressive Pipeline UI</strong>. Users can “Promote to Source” (shifting the RHS target back to the LHS source) to chain conversions indefinitely. Additionally, a new “Run Inference” execution layer will provide interactive testing and profiling of the generated artifacts directly in the browser.</p>
+<p><strong>Key Requirements:</strong></p>
+<ul class="simple">
+<li><p><strong>Zero Framework Dependency:</strong> Strictly Vanilla JS.</p></li>
+<li><p><strong>100% Quality Gates:</strong> 100% JSDoc, 100% Unit Test Coverage, Comprehensive Playwright E2E.</p></li>
+<li><p><strong>Non-Blocking Architecture:</strong> All heavy compilation and execution tasks MUST run in Web Workers.</p></li>
+</ul>
+</section>
+<section id="implementation-steps">
+<h2>Implementation Steps<a class="headerlink" href="#implementation-steps" title="Link to this heading">¶</a></h2>
+<section id="phase-12-core-pipeline-architecture-state-management">
+<h3>Phase 12: Core Pipeline Architecture &amp; State Management<a class="headerlink" href="#phase-12-core-pipeline-architecture-state-management" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Define <code class="docutils literal notranslate"><span class="pre">PipelineNode</span></code> vanilla JS class for chaining transformations.</p></li>
+<li><p>[x] Extend global state store to support a <code class="docutils literal notranslate"><span class="pre">PipelineHistory</span></code> array.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">undo()</span></code> method in state store to revert pipeline steps.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">redo()</span></code> method in state store.</p></li>
+<li><p>[x] Write unit tests verifying <code class="docutils literal notranslate"><span class="pre">PipelineHistory</span></code> immutability.</p></li>
+<li><p>[x] Write unit tests verifying <code class="docutils literal notranslate"><span class="pre">undo()</span></code> correctly restores previous Source/Target states.</p></li>
+<li><p>[x] Write unit tests verifying <code class="docutils literal notranslate"><span class="pre">redo()</span></code> functionality.</p></li>
+<li><p>[x] Define <code class="docutils literal notranslate"><span class="pre">PipelineValidator</span></code> utility to check compatibility between target outputs and new source inputs.</p></li>
+<li><p>[x] Add compatibility matrix: <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code>, <code class="docutils literal notranslate"><span class="pre">Olive</span></code>, <code class="docutils literal notranslate"><span class="pre">onnx-mlir</span></code>, <code class="docutils literal notranslate"><span class="pre">onnx2c</span></code>, <code class="docutils literal notranslate"><span class="pre">ORT</span> <span class="pre">Web</span></code>.</p></li>
+<li><p>[x] Add compatibility matrix: <code class="docutils literal notranslate"><span class="pre">MLIR</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">IREE</span> <span class="pre">Compiler</span></code>.</p></li>
+<li><p>[x] Add compatibility matrix: <code class="docutils literal notranslate"><span class="pre">C/C++</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Emscripten</span></code>.</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">PipelineValidator</span></code> covering all valid matrices.</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">PipelineValidator</span></code> covering invalid transitions.</p></li>
+<li><p>[x] Update <code class="docutils literal notranslate"><span class="pre">EventBus</span></code> to handle <code class="docutils literal notranslate"><span class="pre">PIPELINE_STEP_ADDED</span></code> and <code class="docutils literal notranslate"><span class="pre">PIPELINE_STEP_REMOVED</span></code> events.</p></li>
+<li><p>[x] Add 100% JSDoc to <code class="docutils literal notranslate"><span class="pre">PipelineNode</span></code>, <code class="docutils literal notranslate"><span class="pre">PipelineHistory</span></code>, and <code class="docutils literal notranslate"><span class="pre">PipelineValidator</span></code>.</p></li>
+<li><p>[x] Create UI component for “Pipeline Breadcrumbs” (e.g., PyTorch &gt; ONNX &gt; MLIR &gt; VMFB).</p></li>
+<li><p>[x] Mount breadcrumbs component in the top header of the UI.</p></li>
+<li><p>[x] Bind breadcrumbs to <code class="docutils literal notranslate"><span class="pre">PipelineHistory</span></code> state changes.</p></li>
+<li><p>[x] Implement click-to-revert logic on breadcrumb items.</p></li>
+<li><p>[x] Write DOM tests verifying breadcrumb rendering based on state.</p></li>
+<li><p>[x] Write DOM tests verifying click-to-revert dispatches correct state changes.</p></li>
+<li><p>[x] Add CSS for breadcrumb active, hover, and disabled states.</p></li>
+<li><p>[x] Add Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">pipeline-breadcrumbs.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify completing a conversion adds a breadcrumb.</p></li>
+<li><p>[x] E2E: Verify clicking a previous breadcrumb restores the LHS/RHS UI state.</p></li>
+<li><p>[x] Ensure 100% coverage on new architecture core logic.</p></li>
+<li><p>[x] Document the extended state machine in <code class="docutils literal notranslate"><span class="pre">ARCHITECTURE.md</span></code>.</p></li>
+<li><p>[x] Set up telemetry mock to track pipeline depth (for internal analytics).</p></li>
+<li><p>[x] Write unit tests for the telemetry mock.</p></li>
+<li><p>[x] Review Phase 12 against Vanilla JS constraints.</p></li>
+</ul>
+</section>
+<section id="phase-13-promote-to-source-shift-left-mechanics">
+<h3>Phase 13: “Promote to Source” (Shift Left) Mechanics<a class="headerlink" href="#phase-13-promote-to-source-shift-left-mechanics" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> vanilla JS component with <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">&lt;</span> <span class="pre">Promote</span> <span class="pre">to</span> <span class="pre">Source</span> <span class="pre">]</span></code> label.</p></li>
+<li><p>[x] Mount <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> in the RHS Target header.</p></li>
+<li><p>[x] Implement CSS for <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> (primary action style, disabled state).</p></li>
+<li><p>[x] Add logic to disable <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> if RHS is empty or currently processing.</p></li>
+<li><p>[x] Bind <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> click to dispatch <code class="docutils literal notranslate"><span class="pre">PROMOTE_TARGET_TO_SOURCE</span></code> event.</p></li>
+<li><p>[x] Implement state handler for <code class="docutils literal notranslate"><span class="pre">PROMOTE_TARGET_TO_SOURCE</span></code>.</p></li>
+<li><p>[x] Logic: Map RHS active file content to LHS Editor state.</p></li>
+<li><p>[x] Logic: Update LHS Dropdown to reflect the new source type (e.g., <code class="docutils literal notranslate"><span class="pre">.onnx</span></code>).</p></li>
+<li><p>[x] Logic: Clear RHS Target state and Editor content.</p></li>
+<li><p>[x] Logic: Push current state to <code class="docutils literal notranslate"><span class="pre">PipelineHistory</span></code>.</p></li>
+<li><p>[x] Add CSS transition for “shift left” visual effect on Monaco Editors.</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">PROMOTE_TARGET_TO_SOURCE</span></code> state transitions.</p></li>
+<li><p>[x] Write unit tests verifying RHS clears on promotion.</p></li>
+<li><p>[x] Write DOM tests verifying <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> disables correctly during WASM processing.</p></li>
+<li><p>[x] Write DOM tests verifying <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> enables upon successful conversion.</p></li>
+<li><p>[x] Add toast notification system for successful promotion (“Artifact promoted to Source”).</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">ToastNotification</span></code> vanilla JS component.</p></li>
+<li><p>[x] Implement toast timeout and CSS fade-out logic.</p></li>
+<li><p>[x] Write DOM tests for <code class="docutils literal notranslate"><span class="pre">ToastNotification</span></code> component.</p></li>
+<li><p>[x] Add 100% JSDoc to <code class="docutils literal notranslate"><span class="pre">PromoteButton</span></code> and <code class="docutils literal notranslate"><span class="pre">ToastNotification</span></code>.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">promote-to-source.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify clicking “Promote to Source” moves content from RHS to LHS.</p></li>
+<li><p>[x] E2E: Verify LHS framework dropdown updates automatically based on promoted file type.</p></li>
+<li><p>[x] E2E: Verify RHS is cleared after promotion.</p></li>
+<li><p>[x] E2E: Verify toast notification appears on promotion.</p></li>
+<li><p>[x] E2E: Verify “Promote to Source” is disabled when RHS is empty.</p></li>
+<li><p>[x] Add keyboard shortcut (e.g., <code class="docutils literal notranslate"><span class="pre">Ctrl+Shift+Left</span></code>) to trigger promotion.</p></li>
+<li><p>[x] Write unit tests for the keyboard shortcut listener.</p></li>
+<li><p>[x] Ensure 100% line/branch coverage for Phase 13 components.</p></li>
+<li><p>[x] Document promotion workflow in user-facing Sphinx guides.</p></li>
+</ul>
+</section>
+<section id="phase-14-web-worker-wasm-execution-orchestration">
+<h3>Phase 14: Web Worker &amp; WASM Execution Orchestration<a class="headerlink" href="#phase-14-web-worker-wasm-execution-orchestration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Define <code class="docutils literal notranslate"><span class="pre">WorkerManager</span></code> singleton for managing Web Worker pools.</p></li>
+<li><p>[x] Implement worker initialization logic from bundled WASM wrappers.</p></li>
+<li><p>[x] Define standardized <code class="docutils literal notranslate"><span class="pre">WorkerMessage</span></code> protocol (ID, Type, Payload, Error).</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">postMessage</span></code> wrapper with Promise-based responses.</p></li>
+<li><p>[x] Add timeout logic to worker requests to prevent deadlocks.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">terminate()</span></code> method to forcefully stop a runaway worker.</p></li>
+<li><p>[x] Add UI cancel button to interrupt long-running conversions.</p></li>
+<li><p>[x] Bind cancel button to <code class="docutils literal notranslate"><span class="pre">WorkerManager.terminate()</span></code>.</p></li>
+<li><p>[x] Handle worker <code class="docutils literal notranslate"><span class="pre">onerror</span></code> and <code class="docutils literal notranslate"><span class="pre">onmessageerror</span></code> events.</p></li>
+<li><p>[x] Map worker errors to user-friendly Console tab output.</p></li>
+<li><p>[x] Set up <code class="docutils literal notranslate"><span class="pre">SharedArrayBuffer</span></code> support where available for zero-copy memory transfers.</p></li>
+<li><p>[x] Add feature detection fallback to standard <code class="docutils literal notranslate"><span class="pre">postMessage</span></code> copy if SAB is restricted (COOP/COEP).</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">WorkerManager</span></code> instantiating and pooling workers.</p></li>
+<li><p>[x] Write unit tests mocking <code class="docutils literal notranslate"><span class="pre">Worker</span></code> to test Promise resolution/rejection.</p></li>
+<li><p>[x] Write unit tests verifying timeout logic throws correctly.</p></li>
+<li><p>[x] Write unit tests for worker termination and pool recycling.</p></li>
+<li><p>[x] Write unit tests for feature detection fallback logic.</p></li>
+<li><p>[x] Add 100% JSDoc to all Worker management utilities.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">WasmExecutionStream</span></code> to pipe stdout/stderr from worker to Console UI via chunks.</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">WasmExecutionStream</span></code> chunk buffering.</p></li>
+<li><p>[x] Add Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">web-worker-execution.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify long-running WASM task can be cancelled via UI.</p></li>
+<li><p>[x] E2E: Verify cancelled task resets UI state gracefully.</p></li>
+<li><p>[x] E2E: Verify stdout streams to console in real-time without freezing main thread.</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">WorkerManager</span></code> cleans up resources on <code class="docutils literal notranslate"><span class="pre">window.beforeunload</span></code>.</p></li>
+<li><p>[x] Profile memory leaks in worker instantiation using DevTools.</p></li>
+<li><p>[x] Add memory limit safeguards to reject excessively large inputs.</p></li>
+<li><p>[x] Write unit tests for memory limit rejection logic.</p></li>
+<li><p>[x] Ensure 100% test coverage for Phase 14 modules.</p></li>
+<li><p>[x] Document worker architecture in <code class="docutils literal notranslate"><span class="pre">ONNX_WEBGPU_SUPPORT.md</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-15-pipeline-a-optimization-quantization-olive">
+<h3>Phase 15: Pipeline A - Optimization &amp; Quantization (Olive)<a class="headerlink" href="#phase-15-pipeline-a-optimization-quantization-olive" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">Olive</span></code> / <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> to Target Dropdown options (requires <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> source).</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">OliveOptimizer</span></code> worker wrapper.</p></li>
+<li><p>[x] Define state logic for selecting “Optimize (Olive)”.</p></li>
+<li><p>[x] Expose Olive configuration UI (sliders for quantization level, toggle for INT8/FP16).</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">OliveConfigPanel</span></code> vanilla JS component.</p></li>
+<li><p>[x] Mount <code class="docutils literal notranslate"><span class="pre">OliveConfigPanel</span></code> in RHS when Olive is selected.</p></li>
+<li><p>[x] Write DOM tests for <code class="docutils literal notranslate"><span class="pre">OliveConfigPanel</span></code> inputs and state binding.</p></li>
+<li><p>[x] Integrate WASM build of <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code>.</p></li>
+<li><p>[x] Execute <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> step in Web Worker.</p></li>
+<li><p>[x] Handle success/failure of simplification step.</p></li>
+<li><p>[x] Integrate WASM build of <code class="docutils literal notranslate"><span class="pre">Olive</span></code> (mocked or actual, depending on engine limits).</p></li>
+<li><p>[x] Implement dynamic graph diffing in <code class="docutils literal notranslate"><span class="pre">OnnxVisualizer</span></code>.</p></li>
+<li><p>[x] Highlight removed/fused nodes in red/green within the Visualizer tab.</p></li>
+<li><p>[x] Extract model size (bytes) before and after optimization.</p></li>
+<li><p>[x] Display compression ratio metric in the UI.</p></li>
+<li><p>[x] Write unit tests verifying size metric calculations.</p></li>
+<li><p>[x] Write unit tests for Olive config state serialization.</p></li>
+<li><p>[x] Write unit tests for optimization worker payload formatting.</p></li>
+<li><p>[x] Add 100% JSDoc to Pipeline A specific components.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">pipeline-a-optimization.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify selecting Olive shows config panel.</p></li>
+<li><p>[x] E2E: Verify running optimization produces a smaller <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> target.</p></li>
+<li><p>[x] E2E: Verify visualizer shows side-by-side or highlighted graph differences.</p></li>
+<li><p>[x] E2E: Verify promoting optimized ONNX sets it as new LHS source.</p></li>
+<li><p>[x] Implement static shape inference toggle in Olive config.</p></li>
+<li><p>[x] Implement transformer-specific optimizations (fusion) toggle.</p></li>
+<li><p>[x] Write unit tests for static shape inference payload flag.</p></li>
+<li><p>[x] Ensure 100% coverage on Optimization logic.</p></li>
+<li><p>[x] Add optimization tutorial to Sphinx docs.</p></li>
+<li><p>[x] Verify Olive UI layout remains responsive on mobile.</p></li>
+</ul>
+</section>
+<section id="phase-16-pipeline-a-execution-profiling-ort-web-webnn">
+<h3>Phase 16: Pipeline A - Execution &amp; Profiling (ORT Web/WebNN)<a class="headerlink" href="#phase-16-pipeline-a-execution-profiling-ort-web-webnn" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">RunInferenceButton</span></code> in RHS Target header (visible only for runnable artifacts).</p></li>
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">Execution</span> <span class="pre">Profiler</span></code> tab to Bottom Pane.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ORTWebRunner</span></code> wrapper class.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">WebNNPolyfillRunner</span></code> wrapper class.</p></li>
+<li><p>[x] Create UI dropdown to select Execution Provider (WASM, WebGL, WebGPU, WebNN).</p></li>
+<li><p>[x] Write unit tests for EP selection and fallback logic.</p></li>
+<li><p>[x] Handle WebGPU/WebNN feature detection and disable unsupported dropdown options.</p></li>
+<li><p>[x] Integrate ORT Web session instantiation in a Web Worker.</p></li>
+<li><p>[x] Implement execution timer using <code class="docutils literal notranslate"><span class="pre">performance.now()</span></code>.</p></li>
+<li><p>[x] Calculate Time To First Token (TTFT) for text-generation models.</p></li>
+<li><p>[x] Calculate Tokens Per Second (TPS) metrics.</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">MetricsDashboard</span></code> component to display TPS, TTFT, and total latency.</p></li>
+<li><p>[x] Mount <code class="docutils literal notranslate"><span class="pre">MetricsDashboard</span></code> in the Execution Profiler tab.</p></li>
+<li><p>[x] Plot latency variance using a lightweight vanilla JS canvas chart.</p></li>
+<li><p>[x] Track memory utilization during inference using Web Performance API (if available).</p></li>
+<li><p>[x] Write unit tests for TTFT and TPS calculation math.</p></li>
+<li><p>[x] Write DOM tests for <code class="docutils literal notranslate"><span class="pre">MetricsDashboard</span></code> rendering.</p></li>
+<li><p>[x] Write unit tests for canvas charting boundaries and data normalization.</p></li>
+<li><p>[x] Handle asynchronous inference loops for streaming outputs.</p></li>
+<li><p>[x] Dispatch <code class="docutils literal notranslate"><span class="pre">INFERENCE_CHUNK_RECEIVED</span></code> events to update UI progressively.</p></li>
+<li><p>[x] Write unit tests for inference event streaming.</p></li>
+<li><p>[x] Add 100% JSDoc to Execution Pipeline components.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">pipeline-a-execution.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify “Run Inference” button is visible for <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> files.</p></li>
+<li><p>[x] E2E: Verify executing runs without crashing and updates Console.</p></li>
+<li><p>[x] E2E: Verify Execution Profiler tab populates with latency data.</p></li>
+<li><p>[x] E2E: Verify streaming output updates UI continuously.</p></li>
+<li><p>[x] Ensure strict cleanup of ORT sessions (<code class="docutils literal notranslate"><span class="pre">session.release()</span></code>) to prevent memory leaks.</p></li>
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">finally</span></code> blocks in worker to guarantee memory cleanup on error.</p></li>
+<li><p>[x] Run coverage report and hit 100% on execution wrappers.</p></li>
+</ul>
+</section>
+<section id="phase-17-pipeline-b-mlir-iree-compiler-flow">
+<h3>Phase 17: Pipeline B - MLIR &amp; IREE Compiler Flow<a class="headerlink" href="#phase-17-pipeline-b-mlir-iree-compiler-flow" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">MLIR</span></code> to Target Dropdown options.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">OnnxMlirCompiler</span></code> worker wrapper.</p></li>
+<li><p>[x] Add UI dropdown for MLIR emission type (ONNX Dialect, Linalg, LLVM IR).</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">MlirAstViewer</span></code> tab in Bottom Pane.</p></li>
+<li><p>[x] Implement basic syntax highlighting for MLIR format in Monaco.</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> to MLIR (ONNX Dialect) via Web Worker.</p></li>
+<li><p>[x] Map stdout errors from <code class="docutils literal notranslate"><span class="pre">onnx-mlir</span></code> to the code editor (gutter error markers).</p></li>
+<li><p>[x] Write unit tests for mapping CLI error lines to editor line numbers.</p></li>
+<li><p>[x] Write DOM tests verifying <code class="docutils literal notranslate"><span class="pre">MlirAstViewer</span></code> tab displays generated MLIR.</p></li>
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">IREE</span> <span class="pre">Compiler</span></code> to Target Dropdown options (requires <code class="docutils literal notranslate"><span class="pre">MLIR</span></code> source).</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">IreeCompiler</span></code> worker wrapper.</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">IreeConfigPanel</span></code> component.</p></li>
+<li><p>[x] Add targeting options (WASM-CPU, WebGPU, Vulkan) to <code class="docutils literal notranslate"><span class="pre">IreeConfigPanel</span></code>.</p></li>
+<li><p>[x] Execute <code class="docutils literal notranslate"><span class="pre">iree-compile</span></code> passing MLIR to generate <code class="docutils literal notranslate"><span class="pre">.vmfb</span></code> (Virtual Machine FlatBuffer).</p></li>
+<li><p>[x] Display a binary hex viewer or read-only info screen for the <code class="docutils literal notranslate"><span class="pre">.vmfb</span></code> output in RHS Editor.</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">IreeConfigPanel</span></code> state management.</p></li>
+<li><p>[x] Write unit tests for VMFB binary parser/fallback UI.</p></li>
+<li><p>[x] Add 100% JSDoc to MLIR/IREE compiler wrappers.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">pipeline-b-mlir.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> can be converted to MLIR.</p></li>
+<li><p>[x] E2E: Verify MLIR syntax highlighting applies in Monaco.</p></li>
+<li><p>[x] E2E: Verify promoting MLIR and targeting IREE generates a <code class="docutils literal notranslate"><span class="pre">.vmfb</span></code> artifact.</p></li>
+<li><p>[x] E2E: Verify compiler warnings appear in Console tab.</p></li>
+<li><p>[x] Add caching for intermediate MLIR dialects to speed up UI switching.</p></li>
+<li><p>[x] Write unit tests for MLIR compiler cache hit/miss logic.</p></li>
+<li><p>[x] Ensure 100% coverage on Phase 17 components.</p></li>
+<li><p>[x] Document the MLIR lowering tutorial in <code class="docutils literal notranslate"><span class="pre">TUTORIAL_MLIR_LOWERING.md</span></code>.</p></li>
+<li><p>[x] Add missing Pytest checks for the backend tools supplying these WASM binaries.</p></li>
+</ul>
+</section>
+<section id="phase-18-pipeline-b-iree-wasm-vm-execution">
+<h3>Phase 18: Pipeline B - IREE WASM VM Execution<a class="headerlink" href="#phase-18-pipeline-b-iree-wasm-vm-execution" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Add “Run Inference” action for <code class="docutils literal notranslate"><span class="pre">.vmfb</span></code> artifacts.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">IreeVmRunner</span></code> worker wrapper.</p></li>
+<li><p>[x] Load IREE WASM VM runtime engine.</p></li>
+<li><p>[x] Define memory mapping logic for passing inputs to IREE VM.</p></li>
+<li><p>[x] Handle execution state: Initialize, Load Module, Invoke Function.</p></li>
+<li><p>[x] Provide UI dropdown to select the target exported function (e.g., <code class="docutils literal notranslate"><span class="pre">main</span></code>, <code class="docutils literal notranslate"><span class="pre">predict</span></code>).</p></li>
+<li><p>[x] Read exported function signatures from <code class="docutils literal notranslate"><span class="pre">.vmfb</span></code> header.</p></li>
+<li><p>[x] Write unit tests for VMFB header signature parsing.</p></li>
+<li><p>[x] Map execution results back from IREE memory space to JS typed arrays.</p></li>
+<li><p>[x] Format output tensors into human-readable tables in the UI.</p></li>
+<li><p>[x] Compare IREE output with ORT output (if both exist in history) to verify numerical accuracy.</p></li>
+<li><p>[x] Display numerical diff (e.g., max absolute error) in the Profiler Tab.</p></li>
+<li><p>[x] Write unit tests for numerical comparison utility.</p></li>
+<li><p>[x] Write DOM tests for table formatting of output arrays.</p></li>
+<li><p>[x] Write unit tests handling VM traps/crashes gracefully.</p></li>
+<li><p>[x] Add 100% JSDoc to IREE VM execution logic.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">pipeline-b-iree-execution.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify executing VMFB runs in IREE VM and outputs a tensor.</p></li>
+<li><p>[x] E2E: Verify output tensor is formatted as a table.</p></li>
+<li><p>[x] E2E: Verify numerical diff compares against baseline ONNX execution.</p></li>
+<li><p>[x] Setup memory profiling specific to IREE VM heap usage.</p></li>
+<li><p>[x] Plot IREE heap usage on the <code class="docutils literal notranslate"><span class="pre">MetricsDashboard</span></code>.</p></li>
+<li><p>[x] Ensure VM engine instances are correctly disposed after execution.</p></li>
+<li><p>[x] Add strict memory leak tests using mocked <code class="docutils literal notranslate"><span class="pre">FinalizationRegistry</span></code>.</p></li>
+<li><p>[x] Reach 100% coverage on <code class="docutils literal notranslate"><span class="pre">IreeVmRunner</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-19-pipeline-c-edge-c-c-compilation-onnx2c">
+<h3>Phase 19: Pipeline C - Edge C/C++ Compilation (ONNX2C)<a class="headerlink" href="#phase-19-pipeline-c-edge-c-c-compilation-onnx2c" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">C/C++</span> <span class="pre">(onnx2c)</span></code> to Target Dropdown options.</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Onnx2CCompiler</span></code> worker wrapper.</p></li>
+<li><p>[x] Generate pure C code representation of the <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> graph.</p></li>
+<li><p>[x] Provide syntax highlighting for C/C++ in the RHS Monaco editor.</p></li>
+<li><p>[x] Write unit tests for <code class="docutils literal notranslate"><span class="pre">Onnx2CCompiler</span></code> argument mapping.</p></li>
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">Emscripten/WASM</span></code> to Target Dropdown (requires <code class="docutils literal notranslate"><span class="pre">C/C++</span></code> source).</p></li>
+<li><p>[x] Implement in-browser Emscripten mock (or minimal clang WASM) to compile the C code.</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">MemMockDashboard</span></code> tab to analyze static memory allocation in the generated C code.</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">malloc</span></code> and static array declarations from the C output.</p></li>
+<li><p>[x] Calculate total theoretical footprint (KB/MB) and display it.</p></li>
+<li><p>[x] Write unit tests for C AST parsing and memory footprint math.</p></li>
+<li><p>[x] Add 100% JSDoc to Pipeline C tools.</p></li>
+<li><p>[x] Execute compiled standalone WASM directly (Zero-dependency execution).</p></li>
+<li><p>[x] Compare execution latency between native ORT Web and standalone ONNX2C WASM.</p></li>
+<li><p>[x] Display latency comparison in Profiler Tab.</p></li>
+<li><p>[x] Write unit tests verifying latency comparison payload logic.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">pipeline-c-onnx2c.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> converts to C code.</p></li>
+<li><p>[x] E2E: Verify C code displays with correct highlighting.</p></li>
+<li><p>[x] E2E: Verify memory footprint calculation displays correctly.</p></li>
+<li><p>[x] E2E: Verify compiling to Emscripten WASM and executing works.</p></li>
+<li><p>[x] Add “Download C Source” button to the UI.</p></li>
+<li><p>[x] Write DOM tests for Download button blob generation.</p></li>
+<li><p>[x] Ensure 100% test coverage for Phase 19.</p></li>
+<li><p>[x] Document ONNX2C usage in <code class="docutils literal notranslate"><span class="pre">ONNX33_ONNX2C.md</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-20-execution-ui-tensor-input-modals">
+<h3>Phase 20: Execution UI &amp; Tensor Input Modals<a class="headerlink" href="#phase-20-execution-ui-tensor-input-modals" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">TensorInputModal</span></code> vanilla JS component.</p></li>
+<li><p>[x] Detect required input shapes from the active model artifact.</p></li>
+<li><p>[x] Render dynamic form fields based on input shapes (e.g., <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">3,</span> <span class="pre">224,</span> <span class="pre">224]</span></code>).</p></li>
+<li><p>[x] Add “Generate Random Data” button to fill inputs with normalized floats.</p></li>
+<li><p>[x] Write unit tests for dynamic shape form generation.</p></li>
+<li><p>[x] Write unit tests for random data generation (normal distribution).</p></li>
+<li><p>[x] Add “Upload Image” option for <code class="docutils literal notranslate"><span class="pre">N,</span> <span class="pre">3,</span> <span class="pre">H,</span> <span class="pre">W</span></code> inputs.</p></li>
+<li><p>[x] Implement hidden <code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;file&quot;&gt;</span></code> and HTML5 Canvas to resize/crop images.</p></li>
+<li><p>[x] Extract RGB channels from Canvas and format as Float32Array.</p></li>
+<li><p>[x] Write unit tests for Image-to-Tensor array conversion math.</p></li>
+<li><p>[x] Write DOM tests for Image upload and Canvas rendering.</p></li>
+<li><p>[x] Add “Text Input” option for <code class="docutils literal notranslate"><span class="pre">INT64</span></code> sequence inputs (requires a tokenizer).</p></li>
+<li><p>[x] Integrate a lightweight JS tokenizer fallback for basic text models.</p></li>
+<li><p>[x] Write unit tests for Text-to-TokenArray logic.</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">InferenceResultModal</span></code> component.</p></li>
+<li><p>[x] Render Softmax classification outputs as a progress-bar chart.</p></li>
+<li><p>[x] Render bounding box outputs as an overlay on the uploaded image.</p></li>
+<li><p>[x] Write DOM tests for bounding box CSS absolute positioning math.</p></li>
+<li><p>[x] Add 100% JSDoc to all Modals and Input processors.</p></li>
+<li><p>[x] Create Playwright E2E spec: <code class="docutils literal notranslate"><span class="pre">execution-input-output.spec.ts</span></code>.</p></li>
+<li><p>[x] E2E: Verify opening execution modal dynamically maps input shapes.</p></li>
+<li><p>[x] E2E: Verify “Generate Random Data” populates all fields.</p></li>
+<li><p>[x] E2E: Verify uploading an image populates the image preview.</p></li>
+<li><p>[x] E2E: Verify results are rendered as a classification chart.</p></li>
+<li><p>[x] Handle extremely large tensor inputs (e.g., audio files) gracefully via chunking.</p></li>
+<li><p>[x] Ensure strict cleanup of Image/Canvas data to prevent memory bloat.</p></li>
+<li><p>[x] Validate 100% test coverage for Phase 20 input/output handling.</p></li>
+</ul>
+</section>
+<section id="phase-21-e2e-testing-audits-integration">
+<h3>Phase 21: E2E Testing, Audits, &amp; Integration<a class="headerlink" href="#phase-21-e2e-testing-audits-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Run complete end-to-end <code class="docutils literal notranslate"><span class="pre">npm</span> <span class="pre">run</span> <span class="pre">test</span></code> validating 100% coverage on all new files.</p></li>
+<li><p>[x] Add missing branch coverage tests for edge cases in execution logic.</p></li>
+<li><p>[x] Add missing branch coverage tests for state history array bounds.</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">eslint.config.js</span></code> passes cleanly with NO framework violations.</p></li>
+<li><p>[x] Execute <code class="docutils literal notranslate"><span class="pre">typedoc</span></code> and verify no missing JSDoc warnings.</p></li>
+<li><p>[x] Verify accessibility of multi-step pipeline (tab index, ARIA roles on new buttons).</p></li>
+<li><p>[x] Run Lighthouse audit, verify 90+ score for Performance and Accessibility.</p></li>
+<li><p>[x] Test entire UI flow on mobile Chrome (Android) verifying modals fit screens.</p></li>
+<li><p>[x] Test entire UI flow on mobile Safari (iOS) verifying WASM execution works.</p></li>
+<li><p>[x] Audit application bundle size (JS and CSS). Implement lazy-loading for heavy charting libs if needed.</p></li>
+<li><p>[x] Integrate extended Sphinx documentation confirming directives compile correctly.</p></li>
+<li><p>[x] Verify dark mode switches correctly invert colors for MLIR viewer and Tensor modals.</p></li>
+<li><p>[x] Check cross-browser functionality of Web Workers (Firefox, Safari, Edge, Chrome).</p></li>
+<li><p>[x] Run full Playwright test suite against the built Sphinx production output.</p></li>
+<li><p>[x] Identify and fix any flaky E2E tests utilizing <code class="docutils literal notranslate"><span class="pre">waitForFunction</span></code>.</p></li>
+<li><p>[x] Update <code class="docutils literal notranslate"><span class="pre">ROADMAP.md</span></code> indicating Phase 2 implementation complete.</p></li>
+<li><p>[x] Update <code class="docutils literal notranslate"><span class="pre">README.md</span></code> to highlight interactive multi-pipeline capabilities.</p></li>
+<li><p>[x] Perform security audit on uploaded file blobs and Web Worker message passing (prevent XSS/RCE).</p></li>
+<li><p>[x] Create comprehensive recorded demo GIF of Pipeline A, B, and C.</p></li>
+<li><p>[x] Add recorded GIFs to the project repository docs.</p></li>
+<li><p>[x] Merge PR and publish v2 release announcement.</p></li>
+<li><p>[x] Monitor crash logs or user feedback on extended capabilities.</p></li>
+<li><p>[x] Plan Phase 3 optimizations (WebGPU backend integrations).</p></li>
+<li><p>[x] Final team sign-off.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX01_COMPLIANCE.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX Standard Compliance &amp; Testing Tracker</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX12_SKL2ONNX.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">skl2onnx Replication &amp; Parity Tracker</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a><ul>
+<li><a class="reference internal" href="#problem-description">Problem Description</a></li>
+<li><a class="reference internal" href="#implementation-steps">Implementation Steps</a><ul>
+<li><a class="reference internal" href="#phase-12-core-pipeline-architecture-state-management">Phase 12: Core Pipeline Architecture &amp; State Management</a></li>
+<li><a class="reference internal" href="#phase-13-promote-to-source-shift-left-mechanics">Phase 13: “Promote to Source” (Shift Left) Mechanics</a></li>
+<li><a class="reference internal" href="#phase-14-web-worker-wasm-execution-orchestration">Phase 14: Web Worker &amp; WASM Execution Orchestration</a></li>
+<li><a class="reference internal" href="#phase-15-pipeline-a-optimization-quantization-olive">Phase 15: Pipeline A - Optimization &amp; Quantization (Olive)</a></li>
+<li><a class="reference internal" href="#phase-16-pipeline-a-execution-profiling-ort-web-webnn">Phase 16: Pipeline A - Execution &amp; Profiling (ORT Web/WebNN)</a></li>
+<li><a class="reference internal" href="#phase-17-pipeline-b-mlir-iree-compiler-flow">Phase 17: Pipeline B - MLIR &amp; IREE Compiler Flow</a></li>
+<li><a class="reference internal" href="#phase-18-pipeline-b-iree-wasm-vm-execution">Phase 18: Pipeline B - IREE WASM VM Execution</a></li>
+<li><a class="reference internal" href="#phase-19-pipeline-c-edge-c-c-compilation-onnx2c">Phase 19: Pipeline C - Edge C/C++ Compilation (ONNX2C)</a></li>
+<li><a class="reference internal" href="#phase-20-execution-ui-tensor-input-modals">Phase 20: Execution UI &amp; Tensor Input Modals</a></li>
+<li><a class="reference internal" href="#phase-21-e2e-testing-audits-integration">Phase 21: E2E Testing, Audits, &amp; Integration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

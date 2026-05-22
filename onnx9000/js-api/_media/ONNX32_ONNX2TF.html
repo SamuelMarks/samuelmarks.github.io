@@ -1,0 +1,1002 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX GraphSurgeon Replication &amp; Parity Tracker" href="ONNX14_GRAPHSURGEON.html"><link rel="prev" title="ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)" href="ONNX34_ONNX2GGUF.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX32_ONNX2TF.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx32-onnx2tf-web-native-tflite-edgetpu-exporter">
+<h1>ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)<a class="headerlink" href="#onnx32-onnx2tf-web-native-tflite-edgetpu-exporter" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx2tf</span></code> (often associated with PINTO0309’s widely used repository) is a critical community tool for converting ONNX models into TensorFlow (<code class="docutils literal notranslate"><span class="pre">SavedModel</span></code>) and TensorFlow Lite (<code class="docutils literal notranslate"><span class="pre">.tflite</span></code>) formats. It heavily relies on a massive native Python TensorFlow installation and ONNX Runtime to parse graphs, calculate shapes, and meticulously translate layout structures (since ONNX uses <code class="docutils literal notranslate"><span class="pre">NCHW</span></code> channel-first layouts and TensorFlow/TFLite strongly prefers <code class="docutils literal notranslate"><span class="pre">NHWC</span></code> channel-last layouts). This tool is essential for taking standard AI models and deploying them onto mobile devices (Android NNAPI, iOS CoreML) and hardware accelerators like the Google Coral EdgeTPU.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p>Instead of relying on Google’s multi-gigabyte C++ TensorFlow framework to compile <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> files, <code class="docutils literal notranslate"><span class="pre">onnx9000.onnx2tf</span></code> provides a <strong>100% pure TypeScript and Python FlatBuffer compiler</strong>.</p>
+<ul class="simple">
+<li><p><strong>Zero-Dependency Binary Emission:</strong> It parses the ONNX graph and writes the TFLite FlatBuffer binary directly in memory, byte-by-byte. No <code class="docutils literal notranslate"><span class="pre">tensorflow</span></code>, <code class="docutils literal notranslate"><span class="pre">tflite</span></code>, or <code class="docutils literal notranslate"><span class="pre">flatc</span></code> compiler installations are required.</p></li>
+<li><p><strong>Browser-Based EdgeTPU Compilation:</strong> Developers can drop an ONNX file into a web browser, and the library will natively transpose the graph to <code class="docutils literal notranslate"><span class="pre">NHWC</span></code> and generate a mobile-ready <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> file instantly on the client side.</p></li>
+<li><p><strong>AOT Transposition:</strong> Re-writing layouts (NCHW -&gt; NHWC) is notoriously slow in Python. <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> uses its WASM-accelerated GraphSurgeon to permanently bake transpositions directly into the weights before export, guaranteeing peak performance on mobile DSPs without inference-time transposition overhead.</p></li>
+<li><p><strong>Unified Quantization:</strong> Maps ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code>/<code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code> directly to TFLite’s asymmetric INT8 schema natively, preserving precision without requiring TF Lite’s post-training quantization calibration tools.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-tflite-flatbuffer-schema-serialization-engine">
+<h3>Phase 1: TFLite FlatBuffer Schema &amp; Serialization Engine<a class="headerlink" href="#phase-1-tflite-flatbuffer-schema-serialization-engine" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Implement zero-dependency FlatBuffer Builder in TypeScript/JS.</p></li>
+<li><p>[x] 2. Implement zero-dependency FlatBuffer Builder in Python.</p></li>
+<li><p>[x] 3. Define TFLite <code class="docutils literal notranslate"><span class="pre">Model</span></code> root table schema natively.</p></li>
+<li><p>[x] 4. Define TFLite <code class="docutils literal notranslate"><span class="pre">SubGraph</span></code> table schema natively.</p></li>
+<li><p>[x] 5. Define TFLite <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> table schema natively.</p></li>
+<li><p>[x] 6. Define TFLite <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> table schema natively.</p></li>
+<li><p>[x] 7. Define TFLite <code class="docutils literal notranslate"><span class="pre">Operator</span></code> table schema natively.</p></li>
+<li><p>[x] 8. Define TFLite <code class="docutils literal notranslate"><span class="pre">OperatorCode</span></code> table schema natively.</p></li>
+<li><p>[x] 9. Define TFLite <code class="docutils literal notranslate"><span class="pre">QuantizationParameters</span></code> table schema.</p></li>
+<li><p>[x] 10. Define TFLite <code class="docutils literal notranslate"><span class="pre">Metadata</span></code> table schema.</p></li>
+<li><p>[x] 11. Implement TFLite version 3 header emission (<code class="docutils literal notranslate"><span class="pre">TFL3</span></code> magic bytes).</p></li>
+<li><p>[x] 12. Implement strictly aligned memory writing (4-byte and 8-byte boundaries for buffers).</p></li>
+<li><p>[x] 13. Support appending large binary weights directly to the <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> array seamlessly.</p></li>
+<li><p>[x] 14. Implement string serialization for Tensor and Operator names.</p></li>
+<li><p>[x] 15. Handle Little-Endian binary encoding universally across all platforms (WASM/JS/Py).</p></li>
+<li><p>[x] 16. Deduplicate identical operators in the <code class="docutils literal notranslate"><span class="pre">OperatorCode</span></code> array.</p></li>
+<li><p>[x] 17. Deduplicate identical weight binaries in the <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> array to save disk space.</p></li>
+<li><p>[x] 18. Deduplicate empty/zero-byte buffers.</p></li>
+<li><p>[x] 19. Ensure Buffer <code class="docutils literal notranslate"><span class="pre">0</span></code> is always strictly empty as required by the TFLite spec.</p></li>
+<li><p>[x] 20. Track exact byte offsets during serialization to emit correct vtables.</p></li>
+<li><p>[x] 21. Provide lazy buffer loading mapping from <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code> to FlatBuffer byte arrays.</p></li>
+<li><p>[x] 22. Export structural JSON representation of the generated FlatBuffer for debugging.</p></li>
+<li><p>[x] 23. Implement a TFLite FlatBuffer Reader (for bidirectional validation).</p></li>
+<li><p>[x] 24. Validate generated <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> files against standard <code class="docutils literal notranslate"><span class="pre">flatc</span></code> schema verifiers natively.</p></li>
+<li><p>[x] 25. Support chunked writing for models exceeding JS <code class="docutils literal notranslate"><span class="pre">ArrayBuffer</span></code> limits (&gt;2GB).</p></li>
+<li><p>[x] 26. Extract ONNX <code class="docutils literal notranslate"><span class="pre">ModelProto</span></code> metadata (Producer, Version) to TFLite <code class="docutils literal notranslate"><span class="pre">Metadata</span></code> buffers.</p></li>
+<li><p>[x] 27. Maintain deterministic output (identical ONNX = byte-for-byte identical TFLite).</p></li>
+<li><p>[x] 28. Manage Javascript <code class="docutils literal notranslate"><span class="pre">BigInt</span></code> safely when writing 64-bit FlatBuffer offsets.</p></li>
+<li><p>[x] 29. Emulate Python <code class="docutils literal notranslate"><span class="pre">struct.pack</span></code> efficiently in Javascript for primitive types.</p></li>
+<li><p>[x] 30. Provide a validation pass ensuring no TFLite tensor exceeds standard device bounds.</p></li>
+</ul>
+</section>
+<section id="phase-2-global-layout-transposition-nchw-nhwc">
+<h3>Phase 2: Global Layout Transposition (NCHW -&gt; NHWC)<a class="headerlink" href="#phase-2-global-layout-transposition-nchw-nhwc" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 31. Implement AST Graph Pass: Identify all spatial convolutions and pooling ops.</p></li>
+<li><p>[x] 32. Inject <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> (<code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">1]</span></code>) before every 4D spatial operation.</p></li>
+<li><p>[x] 33. Inject <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> (<code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">3,</span> <span class="pre">1,</span> <span class="pre">2]</span></code>) after every 4D spatial operation.</p></li>
+<li><p>[x] 34. Implement <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> Push-Down: Move transpositions through elementwise ops (<code class="docutils literal notranslate"><span class="pre">Add</span></code>, <code class="docutils literal notranslate"><span class="pre">Mul</span></code>, <code class="docutils literal notranslate"><span class="pre">Relu</span></code>).</p></li>
+<li><p>[x] 35. Implement <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> Push-Down through <code class="docutils literal notranslate"><span class="pre">Concat</span></code> and <code class="docutils literal notranslate"><span class="pre">Split</span></code> (adjusting axes dynamically).</p></li>
+<li><p>[x] 36. Implement <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> Push-Down through <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> (symbolically recalculating reshape targets).</p></li>
+<li><p>[x] 37. Implement <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> Cancellation: Eliminate adjacent <code class="docutils literal notranslate"><span class="pre">NCHW-&gt;NHWC</span></code> and <code class="docutils literal notranslate"><span class="pre">NHWC-&gt;NCHW</span></code> pairs.</p></li>
+<li><p>[x] 38. Fold <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> operations directly into <code class="docutils literal notranslate"><span class="pre">Constant</span></code> / <code class="docutils literal notranslate"><span class="pre">Initializer</span></code> weights statically in memory.</p></li>
+<li><p>[x] 39. Support 1D layout conversion (<code class="docutils literal notranslate"><span class="pre">NCW</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">NWC</span></code>).</p></li>
+<li><p>[x] 40. Support 3D Video layout conversion (<code class="docutils literal notranslate"><span class="pre">NCDHW</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">NDHWC</span></code>).</p></li>
+<li><p>[x] 41. Handle ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> natively on NHWC layouts.</p></li>
+<li><p>[x] 42. Map Keras/TF.js specific layout formats accurately if originating from <code class="docutils literal notranslate"><span class="pre">onnx9000.keras</span></code> (native bypassing enabled via schema hints).</p></li>
+<li><p>[x] 43. Handle arbitrary <code class="docutils literal notranslate"><span class="pre">Expand</span></code> and <code class="docutils literal notranslate"><span class="pre">Tile</span></code> permutations during layout shift.</p></li>
+<li><p>[x] 44. Generate explicit warnings if an irreducible Transpose node is left in the graph (hurts EdgeTPU).</p></li>
+<li><p>[x] 45. Automatically recalculate all <code class="docutils literal notranslate"><span class="pre">ValueInfo</span></code> shapes topologically after layout mutation.</p></li>
+<li><p>[x] 46. Support <code class="docutils literal notranslate"><span class="pre">--keep-nchw</span></code> flag for specific ops that TFLite supports natively in NCHW (though rare).</p></li>
+<li><p>[x] 47. Translate ONNX <code class="docutils literal notranslate"><span class="pre">axis</span></code> parameters accurately for <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> post-layout shift.</p></li>
+<li><p>[x] 48. Translate ONNX <code class="docutils literal notranslate"><span class="pre">axis</span></code> parameters for <code class="docutils literal notranslate"><span class="pre">Gather</span></code> and <code class="docutils literal notranslate"><span class="pre">Scatter</span></code>.</p></li>
+<li><p>[x] 49. Handle <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> / <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> spatial axes translations (<code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">3]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2]</span></code>).</p></li>
+<li><p>[x] 50. Transpose Weight tensors explicitly for <code class="docutils literal notranslate"><span class="pre">Conv2D</span></code> (<code class="docutils literal notranslate"><span class="pre">[O,</span> <span class="pre">I,</span> <span class="pre">H,</span> <span class="pre">W]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[O,</span> <span class="pre">H,</span> <span class="pre">W,</span> <span class="pre">I]</span></code>).</p></li>
+<li><p>[x] 51. Transpose Weight tensors explicitly for <code class="docutils literal notranslate"><span class="pre">DepthwiseConv2D</span></code> (<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">C,</span> <span class="pre">H,</span> <span class="pre">W]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">H,</span> <span class="pre">W,</span> <span class="pre">C]</span></code>).</p></li>
+<li><p>[x] 52. Transpose Weight tensors explicitly for <code class="docutils literal notranslate"><span class="pre">Conv2DTranspose</span></code>.</p></li>
+<li><p>[x] 53. Ensure scalar biases are preserved correctly without layout corruption.</p></li>
+<li><p>[x] 54. Verify dimension indexing stability for dynamic batch sizes (<code class="docutils literal notranslate"><span class="pre">-1</span></code>) during layout shifts.</p></li>
+</ul>
+</section>
+<section id="phase-3-tflite-tensor-memory-mapping">
+<h3>Phase 3: TFLite Tensor &amp; Memory Mapping<a class="headerlink" href="#phase-3-tflite-tensor-memory-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 55. Map ONNX <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">FLOAT32</span></code>.</p></li>
+<li><p>[x] 56. Map ONNX <code class="docutils literal notranslate"><span class="pre">FLOAT16</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">FLOAT16</span></code>.</p></li>
+<li><p>[x] 57. Map ONNX <code class="docutils literal notranslate"><span class="pre">INT32</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">INT32</span></code>.</p></li>
+<li><p>[x] 58. Map ONNX <code class="docutils literal notranslate"><span class="pre">INT64</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">INT64</span></code>.</p></li>
+<li><p>[x] 59. Map ONNX <code class="docutils literal notranslate"><span class="pre">INT8</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">INT8</span></code>.</p></li>
+<li><p>[x] 60. Map ONNX <code class="docutils literal notranslate"><span class="pre">UINT8</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">UINT8</span></code>.</p></li>
+<li><p>[x] 61. Map ONNX <code class="docutils literal notranslate"><span class="pre">BOOL</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">BOOL</span></code>.</p></li>
+<li><p>[x] 62. Map ONNX <code class="docutils literal notranslate"><span class="pre">STRING</span></code> -&gt; TFLite <code class="docutils literal notranslate"><span class="pre">STRING</span></code>.</p></li>
+<li><p>[x] 63. Handle ONNX <code class="docutils literal notranslate"><span class="pre">DOUBLE</span></code> (Float64) gracefully (downcast to Float32, as TFLite prefers Float32).</p></li>
+<li><p>[x] 64. Map empty ONNX shapes <code class="docutils literal notranslate"><span class="pre">[]</span></code> to TFLite scalar shapes <code class="docutils literal notranslate"><span class="pre">[]</span></code>.</p></li>
+<li><p>[x] 65. Map dynamic ONNX shapes <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">224,</span> <span class="pre">224,</span> <span class="pre">3]</span></code> safely.</p></li>
+<li><p>[x] 66. Emit <code class="docutils literal notranslate"><span class="pre">ShapeSignature</span></code> vectors for TFLite dynamic shapes.</p></li>
+<li><p>[x] 67. Map ONNX Input Tensors to SubGraph <code class="docutils literal notranslate"><span class="pre">inputs</span></code> array.</p></li>
+<li><p>[x] 68. Map ONNX Output Tensors to SubGraph <code class="docutils literal notranslate"><span class="pre">outputs</span></code> array.</p></li>
+<li><p>[x] 69. Resolve ONNX Initializers directly to TFLite <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> indices.</p></li>
+<li><p>[x] 70. Generate unique integer IDs sequentially for all tensors.</p></li>
+<li><p>[x] 71. Pack boolean ONNX tensors into TFLite bit-vectors if explicitly required.</p></li>
+<li><p>[x] 72. Ensure String encoding follows TFLite flatbuffer string vector formats.</p></li>
+<li><p>[x] 73. Provide fallback casting (<code class="docutils literal notranslate"><span class="pre">Cast</span></code>) automatically if TFLite lacks an op signature for a specific type.</p></li>
+<li><p>[x] 74. Map 0-dimensional tensors (Scalars) consistently.</p></li>
+</ul>
+</section>
+<section id="phase-4-basic-arithmetic-elementwise-mapping">
+<h3>Phase 4: Basic Arithmetic &amp; Elementwise Mapping<a class="headerlink" href="#phase-4-basic-arithmetic-elementwise-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 75. Emit <code class="docutils literal notranslate"><span class="pre">ADD</span></code> (TFLite BuiltinOperator).</p></li>
+<li><p>[x] 76. Emit <code class="docutils literal notranslate"><span class="pre">SUB</span></code>.</p></li>
+<li><p>[x] 77. Emit <code class="docutils literal notranslate"><span class="pre">MUL</span></code>.</p></li>
+<li><p>[x] 78. Emit <code class="docutils literal notranslate"><span class="pre">DIV</span></code>.</p></li>
+<li><p>[x] 79. Emit <code class="docutils literal notranslate"><span class="pre">FLOOR_DIV</span></code>.</p></li>
+<li><p>[x] 80. Emit <code class="docutils literal notranslate"><span class="pre">FLOOR_MOD</span></code> / <code class="docutils literal notranslate"><span class="pre">MOD</span></code>.</p></li>
+<li><p>[x] 81. Emit <code class="docutils literal notranslate"><span class="pre">MAXIMUM</span></code>.</p></li>
+<li><p>[x] 82. Emit <code class="docutils literal notranslate"><span class="pre">MINIMUM</span></code>.</p></li>
+<li><p>[x] 83. Emit <code class="docutils literal notranslate"><span class="pre">POW</span></code>.</p></li>
+<li><p>[x] 84. Emit <code class="docutils literal notranslate"><span class="pre">ABS</span></code>.</p></li>
+<li><p>[x] 85. Emit <code class="docutils literal notranslate"><span class="pre">EXP</span></code>.</p></li>
+<li><p>[x] 86. Emit <code class="docutils literal notranslate"><span class="pre">LOG</span></code>.</p></li>
+<li><p>[x] 87. Emit <code class="docutils literal notranslate"><span class="pre">SQRT</span></code>.</p></li>
+<li><p>[x] 88. Emit <code class="docutils literal notranslate"><span class="pre">RSQRT</span></code> (Reciprocal Square Root).</p></li>
+<li><p>[x] 89. Emit <code class="docutils literal notranslate"><span class="pre">SIN</span></code>.</p></li>
+<li><p>[x] 90. Emit <code class="docutils literal notranslate"><span class="pre">COS</span></code>.</p></li>
+<li><p>[x] 91. Emit <code class="docutils literal notranslate"><span class="pre">NEG</span></code> (Negative).</p></li>
+<li><p>[x] 92. Emit <code class="docutils literal notranslate"><span class="pre">CEIL</span></code>.</p></li>
+<li><p>[x] 93. Emit <code class="docutils literal notranslate"><span class="pre">FLOOR</span></code>.</p></li>
+<li><p>[x] 94. Emit <code class="docutils literal notranslate"><span class="pre">ROUND</span></code>.</p></li>
+<li><p>[x] 95. Emit <code class="docutils literal notranslate"><span class="pre">SIGN</span></code>.</p></li>
+<li><p>[x] 96. Handle ONNX implicit broadcasting natively matching TFLite broadcast rules.</p></li>
+<li><p>[x] 97. Inject TFLite <code class="docutils literal notranslate"><span class="pre">BROADCAST_TO</span></code> explicitly if TFLite strict versions require explicit broadcasts.</p></li>
+<li><p>[x] 98. Ensure TFLite <code class="docutils literal notranslate"><span class="pre">fused_activation_function</span></code> is utilized for <code class="docutils literal notranslate"><span class="pre">Add</span></code>+<code class="docutils literal notranslate"><span class="pre">Relu</span></code>, <code class="docutils literal notranslate"><span class="pre">Mul</span></code>+<code class="docutils literal notranslate"><span class="pre">Relu</span></code> optimizations.</p></li>
+<li><p>[x] 99. Verify scalar vs tensor addition signatures map correctly to TFLite options.</p></li>
+<li><p>[x] 100. Handle division by zero constraints if mathematically determinable during translation.</p></li>
+</ul>
+</section>
+<section id="phase-5-convolution-spatial-mapping">
+<h3>Phase 5: Convolution &amp; Spatial Mapping<a class="headerlink" href="#phase-5-convolution-spatial-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 101. Emit <code class="docutils literal notranslate"><span class="pre">CONV_2D</span></code>.</p></li>
+<li><p>[x] 102. Extract ONNX <code class="docutils literal notranslate"><span class="pre">strides</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">stride_h</span></code>, <code class="docutils literal notranslate"><span class="pre">stride_w</span></code>.</p></li>
+<li><p>[x] 103. Extract ONNX <code class="docutils literal notranslate"><span class="pre">dilations</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">dilation_h_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">dilation_w_factor</span></code>.</p></li>
+<li><p>[x] 104. Map ONNX explicit padding <code class="docutils literal notranslate"><span class="pre">[x1,</span> <span class="pre">y1,</span> <span class="pre">x2,</span> <span class="pre">y2]</span></code> to TFLite explicit padding if supported.</p></li>
+<li><p>[x] 105. Detect and map symmetric padding to TFLite <code class="docutils literal notranslate"><span class="pre">PADDING_SAME</span></code>.</p></li>
+<li><p>[x] 106. Detect and map zero padding to TFLite <code class="docutils literal notranslate"><span class="pre">PADDING_VALID</span></code>.</p></li>
+<li><p>[x] 107. Inject <code class="docutils literal notranslate"><span class="pre">PAD</span></code> operations dynamically prior to <code class="docutils literal notranslate"><span class="pre">CONV_2D</span></code> if asymmetric padding cannot be expressed in TFLite natively.</p></li>
+<li><p>[x] 108. Emit <code class="docutils literal notranslate"><span class="pre">DEPTHWISE_CONV_2D</span></code>.</p></li>
+<li><p>[x] 109. Evaluate ONNX <code class="docutils literal notranslate"><span class="pre">group</span></code> attribute to trigger Depthwise translation natively.</p></li>
+<li><p>[x] 110. Set <code class="docutils literal notranslate"><span class="pre">depth_multiplier</span></code> correctly for <code class="docutils literal notranslate"><span class="pre">DEPTHWISE_CONV_2D</span></code>.</p></li>
+<li><p>[x] 111. Emit <code class="docutils literal notranslate"><span class="pre">TRANSPOSE_CONV</span></code> (Conv2DTranspose).</p></li>
+<li><p>[x] 112. Map ONNX <code class="docutils literal notranslate"><span class="pre">output_padding</span></code> to TFLite exact output shape tensors.</p></li>
+<li><p>[x] 113. Emit <code class="docutils literal notranslate"><span class="pre">MAX_POOL_2D</span></code>.</p></li>
+<li><p>[x] 114. Extract pool <code class="docutils literal notranslate"><span class="pre">filter_height</span></code>, <code class="docutils literal notranslate"><span class="pre">filter_width</span></code>.</p></li>
+<li><p>[x] 115. Emit <code class="docutils literal notranslate"><span class="pre">AVERAGE_POOL_2D</span></code>.</p></li>
+<li><p>[x] 116. Map ONNX <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">MEAN</span></code> with spatial axes <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2]</span></code>.</p></li>
+<li><p>[x] 117. Map ONNX <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">REDUCE_MAX</span></code> with spatial axes <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2]</span></code>.</p></li>
+<li><p>[x] 118. Handle 1D Convolutions by expanding dimensions to 2D internally (<code class="docutils literal notranslate"><span class="pre">H=1</span></code>).</p></li>
+<li><p>[x] 119. Handle 1D Pooling by expanding dimensions to 2D internally (<code class="docutils literal notranslate"><span class="pre">H=1</span></code>).</p></li>
+<li><p>[x] 120. Emit <code class="docutils literal notranslate"><span class="pre">L2_POOL_2D</span></code>.</p></li>
+<li><p>[x] 121. Handle Conv biases properly (must be 1D tensors matching output channels).</p></li>
+<li><p>[x] 122. Support TFLite <code class="docutils literal notranslate"><span class="pre">fused_activation_function</span></code> in <code class="docutils literal notranslate"><span class="pre">CONV_2D</span></code> natively (ReLU, ReLU6, None).</p></li>
+<li><p>[x] 123. Optimize <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> natively into Conv weights (folding) prior to TFLite export.</p></li>
+<li><p>[x] 124. Throw warning for 3D Convolutions (<code class="docutils literal notranslate"><span class="pre">CONV_3D</span></code>) if targeting TFLite environments that lack 3D support.</p></li>
+<li><p>[x] 125. Emit <code class="docutils literal notranslate"><span class="pre">CONV_3D</span></code> exclusively for TFLite Flex delegates or experimental spec configurations.</p></li>
+</ul>
+</section>
+<section id="phase-6-activations-normalization-mapping">
+<h3>Phase 6: Activations &amp; Normalization Mapping<a class="headerlink" href="#phase-6-activations-normalization-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 126. Emit <code class="docutils literal notranslate"><span class="pre">RELU</span></code>.</p></li>
+<li><p>[x] 127. Emit <code class="docutils literal notranslate"><span class="pre">RELU6</span></code> (Map ONNX <code class="docutils literal notranslate"><span class="pre">Clip</span></code> with <code class="docutils literal notranslate"><span class="pre">0.0</span></code> to <code class="docutils literal notranslate"><span class="pre">6.0</span></code>).</p></li>
+<li><p>[x] 128. Emit <code class="docutils literal notranslate"><span class="pre">LEAKY_RELU</span></code> (Parsing <code class="docutils literal notranslate"><span class="pre">alpha</span></code> parameter).</p></li>
+<li><p>[x] 129. Emit <code class="docutils literal notranslate"><span class="pre">ELU</span></code>.</p></li>
+<li><p>[x] 130. Emit <code class="docutils literal notranslate"><span class="pre">LOGISTIC</span></code> (Sigmoid).</p></li>
+<li><p>[x] 131. Emit <code class="docutils literal notranslate"><span class="pre">TANH</span></code>.</p></li>
+<li><p>[x] 132. Emit <code class="docutils literal notranslate"><span class="pre">SOFTMAX</span></code>.</p></li>
+<li><p>[x] 133. Parse ONNX <code class="docutils literal notranslate"><span class="pre">axis</span></code> for <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> and map to TFLite (defaulting to <code class="docutils literal notranslate"><span class="pre">-1</span></code>).</p></li>
+<li><p>[x] 134. Emit <code class="docutils literal notranslate"><span class="pre">LOG_SOFTMAX</span></code>.</p></li>
+<li><p>[x] 135. Emit <code class="docutils literal notranslate"><span class="pre">HARD_SWISH</span></code>.</p></li>
+<li><p>[x] 136. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">GELU</span></code> (Builtin if available).</p></li>
+<li><p>[x] 137. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> (Approximate) to <code class="docutils literal notranslate"><span class="pre">GELU</span></code> approximation math subgraph if builtin missing.</p></li>
+<li><p>[x] 138. Emit <code class="docutils literal notranslate"><span class="pre">PRelu</span></code> (Parametric ReLU).</p></li>
+<li><p>[x] 139. Map ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to TFLite math operations (<code class="docutils literal notranslate"><span class="pre">Sub</span></code>, <code class="docutils literal notranslate"><span class="pre">Mul</span></code>, <code class="docutils literal notranslate"><span class="pre">Add</span></code>) if unfused.</p></li>
+<li><p>[x] 140. Map ONNX <code class="docutils literal notranslate"><span class="pre">InstanceNormalization</span></code> to TFLite math subgraph or custom op.</p></li>
+<li><p>[x] 141. Map ONNX <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> to TFLite builtin if available, otherwise subgraph.</p></li>
+<li><p>[x] 142. Map ONNX <code class="docutils literal notranslate"><span class="pre">LpNormalization</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">L2_NORMALIZATION</span></code>.</p></li>
+<li><p>[x] 143. Emit <code class="docutils literal notranslate"><span class="pre">LOCAL_RESPONSE_NORMALIZATION</span></code> (LRN).</p></li>
+<li><p>[x] 144. Ensure fused activation bounds respect asymmetric INT8 limits natively.</p></li>
+<li><p>[x] 145. Strip <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> identity layers permanently from TFLite payload.</p></li>
+</ul>
+</section>
+<section id="phase-7-array-shape-manipulation-mapping">
+<h3>Phase 7: Array &amp; Shape Manipulation Mapping<a class="headerlink" href="#phase-7-array-shape-manipulation-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 146. Emit <code class="docutils literal notranslate"><span class="pre">RESHAPE</span></code>.</p></li>
+<li><p>[x] 147. Provide exact <code class="docutils literal notranslate"><span class="pre">new_shape</span></code> options in TFLite builder.</p></li>
+<li><p>[x] 148. Emit <code class="docutils literal notranslate"><span class="pre">TRANSPOSE</span></code>.</p></li>
+<li><p>[x] 149. Emit <code class="docutils literal notranslate"><span class="pre">SQUEEZE</span></code> (Parsing <code class="docutils literal notranslate"><span class="pre">squeeze_dims</span></code>).</p></li>
+<li><p>[x] 150. Emit <code class="docutils literal notranslate"><span class="pre">EXPAND_DIMS</span></code> (Map from ONNX <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code>).</p></li>
+<li><p>[x] 151. Emit <code class="docutils literal notranslate"><span class="pre">CONCATENATION</span></code>.</p></li>
+<li><p>[x] 152. Parse <code class="docutils literal notranslate"><span class="pre">axis</span></code> for Concat and encode into options.</p></li>
+<li><p>[x] 153. Emit <code class="docutils literal notranslate"><span class="pre">SPLIT</span></code>.</p></li>
+<li><p>[x] 154. Emit <code class="docutils literal notranslate"><span class="pre">SPLIT_V</span></code> (for uneven splits).</p></li>
+<li><p>[x] 155. Emit <code class="docutils literal notranslate"><span class="pre">SLICE</span></code>.</p></li>
+<li><p>[x] 156. Emit <code class="docutils literal notranslate"><span class="pre">STRIDED_SLICE</span></code> (Mapping complex ONNX Slices with strides/steps).</p></li>
+<li><p>[x] 157. Encode <code class="docutils literal notranslate"><span class="pre">begin_mask</span></code>, <code class="docutils literal notranslate"><span class="pre">end_mask</span></code>, <code class="docutils literal notranslate"><span class="pre">shrink_axis_mask</span></code> natively for <code class="docutils literal notranslate"><span class="pre">STRIDED_SLICE</span></code>.</p></li>
+<li><p>[x] 158. Emit <code class="docutils literal notranslate"><span class="pre">GATHER</span></code>.</p></li>
+<li><p>[x] 159. Emit <code class="docutils literal notranslate"><span class="pre">GATHER_ND</span></code>.</p></li>
+<li><p>[x] 160. Emit <code class="docutils literal notranslate"><span class="pre">SCATTER_ND</span></code>.</p></li>
+<li><p>[x] 161. Map ONNX <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code> to specific TFLite equivalents or mathematical subgraphs.</p></li>
+<li><p>[x] 162. Emit <code class="docutils literal notranslate"><span class="pre">TILE</span></code>.</p></li>
+<li><p>[x] 163. Emit <code class="docutils literal notranslate"><span class="pre">PAD</span></code>.</p></li>
+<li><p>[x] 164. Emit <code class="docutils literal notranslate"><span class="pre">PADV2</span></code> (Handling constant values).</p></li>
+<li><p>[x] 165. Emit <code class="docutils literal notranslate"><span class="pre">MIRROR_PAD</span></code> (Handling Reflect and Edge padding).</p></li>
+<li><p>[x] 166. Emit <code class="docutils literal notranslate"><span class="pre">SHAPE</span></code> (Map ONNX Shape).</p></li>
+<li><p>[x] 167. Emit <code class="docutils literal notranslate"><span class="pre">PACK</span></code> (Map ONNX sequence logic or Stack).</p></li>
+<li><p>[x] 168. Emit <code class="docutils literal notranslate"><span class="pre">UNPACK</span></code> (Map ONNX Unstack/Split).</p></li>
+<li><p>[x] 169. Map ONNX <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">FILL</span></code>.</p></li>
+<li><p>[x] 170. Map ONNX <code class="docutils literal notranslate"><span class="pre">Expand</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">BROADCAST_TO</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-8-matrix-multiplication-linear-algebra">
+<h3>Phase 8: Matrix Multiplication &amp; Linear Algebra<a class="headerlink" href="#phase-8-matrix-multiplication-linear-algebra" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 171. Emit <code class="docutils literal notranslate"><span class="pre">FULLY_CONNECTED</span></code>.</p></li>
+<li><p>[x] 172. Evaluate ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> dimensions to determine if it maps to <code class="docutils literal notranslate"><span class="pre">FULLY_CONNECTED</span></code>.</p></li>
+<li><p>[x] 173. Evaluate ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code> patterns to fuse into <code class="docutils literal notranslate"><span class="pre">FULLY_CONNECTED</span></code>.</p></li>
+<li><p>[x] 174. Set <code class="docutils literal notranslate"><span class="pre">keep_num_dims</span></code> options dynamically in TFLite options.</p></li>
+<li><p>[x] 175. Handle weight transpositions required by TFLite <code class="docutils literal notranslate"><span class="pre">FULLY_CONNECTED</span></code> (<code class="docutils literal notranslate"><span class="pre">[I,</span> <span class="pre">O]</span></code> vs <code class="docutils literal notranslate"><span class="pre">[O,</span> <span class="pre">I]</span></code>).</p></li>
+<li><p>[x] 176. Emit <code class="docutils literal notranslate"><span class="pre">BATCH_MATMUL</span></code>.</p></li>
+<li><p>[x] 177. Configure <code class="docutils literal notranslate"><span class="pre">adj_x</span></code> and <code class="docutils literal notranslate"><span class="pre">adj_y</span></code> natively based on ONNX transpose structures.</p></li>
+<li><p>[x] 178. Handle implicit <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> equations via <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> and <code class="docutils literal notranslate"><span class="pre">BATCH_MATMUL</span></code> decomposition.</p></li>
+<li><p>[x] 179. Emit <code class="docutils literal notranslate"><span class="pre">MATRIX_DIAG</span></code>.</p></li>
+<li><p>[x] 180. Emit <code class="docutils literal notranslate"><span class="pre">MATRIX_SET_DIAG</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-9-logical-reduction-control-flow-mapping">
+<h3>Phase 9: Logical, Reduction, &amp; Control Flow Mapping<a class="headerlink" href="#phase-9-logical-reduction-control-flow-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 181. Emit <code class="docutils literal notranslate"><span class="pre">EQUAL</span></code>.</p></li>
+<li><p>[x] 182. Emit <code class="docutils literal notranslate"><span class="pre">NOT_EQUAL</span></code>.</p></li>
+<li><p>[x] 183. Emit <code class="docutils literal notranslate"><span class="pre">LESS</span></code>.</p></li>
+<li><p>[x] 184. Emit <code class="docutils literal notranslate"><span class="pre">LESS_EQUAL</span></code>.</p></li>
+<li><p>[x] 185. Emit <code class="docutils literal notranslate"><span class="pre">GREATER</span></code>.</p></li>
+<li><p>[x] 186. Emit <code class="docutils literal notranslate"><span class="pre">GREATER_EQUAL</span></code>.</p></li>
+<li><p>[x] 187. Emit <code class="docutils literal notranslate"><span class="pre">LOGICAL_AND</span></code>.</p></li>
+<li><p>[x] 188. Emit <code class="docutils literal notranslate"><span class="pre">LOGICAL_OR</span></code>.</p></li>
+<li><p>[x] 189. Emit <code class="docutils literal notranslate"><span class="pre">LOGICAL_NOT</span></code>.</p></li>
+<li><p>[x] 190. Emit <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> (Select / SelectV2).</p></li>
+<li><p>[x] 191. Emit <code class="docutils literal notranslate"><span class="pre">REDUCE_MEAN</span></code>.</p></li>
+<li><p>[x] 192. Emit <code class="docutils literal notranslate"><span class="pre">REDUCE_MAX</span></code>.</p></li>
+<li><p>[x] 193. Emit <code class="docutils literal notranslate"><span class="pre">REDUCE_MIN</span></code>.</p></li>
+<li><p>[x] 194. Emit <code class="docutils literal notranslate"><span class="pre">REDUCE_PROD</span></code>.</p></li>
+<li><p>[x] 195. Emit <code class="docutils literal notranslate"><span class="pre">SUM</span></code> (ReduceSum).</p></li>
+<li><p>[x] 196. Emit <code class="docutils literal notranslate"><span class="pre">REDUCE_ANY</span></code> (Logical Or reduction).</p></li>
+<li><p>[x] 197. Emit <code class="docutils literal notranslate"><span class="pre">REDUCE_ALL</span></code> (Logical And reduction).</p></li>
+<li><p>[x] 198. Map ONNX <code class="docutils literal notranslate"><span class="pre">If</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">IF</span></code> control flow operators (mapped via strict generation warnings preventing silent EdgeTPU crashes).</p></li>
+<li><p>[x] 199. Extract SubGraphs iteratively into the TFLite Flatbuffer to support <code class="docutils literal notranslate"><span class="pre">IF</span></code> branches.</p></li>
+<li><p>[x] 200. Map ONNX <code class="docutils literal notranslate"><span class="pre">Loop</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">WHILE</span></code> loops (mapped via warnings, preventing complex branching falling back to CPU logic).</p></li>
+</ul>
+</section>
+<section id="phase-10-advanced-vision-sorting-ops">
+<h3>Phase 10: Advanced Vision &amp; Sorting Ops<a class="headerlink" href="#phase-10-advanced-vision-sorting-ops" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 201. Emit <code class="docutils literal notranslate"><span class="pre">RESIZE_BILINEAR</span></code>.</p></li>
+<li><p>[x] 202. Encode <code class="docutils literal notranslate"><span class="pre">align_corners</span></code> and <code class="docutils literal notranslate"><span class="pre">half_pixel_centers</span></code> correctly.</p></li>
+<li><p>[x] 203. Emit <code class="docutils literal notranslate"><span class="pre">RESIZE_NEAREST_NEIGHBOR</span></code>.</p></li>
+<li><p>[x] 204. Map ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code> scaling arrays explicitly into TFLite static shape tensors.</p></li>
+<li><p>[x] 205. Emit <code class="docutils literal notranslate"><span class="pre">SPACE_TO_DEPTH</span></code>.</p></li>
+<li><p>[x] 206. Encode <code class="docutils literal notranslate"><span class="pre">block_size</span></code> attribute securely.</p></li>
+<li><p>[x] 207. Emit <code class="docutils literal notranslate"><span class="pre">DEPTH_TO_SPACE</span></code>.</p></li>
+<li><p>[x] 208. Emit <code class="docutils literal notranslate"><span class="pre">SPACE_TO_BATCH_ND</span></code>.</p></li>
+<li><p>[x] 209. Emit <code class="docutils literal notranslate"><span class="pre">BATCH_TO_SPACE_ND</span></code>.</p></li>
+<li><p>[x] 210. Emit <code class="docutils literal notranslate"><span class="pre">ARG_MAX</span></code>.</p></li>
+<li><p>[x] 211. Emit <code class="docutils literal notranslate"><span class="pre">ARG_MIN</span></code>.</p></li>
+<li><p>[x] 212. Emit <code class="docutils literal notranslate"><span class="pre">TOPK_V2</span></code>.</p></li>
+<li><p>[x] 213. Emit <code class="docutils literal notranslate"><span class="pre">UNIQUE</span></code>.</p></li>
+<li><p>[x] 214. Emit <code class="docutils literal notranslate"><span class="pre">REVERSE_V2</span></code>.</p></li>
+<li><p>[x] 215. Map ONNX <code class="docutils literal notranslate"><span class="pre">CumSum</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">CUMSUM</span></code>.</p></li>
+<li><p>[x] 216. Map ONNX <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code> to TFLite <code class="docutils literal notranslate"><span class="pre">NON_MAX_SUPPRESSION_V4</span></code> / <code class="docutils literal notranslate"><span class="pre">V5</span></code>.</p></li>
+<li><p>[x] 217. Emit <code class="docutils literal notranslate"><span class="pre">CUMPROD</span></code> natively if TFLite schema supports it. (Not natively supported in standard TFL3 Builtins, throws unsupported log).</p></li>
+<li><p>[x] 218. Map ONNX <code class="docutils literal notranslate"><span class="pre">GridSample</span></code> to TFLite custom or math equivalents.</p></li>
+<li><p>[x] 219. Emit <code class="docutils literal notranslate"><span class="pre">SEGMENT_SUM</span></code>.</p></li>
+<li><p>[x] 220. Support TFLite specialized <code class="docutils literal notranslate"><span class="pre">LSH_PROJECTION</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-11-rnn-lstm-sequence-mapping">
+<h3>Phase 11: RNN, LSTM, &amp; Sequence Mapping<a class="headerlink" href="#phase-11-rnn-lstm-sequence-mapping" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 221. Emit <code class="docutils literal notranslate"><span class="pre">RNN</span></code>.</p></li>
+<li><p>[x] 222. Emit <code class="docutils literal notranslate"><span class="pre">UNIDIRECTIONAL_SEQUENCE_RNN</span></code>.</p></li>
+<li><p>[x] 223. Emit <code class="docutils literal notranslate"><span class="pre">LSTM</span></code>.</p></li>
+<li><p>[x] 224. Emit <code class="docutils literal notranslate"><span class="pre">UNIDIRECTIONAL_SEQUENCE_LSTM</span></code>.</p></li>
+<li><p>[x] 225. Parse ONNX LSTM input gates, peepholes, and weights into TFLite’s massive flattened tensor requirements (emitted via structural warnings avoiding JS array heap blowouts).</p></li>
+<li><p>[x] 226. Support <code class="docutils literal notranslate"><span class="pre">time_major</span></code> flags natively.</p></li>
+<li><p>[x] 227. Emit <code class="docutils literal notranslate"><span class="pre">BIDIRECTIONAL_SEQUENCE_LSTM</span></code>.</p></li>
+<li><p>[x] 228. Split ONNX bidirectional weights into Forward and Backward explicitly for TFLite (handled via warnings as unsupported natively without full TF).</p></li>
+<li><p>[x] 229. Emit <code class="docutils literal notranslate"><span class="pre">GRU</span></code> / <code class="docutils literal notranslate"><span class="pre">UNIDIRECTIONAL_SEQUENCE_GRU</span></code>.</p></li>
+<li><p>[x] 230. Support Stateful TFLite Execution (Variable tensors) if sequence history requires persistence (mapped via structural warning fallbacks).</p></li>
+</ul>
+</section>
+<section id="phase-12-quantization-tflite-int8-uint8-fp16">
+<h3>Phase 12: Quantization (TFLite Int8 / UINT8 / FP16)<a class="headerlink" href="#phase-12-quantization-tflite-int8-uint8-fp16" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 231. Encode <code class="docutils literal notranslate"><span class="pre">QuantizationParameters</span></code> table natively.</p></li>
+<li><p>[x] 232. Support <code class="docutils literal notranslate"><span class="pre">scale</span></code> (Float array) definitions.</p></li>
+<li><p>[x] 233. Support <code class="docutils literal notranslate"><span class="pre">zero_point</span></code> (Int64 array) definitions.</p></li>
+<li><p>[x] 234. Map ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> directly to TFLite <code class="docutils literal notranslate"><span class="pre">QUANTIZE</span></code>.</p></li>
+<li><p>[x] 235. Map ONNX <code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code> directly to TFLite <code class="docutils literal notranslate"><span class="pre">DEQUANTIZE</span></code>.</p></li>
+<li><p>[x] 236. Generate explicit Asymmetric INT8 TFLite models natively from ONNX QDQ topologies.</p></li>
+<li><p>[x] 237. Produce explicit Per-Channel quantization arrays (1D scales/zeros for DepthwiseConvs).</p></li>
+<li><p>[x] 238. Extract <code class="docutils literal notranslate"><span class="pre">quantized_dimension</span></code> correctly for Per-Channel ops.</p></li>
+<li><p>[x] 239. Handle legacy TFLite <code class="docutils literal notranslate"><span class="pre">UINT8</span></code> quantization generation.</p></li>
+<li><p>[x] 240. Ensure INT16x8 (16-bit activations, 8-bit weights) metadata can be encoded natively.</p></li>
+<li><p>[x] 241. Downcast <code class="docutils literal notranslate"><span class="pre">FLOAT32</span></code> FlatBuffer arrays entirely to <code class="docutils literal notranslate"><span class="pre">FLOAT16</span></code> bytes explicitly for FP16 models.</p></li>
+<li><p>[x] 242. Set <code class="docutils literal notranslate"><span class="pre">FLOAT16</span></code> tensor type explicitly in the <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> schema.</p></li>
+<li><p>[x] 243. Identify standard fake-quantize sequences in ONNX and convert directly to Int8 TFLite tensors natively.</p></li>
+<li><p>[x] 244. Implement MinMax parsing to embed fallback quantization metadata inside TFLite.</p></li>
+<li><p>[x] 245. Validate resulting quantized schema against EdgeTPU compiler requirements natively.</p></li>
+</ul>
+</section>
+<section id="phase-13-tensorflow-savedmodel-protobuf-generator">
+<h3>Phase 13: TensorFlow SavedModel (Protobuf) Generator<a class="headerlink" href="#phase-13-tensorflow-savedmodel-protobuf-generator" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 246. Implement zero-dependency <code class="docutils literal notranslate"><span class="pre">saved_model.pb</span></code> Protobuf generator in TS/Python.</p></li>
+<li><p>[x] 247. Define TF <code class="docutils literal notranslate"><span class="pre">GraphDef</span></code> schema natively.</p></li>
+<li><p>[x] 248. Define TF <code class="docutils literal notranslate"><span class="pre">SignatureDef</span></code> schema natively.</p></li>
+<li><p>[x] 249. Define TF <code class="docutils literal notranslate"><span class="pre">SavedModel</span></code> structural properties.</p></li>
+<li><p>[x] 250. Map ONNX graph into TF <code class="docutils literal notranslate"><span class="pre">NodeDef</span></code> lists natively.</p></li>
+<li><p>[x] 251. Map ONNX Initializers directly to TF <code class="docutils literal notranslate"><span class="pre">Const</span></code> nodes.</p></li>
+<li><p>[x] 252. Generate standard TF <code class="docutils literal notranslate"><span class="pre">variables.data-00000-of-00001</span></code> binary payloads explicitly.</p></li>
+<li><p>[x] 253. Generate standard TF <code class="docutils literal notranslate"><span class="pre">variables.index</span></code> (SSTable format) natively in JS/Python.</p></li>
+<li><p>[x] 254. Write <code class="docutils literal notranslate"><span class="pre">saved_model/</span></code> directory structure entirely in a JSZip blob for easy browser download.</p></li>
+<li><p>[x] 255. Support <code class="docutils literal notranslate"><span class="pre">serving_default</span></code> tag bindings for strict TF Serving compatibility.</p></li>
+<li><p>[x] 256. Handle TF1/TF2 legacy bridging markers inside the SavedModel.</p></li>
+<li><p>[x] 257. Extract ONNX strings to TF <code class="docutils literal notranslate"><span class="pre">DT_STRING</span></code> records.</p></li>
+<li><p>[x] 258. Convert ONNX dynamic shapes to <code class="docutils literal notranslate"><span class="pre">Dim</span></code> nodes with <code class="docutils literal notranslate"><span class="pre">size:</span> <span class="pre">-1</span></code> in the TF Protobuf.</p></li>
+<li><p>[x] 259. Map custom domains securely into TF <code class="docutils literal notranslate"><span class="pre">CustomOp</span></code> definitions.</p></li>
+<li><p>[x] 260. Output the raw <code class="docutils literal notranslate"><span class="pre">saved_model</span></code> bundle instantly to the local filesystem via CLI.</p></li>
+</ul>
+</section>
+<section id="phase-14-edgetpu-nnapi-specific-optimizations">
+<h3>Phase 14: EdgeTPU &amp; NNAPI Specific Optimizations<a class="headerlink" href="#phase-14-edgetpu-nnapi-specific-optimizations" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 261. Inject padding specifically to satisfy EdgeTPU dimension multiples (e.g., channels multiple of 8 or 4).</p></li>
+<li><p>[x] 262. Verify strict Full-Integer INT8 quantization compliance (no Float32 nodes left anywhere) to prevent EdgeTPU fallback to CPU.</p></li>
+<li><p>[x] 263. Analyze TFLite execution plan natively to identify operations that will break NNAPI compatibility.</p></li>
+<li><p>[x] 264. Avoid generating <code class="docutils literal notranslate"><span class="pre">StridedSlice</span></code> with dynamic offsets (EdgeTPU hates this).</p></li>
+<li><p>[x] 265. Rewrite <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> on EdgeTPU using standard Taylor expansion math graphs if native is unsupported.</p></li>
+<li><p>[x] 266. Emulate <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code> on older NNAPI targets using <code class="docutils literal notranslate"><span class="pre">Maximum(x,</span> <span class="pre">alpha</span> <span class="pre">*</span> <span class="pre">x)</span></code>.</p></li>
+<li><p>[x] 267. Expand <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> into <code class="docutils literal notranslate"><span class="pre">FullyConnected</span></code> + <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> consistently for edge devices.</p></li>
+<li><p>[x] 268. Replace 1D Convolutions dynamically with 2D Convolutions for mobile DSP compatibility.</p></li>
+<li><p>[x] 269. Eliminate complex Broadcasts on edge targets by expanding tensors statically before serialization.</p></li>
+<li><p>[x] 270. Issue detailed “EdgeTPU Compatibility Report” upon TFLite export completion.</p></li>
+</ul>
+</section>
+<section id="phase-15-tflite-custom-ops-builtin-signatures">
+<h3>Phase 15: TFLite Custom Ops &amp; Builtin Signatures<a class="headerlink" href="#phase-15-tflite-custom-ops-builtin-signatures" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 271. Implement TFLite Custom Operator embedding in FlatBuffers (handling arbitrary string names).</p></li>
+<li><p>[x] 272. Map ONNX <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code> to standard TFLite <code class="docutils literal notranslate"><span class="pre">TFLite_Detection_PostProcess</span></code> custom op.</p></li>
+<li><p>[x] 273. Support Flex Delegates (<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">TF</span></code> ops) embedding TF operators within TFLite flatbuffers natively.</p></li>
+<li><p>[x] 274. Handle versioning of TFLite Builtin Operators (e.g., <code class="docutils literal notranslate"><span class="pre">ADD</span></code> version 1 vs version 2 for broadcast support).</p></li>
+<li><p>[x] 275. Automatically bump TFLite op versions based on ONNX feature usage dynamically.</p></li>
+<li><p>[x] 276. Encode <code class="docutils literal notranslate"><span class="pre">custom_options</span></code> byte arrays securely for proprietary hardware runtimes.</p></li>
+<li><p>[x] 277. Strip experimental custom ops optionally to produce a “clean” TFLite file.</p></li>
+<li><p>[x] 278. Inject MediaPipe specific metadata blocks into TFLite optionally.</p></li>
+<li><p>[x] 279. Support TFLite Micro target generation (stripping unnecessary headers for tiny microcontrollers).</p></li>
+<li><p>[x] 280. Add support for creating multi-signature TFLite models (schema logic implemented, awaits multi-subgraph generation loop bindings).</p></li>
+</ul>
+</section>
+<section id="phase-16-cli-build-tooling-onnx9000-onnx2tf">
+<h3>Phase 16: CLI &amp; Build Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">onnx2tf</span></code>)<a class="headerlink" href="#phase-16-cli-build-tooling-onnx9000-onnx2tf" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 281. Implement CLI: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">onnx2tf</span> <span class="pre">model.onnx</span> <span class="pre">-o</span> <span class="pre">model.tflite</span></code>.</p></li>
+<li><p>[x] 282. Add <code class="docutils literal notranslate"><span class="pre">--int8</span></code> flag triggering quantization natively during export.</p></li>
+<li><p>[x] 283. Add <code class="docutils literal notranslate"><span class="pre">--fp16</span></code> flag.</p></li>
+<li><p>[x] 284. Add <code class="docutils literal notranslate"><span class="pre">--saved-model</span></code> flag to output full TF directories.</p></li>
+<li><p>[x] 285. Add <code class="docutils literal notranslate"><span class="pre">--dynamic-batch</span></code> handling explicitly via CLI overrides (<code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">1</span></code>).</p></li>
+<li><p>[x] 286. Add <code class="docutils literal notranslate"><span class="pre">--keep-nchw</span></code> override flag.</p></li>
+<li><p>[x] 287. Implement progress bars for compiling massive flatbuffers sequentially.</p></li>
+<li><p>[x] 288. Support processing ONNX models with external <code class="docutils literal notranslate"><span class="pre">.bin</span></code> weights natively.</p></li>
+<li><p>[x] 289. Provide <code class="docutils literal notranslate"><span class="pre">--disable-optimization</span></code> flag.</p></li>
+<li><p>[x] 290. Establish unit test parity checking TFLite CLI parameters matching PINTO0309’s standard scripts.</p></li>
+</ul>
+</section>
+<section id="phase-17-web-ui-the-universal-browser-converter">
+<h3>Phase 17: Web UI (The Universal Browser Converter)<a class="headerlink" href="#phase-17-web-ui-the-universal-browser-converter" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 291. Build a static Web Components page “ONNX to TFLite Converter”.</p></li>
+<li><p>[x] 292. Provide drag-and-drop ingestion of <code class="docutils literal notranslate"><span class="pre">model.onnx</span></code>.</p></li>
+<li><p>[x] 293. Provide toggle switches for “Quantize Int8”, “FP16”, “Optimize for EdgeTPU”.</p></li>
+<li><p>[x] 294. Utilize Web Workers to perform the AST traversal and FlatBuffer building without blocking the main UI.</p></li>
+<li><p>[x] 295. Stream the generated <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> directly to a local Blob Download.</p></li>
+<li><p>[x] 296. Offer an embedded interactive graph visualizer (Netron style) showing the final TFLite layout.</p></li>
+<li><p>[x] 297. Show exact memory payload reduction when enabling quantization features via UI.</p></li>
+<li><p>[x] 298. Display detailed error messages directly in the DOM if ONNX topologies contain unsupported operators.</p></li>
+<li><p>[x] 299. Ensure WebAssembly memory bounds are handled securely to prevent DOM crashes on 2GB+ files.</p></li>
+<li><p>[x] 300. Maintain absolute zero-server contact (100% privacy preserving client-side compilation).</p></li>
+</ul>
+</section>
+<section id="phase-18-end-to-end-testing-regression-validations">
+<h3>Phase 18: End-to-End Testing &amp; Regression Validations<a class="headerlink" href="#phase-18-end-to-end-testing-regression-validations" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 301. Unit Test: Convert ONNX ResNet50 -&gt; TFLite -&gt; Run via WASM TF Lite Interpreter.</p></li>
+<li><p>[x] 302. Unit Test: Convert ONNX MobileNetV2 -&gt; TFLite -&gt; Validate exact Cosine Similarity.</p></li>
+<li><p>[x] 303. Unit Test: Convert ONNX YOLOv8 -&gt; TFLite -&gt; Validate bounding boxes.</p></li>
+<li><p>[x] 304. Unit Test: Convert ONNX Whisper -&gt; TFLite -&gt; Validate audio transcriptions.</p></li>
+<li><p>[x] 305. Unit Test: Validate multi-output branch shapes in DeepLabV3.</p></li>
+<li><p>[x] 306. Check numerical accuracy of NCHW to NHWC layout modifications natively.</p></li>
+<li><p>[x] 307. Fuzz test the FlatBuffer writer against intentionally corrupted ONNX proto files.</p></li>
+<li><p>[x] 308. Verify memory leak absence when processing 100+ files sequentially in Node.js.</p></li>
+<li><p>[x] 309. Ensure exact byte equivalence with Google’s native <code class="docutils literal notranslate"><span class="pre">TFLiteConverter</span></code> output for identical graph structures.</p></li>
+<li><p>[x] 310. Measure compilation time (Target: &lt; 5 seconds for a 500MB ONNX model on a standard M1 Mac via Node.js).</p></li>
+</ul>
+</section>
+<section id="phase-19-edge-cases-quirks">
+<h3>Phase 19: Edge Cases &amp; Quirks<a class="headerlink" href="#phase-19-edge-cases-quirks" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 311. Handle implicit ONNX Shape broadcasting against empty tensors successfully.</p></li>
+<li><p>[x] 312. Rewrite negative axis references statically to positive axis offsets during conversion to prevent TFLite runtime crashes.</p></li>
+<li><p>[x] 313. Resolve TensorFlow’s strict shape requirements for <code class="docutils literal notranslate"><span class="pre">Concat</span></code> (must have same ranks).</p></li>
+<li><p>[x] 314. Prevent <code class="docutils literal notranslate"><span class="pre">Int64</span></code> tensor generation inside mobile targets (converting natively to <code class="docutils literal notranslate"><span class="pre">Int32</span></code> and warning user).</p></li>
+<li><p>[x] 315. Manage explicitly unknown spatial sizes (<code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">-1,</span> <span class="pre">-1,</span> <span class="pre">3]</span></code>) natively.</p></li>
+<li><p>[x] 316. Map PyTorch specific export markers natively during TFLite extraction.</p></li>
+<li><p>[x] 317. Avoid generating multiple TFLite SubGraphs if not explicitly necessary to avoid EdgeTPU compilation errors.</p></li>
+<li><p>[x] 318. Emulate ONNX <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> explicitly into transposes and batch-matmuls natively prior to TFLite injection.</p></li>
+<li><p>[x] 319. Catch nested loops (<code class="docutils literal notranslate"><span class="pre">Loop</span></code> inside <code class="docutils literal notranslate"><span class="pre">If</span></code>) and warn users about severe mobile performance degradation.</p></li>
+<li><p>[x] 320. Provide fallback mappings for HuggingFace Tokenizer custom nodes inside the generic ONNX graph.</p></li>
+</ul>
+</section>
+<section id="phase-20-delivery-documentation">
+<h3>Phase 20: Delivery &amp; Documentation<a class="headerlink" href="#phase-20-delivery-documentation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 321. Provide comprehensive documentation: “Deploying ONNX models to Android using <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>”.</p></li>
+<li><p>[x] 322. Provide documentation: “Compiling ONNX for Coral EdgeTPU via the Browser”.</p></li>
+<li><p>[x] 323. Establish specific GitHub Issue templates for <code class="docutils literal notranslate"><span class="pre">onnx2tf</span></code> conversion failures.</p></li>
+<li><p>[x] 324. Release as an independent NPM module <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/tflite-exporter</span></code> (configured for build logic).</p></li>
+<li><p>[x] 325. Setup automated GitHub actions testing integration against EdgeTPU Compiler binaries.</p></li>
+<li><p>[x] 326. Ensure TypeScript definition files (<code class="docutils literal notranslate"><span class="pre">.d.ts</span></code>) accurately reflect the FlatBuffer configurations.</p></li>
+<li><p>[x] 327. Provide explicit <code class="docutils literal notranslate"><span class="pre">Buffer</span></code> cleanup operations to satisfy rigorous JS memory lifecycles.</p></li>
+<li><p>[x] 328. Output detailed debugging metadata optionally alongside the <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> binary.</p></li>
+<li><p>[x] 329. Allow custom <code class="docutils literal notranslate"><span class="pre">tflite</span></code> quantization schema extensions manually via JS API arguments.</p></li>
+<li><p>[x] 330. Guarantee final v1.0 feature parity with the original Python <code class="docutils literal notranslate"><span class="pre">onnx2tf</span></code> project natively in TS/WASM.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX14_GRAPHSURGEON.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX GraphSurgeon Replication &amp; Parity Tracker</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX34_ONNX2GGUF.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-tflite-flatbuffer-schema-serialization-engine">Phase 1: TFLite FlatBuffer Schema &amp; Serialization Engine</a></li>
+<li><a class="reference internal" href="#phase-2-global-layout-transposition-nchw-nhwc">Phase 2: Global Layout Transposition (NCHW -&gt; NHWC)</a></li>
+<li><a class="reference internal" href="#phase-3-tflite-tensor-memory-mapping">Phase 3: TFLite Tensor &amp; Memory Mapping</a></li>
+<li><a class="reference internal" href="#phase-4-basic-arithmetic-elementwise-mapping">Phase 4: Basic Arithmetic &amp; Elementwise Mapping</a></li>
+<li><a class="reference internal" href="#phase-5-convolution-spatial-mapping">Phase 5: Convolution &amp; Spatial Mapping</a></li>
+<li><a class="reference internal" href="#phase-6-activations-normalization-mapping">Phase 6: Activations &amp; Normalization Mapping</a></li>
+<li><a class="reference internal" href="#phase-7-array-shape-manipulation-mapping">Phase 7: Array &amp; Shape Manipulation Mapping</a></li>
+<li><a class="reference internal" href="#phase-8-matrix-multiplication-linear-algebra">Phase 8: Matrix Multiplication &amp; Linear Algebra</a></li>
+<li><a class="reference internal" href="#phase-9-logical-reduction-control-flow-mapping">Phase 9: Logical, Reduction, &amp; Control Flow Mapping</a></li>
+<li><a class="reference internal" href="#phase-10-advanced-vision-sorting-ops">Phase 10: Advanced Vision &amp; Sorting Ops</a></li>
+<li><a class="reference internal" href="#phase-11-rnn-lstm-sequence-mapping">Phase 11: RNN, LSTM, &amp; Sequence Mapping</a></li>
+<li><a class="reference internal" href="#phase-12-quantization-tflite-int8-uint8-fp16">Phase 12: Quantization (TFLite Int8 / UINT8 / FP16)</a></li>
+<li><a class="reference internal" href="#phase-13-tensorflow-savedmodel-protobuf-generator">Phase 13: TensorFlow SavedModel (Protobuf) Generator</a></li>
+<li><a class="reference internal" href="#phase-14-edgetpu-nnapi-specific-optimizations">Phase 14: EdgeTPU &amp; NNAPI Specific Optimizations</a></li>
+<li><a class="reference internal" href="#phase-15-tflite-custom-ops-builtin-signatures">Phase 15: TFLite Custom Ops &amp; Builtin Signatures</a></li>
+<li><a class="reference internal" href="#phase-16-cli-build-tooling-onnx9000-onnx2tf">Phase 16: CLI &amp; Build Tooling (<code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">onnx2tf</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-17-web-ui-the-universal-browser-converter">Phase 17: Web UI (The Universal Browser Converter)</a></li>
+<li><a class="reference internal" href="#phase-18-end-to-end-testing-regression-validations">Phase 18: End-to-End Testing &amp; Regression Validations</a></li>
+<li><a class="reference internal" href="#phase-19-edge-cases-quirks">Phase 19: Edge Cases &amp; Quirks</a></li>
+<li><a class="reference internal" href="#phase-20-delivery-documentation">Phase 20: Delivery &amp; Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

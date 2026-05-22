@@ -1,0 +1,934 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)" href="ONNX30_ONNX_ARRAY_API.html"><link rel="prev" title="onnx-mlir Replication &amp; Parity Tracker" href="ONNX19_ONNXMLIR.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Hummingbird Replication &amp; Parity Tracker - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX15_HUMMINGBIRD.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="hummingbird-replication-parity-tracker">
+<h1>Hummingbird Replication &amp; Parity Tracker<a class="headerlink" href="#hummingbird-replication-parity-tracker" title="Link to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>This document tracks the complete reimplementation of <code class="docutils literal notranslate"><span class="pre">Hummingbird</span></code> within the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> ecosystem.
+The original <code class="docutils literal notranslate"><span class="pre">Hummingbird</span></code> compiles traditional machine learning models (decision trees, random forests, linear models) into PyTorch or ONNX tensor operations. This allows traditional ML to leverage GPU hardware acceleration via matrix multiplications and advanced tensor operations rather than slow CPU branching.
+Our <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> reimplementation focuses on transpiling traditional models into pure <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> (core mathematical ops) natively in Python. This zero-dependency translation is incredibly powerful for <strong>WebGPU</strong> and <strong>WASM</strong> execution, as GPUs suffer massive performance penalties from branch divergence (if/else statements in trees). By lowering trees to tensor math, we unlock parallelized, hardware-accelerated inference for traditional ML directly inside the browser.</p>
+</section>
+<section id="exhaustive-parity-checklist">
+<h2>Exhaustive Parity Checklist<a class="headerlink" href="#exhaustive-parity-checklist" title="Link to this heading">¶</a></h2>
+<section id="core-architecture-strategy-selection-25-items">
+<h3>1. Core Architecture &amp; Strategy Selection (25+ items)<a class="headerlink" href="#core-architecture-strategy-selection-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement zero-dependency transpilation engine architecture</p></li>
+<li><p>[x] Implement strategy selector based on hardware target (CPU vs GPU vs WebGPU)</p></li>
+<li><p>[x] Implement strategy selector based on tree depth / sparsity</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">gemm</span></code> (General Matrix Multiply) execution strategy</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">tree_trav</span></code> (Tree Traversal) execution strategy</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">perf_tree_trav</span></code> (Perfect Tree Traversal) execution strategy</p></li>
+<li><p>[x] Implement memory-footprint estimator to auto-select optimal strategy</p></li>
+<li><p>[x] Allow explicit strategy overrides by the user</p></li>
+<li><p>[x] Map tree nodes to intermediate tensor abstractions natively</p></li>
+<li><p>[x] Support batch-size optimizations (switching strategy based on <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>)</p></li>
+<li><p>[x] Implement backend registry for extensibility (e.g., pure ONNX, custom WGSL)</p></li>
+<li><p>[x] Ensure transpiled graphs use exclusively <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> operators (no <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml</span></code>)</p></li>
+<li><p>[x] Prevent generation of branch operators (<code class="docutils literal notranslate"><span class="pre">If</span></code>, <code class="docutils literal notranslate"><span class="pre">Loop</span></code>) in tree bodies</p></li>
+<li><p>[x] Provide dynamic batching support internally via symbolic dimensions</p></li>
+<li><p>[x] Handle models with a mix of categorical and continuous features natively</p></li>
+<li><p>[x] Transpile numerical threshold comparisons accurately</p></li>
+<li><p>[x] Handle structural missing values (NaN) within tensor operations</p></li>
+<li><p>[x] Extract global constants into contiguous initialized Tensors</p></li>
+<li><p>[x] Provide tree depth analysis utility (min, max, mean depths)</p></li>
+<li><p>[x] Provide tree leaf distribution utility</p></li>
+<li><p>[x] Parse ensemble weights natively (for AdaBoost / Weighted Forests)</p></li>
+<li><p>[x] Flatten nested ensemble structures into unified 2D/3D tensors</p></li>
+<li><p>[x] Resolve numerical precision mismatches (FP32 vs FP64) ahead of time</p></li>
+<li><p>[x] Cast FP64 parameters to FP32 natively to optimize WebGPU limits</p></li>
+<li><p>[x] Expose verbosity and logging to debug transpilation steps</p></li>
+</ul>
+</section>
+<section id="gemm-matrix-multiplication-strategy-35-items">
+<h3>2. GEMM (Matrix Multiplication) Strategy (35+ items)<a class="headerlink" href="#gemm-matrix-multiplication-strategy-35-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Map internal tree decision nodes to Matrix A (feature indices)</p></li>
+<li><p>[x] Map internal tree thresholds to Matrix B (comparisons)</p></li>
+<li><p>[x] Map tree leaf values to Matrix C (predictions)</p></li>
+<li><p>[x] Map tree node routing logic to Matrix D (left/right path tracking)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> for feature selection</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Less</span></code> / <code class="docutils literal notranslate"><span class="pre">Greater</span></code> ops for threshold evaluation natively</p></li>
+<li><p>[x] Map boolean path selections using <code class="docutils literal notranslate"><span class="pre">Sign</span></code> and <code class="docutils literal notranslate"><span class="pre">Relu</span></code> math tricks</p></li>
+<li><p>[x] Map bitwise routing using exact integer multiplications</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code> for final leaf selection in the matrix space</p></li>
+<li><p>[x] Support multi-class prediction packing in GEMM C matrices</p></li>
+<li><p>[x] Compile Random Forest (multiple trees) into batched 3D <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[x] Compile Gradient Boosting into sequential 2D <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> additions</p></li>
+<li><p>[x] Implement GEMM sparsity optimizations (removing dead matrix columns)</p></li>
+<li><p>[x] Compress Matrix A (feature selectors) using one-hot/sparse representations</p></li>
+<li><p>[x] Ensure GEMM generated graph avoids <code class="docutils literal notranslate"><span class="pre">Gather</span></code> ops for maximum ALU utilization</p></li>
+<li><p>[x] Exploit ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> operator’s built-in <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code> parameters</p></li>
+<li><p>[x] Transpile <code class="docutils literal notranslate"><span class="pre">Sum</span></code> reduction over ensemble outputs natively</p></li>
+<li><p>[x] Address intermediate tensor memory blow-up on extremely deep trees</p></li>
+<li><p>[x] Optimize GEMM memory using block-diagonal matrix representations for ensembles</p></li>
+<li><p>[x] Implement partial GEMM execution for trees evaluated in chunks</p></li>
+<li><p>[x] Map missing values to extreme matrix thresholds (<code class="docutils literal notranslate"><span class="pre">+inf</span></code> / <code class="docutils literal notranslate"><span class="pre">-inf</span></code>)</p></li>
+<li><p>[x] Utilize <code class="docutils literal notranslate"><span class="pre">Where</span></code> operator to conditionally zero-out path matrices</p></li>
+<li><p>[x] Support GEMM lowering for DecisionTreeRegressors</p></li>
+<li><p>[x] Support GEMM lowering for DecisionTreeClassifiers</p></li>
+<li><p>[x] Support GEMM lowering for IsolationForests</p></li>
+<li><p>[x] Validate GEMM output numerical equivalence against reference models</p></li>
+<li><p>[x] Measure and optimize peak VRAM usage of GEMM constants</p></li>
+<li><p>[x] Compile leaf node outputs into <code class="docutils literal notranslate"><span class="pre">Concat</span></code> + <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[x] Pre-compute scaling factors in GEMM matrices</p></li>
+<li><p>[x] Merge bias additions directly into GEMM Matrix C</p></li>
+<li><p>[x] Support batch dynamic sizes <code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">features]</span></code> strictly in GEMM <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[x] Resolve dimension broadcasting constraints statically</p></li>
+<li><p>[x] Pack tree indices to minimize matrix row sizes</p></li>
+<li><p>[x] Detect and eliminate redundant threshold checks across identical trees</p></li>
+<li><p>[x] Implement binary encoding of tree paths for logarithmic complexity</p></li>
+</ul>
+</section>
+<section id="treetraversal-strategy-25-items">
+<h3>3. TreeTraversal Strategy (25+ items)<a class="headerlink" href="#treetraversal-strategy-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Map tree structures to flat 1D index arrays</p></li>
+<li><p>[x] Map feature threshold values to flat 1D arrays</p></li>
+<li><p>[x] Implement dynamic array indexing using ONNX <code class="docutils literal notranslate"><span class="pre">Gather</span></code></p></li>
+<li><p>[x] Implement iterative gathering (simulating tree descent) without <code class="docutils literal notranslate"><span class="pre">Loop</span></code></p></li>
+<li><p>[x] Track left child indices in a parallel tensor</p></li>
+<li><p>[x] Track right child indices in a parallel tensor</p></li>
+<li><p>[x] Track feature indices in a parallel tensor</p></li>
+<li><p>[x] Use <code class="docutils literal notranslate"><span class="pre">Less</span></code> / <code class="docutils literal notranslate"><span class="pre">Greater</span></code> to generate binary offsets (0 or 1)</p></li>
+<li><p>[x] Multiply binary offsets by jump strides</p></li>
+<li><p>[x] Use <code class="docutils literal notranslate"><span class="pre">Add</span></code> to compute next node index natively</p></li>
+<li><p>[x] Support batched gathering (batch of inputs traversing trees simultaneously)</p></li>
+<li><p>[x] Handle leaf node identification (e.g., negative index markers)</p></li>
+<li><p>[x] Use <code class="docutils literal notranslate"><span class="pre">Where</span></code> to freeze indices of rows that have reached a leaf</p></li>
+<li><p>[x] Handle uneven tree depths via masked padding</p></li>
+<li><p>[x] Optimize Gather operations by merging index tensors</p></li>
+<li><p>[x] Implement parallel traversal of all trees in an ensemble using batched Gathers</p></li>
+<li><p>[x] Transpile <code class="docutils literal notranslate"><span class="pre">TreeEnsembleRegressor</span></code> using TreeTraversal</p></li>
+<li><p>[x] Transpile <code class="docutils literal notranslate"><span class="pre">TreeEnsembleClassifier</span></code> using TreeTraversal</p></li>
+<li><p>[x] Manage ONNX sequence lengths statically for unrolled traversals</p></li>
+<li><p>[x] Extract maximum tree depth to dictate unrolling iterations</p></li>
+<li><p>[x] Pre-allocate output tensors for traversal aggregations</p></li>
+<li><p>[x] Handle missing value routing natively within gathered offsets</p></li>
+<li><p>[x] Implement categorical feature gathering (equality checks vs inequalities)</p></li>
+<li><p>[x] Flatten multi-class leaf outputs into parallel gathers</p></li>
+<li><p>[x] Test and validate latency of <code class="docutils literal notranslate"><span class="pre">Gather</span></code> bounds on WASM</p></li>
+</ul>
+</section>
+<section id="perfecttree-traversal-strategy-20-items">
+<h3>4. PerfectTree Traversal Strategy (20+ items)<a class="headerlink" href="#perfecttree-traversal-strategy-20-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Pad all trees to perfectly balanced binary trees (depth $D$)</p></li>
+<li><p>[x] Calculate $2^D - 1$ required node capacities natively</p></li>
+<li><p>[x] Map perfect tree structure to implicit binary heap indices (e.g., $2i+1$, $2i+2$)</p></li>
+<li><p>[x] Eliminate explicit left/right index arrays (computed purely mathematically)</p></li>
+<li><p>[x] Transpile feature indices to perfect tree array</p></li>
+<li><p>[x] Transpile thresholds to perfect tree array</p></li>
+<li><p>[x] Transpile leaf values to perfect tree array</p></li>
+<li><p>[x] Use bitwise or arithmetic shifts (if supported/emulated) for node traversal</p></li>
+<li><p>[x] Implement unrolled loop of depth $D$ using pure arithmetic</p></li>
+<li><p>[x] Use <code class="docutils literal notranslate"><span class="pre">Gather</span></code> only for feature extraction and final leaf value</p></li>
+<li><p>[x] Heavily compress memory footprint of perfect trees vs GEMM</p></li>
+<li><p>[x] Support dynamic depth selection based on ensemble characteristics</p></li>
+<li><p>[x] Detect and trim physically unreachable perfect tree branches</p></li>
+<li><p>[x] Map categorical branches effectively within perfect node constraints</p></li>
+<li><p>[x] Handle multi-output regression perfectly aligned</p></li>
+<li><p>[x] Test memory constraints on WebGPU for deep PerfectTrees ($D &gt; 15$)</p></li>
+<li><p>[x] Optimize padding values to bypass threshold evaluations cleanly</p></li>
+<li><p>[x] Implement early exit masking (simulated) for shallow branches in a perfect tree</p></li>
+<li><p>[x] Validate execution efficiency on wide arrays</p></li>
+<li><p>[x] Profile compilation time overhead of perfect tree padding</p></li>
+</ul>
+</section>
+<section id="scikit-learn-translators-35-items">
+<h3>5. Scikit-Learn Translators (35+ items)<a class="headerlink" href="#scikit-learn-translators-35-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">DecisionTreeClassifier</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">DecisionTreeRegressor</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">RandomForestClassifier</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">RandomForestRegressor</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">ExtraTreesClassifier</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">ExtraTreesRegressor</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">GradientBoostingClassifier</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">GradientBoostingRegressor</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingClassifier</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">HistGradientBoostingRegressor</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">IsolationForest</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">AdaBoostClassifier</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">AdaBoostRegressor</span></code> into Intermediate Representation</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">n_estimators</span></code>, <code class="docutils literal notranslate"><span class="pre">max_depth</span></code>, and tree arrays automatically</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">LinearRegression</span></code> -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">LogisticRegression</span></code> -&gt; Tensor Math + Sigmoid/Softmax</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">Ridge</span></code>, <code class="docutils literal notranslate"><span class="pre">Lasso</span></code>, <code class="docutils literal notranslate"><span class="pre">ElasticNet</span></code> -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">SGDClassifier</span></code> -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">LinearSVC</span></code> -&gt; Tensor Math + Sign</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">SVC</span></code> (Poly) -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">SVC</span></code> (RBF) -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">SVC</span></code> (Sigmoid) -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">GaussianNB</span></code> -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">MultinomialNB</span></code> -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">BernoulliNB</span></code> -&gt; Tensor Math</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">MLPClassifier</span></code> -&gt; Tensor Math (Pure ONNX dense layers)</p></li>
+<li><p>[x] Extract classes and mapping them to output ZipMaps / Tensors</p></li>
+<li><p>[x] Parse pipeline structures seamlessly</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code> via post-processing mathematical transformations</p></li>
+<li><p>[x] Handle multi-output regressors (n_targets &gt; 1) natively</p></li>
+<li><p>[x] Handle multi-label classification natively</p></li>
+<li><p>[x] Bypass Scikit-Learn C++ extensions, extracting directly from Python object properties</p></li>
+<li><p>[x] Optimize Scikit-Learn <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code> + <code class="docutils literal notranslate"><span class="pre">Mul</span></code></p></li>
+<li><p>[x] Optimize Scikit-Learn <code class="docutils literal notranslate"><span class="pre">Binarizer</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Greater</span></code> + <code class="docutils literal notranslate"><span class="pre">Cast</span></code></p></li>
+<li><p>[x] Optimize Scikit-Learn <code class="docutils literal notranslate"><span class="pre">OneHotEncoder</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Equal</span></code> / <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code></p></li>
+</ul>
+</section>
+<section id="lightgbm-translators-25-items">
+<h3>6. LightGBM Translators (25+ items)<a class="headerlink" href="#lightgbm-translators-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">LGBMClassifier</span></code> directly from Python memory</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">LGBMRegressor</span></code> directly from Python memory</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">LGBMRanker</span></code> directly from Python memory</p></li>
+<li><p>[x] Extract LightGBM booster dumps (JSON) strictly in memory</p></li>
+<li><p>[x] Transpile LightGBM default missing value behaviors to tensor masks</p></li>
+<li><p>[x] Handle LightGBM <code class="docutils literal notranslate"><span class="pre">max_bin</span></code> constraints within tensor limits</p></li>
+<li><p>[x] Transpile LightGBM categorical features (bitset evaluations) to <code class="docutils literal notranslate"><span class="pre">Gather</span></code> / <code class="docutils literal notranslate"><span class="pre">Equal</span></code> chains</p></li>
+<li><p>[x] Extract LightGBM <code class="docutils literal notranslate"><span class="pre">sigmoid</span></code> parameter for binary classification output</p></li>
+<li><p>[x] Map LightGBM multiclass Objective (Softmax) to ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code></p></li>
+<li><p>[x] Map LightGBM multiclassova Objective to ONNX <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code></p></li>
+<li><p>[x] Map LightGBM regression objectives (RMSE, L1, Huber) to raw outputs</p></li>
+<li><p>[x] Flatten LightGBM leaf weights into GEMM Matrix C</p></li>
+<li><p>[x] Transpile LightGBM Poisson objective -&gt; <code class="docutils literal notranslate"><span class="pre">Exp</span></code> math node</p></li>
+<li><p>[x] Transpile LightGBM Tweedie objective -&gt; <code class="docutils literal notranslate"><span class="pre">Exp</span></code> math node</p></li>
+<li><p>[x] Map LightGBM leaf output scaling (learning rate / base score) into matrix biases</p></li>
+<li><p>[x] Handle explicit <code class="docutils literal notranslate"><span class="pre">num_class</span></code> parameter conversions safely</p></li>
+<li><p>[x] Test performance on &gt;5,000 tree LightGBM models</p></li>
+<li><p>[x] Provide error boundaries for unsupported custom LightGBM loss functions</p></li>
+<li><p>[x] Optimize <code class="docutils literal notranslate"><span class="pre">limit_max_depth</span></code> trees explicitly into PerfectTree strategies</p></li>
+<li><p>[x] Strip LightGBM specific feature names mapping to strict ONNX indices</p></li>
+<li><p>[x] Support boolean vs integer encoding for LightGBM split paths</p></li>
+<li><p>[x] Validate transpiled output against LightGBM native <code class="docutils literal notranslate"><span class="pre">predict()</span></code> (rtol=1e-5)</p></li>
+<li><p>[x] Validate transpiled output against LightGBM native <code class="docutils literal notranslate"><span class="pre">predict_proba()</span></code></p></li>
+<li><p>[x] Parse categorical threshold subsets natively (simulating <code class="docutils literal notranslate"><span class="pre">in</span></code> operators)</p></li>
+<li><p>[x] Compress large categorical bitsets using int64 arithmetic in ONNX</p></li>
+</ul>
+</section>
+<section id="xgboost-catboost-translators-25-items">
+<h3>7. XGBoost &amp; CatBoost Translators (25+ items)<a class="headerlink" href="#xgboost-catboost-translators-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">XGBClassifier</span></code> directly from Python memory</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">XGBRegressor</span></code> directly from Python memory</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">XGBRanker</span></code> directly from Python memory</p></li>
+<li><p>[x] Load XGBoost Booster JSON dumps natively</p></li>
+<li><p>[x] Extract XGBoost <code class="docutils literal notranslate"><span class="pre">base_score</span></code> and bake into output <code class="docutils literal notranslate"><span class="pre">Add</span></code> tensor</p></li>
+<li><p>[x] Transpile XGBoost <code class="docutils literal notranslate"><span class="pre">missing</span></code> child routing natively into <code class="docutils literal notranslate"><span class="pre">Where</span></code> masks</p></li>
+<li><p>[x] Support XGBoost <code class="docutils literal notranslate"><span class="pre">dart</span></code> (Dropout Additive Regression Trees) by applying static weight scales</p></li>
+<li><p>[x] Map XGBoost <code class="docutils literal notranslate"><span class="pre">binary:logistic</span></code> to <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code></p></li>
+<li><p>[x] Map XGBoost <code class="docutils literal notranslate"><span class="pre">binary:logitraw</span></code> to Raw Output</p></li>
+<li><p>[x] Map XGBoost <code class="docutils literal notranslate"><span class="pre">multi:softmax</span></code> to <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code></p></li>
+<li><p>[x] Map XGBoost <code class="docutils literal notranslate"><span class="pre">multi:softprob</span></code> to <code class="docutils literal notranslate"><span class="pre">Softmax</span></code></p></li>
+<li><p>[x] Map XGBoost <code class="docutils literal notranslate"><span class="pre">count:poisson</span></code> to <code class="docutils literal notranslate"><span class="pre">Exp</span></code></p></li>
+<li><p>[x] Handle multi-target regression mapping cleanly</p></li>
+<li><p>[x] Parse CatBoost <code class="docutils literal notranslate"><span class="pre">CatBoostClassifier</span></code> directly</p></li>
+<li><p>[x] Parse CatBoost <code class="docutils literal notranslate"><span class="pre">CatBoostRegressor</span></code> directly</p></li>
+<li><p>[x] Leverage CatBoost Oblivious Trees to natively map to the PerfectTree Strategy</p></li>
+<li><p>[x] Extract symmetric CatBoost thresholds efficiently</p></li>
+<li><p>[x] Extract CatBoost leaf value arrays without duplication</p></li>
+<li><p>[x] Handle CatBoost one-hot encoded categorical variables mathematically</p></li>
+<li><p>[x] Bypass CTR (Categorical Target Encoding) constraints via explicit Gather maps</p></li>
+<li><p>[x] Map CatBoost <code class="docutils literal notranslate"><span class="pre">Logloss</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code></p></li>
+<li><p>[x] Map CatBoost <code class="docutils literal notranslate"><span class="pre">MultiClass</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Softmax</span></code></p></li>
+<li><p>[x] Validate XGBoost transpilation against native Python outputs</p></li>
+<li><p>[x] Validate CatBoost transpilation against native Python outputs</p></li>
+<li><p>[x] Ensure strict dynamic batch size <code class="docutils literal notranslate"><span class="pre">N</span></code> capability across all compiled matrices</p></li>
+</ul>
+</section>
+<section id="onnx-ml-lowering-30-items">
+<h3>8. ONNX-ML Lowering (30+ items)<a class="headerlink" href="#onnx-ml-lowering-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.TreeEnsembleClassifier</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.TreeEnsembleRegressor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.LinearClassifier</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.LinearRegressor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.SVMClassifier</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.SVMRegressor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.Scaler</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.Normalizer</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.Binarizer</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.OneHotEncoder</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.Imputer</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Math</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.ArrayFeatureExtractor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx.Gather</span></code></p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.CategoryMapper</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> Gather/Where</p></li>
+<li><p>[x] Provide explicit converter for <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml.ZipMap</span></code> -&gt; standard Tensors + external dictionaries</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_treeids</span></code> natively from <code class="docutils literal notranslate"><span class="pre">TreeEnsemble</span></code></p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_nodeids</span></code> natively from <code class="docutils literal notranslate"><span class="pre">TreeEnsemble</span></code></p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_featureids</span></code> natively from <code class="docutils literal notranslate"><span class="pre">TreeEnsemble</span></code></p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_values</span></code> (thresholds) natively from <code class="docutils literal notranslate"><span class="pre">TreeEnsemble</span></code></p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_hitrates</span></code> (if applicable) natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_modes</span></code> (BRANCH_LEQ, BRANCH_LT, BRANCH_GTE, etc.) natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_truenodeids</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_falsenodeids</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">nodes_missing_value_tracks_true</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">class_treeids</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">class_nodeids</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">class_ids</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">class_weights</span></code> natively</p></li>
+<li><p>[x] Extract <code class="docutils literal notranslate"><span class="pre">target_treeids</span></code>, <code class="docutils literal notranslate"><span class="pre">target_nodeids</span></code>, <code class="docutils literal notranslate"><span class="pre">target_ids</span></code>, <code class="docutils literal notranslate"><span class="pre">target_weights</span></code> for regressors</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">post_transform</span></code> extraction (NONE, SOFTMAX, LOGISTIC) natively</p></li>
+<li><p>[x] Ensure lowered ONNX subgraphs are perfectly statically shaped</p></li>
+</ul>
+</section>
+<section id="advanced-feature-engineering-mathematics-25-items">
+<h3>9. Advanced Feature Engineering &amp; Mathematics (25+ items)<a class="headerlink" href="#advanced-feature-engineering-mathematics-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">CountVectorizer</span></code> to native <code class="docutils literal notranslate"><span class="pre">Equal</span></code>, <code class="docutils literal notranslate"><span class="pre">Cast</span></code>, and <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> ops</p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code> to native ONNX math ops using sparse dictionaries</p></li>
+<li><p>[x] Map polynomial expansions using <code class="docutils literal notranslate"><span class="pre">Pow</span></code> and <code class="docutils literal notranslate"><span class="pre">Mul</span></code> combinations</p></li>
+<li><p>[x] Implement MurmurHash3 purely in ONNX ops for <code class="docutils literal notranslate"><span class="pre">FeatureHasher</span></code> support (if feasible)</p></li>
+<li><p>[x] Support embedding lookups using dense <code class="docutils literal notranslate"><span class="pre">Gather</span></code> replacements</p></li>
+<li><p>[x] Handle explicit 64-bit to 32-bit integer casting natively</p></li>
+<li><p>[x] Resolve numerical instability in Softmax over highly weighted tree leaves</p></li>
+<li><p>[x] Optimize Sigmoid using mathematically equivalent faster operations if requested</p></li>
+<li><p>[x] Fold sequential <code class="docutils literal notranslate"><span class="pre">Scaler</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LinearRegressor</span></code> into a single affine transform natively</p></li>
+<li><p>[x] Map KNN distances to <code class="docutils literal notranslate"><span class="pre">ReduceSumSquare</span></code>, <code class="docutils literal notranslate"><span class="pre">TopK</span></code>, and <code class="docutils literal notranslate"><span class="pre">Gather</span></code> natively</p></li>
+<li><p>[x] Support Minkowski distances natively in ONNX math</p></li>
+<li><p>[x] Handle cosine distance via <code class="docutils literal notranslate"><span class="pre">LpNormalization</span></code> and <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[x] Transpile Naive Bayes log-probabilities natively using <code class="docutils literal notranslate"><span class="pre">Log</span></code> and <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[x] Replace <code class="docutils literal notranslate"><span class="pre">Mod</span></code> operations with <code class="docutils literal notranslate"><span class="pre">Div</span></code>, <code class="docutils literal notranslate"><span class="pre">Floor</span></code>, and <code class="docutils literal notranslate"><span class="pre">Sub</span></code> if target backend lacks <code class="docutils literal notranslate"><span class="pre">Mod</span></code></p></li>
+<li><p>[x] Replace <code class="docutils literal notranslate"><span class="pre">Where</span></code> with arithmetic masking <code class="docutils literal notranslate"><span class="pre">(mask</span> <span class="pre">*</span> <span class="pre">A)</span> <span class="pre">+</span> <span class="pre">((1-mask)</span> <span class="pre">*</span> <span class="pre">B)</span></code> for older Opsets</p></li>
+<li><p>[x] Enforce broadcast safety (always unsqueeze target tensors prior to arithmetic)</p></li>
+<li><p>[x] Test mathematical stability of <code class="docutils literal notranslate"><span class="pre">Exp</span></code> against float16 boundaries</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> numerical stability (subtract max) internally</p></li>
+<li><p>[x] Transpile PCA to pure <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[x] Transpile TruncatedSVD to pure <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[x] Transpile LDA to dense linear operations</p></li>
+<li><p>[x] Optimize one-hot encoder dimensions dynamically</p></li>
+<li><p>[x] Provide graph utility to clamp NaN features to zero safely</p></li>
+<li><p>[x] Implement robust division by zero guards <code class="docutils literal notranslate"><span class="pre">Add(x,</span> <span class="pre">epsilon)</span></code></p></li>
+<li><p>[x] Validate mathematical exactness using symbolic manipulation tools</p></li>
+</ul>
+</section>
+<section id="target-post-processing-15-items">
+<h3>10. Target Post-Processing (15+ items)<a class="headerlink" href="#target-post-processing-15-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">ZipMap</span></code> requirements and emit explicit output sequences</p></li>
+<li><p>[x] Provide configuration to omit <code class="docutils literal notranslate"><span class="pre">ZipMap</span></code> for raw tensor performance</p></li>
+<li><p>[x] Flatten multi-class <code class="docutils literal notranslate"><span class="pre">classlabels_strings</span></code> into metadata</p></li>
+<li><p>[x] Provide ONNX <code class="docutils literal notranslate"><span class="pre">Cast</span></code> nodes for specific output target requirements (e.g., bool outputs)</p></li>
+<li><p>[x] Extract predicted classes via <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code></p></li>
+<li><p>[x] Attach <code class="docutils literal notranslate"><span class="pre">classlabels_ints</span></code> to raw indices seamlessly</p></li>
+<li><p>[x] Map hierarchical probability distributions cleanly</p></li>
+<li><p>[x] Combine multi-output regression lists into contiguous vectors</p></li>
+<li><p>[x] Merge multi-label classification into 2D probability matrices</p></li>
+<li><p>[x] Emit specific named outputs (<code class="docutils literal notranslate"><span class="pre">label</span></code>, <code class="docutils literal notranslate"><span class="pre">probabilities</span></code>) reliably</p></li>
+<li><p>[x] Append top-K post-processing dynamically to the lowered graph</p></li>
+<li><p>[x] Output logits / pre-activation scores on demand (bypassing Sigmoid/Softmax)</p></li>
+<li><p>[x] Scale output probabilities by calibration factors statically</p></li>
+<li><p>[x] Correctly manage <code class="docutils literal notranslate"><span class="pre">batch_size=1</span></code> specific dimensional drops</p></li>
+<li><p>[x] Append confidence score derivations directly into the ONNX graph</p></li>
+</ul>
+</section>
+<section id="webgpu-wasm-execution-optimizations-35-items">
+<h3>11. WebGPU &amp; WASM Execution Optimizations (35+ items)<a class="headerlink" href="#webgpu-wasm-execution-optimizations-35-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Eliminate all branch divergence to maximize WebGPU warp efficiency</p></li>
+<li><p>[x] Ensure all generated constants fit within WebGPU max buffer sizes (128MB/256MB)</p></li>
+<li><p>[x] Auto-chunk massive GEMM matrices into smaller tiled <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> sequences if needed</p></li>
+<li><p>[x] Validate memory alignment of <code class="docutils literal notranslate"><span class="pre">Float32</span></code> constants for WASM direct ingestion</p></li>
+<li><p>[x] Pre-transpose Matrix B dynamically during generation to leverage WebGPU layout efficiency</p></li>
+<li><p>[x] Pre-transpose Matrix A if required for optimal WGSL shader performance</p></li>
+<li><p>[x] Avoid <code class="docutils literal notranslate"><span class="pre">Gather</span></code> ops on highly fragmented indices to prevent WebGPU L1 cache misses</p></li>
+<li><p>[x] Utilize <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code> to dynamically allocate scratchpad memory inside the graph</p></li>
+<li><p>[x] Test WASM execution footprint of PerfectTree vs GEMM (WASM prefers GEMM)</p></li>
+<li><p>[x] Benchmark TreeTraversal strategy on WebAssembly CPU (usually faster than WebGPU for deep/sparse trees)</p></li>
+<li><p>[x] Expose heuristic flag <code class="docutils literal notranslate"><span class="pre">force_webgpu</span></code> to enforce GEMM regardless of tree depth</p></li>
+<li><p>[x] Expose heuristic flag <code class="docutils literal notranslate"><span class="pre">force_wasm</span></code> to enforce TreeTraversal</p></li>
+<li><p>[x] Support generating WebGPU compatible dynamic axes (using strict variables)</p></li>
+<li><p>[x] Verify maximum texture dimension limits for GEMM A/B matrices</p></li>
+<li><p>[x] Optimize scalar additions (fuse into <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> beta where possible)</p></li>
+<li><p>[x] Prevent creation of heavily nested subgraphs (WebGPU prefers flattened execution)</p></li>
+<li><p>[x] Guarantee no usage of <code class="docutils literal notranslate"><span class="pre">If</span></code> or <code class="docutils literal notranslate"><span class="pre">Loop</span></code> anywhere in the transpiled tree structures</p></li>
+<li><p>[x] Strip ONNX metadata to compress <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> payload size for network transfer (&lt;1MB)</p></li>
+<li><p>[x] Serialize <code class="docutils literal notranslate"><span class="pre">Constant</span></code> arrays cleanly using little-endian standard</p></li>
+<li><p>[x] Prevent Out-of-Memory (OOM) on Pyodide by aggressively garbage collecting intermediate trees</p></li>
+<li><p>[x] Minimize peak RAM during the compilation phase</p></li>
+<li><p>[x] Support async loading hooks for massive constant arrays natively</p></li>
+<li><p>[x] Support INT8 quantization of GEMM matrices to halve WebGPU buffer sizes</p></li>
+<li><p>[x] Support FP16 downcasting of GEMM matrices natively</p></li>
+<li><p>[x] Ensure WGSL shader compatibility by avoiding <code class="docutils literal notranslate"><span class="pre">Float64</span></code> across the entire graph</p></li>
+<li><p>[x] Ensure WGSL shader compatibility by casting <code class="docutils literal notranslate"><span class="pre">Int64</span></code> to <code class="docutils literal notranslate"><span class="pre">Int32</span></code> natively</p></li>
+<li><p>[x] Test tree ensemble transpilation directly inside Chrome/V8</p></li>
+<li><p>[x] Test tree ensemble transpilation directly inside Safari/JavaScriptCore</p></li>
+<li><p>[x] Validate multi-threading (SharedArrayBuffer) concurrency with generated GEMM graphs</p></li>
+<li><p>[x] Evaluate cold-start latency of GEMM graph on AWS Lambda</p></li>
+<li><p>[x] Optimize node topology specifically for <code class="docutils literal notranslate"><span class="pre">onnxruntime-web</span></code> execution providers</p></li>
+<li><p>[x] Map tree structures to explicitly parallelized sub-graphs if hardware supports it</p></li>
+<li><p>[x] Pre-evaluate static shapes using <code class="docutils literal notranslate"><span class="pre">GraphSurgeon</span></code> tools automatically</p></li>
+<li><p>[x] Run constant folding automatically on transpiled graphs</p></li>
+<li><p>[x] Run dead-code elimination automatically on transpiled graphs</p></li>
+</ul>
+</section>
+<section id="testing-validation-edge-cases-25-items">
+<h3>12. Testing, Validation &amp; Edge Cases (25+ items)<a class="headerlink" href="#testing-validation-edge-cases-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Unit Test: 1-tree DecisionTreeClassifier</p></li>
+<li><p>[x] Unit Test: 100-tree RandomForestClassifier (binary)</p></li>
+<li><p>[x] Unit Test: 100-tree RandomForestClassifier (multiclass)</p></li>
+<li><p>[x] Unit Test: 100-tree RandomForestRegressor</p></li>
+<li><p>[x] Unit Test: LightGBM GBDT (1000 trees)</p></li>
+<li><p>[x] Unit Test: LightGBM DART (100 trees)</p></li>
+<li><p>[x] Unit Test: XGBoost gblinear</p></li>
+<li><p>[x] Unit Test: XGBoost gbtree (binary:logistic)</p></li>
+<li><p>[x] Unit Test: XGBoost gbtree (multi:softprob)</p></li>
+<li><p>[x] Unit Test: CatBoost (symmetric trees)</p></li>
+<li><p>[x] Unit Test: IsolationForest anomaly detection</p></li>
+<li><p>[x] Unit Test: Empty tree structure handling</p></li>
+<li><p>[x] Unit Test: Trees with depth &gt; 50 (GEMM strategy fallback)</p></li>
+<li><p>[x] Unit Test: Trees with perfectly balanced properties</p></li>
+<li><p>[x] Test output equivalency with Scikit-Learn <code class="docutils literal notranslate"><span class="pre">predict</span></code> (atol=1e-5)</p></li>
+<li><p>[x] Test output equivalency with Scikit-Learn <code class="docutils literal notranslate"><span class="pre">predict_proba</span></code> (atol=1e-5)</p></li>
+<li><p>[x] Test output equivalency with LightGBM (atol=1e-5)</p></li>
+<li><p>[x] Test output equivalency with XGBoost (atol=1e-5)</p></li>
+<li><p>[x] Test output equivalency with <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> native <code class="docutils literal notranslate"><span class="pre">ai.onnx.ml</span></code> providers</p></li>
+<li><p>[x] Stress Test: 10,000 tree Random Forest (compilation time &lt; 2 seconds)</p></li>
+<li><p>[x] Stress Test: 10,000 tree Random Forest (WASM execution time &lt; 10ms)</p></li>
+<li><p>[x] Handle identically named features in input datasets securely</p></li>
+<li><p>[x] Parse completely collinear features cleanly</p></li>
+<li><p>[x] Handle deeply imbalanced multi-class trees without NaNs</p></li>
+<li><p>[x] Prevent integer overflow during PerfectTree depth capacity calculations</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX30_ONNX_ARRAY_API.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX19_ONNXMLIR.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">onnx-mlir Replication &amp; Parity Tracker</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Hummingbird Replication &amp; Parity Tracker</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#exhaustive-parity-checklist">Exhaustive Parity Checklist</a><ul>
+<li><a class="reference internal" href="#core-architecture-strategy-selection-25-items">1. Core Architecture &amp; Strategy Selection (25+ items)</a></li>
+<li><a class="reference internal" href="#gemm-matrix-multiplication-strategy-35-items">2. GEMM (Matrix Multiplication) Strategy (35+ items)</a></li>
+<li><a class="reference internal" href="#treetraversal-strategy-25-items">3. TreeTraversal Strategy (25+ items)</a></li>
+<li><a class="reference internal" href="#perfecttree-traversal-strategy-20-items">4. PerfectTree Traversal Strategy (20+ items)</a></li>
+<li><a class="reference internal" href="#scikit-learn-translators-35-items">5. Scikit-Learn Translators (35+ items)</a></li>
+<li><a class="reference internal" href="#lightgbm-translators-25-items">6. LightGBM Translators (25+ items)</a></li>
+<li><a class="reference internal" href="#xgboost-catboost-translators-25-items">7. XGBoost &amp; CatBoost Translators (25+ items)</a></li>
+<li><a class="reference internal" href="#onnx-ml-lowering-30-items">8. ONNX-ML Lowering (30+ items)</a></li>
+<li><a class="reference internal" href="#advanced-feature-engineering-mathematics-25-items">9. Advanced Feature Engineering &amp; Mathematics (25+ items)</a></li>
+<li><a class="reference internal" href="#target-post-processing-15-items">10. Target Post-Processing (15+ items)</a></li>
+<li><a class="reference internal" href="#webgpu-wasm-execution-optimizations-35-items">11. WebGPU &amp; WASM Execution Optimizations (35+ items)</a></li>
+<li><a class="reference internal" href="#testing-validation-edge-cases-25-items">12. Testing, Validation &amp; Edge Cases (25+ items)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

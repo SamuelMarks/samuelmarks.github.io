@@ -1,0 +1,909 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)" href="ONNX37_TENSORRT.html"><link rel="prev" title="ONNX18: Apache TVM (Ahead-of-Time Web Compiler)" href="ONNX20_TVM_COMPILER.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX09_ORT_NATIVE.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="ort-native-exec-ffi-dispatcher-replication-parity-tracker">
+<h1>ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker<a class="headerlink" href="#ort-native-exec-ffi-dispatcher-replication-parity-tracker" title="Link to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>This document tracks the complete reimplementation of the native hardware Execution Providers (EP) originally found in <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code>, within the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> ecosystem.
+Instead of relying on a massive C++ framework to coordinate hardware execution, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> acts as a zero-overhead pure-Python dynamic dispatcher. It maps ONNX <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> structures (backed by zero-copy DLPack or NumPy contiguous memory) directly to OS-native hardware libraries via <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> and <code class="docutils literal notranslate"><span class="pre">cffi</span></code>.
+This covers the exhaustive integration of <strong>Apple Accelerate (vDSP/BNNS)</strong>, <strong>Apple Metal (MPS)</strong>, <strong>NVIDIA CUDA (cuBLAS/cuDNN)</strong>, and <strong>OpenBLAS/MKL</strong> natively from Python. This architecture allows an ONNX model to execute at native C speeds without requiring any C++ compilation or <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> installations on the host machine.</p>
+</section>
+<section id="exhaustive-parity-checklist">
+<h2>Exhaustive Parity Checklist<a class="headerlink" href="#exhaustive-parity-checklist" title="Link to this heading">¶</a></h2>
+<section id="core-ffi-ctypes-dynamic-library-orchestration-35-items">
+<h3>1. Core FFI, CTypes, &amp; Dynamic Library Orchestration (35+ items)<a class="headerlink" href="#core-ffi-ctypes-dynamic-library-orchestration-35-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement generic <code class="docutils literal notranslate"><span class="pre">DynamicLibrary</span></code> loader for POSIX (<code class="docutils literal notranslate"><span class="pre">dlopen</span></code>, <code class="docutils literal notranslate"><span class="pre">dlsym</span></code>)</p></li>
+<li><p>[x] Implement generic <code class="docutils literal notranslate"><span class="pre">DynamicLibrary</span></code> loader for Windows (<code class="docutils literal notranslate"><span class="pre">LoadLibrary</span></code>, <code class="docutils literal notranslate"><span class="pre">GetProcAddress</span></code>)</p></li>
+<li><p>[x] Extract library paths dynamically using <code class="docutils literal notranslate"><span class="pre">ctypes.util.find_library</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">RTLD_NOW</span></code> and <code class="docutils literal notranslate"><span class="pre">RTLD_GLOBAL</span></code> bindings for proper symbol resolution</p></li>
+<li><p>[x] Catch <code class="docutils literal notranslate"><span class="pre">OSError</span></code> cleanly when a hardware library is missing</p></li>
+<li><p>[x] Fallback gracefully between library versions (e.g. <code class="docutils literal notranslate"><span class="pre">libcudart.so.12</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">libcudart.so.11</span></code>)</p></li>
+<li><p>[x] Define explicit C function signatures (<code class="docutils literal notranslate"><span class="pre">argtypes</span></code>, <code class="docutils literal notranslate"><span class="pre">restype</span></code>) for safety</p></li>
+<li><p>[x] Implement C-struct mappings natively in Python for hardware context handles</p></li>
+<li><p>[x] Prevent Python Garbage Collection on active C-pointers securely</p></li>
+<li><p>[x] Expose native pointers from Python integers (<code class="docutils literal notranslate"><span class="pre">ctypes.c_void_p</span></code>)</p></li>
+<li><p>[x] Abstract synchronous vs asynchronous hardware execution boundaries</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">dlerror()</span></code> strings natively to Python for debugging</p></li>
+<li><p>[x] Handle explicit Windows Calling Conventions (<code class="docutils literal notranslate"><span class="pre">__stdcall</span></code> vs <code class="docutils literal notranslate"><span class="pre">__cdecl</span></code>) securely</p></li>
+<li><p>[x] Verify host architecture dynamically (<code class="docutils literal notranslate"><span class="pre">x86_64</span></code>, <code class="docutils literal notranslate"><span class="pre">aarch64</span></code>, <code class="docutils literal notranslate"><span class="pre">arm64</span></code>)</p></li>
+<li><p>[x] Verify host OS dynamically (<code class="docutils literal notranslate"><span class="pre">Darwin</span></code>, <code class="docutils literal notranslate"><span class="pre">Linux</span></code>, <code class="docutils literal notranslate"><span class="pre">Windows</span></code>)</p></li>
+<li><p>[x] Wrap all FFI calls in minimal-overhead Python decorators</p></li>
+<li><p>[x] Optimize inner-loop FFI calls by caching <code class="docutils literal notranslate"><span class="pre">getattr</span></code> lookups</p></li>
+<li><p>[x] Provide thread-safe FFI invocations (releasing Python GIL if supported)</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">cffi</span></code> ABI mode explicitly for lower overhead than <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> where available</p></li>
+<li><p>[x] Manage Hardware Context handles (e.g. <code class="docutils literal notranslate"><span class="pre">cublasHandle_t</span></code>) safely across Threads</p></li>
+<li><p>[x] Destroy Hardware Context handles explicitly on <code class="docutils literal notranslate"><span class="pre">__del__</span></code> or Context Manager exit</p></li>
+<li><p>[x] Expose explicitly hardware-specific error codes mapped to Python <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code></p></li>
+<li><p>[x] Verify hardware alignment constraints (e.g. 16-byte, 32-byte bounds) natively</p></li>
+<li><p>[x] Prevent illegal memory access (Segfaults) by bounds-checking Python array sizes before FFI dispatch</p></li>
+<li><p>[x] Map Python strings to <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char*</span></code> C-strings seamlessly</p></li>
+<li><p>[x] Map Python <code class="docutils literal notranslate"><span class="pre">bool</span></code> to C <code class="docutils literal notranslate"><span class="pre">int</span></code> natively</p></li>
+<li><p>[x] Emulate C++ <code class="docutils literal notranslate"><span class="pre">std::vector</span></code> contiguous data payloads across the C boundary</p></li>
+<li><p>[x] Provide an abstraction to inject user-provided shared libraries dynamically (<code class="docutils literal notranslate"><span class="pre">.so</span></code> / <code class="docutils literal notranslate"><span class="pre">.dll</span></code>)</p></li>
+<li><p>[x] Ensure 100% pure Python execution if NO hardware libraries are found (graceful fallback)</p></li>
+<li><p>[x] Provide exhaustive verbose logging of FFI load times</p></li>
+<li><p>[x] Isolate FFI imports to prevent crashing the main module on unsupported hardware</p></li>
+<li><p>[x] Profile <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> call overhead to ensure it remains &lt; 1 microsecond per op</p></li>
+<li><p>[x] Execute <code class="docutils literal notranslate"><span class="pre">sysctl</span></code> or <code class="docutils literal notranslate"><span class="pre">machdep</span></code> natively on macOS to query specific CPU features</p></li>
+<li><p>[x] Query <code class="docutils literal notranslate"><span class="pre">/proc/cpuinfo</span></code> on Linux natively to identify AVX/AVX2/AVX512/NEON extensions</p></li>
+<li><p>[x] Identify L1/L2/L3 Cache sizes natively to optimize BLAS tiling logic</p></li>
+</ul>
+</section>
+<section id="zero-copy-memory-dlpack-integration-40-items">
+<h3>2. Zero-Copy Memory &amp; DLPack Integration (40+ items)<a class="headerlink" href="#zero-copy-memory-dlpack-integration-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement strict <code class="docutils literal notranslate"><span class="pre">__dlpack__</span></code> protocol for <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code></p></li>
+<li><p>[x] Implement strict <code class="docutils literal notranslate"><span class="pre">__dlpack_device__</span></code> protocol</p></li>
+<li><p>[x] Consume PyTorch <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> directly via DLPack (Zero-copy)</p></li>
+<li><p>[x] Consume JAX <code class="docutils literal notranslate"><span class="pre">jax.Array</span></code> directly via DLPack (Zero-copy)</p></li>
+<li><p>[x] Consume TensorFlow <code class="docutils literal notranslate"><span class="pre">tf.Tensor</span></code> directly via DLPack (Zero-copy)</p></li>
+<li><p>[x] Consume NumPy <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> directly via <code class="docutils literal notranslate"><span class="pre">__array_interface__</span></code> (Zero-copy)</p></li>
+<li><p>[x] Ensure consumed DLPack tensors retain their original memory backend (CPU vs GPU)</p></li>
+<li><p>[x] Extract raw memory pointers (<code class="docutils literal notranslate"><span class="pre">data_ptr</span></code>) strictly natively</p></li>
+<li><p>[x] Extract memory strides strictly natively</p></li>
+<li><p>[x] Extract data types (<code class="docutils literal notranslate"><span class="pre">DLDataType</span></code> struct) strictly natively</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">kDLCPU</span></code> device natively</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">kDLCUDA</span></code> device natively</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">kDLCUDAManaged</span></code> (Pinned) device natively</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">kDLMetal</span></code> device natively</p></li>
+<li><p>[x] Handle <code class="docutils literal notranslate"><span class="pre">kDLROCM</span></code> device natively</p></li>
+<li><p>[x] Throw exceptions natively if memory is not <code class="docutils literal notranslate"><span class="pre">C_CONTIGUOUS</span></code> and operation requires it</p></li>
+<li><p>[x] Auto-generate contiguous copies if memory is <code class="docutils literal notranslate"><span class="pre">F_CONTIGUOUS</span></code> and operation requires C-layout</p></li>
+<li><p>[x] Support explicit CUDA Pinned Memory allocation (<code class="docutils literal notranslate"><span class="pre">cudaMallocHost</span></code>) natively in Python</p></li>
+<li><p>[x] Support explicit Unified Memory allocation (<code class="docutils literal notranslate"><span class="pre">cudaMallocManaged</span></code>) natively</p></li>
+<li><p>[x] Implement OS-level Page-Locked memory via <code class="docutils literal notranslate"><span class="pre">mlock</span></code> natively in Python</p></li>
+<li><p>[x] Allocate large memory arenas explicitly using anonymous <code class="docutils literal notranslate"><span class="pre">mmap</span></code> (<code class="docutils literal notranslate"><span class="pre">MAP_ANONYMOUS</span> <span class="pre">|</span> <span class="pre">MAP_PRIVATE</span></code>)</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">madvise</span></code> (<code class="docutils literal notranslate"><span class="pre">MADV_HUGEPAGE</span></code>) is used for massive intermediate tensors on Linux</p></li>
+<li><p>[x] Guarantee 64-byte alignment explicitly during arena allocations for AVX512/GPU</p></li>
+<li><p>[x] Track memory views explicitly (slices of tensors do not reallocate memory)</p></li>
+<li><p>[x] Implement robust Reference Counting for memory arenas shared across multiple tensors</p></li>
+<li><p>[x] Support overlapping memory boundaries securely (In-place operations)</p></li>
+<li><p>[x] Prevent Race Conditions when multiple threads access the same Memory Arena</p></li>
+<li><p>[x] Provide <code class="docutils literal notranslate"><span class="pre">tensor.to(device)</span></code> mapping allocating memory directly on the target hardware</p></li>
+<li><p>[x] Transfer memory CPU -&gt; GPU implicitly if Execution Provider mandates it</p></li>
+<li><p>[x] Transfer memory GPU -&gt; CPU implicitly if Execution Provider mandates it</p></li>
+<li><p>[x] Track explicit bandwidth metrics (Bytes/sec) during CPU &lt;-&gt; GPU transfers</p></li>
+<li><p>[x] Support Asynchronous memory transfers (<code class="docutils literal notranslate"><span class="pre">cudaMemcpyAsync</span></code>) via explicit streams</p></li>
+<li><p>[x] Provide explicit memory barrier primitives (<code class="docutils literal notranslate"><span class="pre">cudaStreamSynchronize</span></code>)</p></li>
+<li><p>[x] Handle specific Apple Silicon Unified Memory architectures (Zero-copy CPU &lt;-&gt; GPU)</p></li>
+<li><p>[x] Extract memory pointers from WebAssembly (<code class="docutils literal notranslate"><span class="pre">Module.HEAPU8</span></code>) directly natively</p></li>
+<li><p>[x] Expose native OS memory metrics to the user (e.g. Current VRAM usage)</p></li>
+<li><p>[x] Trap Out-Of-Memory (OOM) explicitly and surface Python <code class="docutils literal notranslate"><span class="pre">MemoryError</span></code></p></li>
+<li><p>[x] Guarantee safe cleanup of unmanaged C pointers via <code class="docutils literal notranslate"><span class="pre">weakref.finalize</span></code></p></li>
+<li><p>[x] Handle Pyodide proxy objects converting to contiguous C pointers natively</p></li>
+<li><p>[x] Support explicit INT4 memory packing and pointer resolution natively</p></li>
+</ul>
+</section>
+<section id="apple-accelerate-vdsp-bnns-backend-40-items">
+<h3>3. Apple Accelerate (vDSP &amp; BNNS) Backend (40+ items)<a class="headerlink" href="#apple-accelerate-vdsp-bnns-backend-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">Accelerate.framework</span></code> dynamically on macOS</p></li>
+<li><p>[x] Load <code class="docutils literal notranslate"><span class="pre">cblas</span></code> directly from Accelerate</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">cblas_sgemm</span></code> (Float32)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">cblas_dgemm</span></code> (Float64)</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">cblas</span></code> transposition arguments (<code class="docutils literal notranslate"><span class="pre">CblasNoTrans</span></code>, <code class="docutils literal notranslate"><span class="pre">CblasTrans</span></code>) correctly map ONNX layouts</p></li>
+<li><p>[x] Load <code class="docutils literal notranslate"><span class="pre">vDSP</span></code> directly from Accelerate</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vadd</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Sub</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vsub</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Mul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vmul</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Div</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vdiv</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Abs</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vabs</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Neg</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vneg</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Clip</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vclip</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_maxv</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_minv</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_sve</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_meanv</span></code></p></li>
+<li><p>[x] Implement Vector-Scalar Add -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vsadd</span></code></p></li>
+<li><p>[x] Implement Vector-Scalar Mul -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vsmul</span></code></p></li>
+<li><p>[x] Implement Vector-Scalar Div -&gt; <code class="docutils literal notranslate"><span class="pre">vDSP_vsdiv</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Exp</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vexp</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Log</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vlog</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vsqrt</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Sin</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vsin</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Cos</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vcos</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Tan</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vtan</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Tanh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">vforce_vtanh</span></code></p></li>
+<li><p>[x] Load <code class="docutils literal notranslate"><span class="pre">BNNS</span></code> (Basic Neural Network Subroutines) dynamically from Accelerate</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Conv</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BNNSFilterApply</span></code> (Convolution)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BNNSFilterApply</span></code> (Pooling)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BNNSFilterApply</span></code> (Pooling)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BNNSFilterApply</span></code> (Normalization)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BNNSFilterApply</span></code> (Activation)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BNNSFilterApply</span></code> (Activation)</p></li>
+<li><p>[x] Manage BNNS filter creation (<code class="docutils literal notranslate"><span class="pre">BNNSFilterCreate...</span></code>) and caching dynamically</p></li>
+<li><p>[x] Release BNNS filters natively to prevent memory leaks (<code class="docutils literal notranslate"><span class="pre">BNNSFilterDestroy</span></code>)</p></li>
+<li><p>[x] Expose native AMX (Apple Matrix Coprocessor) instructions via Accelerate implicitly</p></li>
+<li><p>[x] Validate 32-byte alignment implicitly required by certain vDSP instructions</p></li>
+<li><p>[x] Provide pure Python loop fallback if vDSP length constraints are violated</p></li>
+<li><p>[x] Profile the latency of Accelerate framework calls natively</p></li>
+</ul>
+</section>
+<section id="apple-metal-performance-shaders-mps-backend-40-items">
+<h3>4. Apple Metal Performance Shaders (MPS) Backend (40+ items)<a class="headerlink" href="#apple-metal-performance-shaders-mps-backend-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">Metal.framework</span></code> dynamically</p></li>
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">MetalPerformanceShaders.framework</span></code> (MPS) dynamically</p></li>
+<li><p>[x] Expose PyObjC bridging natively using pure <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> (allocating <code class="docutils literal notranslate"><span class="pre">NSObject</span></code> securely)</p></li>
+<li><p>[x] Request <code class="docutils literal notranslate"><span class="pre">MTLCreateSystemDefaultDevice</span></code> natively</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">MTLCommandQueue</span></code> natively</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">MTLCommandBuffer</span></code> natively per execution step</p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code> to <code class="docutils literal notranslate"><span class="pre">MTLBuffer</span></code> using <code class="docutils literal notranslate"><span class="pre">newBufferWithBytesNoCopy</span></code> for zero-overhead</p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">MTLBuffer</span></code> to <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code> using <code class="docutils literal notranslate"><span class="pre">contents</span></code> securely</p></li>
+<li><p>[x] Sync <code class="docutils literal notranslate"><span class="pre">MTLCommandBuffer</span></code> using <code class="docutils literal notranslate"><span class="pre">waitUntilCompleted</span></code> natively</p></li>
+<li><p>[x] Initialize <code class="docutils literal notranslate"><span class="pre">MPSGraph</span></code> natively</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">additionWithPrimaryTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Sub</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">subtractionWithPrimaryTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Mul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">multiplicationWithPrimaryTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Div</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">divisionWithPrimaryTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">matrixMultiplicationWithPrimaryTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Conv</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">convolution2DWithSourceTensor:...]</span></code></p></li>
+<li><p>[x] Map standard ONNX <code class="docutils literal notranslate"><span class="pre">pads</span></code>, <code class="docutils literal notranslate"><span class="pre">strides</span></code>, <code class="docutils literal notranslate"><span class="pre">dilations</span></code> to MPS <code class="docutils literal notranslate"><span class="pre">MPSGraphConvolution2DOpDescriptor</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">maxPooling2DWithSourceTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">avgPooling2DWithSourceTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Relu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">reLUWithTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">geLUWithTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">softMaxWithTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">reductionSumWithTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">reductionMeanWithTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">reshapeTensor:...]</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">[MPSGraph</span> <span class="pre">transposeTensor:...]</span></code></p></li>
+<li><p>[x] Compile <code class="docutils literal notranslate"><span class="pre">MPSGraph</span></code> to <code class="docutils literal notranslate"><span class="pre">MPSGraphExecutable</span></code> statically to save runtime latency</p></li>
+<li><p>[x] Cache <code class="docutils literal notranslate"><span class="pre">MPSGraphExecutable</span></code> natively keyed by input shape signatures</p></li>
+<li><p>[x] Handle dynamic shapes inside <code class="docutils literal notranslate"><span class="pre">MPSGraph</span></code> gracefully</p></li>
+<li><p>[x] Provide explicit FP16 Metal execution (MPS runs natively in FP16 if requested)</p></li>
+<li><p>[x] Fallback unsupported operations from Metal back to Accelerate (CPU) seamlessly</p></li>
+<li><p>[x] Sync data explicitly between <code class="docutils literal notranslate"><span class="pre">MTLBuffer</span></code> and CPU Ram across Execution Provider boundaries</p></li>
+<li><p>[x] Extract GPU profiling latency natively using <code class="docutils literal notranslate"><span class="pre">MTLEvent</span></code> or <code class="docutils literal notranslate"><span class="pre">GPUEndTime</span></code> metrics</p></li>
+<li><p>[x] Manage <code class="docutils literal notranslate"><span class="pre">NSAutoreleasePool</span></code> natively in Python to prevent macOS memory leaks</p></li>
+<li><p>[x] Catch Metal validation layer errors gracefully and print them to Python stdout</p></li>
+<li><p>[x] Implement Custom Metal Shaders (MSL) compiled via <code class="docutils literal notranslate"><span class="pre">MTLLibrary</span></code> natively for unsupported Ops</p></li>
+<li><p>[x] Dispatch arbitrary MSL Compute Pipelines natively (<code class="docutils literal notranslate"><span class="pre">MTLComputeCommandEncoder</span></code>)</p></li>
+<li><p>[x] Set <code class="docutils literal notranslate"><span class="pre">threadgroupsPerGrid</span></code> and <code class="docutils literal notranslate"><span class="pre">threadsPerThreadgroup</span></code> perfectly for custom MSL</p></li>
+<li><p>[x] Inject <code class="docutils literal notranslate"><span class="pre">Cast</span></code> operations explicitly if MPS refuses to process specific data types (e.g. Int64)</p></li>
+<li><p>[x] Validate Apple Silicon (M1/M2/M3) unified memory bandwidth limits natively</p></li>
+</ul>
+</section>
+<section id="nvidia-cuda-core-cublas-backend-45-items">
+<h3>5. NVIDIA CUDA Core &amp; cuBLAS Backend (45+ items)<a class="headerlink" href="#nvidia-cuda-core-cublas-backend-45-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">libcudart.so</span></code> / <code class="docutils literal notranslate"><span class="pre">cudart.dll</span></code> dynamically</p></li>
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">libcublas.so</span></code> / <code class="docutils literal notranslate"><span class="pre">cublas.dll</span></code> dynamically</p></li>
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">libcublasLt.so</span></code> / <code class="docutils literal notranslate"><span class="pre">cublasLt.dll</span></code> dynamically</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudaGetDeviceCount</span></code> natively</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudaSetDevice</span></code> natively</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudaMalloc</span></code> natively</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudaFree</span></code> natively</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudaMemcpy</span></code> (HostToDevice, DeviceToHost, DeviceToDevice) natively</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudaStreamCreate</span></code>, <code class="docutils literal notranslate"><span class="pre">cudaStreamDestroy</span></code>, <code class="docutils literal notranslate"><span class="pre">cudaStreamSynchronize</span></code> natively</p></li>
+<li><p>[x] Wrap all CUDA calls in strict error checking checking <code class="docutils literal notranslate"><span class="pre">cudaError_t</span></code> != 0</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">cublasCreate_v2</span></code> handle securely</p></li>
+<li><p>[x] Destroy <code class="docutils literal notranslate"><span class="pre">cublasDestroy_v2</span></code> handle securely</p></li>
+<li><p>[x] Set cuBLAS streams via <code class="docutils literal notranslate"><span class="pre">cublasSetStream_v2</span></code></p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float32) to <code class="docutils literal notranslate"><span class="pre">cublasSgemm</span></code></p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float64) to <code class="docutils literal notranslate"><span class="pre">cublasDgemm</span></code></p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float16) to <code class="docutils literal notranslate"><span class="pre">cublasHgemm</span></code></p></li>
+<li><p>[x] Map Batched <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float32) to <code class="docutils literal notranslate"><span class="pre">cublasSgemmStridedBatched</span></code></p></li>
+<li><p>[x] Map Batched <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float16) to <code class="docutils literal notranslate"><span class="pre">cublasHgemmStridedBatched</span></code></p></li>
+<li><p>[x] Explicitly map ONNX Row-Major topologies to cuBLAS Column-Major APIs (using transposed flags <code class="docutils literal notranslate"><span class="pre">CUBLAS_OP_T</span></code>)</p></li>
+<li><p>[x] Evaluate explicitly required Workspace sizes for cuBLAS operations natively</p></li>
+<li><p>[x] Set cuBLAS Math Mode to <code class="docutils literal notranslate"><span class="pre">CUBLAS_TENSOR_OP_MATH</span></code> (enable Tensor Cores for FP16)</p></li>
+<li><p>[x] Set cuBLAS Math Mode to <code class="docutils literal notranslate"><span class="pre">CUBLAS_TF32_TENSOR_OP_MATH</span></code> (enable TF32 on Ampere+)</p></li>
+<li><p>[x] Implement scalar loading directly into GPU memory for cuBLAS <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code> values</p></li>
+<li><p>[x] Bind Elementwise Vector math via <code class="docutils literal notranslate"><span class="pre">cublasSscal</span></code>, <code class="docutils literal notranslate"><span class="pre">cublasSaxpy</span></code> natively</p></li>
+<li><p>[x] Fallback unsupported operations to CPU explicitly (triggering <code class="docutils literal notranslate"><span class="pre">cudaMemcpy</span></code> automatically)</p></li>
+<li><p>[x] Cache CUDA allocations via a Native Python memory arena (preventing <code class="docutils literal notranslate"><span class="pre">cudaMalloc</span></code> overhead)</p></li>
+<li><p>[x] Map specific <code class="docutils literal notranslate"><span class="pre">cublasLtMatmul</span></code> APIs for fused Epilogues (e.g. MatMul + Relu)</p></li>
+<li><p>[x] Provide explicit FP8 inference emulation via <code class="docutils literal notranslate"><span class="pre">cublasLt</span></code> if supported by Ampere/Hopper</p></li>
+<li><p>[x] Query GPU SM count (<code class="docutils literal notranslate"><span class="pre">cudaDeviceGetAttribute</span></code>) to optimize stream splitting</p></li>
+<li><p>[x] Expose native <code class="docutils literal notranslate"><span class="pre">torch.cuda.current_stream()</span></code> synchronization bridging</p></li>
+<li><p>[x] Ensure Multi-GPU topology execution (splitting nodes across Device 0 and Device 1 natively)</p></li>
+<li><p>[x] Trace latency across CUDA ops using <code class="docutils literal notranslate"><span class="pre">cudaEventRecord</span></code> natively</p></li>
+<li><p>[x] Load completely custom <code class="docutils literal notranslate"><span class="pre">.ptx</span></code> files natively using <code class="docutils literal notranslate"><span class="pre">cuModuleLoad</span></code></p></li>
+<li><p>[x] Bind custom <code class="docutils literal notranslate"><span class="pre">.ptx</span></code> kernels to specific ONNX elements dynamically using <code class="docutils literal notranslate"><span class="pre">cuLaunchKernel</span></code></p></li>
+<li><p>[x] Execute completely asynchronously, yielding to the Python event loop while the GPU computes</p></li>
+<li><p>[x] Resolve out-of-bounds pointer allocations safely without hard-crashing the Python process</p></li>
+<li><p>[x] Extract native VRAM metrics dynamically via <code class="docutils literal notranslate"><span class="pre">cudaMemGetInfo</span></code></p></li>
+<li><p>[x] Emulate specific Activation functions via custom generated PTX kernels natively</p></li>
+<li><p>[x] Emulate specific Reductions via custom generated PTX kernels natively</p></li>
+<li><p>[x] Emulate <code class="docutils literal notranslate"><span class="pre">Gather</span></code> and <code class="docutils literal notranslate"><span class="pre">Scatter</span></code> using atomic operations in custom PTX</p></li>
+<li><p>[x] Inject explicit precision casts (<code class="docutils literal notranslate"><span class="pre">Float32</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Float16</span></code>) strictly on the GPU natively</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">Float16</span></code> numerical stability dynamically against CPU calculations (atol=1e-3)</p></li>
+<li><p>[x] Bind <code class="docutils literal notranslate"><span class="pre">cudaDeviceSynchronize</span></code> specifically at the end of the ONNX Graph Execution</p></li>
+<li><p>[x] Provide <code class="docutils literal notranslate"><span class="pre">CUDAExecutionProvider</span></code> Options natively mimicking standard ORT dictionaries</p></li>
+<li><p>[x] Support dynamic sizing (<code class="docutils literal notranslate"><span class="pre">-1</span></code> axes) implicitly by re-calling cuBLAS without reallocation if buffer fits</p></li>
+</ul>
+</section>
+<section id="nvidia-cudnn-tensor-core-backend-40-items">
+<h3>6. NVIDIA cuDNN &amp; Tensor Core Backend (40+ items)<a class="headerlink" href="#nvidia-cudnn-tensor-core-backend-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">libcudnn.so</span></code> / <code class="docutils literal notranslate"><span class="pre">cudnn.dll</span></code> dynamically</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">cudnnCreate</span></code> handle natively</p></li>
+<li><p>[x] Set cuDNN streams via <code class="docutils literal notranslate"><span class="pre">cudnnSetStream</span></code></p></li>
+<li><p>[x] Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> explicitly to <code class="docutils literal notranslate"><span class="pre">cudnnConvolutionForward</span></code></p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">cudnnTensorDescriptor_t</span></code> for inputs natively</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">cudnnTensorDescriptor_t</span></code> for outputs natively</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">cudnnFilterDescriptor_t</span></code> for weights natively</p></li>
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">cudnnConvolutionDescriptor_t</span></code> natively</p></li>
+<li><p>[x] Map ONNX Padding securely to cuDNN parameters</p></li>
+<li><p>[x] Map ONNX Strides securely to cuDNN parameters</p></li>
+<li><p>[x] Map ONNX Dilations securely to cuDNN parameters</p></li>
+<li><p>[x] Emulate Asymmetric padding natively (cuDNN only supports symmetric, must pre-pad inputs)</p></li>
+<li><p>[x] Map ONNX Groups (Depthwise) to cuDNN <code class="docutils literal notranslate"><span class="pre">cudnnSetConvolutionGroupCount</span></code></p></li>
+<li><p>[x] Support NCHW tensor layout explicit mappings</p></li>
+<li><p>[x] Support NHWC tensor layout explicit mappings (Fastest on Tensor Cores)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnGetConvolutionForwardAlgorithm_v7</span></code> to auto-tune the fastest convolution algorithm</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM</span></code> natively</p></li>
+<li><p>[x] Support <code class="docutils literal notranslate"><span class="pre">CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED</span></code> natively</p></li>
+<li><p>[x] Set cuDNN Math Type to <code class="docutils literal notranslate"><span class="pre">CUDNN_TENSOR_OP_MATH</span></code> explicitly</p></li>
+<li><p>[x] Allocate specific Workspace buffers dynamically as requested by cuDNN heuristic search</p></li>
+<li><p>[x] Cache Algorithm selections dynamically based on Input Shapes (preventing tuning overhead)</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnPoolingForward</span></code> for <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnPoolingForward</span></code> for <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code></p></li>
+<li><p>[x] Map ONNX Spatial parameters to <code class="docutils literal notranslate"><span class="pre">cudnnPoolingDescriptor_t</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnActivationForward</span></code> for <code class="docutils literal notranslate"><span class="pre">Relu</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnActivationForward</span></code> for <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnActivationForward</span></code> for <code class="docutils literal notranslate"><span class="pre">Tanh</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnSoftmaxForward</span></code> for <code class="docutils literal notranslate"><span class="pre">Softmax</span></code></p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">cudnnSoftmaxForward</span></code> for <code class="docutils literal notranslate"><span class="pre">LogSoftmax</span></code></p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">cudnnBatchNormalizationForwardInference</span></code> for <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code></p></li>
+<li><p>[x] Map <code class="docutils literal notranslate"><span class="pre">cudnnSpatialTfSamplerForward</span></code> for <code class="docutils literal notranslate"><span class="pre">GridSample</span></code> natively</p></li>
+<li><p>[x] Handle 1D Convolutions correctly by expanding to 2D internally for cuDNN</p></li>
+<li><p>[x] Handle 3D Convolutions (<code class="docutils literal notranslate"><span class="pre">cudnnConvolutionForward</span></code> ND representations)</p></li>
+<li><p>[x] Catch <code class="docutils literal notranslate"><span class="pre">CUDNN_STATUS_NOT_SUPPORTED</span></code> and fallback to generic PTX or CPU execution securely</p></li>
+<li><p>[x] Support FP16 convolutions optimally (Requires NHWC layout natively)</p></li>
+<li><p>[x] Clean up all cuDNN Descriptors natively upon graph garbage collection</p></li>
+<li><p>[x] Trace cuDNN specific kernel execution latencies via <code class="docutils literal notranslate"><span class="pre">cudaEvent</span></code> explicitly</p></li>
+<li><p>[x] Emulate TensorRT fusion graphs using purely cuDNN <code class="docutils literal notranslate"><span class="pre">backend</span></code> API (v8+) if available</p></li>
+<li><p>[x] Ensure strict error tracebacks printing the exact cuDNN failure string</p></li>
+<li><p>[x] Test numerical tolerance on Deep CNNs (ResNet/VGG) entirely on cuDNN</p></li>
+</ul>
+</section>
+<section id="openblas-cpu-generic-execution-fallback-30-items">
+<h3>7. OpenBLAS &amp; CPU Generic Execution Fallback (30+ items)<a class="headerlink" href="#openblas-cpu-generic-execution-fallback-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Detect <code class="docutils literal notranslate"><span class="pre">libopenblas.so</span></code> / <code class="docutils literal notranslate"><span class="pre">libopenblas.dll</span></code> dynamically</p></li>
+<li><p>[x] Implement fallback <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float32) using <code class="docutils literal notranslate"><span class="pre">cblas_sgemm</span></code></p></li>
+<li><p>[x] Implement fallback <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> (Float64) using <code class="docutils literal notranslate"><span class="pre">cblas_dgemm</span></code></p></li>
+<li><p>[x] Set explicitly <code class="docutils literal notranslate"><span class="pre">openblas_set_num_threads</span></code> based on Session Options</p></li>
+<li><p>[x] Override <code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code> and <code class="docutils literal notranslate"><span class="pre">OPENBLAS_NUM_THREADS</span></code> environment variables securely</p></li>
+<li><p>[x] Handle generic fallback CPU elementwise math natively in pure C loops (using <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> loaded kernels)</p></li>
+<li><p>[x] Implement native C loop for <code class="docutils literal notranslate"><span class="pre">Add</span></code> (with broadcasting)</p></li>
+<li><p>[x] Implement native C loop for <code class="docutils literal notranslate"><span class="pre">Mul</span></code> (with broadcasting)</p></li>
+<li><p>[x] Implement native C loop for <code class="docutils literal notranslate"><span class="pre">Exp</span></code>, <code class="docutils literal notranslate"><span class="pre">Log</span></code>, <code class="docutils literal notranslate"><span class="pre">Softmax</span></code></p></li>
+<li><p>[x] Compile the tiny C fallback kernels dynamically at runtime via standard <code class="docutils literal notranslate"><span class="pre">cc</span></code> / <code class="docutils literal notranslate"><span class="pre">gcc</span></code> if needed</p></li>
+<li><p>[x] Cache the tiny compiled <code class="docutils literal notranslate"><span class="pre">.so</span></code> fallback explicitly in <code class="docutils literal notranslate"><span class="pre">~/.onnx9000/cache</span></code></p></li>
+<li><p>[x] Execute <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> bindings on the dynamically compiled CPU Fallback kernels</p></li>
+<li><p>[x] Implement C-level parallelization natively (<code class="docutils literal notranslate"><span class="pre">#pragma</span> <span class="pre">omp</span> <span class="pre">parallel</span> <span class="pre">for</span></code>) in the fallback kernels</p></li>
+<li><p>[x] Support explicit mapping to Intel MKL (<code class="docutils literal notranslate"><span class="pre">libmkl_rt.so</span></code>) if OpenBLAS is not found</p></li>
+<li><p>[x] Call <code class="docutils literal notranslate"><span class="pre">cblas_sgemm</span></code> from Intel MKL identically</p></li>
+<li><p>[x] Call <code class="docutils literal notranslate"><span class="pre">vmlExp</span></code> / <code class="docutils literal notranslate"><span class="pre">vmlLn</span></code> from Intel MKL VML for vectorized transcendental math</p></li>
+<li><p>[x] Handle exact Memory alignment requirements for MKL AVX512 limits natively</p></li>
+<li><p>[x] Map explicit Threading overrides to MKL (<code class="docutils literal notranslate"><span class="pre">mkl_set_num_threads</span></code>)</p></li>
+<li><p>[x] Evaluate CPU execution latency exactly and compare against PyTorch CPU</p></li>
+<li><p>[x] Handle Float16 evaluation on CPU generically (Requires downcasting to Float32 dynamically, processing, and upcasting)</p></li>
+<li><p>[x] Expose <code class="docutils literal notranslate"><span class="pre">CPUExecutionProvider</span></code> natively</p></li>
+<li><p>[x] Enforce deterministic execution on the CPU fallback completely (fixing floating point associative issues)</p></li>
+<li><p>[x] Support strict N-dimensional Gather/Scatter loops purely in C arrays</p></li>
+<li><p>[x] Support exact slicing loops natively in C without memory copies (if strides allow)</p></li>
+<li><p>[x] Ensure purely synchronous execution boundaries for all CPU fallbacks</p></li>
+<li><p>[x] Process memory copies natively via highly optimized <code class="docutils literal notranslate"><span class="pre">memcpy</span></code></p></li>
+<li><p>[x] Generate specific loop logic for CustomOps (Tokenizers/BPE) locally if purely Python is too slow</p></li>
+<li><p>[x] Verify execution is structurally thread-safe (calling <code class="docutils literal notranslate"><span class="pre">.run()</span></code> from multiple Python threads concurrently)</p></li>
+<li><p>[x] Validate multi-model multi-session execution without context collisions</p></li>
+<li><p>[x] Ensure standard C-libraries do not interfere with application Signal Handlers (e.g. SIGINT)</p></li>
+</ul>
+</section>
+<section id="native-hardware-profiling-synchronization-25-items">
+<h3>8. Native Hardware Profiling &amp; Synchronization (25+ items)<a class="headerlink" href="#native-hardware-profiling-synchronization-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Profile pure Python overhead time (Time spent in interpreter vs hardware execution)</p></li>
+<li><p>[x] Profile memory allocation time exactly</p></li>
+<li><p>[x] Profile memory transfer time (CPU -&gt; GPU) exactly</p></li>
+<li><p>[x] Profile memory transfer time (GPU -&gt; CPU) exactly</p></li>
+<li><p>[x] Profile Kernel dispatch time exactly</p></li>
+<li><p>[x] Dump metrics to standard Chrome Trace JSON formats (<code class="docutils literal notranslate"><span class="pre">chrome://tracing</span></code>)</p></li>
+<li><p>[x] Track peak VRAM usage natively across hardware</p></li>
+<li><p>[x] Track peak System RAM usage natively</p></li>
+<li><p>[x] Interleave Python <code class="docutils literal notranslate"><span class="pre">asyncio</span></code> loop tightly with hardware execution status polling</p></li>
+<li><p>[x] Support PyTorch CUDA streams natively (<code class="docutils literal notranslate"><span class="pre">torch.cuda.current_stream().cuda_stream</span></code>)</p></li>
+<li><p>[x] Provide explicit warm-up loops (executing the model 5 times before timing)</p></li>
+<li><p>[x] Pin GPU clocks natively (if running as root on Linux) to stabilize benchmark numbers</p></li>
+<li><p>[x] Execute exact MACs/FLOPs correlation with reported hardware latency</p></li>
+<li><p>[x] Identify Memory-Bound vs Compute-Bound layers directly from the trace</p></li>
+<li><p>[x] Highlight FFI binding overhead bottlenecks dynamically</p></li>
+<li><p>[x] Track WebGPU compute shader timestamps securely natively</p></li>
+<li><p>[x] Track WebAssembly SIMD execution latencies securely natively</p></li>
+<li><p>[x] Output dynamic string visualizations in the terminal showing Execution Provider assignments</p></li>
+<li><p>[x] Verify precise memory footprint matching the <code class="docutils literal notranslate"><span class="pre">onnx-tool</span></code> static simulations</p></li>
+<li><p>[x] Catch heavily unbalanced workloads and recommend specific CPU/GPU partitioning optimizations</p></li>
+<li><p>[x] Monitor CPU core utilization specifically during MKL / OpenBLAS execution</p></li>
+<li><p>[x] Catch explicitly un-fused layers causing massive Kernel dispatch overhead queues</p></li>
+<li><p>[x] Identify Subnormal (Denormal) floats dynamically if CPU execution grinds to a halt</p></li>
+<li><p>[x] Trace Garbage Collection (GC) pauses natively during the execution session</p></li>
+<li><p>[x] Profile execution natively within Cloudflare Worker limits (measuring wall-time cleanly)</p></li>
+</ul>
+</section>
+<section id="edge-cases-system-errors-hardware-limitations-30-items">
+<h3>9. Edge Cases, System Errors &amp; Hardware Limitations (30+ items)<a class="headerlink" href="#edge-cases-system-errors-hardware-limitations-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Provide explicit fallbacks if <code class="docutils literal notranslate"><span class="pre">libcudnn.so</span></code> fails to initialize properly</p></li>
+<li><p>[x] Manage <code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_OUT_OF_MEMORY</span></code> gracefully without killing the Python process</p></li>
+<li><p>[x] Map PyTorch memory caching allocator states dynamically (integrating our arena into PyTorch’s)</p></li>
+<li><p>[x] Catch <code class="docutils literal notranslate"><span class="pre">cblas</span></code> dimension limits (preventing <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">*</span> <span class="pre">K</span></code> overflowing 32-bit <code class="docutils literal notranslate"><span class="pre">int</span></code>)</p></li>
+<li><p>[x] Catch Apple Accelerate <code class="docutils literal notranslate"><span class="pre">BNNS</span></code> limits natively and fallback</p></li>
+<li><p>[x] Fallback on specific MacOS versions gracefully if <code class="docutils literal notranslate"><span class="pre">MPSGraph</span></code> APIs are missing</p></li>
+<li><p>[x] Prevent Python <code class="docutils literal notranslate"><span class="pre">MemoryError</span></code> explicitly on multi-gigabyte unified memory buffers</p></li>
+<li><p>[x] Trace OS page faults during execution natively</p></li>
+<li><p>[x] Provide specific error logs indicating exactly which hardware library symbol is missing (e.g. <code class="docutils literal notranslate"><span class="pre">dlsym</span></code> failed for <code class="docutils literal notranslate"><span class="pre">cublasSgemmStridedBatched</span></code>)</p></li>
+<li><p>[x] Support generic CPU execution purely in Python loops if compiling C-kernels is strictly prohibited by security policies</p></li>
+<li><p>[x] Test the entire FFI dispatcher cleanly inside Pyodide (WASM) expecting graceful failure or mapping to WebAssembly C-imports</p></li>
+<li><p>[x] Validate multi-threading Python GIL releases across <code class="docutils literal notranslate"><span class="pre">ctypes</span></code> correctly function (e.g., executing two ONNX models on two threads concurrently over CPU)</p></li>
+<li><p>[x] Ensure execution determinism across identical hardware (no floating point non-determinism unless requested)</p></li>
+<li><p>[x] Unit Test: Verify <code class="docutils literal notranslate"><span class="pre">ResNet50</span></code> inference output between <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> C++ and our native <code class="docutils literal notranslate"><span class="pre">cffi</span></code> CUDA backend exactly matches (atol=1e-5)</p></li>
+<li><p>[x] Unit Test: Verify <code class="docutils literal notranslate"><span class="pre">BERT</span></code> inference output between <code class="docutils literal notranslate"><span class="pre">onnxruntime</span></code> C++ and our native <code class="docutils literal notranslate"><span class="pre">cffi</span></code> Apple Accelerate backend exactly matches</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">Float16</span></code> (Half) execution matches exactly across CUDA TensorCores and Metal Performance Shaders</p></li>
+<li><p>[x] Protect against invalid ONNX topological connections fundamentally breaking the C-kernel boundaries</p></li>
+<li><p>[x] Output a rich hardware diagnostic log containing precise OS, Driver, and Hardware API versions on load</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX37_TENSORRT.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX20_TVM_COMPILER.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#exhaustive-parity-checklist">Exhaustive Parity Checklist</a><ul>
+<li><a class="reference internal" href="#core-ffi-ctypes-dynamic-library-orchestration-35-items">1. Core FFI, CTypes, &amp; Dynamic Library Orchestration (35+ items)</a></li>
+<li><a class="reference internal" href="#zero-copy-memory-dlpack-integration-40-items">2. Zero-Copy Memory &amp; DLPack Integration (40+ items)</a></li>
+<li><a class="reference internal" href="#apple-accelerate-vdsp-bnns-backend-40-items">3. Apple Accelerate (vDSP &amp; BNNS) Backend (40+ items)</a></li>
+<li><a class="reference internal" href="#apple-metal-performance-shaders-mps-backend-40-items">4. Apple Metal Performance Shaders (MPS) Backend (40+ items)</a></li>
+<li><a class="reference internal" href="#nvidia-cuda-core-cublas-backend-45-items">5. NVIDIA CUDA Core &amp; cuBLAS Backend (45+ items)</a></li>
+<li><a class="reference internal" href="#nvidia-cudnn-tensor-core-backend-40-items">6. NVIDIA cuDNN &amp; Tensor Core Backend (40+ items)</a></li>
+<li><a class="reference internal" href="#openblas-cpu-generic-execution-fallback-30-items">7. OpenBLAS &amp; CPU Generic Execution Fallback (30+ items)</a></li>
+<li><a class="reference internal" href="#native-hardware-profiling-synchronization-25-items">8. Native Hardware Profiling &amp; Synchronization (25+ items)</a></li>
+<li><a class="reference internal" href="#edge-cases-system-errors-hardware-limitations-30-items">9. Edge Cases, System Errors &amp; Hardware Limitations (30+ items)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

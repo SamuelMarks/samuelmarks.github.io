@@ -1,0 +1,928 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)" href="ONNX24_OPTIMUM.html"><link rel="prev" title="ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)" href="ONNX41_OPENVINO.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Torch &amp; TF Exporters Replication &amp; Parity Tracker - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX05_TORCH_EXPORTERS.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="torch-tf-exporters-replication-parity-tracker">
+<h1>Torch &amp; TF Exporters Replication &amp; Parity Tracker<a class="headerlink" href="#torch-tf-exporters-replication-parity-tracker" title="Link to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>This document tracks the complete reimplementation of the PyTorch exporter (<code class="docutils literal notranslate"><span class="pre">torch.onnx</span></code>) within the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> ecosystem.
+Standard <code class="docutils literal notranslate"><span class="pre">torch.onnx.export</span></code> relies on massive C++ dependencies (<code class="docutils literal notranslate"><span class="pre">libtorch</span></code>) to trace operations and translate ATen (PyTorch’s internal C++ tensor library) to ONNX.
+Our <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> reimplementation completely bypasses C++ tracing. It provides a pure-Python, PyTorch-like API and leverages pure-Python <code class="docutils literal notranslate"><span class="pre">torch.fx</span></code> (Dynamo) graph extraction to map PyTorch operations directly to ONNX. This lightweight architecture allows model conversion to execute seamlessly in the browser via Pyodide, or instantly on edge devices, completely removing the gigabytes of C++ overhead typically required to export a model.</p>
+</section>
+<section id="exhaustive-parity-checklist">
+<h2>Exhaustive Parity Checklist<a class="headerlink" href="#exhaustive-parity-checklist" title="Link to this heading">¶</a></h2>
+<section id="core-export-api-architecture-30-items">
+<h3>1. Core Export API &amp; Architecture (30+ items)<a class="headerlink" href="#core-export-api-architecture-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Implement pure-Python <code class="docutils literal notranslate"><span class="pre">onnx9000.export(model,</span> <span class="pre">args,</span> <span class="pre">f)</span></code></p></li>
+<li><p>[xx] Implement pure-Python <code class="docutils literal notranslate"><span class="pre">onnx9000.dynamo_export(model,</span> <span class="pre">args)</span></code></p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">export_params=True</span></code> (embedding weights as initializers)</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">export_params=False</span></code> (weights as graph inputs)</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">verbose=True</span></code> for topological logging</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">training=TrainingMode.EVAL</span></code> strictly</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">training=TrainingMode.TRAINING</span></code></p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">input_names</span></code> lists for explicit input naming</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">output_names</span></code> lists for explicit output naming</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">dynamic_axes</span></code> dictionaries for symbolic dimension overrides</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">keep_initializers_as_inputs=True/False</span></code></p></li>
+<li><p>[xx] Support explicit ONNX <code class="docutils literal notranslate"><span class="pre">opset_version</span></code> targeting (Opsets 9 through 21)</p></li>
+<li><p>[xx] Extract PyTorch <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> state dictionaries entirely in Python memory</p></li>
+<li><p>[xx] Extract nested <code class="docutils literal notranslate"><span class="pre">nn.Module</span></code> sub-modules tracking namespaces (e.g., <code class="docutils literal notranslate"><span class="pre">layer.0.conv</span></code>)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> data seamlessly to <code class="docutils literal notranslate"><span class="pre">onnx9000.Tensor</span></code> (via Pyodide or DLPack)</p></li>
+<li><p>[xx] Wrap PyTorch <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> natively to trace ops without <code class="docutils literal notranslate"><span class="pre">libtorch</span></code></p></li>
+<li><p>[xx] Translate PyTorch <code class="docutils literal notranslate"><span class="pre">torch.dtype</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">torch.float32</span></code>) to ONNX <code class="docutils literal notranslate"><span class="pre">TensorProto.DataType</span></code></p></li>
+<li><p>[xx] Translate <code class="docutils literal notranslate"><span class="pre">torch.bfloat16</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">BFLOAT16</span></code></p></li>
+<li><p>[xx] Translate <code class="docutils literal notranslate"><span class="pre">torch.complex64</span></code> gracefully (or throw explicit unsupported errors)</p></li>
+<li><p>[xx] Handle PyTorch arbitrary nested tuples/lists/dicts as model inputs</p></li>
+<li><p>[xx] Handle PyTorch arbitrary nested tuples/lists/dicts as model outputs</p></li>
+<li><p>[xx] Implement PyTorch <code class="docutils literal notranslate"><span class="pre">FakeTensor</span></code> tracing compatibility natively</p></li>
+<li><p>[xx] Support <code class="docutils literal notranslate"><span class="pre">custom_opsets</span></code> dictionary for domain-specific mappings</p></li>
+<li><p>[xx] Catch un-traced or pure Python branching (<code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">x.sum()</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>) dynamically and warn</p></li>
+<li><p>[xx] Intercept <code class="docutils literal notranslate"><span class="pre">torch.autograd.Function</span></code> custom backward definitions (skip in eval mode)</p></li>
+<li><p>[xx] Emit ONNX <code class="docutils literal notranslate"><span class="pre">ModelProto</span></code> purely in Python</p></li>
+<li><p>[xx] Export multi-GB models safely using external data format (<code class="docutils literal notranslate"><span class="pre">.bin</span></code>) without OOM</p></li>
+<li><p>[xx] Provide drop-in replacement API <code class="docutils literal notranslate"><span class="pre">onnx9000.nn.Module</span></code> for fully native non-torch execution</p></li>
+<li><p>[xx] Emulate <code class="docutils literal notranslate"><span class="pre">torch.no_grad()</span></code> scoping implicitly during export</p></li>
+<li><p>[xx] Ensure strict adherence to PyTorch <code class="docutils literal notranslate"><span class="pre">fx.GraphModule</span></code> topological traversal</p></li>
+</ul>
+</section>
+<section id="aten-math-elementwise-operator-mappings-50-items">
+<h3>2. ATen Math &amp; Elementwise Operator Mappings (50+ items)<a class="headerlink" href="#aten-math-elementwise-operator-mappings-50-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::add_</span></code> (inplace) -&gt; <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sub</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sub</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sub_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sub</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::mul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mul</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::mul_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mul</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::div</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Div</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::div_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Div</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::floor_divide</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Div</span></code> + <code class="docutils literal notranslate"><span class="pre">Floor</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::fmod</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mod</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::remainder</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mod</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::abs</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Abs</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::abs_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Abs</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::neg</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Neg</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::neg_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Neg</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::exp</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Exp</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::expm1</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Exp</span></code> + <code class="docutils literal notranslate"><span class="pre">Sub(1)</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::log</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Log</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::log10</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Log</span></code> / <code class="docutils literal notranslate"><span class="pre">Log(10)</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::log1p</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Add(1)</span></code> + <code class="docutils literal notranslate"><span class="pre">Log</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::log2</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Log</span></code> / <code class="docutils literal notranslate"><span class="pre">Log(2)</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sin</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sin</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::cos</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Cos</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::tan</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Tan</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::asin</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Asin</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::acos</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Acos</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::atan</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Atan</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::atan2</span></code> -&gt; Custom Subgraph / Math</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sinh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sinh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::cosh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Cosh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::tanh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Tanh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::asinh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Asinh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::acosh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Acosh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::atanh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Atanh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::pow</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Pow</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sqrt</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::rsqrt</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code> + <code class="docutils literal notranslate"><span class="pre">Reciprocal</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::ceil</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Ceil</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::floor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Floor</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::round</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Round</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::trunc</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Cast</span></code> (int)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sign</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sign</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::erf</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Erf</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::erfc</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sub(1,</span> <span class="pre">Erf)</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::reciprocal</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reciprocal</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bitwise_not</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BitwiseNot</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bitwise_and</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BitwiseAnd</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bitwise_or</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BitwiseOr</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bitwise_xor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BitwiseXor</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bitwise_left_shift</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BitShift</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bitwise_right_shift</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BitShift</span></code></p></li>
+<li><p>[xx] Resolve implicit <code class="docutils literal notranslate"><span class="pre">alpha</span></code> scaling in <code class="docutils literal notranslate"><span class="pre">aten::add(a,</span> <span class="pre">b,</span> <span class="pre">alpha=2)</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Add(a,</span> <span class="pre">Mul(b,</span> <span class="pre">2))</span></code></p></li>
+</ul>
+</section>
+<section id="aten-neural-network-layer-mappings-40-items">
+<h3>3. ATen Neural Network Layer Mappings (40+ items)<a class="headerlink" href="#aten-neural-network-layer-mappings-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::linear</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code> or <code class="docutils literal notranslate"><span class="pre">Gemm</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::conv1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::conv2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::conv3d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::conv_transpose1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::conv_transpose2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::conv_transpose3d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::_convolution</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::batch_norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::native_batch_norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::layer_norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::native_layer_norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::group_norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> + <code class="docutils literal notranslate"><span class="pre">InstanceNormalization</span></code> + <code class="docutils literal notranslate"><span class="pre">Reshape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::instance_norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">InstanceNormalization</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::max_pool1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::max_pool2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::max_pool2d_with_indices</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> (2 outputs)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::max_pool3d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::avg_pool1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::avg_pool2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::avg_pool3d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::adaptive_avg_pool1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code> / Custom</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::adaptive_avg_pool2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::adaptive_max_pool1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code> / Custom</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::adaptive_max_pool2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::reflection_pad1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code> (reflect)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::reflection_pad2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code> (reflect)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::replication_pad1d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code> (edge)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::replication_pad2d</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code> (edge)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::constant_pad_nd</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code> (constant)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::dropout</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> or <code class="docutils literal notranslate"><span class="pre">Identity</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::dropout_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> or <code class="docutils literal notranslate"><span class="pre">Identity</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::feature_dropout</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> or <code class="docutils literal notranslate"><span class="pre">Identity</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::alpha_dropout</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> or <code class="docutils literal notranslate"><span class="pre">Identity</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::rnn_tanh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">RNN</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::rnn_relu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">RNN</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::lstm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LSTM</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::gru</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GRU</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::embedding</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gather</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::embedding_bag</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gather</span></code> + <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code></p></li>
+</ul>
+</section>
+<section id="aten-activation-functions-mappings-25-items">
+<h3>4. ATen Activation Functions Mappings (25+ items)<a class="headerlink" href="#aten-activation-functions-mappings-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::relu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Relu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::relu_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Relu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::relu6</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Clip(0,</span> <span class="pre">6)</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::leaky_relu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::leaky_relu_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::elu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Elu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::elu_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Elu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::selu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Selu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::selu_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Selu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::celu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Celu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::gelu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> or <code class="docutils literal notranslate"><span class="pre">Erf</span></code> subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::silu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mul(X,</span> <span class="pre">Sigmoid(X))</span></code> (Swish)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::silu_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mul(X,</span> <span class="pre">Sigmoid(X))</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::mish</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mish</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sigmoid</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sigmoid_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::hardsigmoid</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">HardSigmoid</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::hardswish</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">HardSwish</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::hardswish_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">HardSwish</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::tanh</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Tanh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::tanh_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Tanh</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::softplus</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Softplus</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::softsign</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Softsign</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::softmax</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Softmax</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::log_softmax</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LogSoftmax</span></code></p></li>
+</ul>
+</section>
+<section id="aten-tensor-manipulation-shape-mappings-45-items">
+<h3>5. ATen Tensor Manipulation &amp; Shape Mappings (45+ items)<a class="headerlink" href="#aten-tensor-manipulation-shape-mappings-45-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::view</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reshape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::reshape</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reshape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::transpose</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Transpose</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::t</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Transpose</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::permute</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Transpose</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::squeeze</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::squeeze_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::unsqueeze</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::unsqueeze_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::flatten</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Flatten</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::unflatten</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reshape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::cat</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Concat</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::stack</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code> + <code class="docutils literal notranslate"><span class="pre">Concat</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::split</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Split</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::split_with_sizes</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Split</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::chunk</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Split</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::slice</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Slice</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::gather</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GatherElements</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::scatter</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::scatter_add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code> (with Add reduction)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::scatter_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::index_select</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gather</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::index_put</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::masked_select</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">NonZero</span></code> + <code class="docutils literal notranslate"><span class="pre">GatherND</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::masked_fill</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Where</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::masked_fill_</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Where</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::where</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Where</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::expand</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Expand</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::expand_as</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Shape</span></code> + <code class="docutils literal notranslate"><span class="pre">Expand</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::repeat</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Tile</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::repeat_interleave</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::broadcast_to</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Expand</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::broadcast_tensors</span></code> -&gt; Multiple <code class="docutils literal notranslate"><span class="pre">Expand</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::contiguous</span></code> -&gt; Identity (No-op in ONNX)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::clone</span></code> -&gt; Identity</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::to</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Cast</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::type_as</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">CastLike</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::size</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Shape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::numel</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Size</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::dim</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Shape</span></code> + <code class="docutils literal notranslate"><span class="pre">Size</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::zeros</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::zeros_like</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Shape</span></code> + <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::ones</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::ones_like</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Shape</span></code> + <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::full</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::full_like</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Shape</span></code> + <code class="docutils literal notranslate"><span class="pre">ConstantOfShape</span></code></p></li>
+</ul>
+</section>
+<section id="aten-reductions-logical-linear-algebra-40-items">
+<h3>6. ATen Reductions, Logical &amp; Linear Algebra (40+ items)<a class="headerlink" href="#aten-reductions-logical-linear-algebra-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sum</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::mean</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::max</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code> (reduction) or <code class="docutils literal notranslate"><span class="pre">Max</span></code> (elementwise)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::min</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code> (reduction) or <code class="docutils literal notranslate"><span class="pre">Min</span></code> (elementwise)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::prod</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceProd</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::std</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::var</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::norm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceL2</span></code> or <code class="docutils literal notranslate"><span class="pre">ReduceL1</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::any</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code> (bool)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::all</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code> (bool)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::argmax</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::argmin</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">ArgMin</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::topk</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">TopK</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::sort</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">TopK</span></code> (K=all)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::argsort</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">TopK</span></code> (indices)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::kthvalue</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">TopK</span></code> (K=k)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::unique</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Unique</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::eq</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Equal</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::ne</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Equal</span></code> + <code class="docutils literal notranslate"><span class="pre">Not</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::lt</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Less</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::le</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">LessOrEqual</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::gt</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Greater</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::ge</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GreaterOrEqual</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::logical_and</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">And</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::logical_or</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Or</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::logical_not</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Not</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::logical_xor</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Xor</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::isnan</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">IsNaN</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::isinf</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">IsInf</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::bmm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::matmul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::mm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::addmm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gemm</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::addbmm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::baddbmm</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::einsum</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Einsum</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::dot</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Mul</span></code> + <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::tensordot</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> / Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::cross</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::diag</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">EyeLike</span></code> + <code class="docutils literal notranslate"><span class="pre">Mul</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::tril</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Trilu</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">aten::triu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Trilu</span></code></p></li>
+</ul>
+</section>
+<section id="torchscript-dynamo-control-flow-25-items">
+<h3>7. TorchScript, Dynamo &amp; Control Flow (25+ items)<a class="headerlink" href="#torchscript-dynamo-control-flow-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::If</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">If</span></code></p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::Loop</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Loop</span></code></p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::ListConstruct</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">SequenceConstruct</span></code></p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::TupleConstruct</span></code> -&gt; Flattened multi-outputs</p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::TupleUnpack</span></code> -&gt; Flattened multi-inputs</p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::ListUnpack</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">SplitToSequence</span></code> / Subgraph</p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">prim::DictConstruct</span></code> -&gt; Dictionary serialization map</p></li>
+<li><p>[xx] Handle <code class="docutils literal notranslate"><span class="pre">torch.jit.script</span></code> graphs seamlessly via ATen IR conversion</p></li>
+<li><p>[xx] Handle <code class="docutils literal notranslate"><span class="pre">torch.fx.GraphModule</span></code> dynamically via Dynamo export pathway</p></li>
+<li><p>[xx] Traverse PyTorch <code class="docutils literal notranslate"><span class="pre">torch.fx.Node</span></code> topologies translating exact ATen ops</p></li>
+<li><p>[xx] Support handling <code class="docutils literal notranslate"><span class="pre">operator.add</span></code> natively inside FX graphs</p></li>
+<li><p>[xx] Support handling <code class="docutils literal notranslate"><span class="pre">operator.mul</span></code> natively inside FX graphs</p></li>
+<li><p>[xx] Support handling <code class="docutils literal notranslate"><span class="pre">operator.getitem</span></code> natively inside FX graphs</p></li>
+<li><p>[xx] Translate <code class="docutils literal notranslate"><span class="pre">torch.ops.aten.add.Tensor</span></code> strictly to ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code></p></li>
+<li><p>[xx] Resolve Python <code class="docutils literal notranslate"><span class="pre">math.pi</span></code> and <code class="docutils literal notranslate"><span class="pre">math.e</span></code> natively to <code class="docutils literal notranslate"><span class="pre">Constant</span></code></p></li>
+<li><p>[xx] Inline standard pure Python functions seamlessly during Dynamo tracing</p></li>
+<li><p>[xx] Strip <code class="docutils literal notranslate"><span class="pre">.backward()</span></code> hooks entirely during trace</p></li>
+<li><p>[xx] Strip <code class="docutils literal notranslate"><span class="pre">torch.profiler</span></code> hooks entirely during trace</p></li>
+<li><p>[xx] Flatten <code class="docutils literal notranslate"><span class="pre">torch.nn.ModuleList</span></code> iterations into sequential topologies natively</p></li>
+<li><p>[xx] Flatten <code class="docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code> iterations natively</p></li>
+<li><p>[xx] Validate <code class="docutils literal notranslate"><span class="pre">torch.nn.Parameter</span></code> gradients are frozen (<code class="docutils literal notranslate"><span class="pre">requires_grad=False</span></code>) for export</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.Tensor.item()</span></code> calls natively (may require tracing breaks or constants)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.Tensor.tolist()</span></code> calls natively</p></li>
+<li><p>[xx] Emit specific Warnings when Python control flow forces an unrolled graph</p></li>
+<li><p>[xx] Support exporting models with custom C++ ops via explicit <code class="docutils literal notranslate"><span class="pre">custom_opsets</span></code> definitions</p></li>
+</ul>
+</section>
+<section id="web-pyodide-zero-dependency-validations-20-items">
+<h3>8. Web/Pyodide &amp; Zero-Dependency Validations (20+ items)<a class="headerlink" href="#web-pyodide-zero-dependency-validations-20-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] CLI fully operational without installing the pip <code class="docutils literal notranslate"><span class="pre">torch</span></code> package (requires providing <code class="docutils literal notranslate"><span class="pre">onnx9000.nn</span></code> equivalent models)</p></li>
+<li><p>[xx] Execute <code class="docutils literal notranslate"><span class="pre">onnx9000.export</span></code> seamlessly inside the browser (WASM/Pyodide)</p></li>
+<li><p>[xx] Load and trace PyTorch <code class="docutils literal notranslate"><span class="pre">.pt</span></code> / <code class="docutils literal notranslate"><span class="pre">.pth</span></code> state dictionaries purely via Python <code class="docutils literal notranslate"><span class="pre">pickle</span></code> parsers natively without <code class="docutils literal notranslate"><span class="pre">torch</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code> state dicts directly to ONNX <code class="docutils literal notranslate"><span class="pre">Initializer</span></code> tensors</p></li>
+<li><p>[xx] Parse <code class="docutils literal notranslate"><span class="pre">__torch_function__</span></code> dispatch hooks natively inside Pyodide without C++ crashes</p></li>
+<li><p>[xx] Ensure the Python tracing module fits within 2MB for Cloudflare Worker deployments</p></li>
+<li><p>[xx] Validate multi-gigabyte models can be exported sequentially without OOM</p></li>
+<li><p>[xx] Test exporting a ResNet50 model directly inside Chrome</p></li>
+<li><p>[xx] Test exporting a Transformer model (BERT) directly inside Safari</p></li>
+<li><p>[xx] Provide pure-Python polyfills for PyTorch’s <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> shape/stride classes</p></li>
+<li><p>[xx] Provide pure-Python implementations of DLPack for zero-copy numpy conversions</p></li>
+<li><p>[xx] Optimize dictionary lookup bottlenecks during <code class="docutils literal notranslate"><span class="pre">fx.Graph</span></code> topological sorting</p></li>
+<li><p>[xx] Validate serialization of PyTorch <code class="docutils literal notranslate"><span class="pre">bfloat16</span></code> byte structures cleanly in JS/Python</p></li>
+<li><p>[xx] Parse PyTorch <code class="docutils literal notranslate"><span class="pre">qint8</span></code> and <code class="docutils literal notranslate"><span class="pre">quint8</span></code> quantized tensor definitions seamlessly</p></li>
+<li><p>[xx] Resolve memory fragmentation by actively garbage collecting ATen variables during the trace</p></li>
+<li><p>[xx] Execute completely synchronously if requested (no async barriers during export)</p></li>
+<li><p>[xx] Test <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> PyTorch exporter against official <code class="docutils literal notranslate"><span class="pre">torch.onnx.export</span></code> (graph isomorphism checks)</p></li>
+<li><p>[xx] Guarantee mathematical equivalence (atol=1e-5) between PyTorch CPU execution and exported ONNX CPU execution</p></li>
+<li><p>[xx] Implement <code class="docutils literal notranslate"><span class="pre">onnx9000.dynamo_export</span></code> compatibility with PyTorch 2.0+ <code class="docutils literal notranslate"><span class="pre">torch.compile</span></code> internals</p></li>
+<li><p>[xx] Export <code class="docutils literal notranslate"><span class="pre">model.safetensors</span></code> mappings natively alongside the ONNX topology implicitly</p></li>
+</ul>
+</section>
+<section id="vision-audio-advanced-operations-25-items">
+<h3>9. Vision, Audio &amp; Advanced Operations (25+ items)<a class="headerlink" href="#vision-audio-advanced-operations-25-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torchvision.ops.nms</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torchvision.ops.roi_align</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">RoiAlign</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torchvision.ops.roi_pool</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">MaxRoiPool</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torchvision.ops.deform_conv2d</span></code> -&gt; Custom Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate</span></code> (nearest) -&gt; <code class="docutils literal notranslate"><span class="pre">Resize</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate</span></code> (bilinear) -&gt; <code class="docutils literal notranslate"><span class="pre">Resize</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.interpolate</span></code> (bicubic) -&gt; <code class="docutils literal notranslate"><span class="pre">Resize</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.grid_sample</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">GridSample</span></code> / Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.affine_grid</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.pixel_shuffle</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">DepthToSpace</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.pixel_unshuffle</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">SpaceToDepth</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.fft.rfft</span></code> -&gt; Custom Subgraph or Extension</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.fft.irfft</span></code> -&gt; Custom Subgraph or Extension</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torchaudio.functional.spectrogram</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.scaled_dot_product_attention</span></code> -&gt; Math Subgraph or <code class="docutils literal notranslate"><span class="pre">Attention</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.pad</span></code> (constant) -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.pad</span></code> (reflect) -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.pad</span></code> (replicate) -&gt; <code class="docutils literal notranslate"><span class="pre">Pad</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.fold</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Col2Im</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.unfold</span></code> -&gt; Im2Col Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.one_hot</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">OneHot</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.embedding</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gather</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.cosine_similarity</span></code> -&gt; Subgraph</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.nn.functional.pdist</span></code> -&gt; Subgraph (Pairwise distance)</p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.distributions.uniform.Uniform</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">RandomUniform</span></code></p></li>
+<li><p>[xx] Map <code class="docutils literal notranslate"><span class="pre">torch.distributions.normal.Normal</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">RandomNormal</span></code></p></li>
+</ul>
+</section>
+<section id="graph-optimizations-export-post-processing-20-items">
+<h3>10. Graph Optimizations &amp; Export Post-Processing (20+ items)<a class="headerlink" href="#graph-optimizations-export-post-processing-20-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[xx] Fold static PyTorch shapes (<code class="docutils literal notranslate"><span class="pre">x.shape[0]</span></code>) into <code class="docutils literal notranslate"><span class="pre">Constant</span></code> nodes automatically</p></li>
+<li><p>[xx] Remove <code class="docutils literal notranslate"><span class="pre">aten::contiguous</span></code> operations completely (No-op in ONNX)</p></li>
+<li><p>[xx] Remove <code class="docutils literal notranslate"><span class="pre">aten::to</span></code> operations where <code class="docutils literal notranslate"><span class="pre">dtype</span></code> is identical</p></li>
+<li><p>[xx] Remove <code class="docutils literal notranslate"><span class="pre">aten::clone</span></code> operations completely</p></li>
+<li><p>[xx] Fuse <code class="docutils literal notranslate"><span class="pre">aten::batch_norm</span></code> into <code class="docutils literal notranslate"><span class="pre">aten::conv2d</span></code> natively during export if requested</p></li>
+<li><p>[xx] Optimize sequential <code class="docutils literal notranslate"><span class="pre">aten::transpose</span></code> calls statically during tracing</p></li>
+<li><p>[xx] Clean up redundant <code class="docutils literal notranslate"><span class="pre">aten::view</span></code> nodes immediately after generation</p></li>
+<li><p>[xx] Identify isolated non-differentiable subgraphs and bake them into constants</p></li>
+<li><p>[xx] Track tensor symbolic relationships (<code class="docutils literal notranslate"><span class="pre">batch_size</span></code>, <code class="docutils literal notranslate"><span class="pre">seq_len</span></code>) perfectly from <code class="docutils literal notranslate"><span class="pre">dynamic_axes</span></code> definitions</p></li>
+<li><p>[xx] Generate standard ONNX ValueInfo structures automatically based on PyTorch intermediate shapes</p></li>
+<li><p>[xx] Validate the generated ONNX Graph using <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> internal GraphSurgeon tools natively</p></li>
+<li><p>[xx] Apply <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> shape inference pass implicitly before saving the exported file</p></li>
+<li><p>[xx] Replace PyTorch explicit <code class="docutils literal notranslate"><span class="pre">float64</span></code> casts with <code class="docutils literal notranslate"><span class="pre">float32</span></code> selectively if <code class="docutils literal notranslate"><span class="pre">--fp32-export</span></code> is passed</p></li>
+<li><p>[xx] Support pruning un-used submodules from the traced graph seamlessly</p></li>
+<li><p>[xx] Remove explicitly <code class="docutils literal notranslate"><span class="pre">aten::dropout</span></code> ops natively if tracing in eval mode</p></li>
+<li><p>[xx] Apply Constant Folding to all scalar math generated by Python indexing logic natively</p></li>
+<li><p>[xx] Provide interactive traceback logs mapping exact PyTorch lines of code to generated ONNX nodes</p></li>
+<li><p>[xx] Format PyTorch stack traces securely inside <code class="docutils literal notranslate"><span class="pre">ModelProto.doc_string</span></code></p></li>
+<li><p>[xx] Export directly to <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> byte buffer for instant HTTP transmission or WebSocket delivery</p></li>
+<li><p>[xx] Guarantee the generated <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> requires ZERO external pre-processing to run in <code class="docutils literal notranslate"><span class="pre">onnxruntime-web</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX24_OPTIMUM.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX41_OPENVINO.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#exhaustive-parity-checklist">Exhaustive Parity Checklist</a><ul>
+<li><a class="reference internal" href="#core-export-api-architecture-30-items">1. Core Export API &amp; Architecture (30+ items)</a></li>
+<li><a class="reference internal" href="#aten-math-elementwise-operator-mappings-50-items">2. ATen Math &amp; Elementwise Operator Mappings (50+ items)</a></li>
+<li><a class="reference internal" href="#aten-neural-network-layer-mappings-40-items">3. ATen Neural Network Layer Mappings (40+ items)</a></li>
+<li><a class="reference internal" href="#aten-activation-functions-mappings-25-items">4. ATen Activation Functions Mappings (25+ items)</a></li>
+<li><a class="reference internal" href="#aten-tensor-manipulation-shape-mappings-45-items">5. ATen Tensor Manipulation &amp; Shape Mappings (45+ items)</a></li>
+<li><a class="reference internal" href="#aten-reductions-logical-linear-algebra-40-items">6. ATen Reductions, Logical &amp; Linear Algebra (40+ items)</a></li>
+<li><a class="reference internal" href="#torchscript-dynamo-control-flow-25-items">7. TorchScript, Dynamo &amp; Control Flow (25+ items)</a></li>
+<li><a class="reference internal" href="#web-pyodide-zero-dependency-validations-20-items">8. Web/Pyodide &amp; Zero-Dependency Validations (20+ items)</a></li>
+<li><a class="reference internal" href="#vision-audio-advanced-operations-25-items">9. Vision, Audio &amp; Advanced Operations (25+ items)</a></li>
+<li><a class="reference internal" href="#graph-optimizations-export-post-processing-20-items">10. Graph Optimizations &amp; Export Post-Processing (20+ items)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

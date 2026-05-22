@@ -1,0 +1,917 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)" href="ONNX31_MMDNN.html"><link rel="prev" title="ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)" href="ONNX32_ONNX2TF.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX GraphSurgeon Replication &amp; Parity Tracker - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX14_GRAPHSURGEON.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx-graphsurgeon-replication-parity-tracker">
+<h1>ONNX GraphSurgeon Replication &amp; Parity Tracker<a class="headerlink" href="#onnx-graphsurgeon-replication-parity-tracker" title="Link to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>This document tracks the complete reimplementation of <code class="docutils literal notranslate"><span class="pre">ONNX</span> <span class="pre">GraphSurgeon</span></code> within the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> ecosystem.
+Unlike the original project, our implementation is tightly integrated into a pure-Python, zero-dependency Intermediate Representation (IR). It avoids the massive C++ Protocol Buffers backend entirely.
+By operating purely on Python dictionaries, lists, and lightweight dataclasses, this GraphSurgeon can modify, prune, fold, and optimize 1GB+ graphs instantaneously within a browser (WASM/Pyodide) or a distributed serverless environment with zero installation overhead.</p>
+</section>
+<section id="exhaustive-parity-checklist">
+<h2>Exhaustive Parity Checklist<a class="headerlink" href="#exhaustive-parity-checklist" title="Link to this heading">¶</a></h2>
+<section id="core-ir-abstractions-graph-topology-50-items">
+<h3>1. Core IR Abstractions &amp; Graph Topology (50+ items)<a class="headerlink" href="#core-ir-abstractions-graph-topology-50-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Graph</span></code> core abstraction</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Node</span></code> core abstraction</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> base abstraction</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Variable</span></code> (dynamic tensor) abstraction</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Constant</span></code> (static tensor) abstraction</p></li>
+<li><p>[x] Support Graph <code class="docutils literal notranslate"><span class="pre">name</span></code> manipulation</p></li>
+<li><p>[x] Support Graph <code class="docutils literal notranslate"><span class="pre">opset_imports</span></code> registry and manipulation</p></li>
+<li><p>[x] Support Graph <code class="docutils literal notranslate"><span class="pre">doc_string</span></code> extraction/modification</p></li>
+<li><p>[x] Support Graph <code class="docutils literal notranslate"><span class="pre">inputs</span></code> list modification (adding/removing global inputs)</p></li>
+<li><p>[x] Support Graph <code class="docutils literal notranslate"><span class="pre">outputs</span></code> list modification (adding/removing global outputs)</p></li>
+<li><p>[x] Support Node <code class="docutils literal notranslate"><span class="pre">op</span></code> (operator type) modification</p></li>
+<li><p>[x] Support Node <code class="docutils literal notranslate"><span class="pre">name</span></code> modification</p></li>
+<li><p>[x] Support Node <code class="docutils literal notranslate"><span class="pre">attrs</span></code> (attributes) dictionary-like access</p></li>
+<li><p>[x] Support Node <code class="docutils literal notranslate"><span class="pre">inputs</span></code> list manipulation (binding/unbinding Tensors)</p></li>
+<li><p>[x] Support Node <code class="docutils literal notranslate"><span class="pre">outputs</span></code> list manipulation (binding/unbinding Tensors)</p></li>
+<li><p>[x] Implement Node <code class="docutils literal notranslate"><span class="pre">i()</span></code> utility for quick input tensor retrieval</p></li>
+<li><p>[x] Implement Node <code class="docutils literal notranslate"><span class="pre">o()</span></code> utility for quick output tensor retrieval</p></li>
+<li><p>[x] Support Tensor <code class="docutils literal notranslate"><span class="pre">name</span></code> modification</p></li>
+<li><p>[x] Support Tensor <code class="docutils literal notranslate"><span class="pre">dtype</span></code> manipulation</p></li>
+<li><p>[x] Support Tensor <code class="docutils literal notranslate"><span class="pre">shape</span></code> manipulation</p></li>
+<li><p>[x] Support Constant <code class="docutils literal notranslate"><span class="pre">values</span></code> manipulation (via zero-copy NumPy/Pyodide array views)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">tensors()</span></code> lazy evaluation dictionary generator</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">nodes</span></code> sequential list abstraction</p></li>
+<li><p>[x] Automatically track Node dependencies (Producers/Consumers)</p></li>
+<li><p>[x] Implement Tensor <code class="docutils literal notranslate"><span class="pre">inputs</span></code> (producer node) tracking</p></li>
+<li><p>[x] Implement Tensor <code class="docutils literal notranslate"><span class="pre">outputs</span></code> (consumer nodes) tracking</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">Node</span></code> hashes uniquely by identity for fast dictionary lookups</p></li>
+<li><p>[x] Ensure <code class="docutils literal notranslate"><span class="pre">Tensor</span></code> hashes uniquely by identity</p></li>
+<li><p>[x] Support cyclic graph detection during topology traversal</p></li>
+<li><p>[x] Implement pure-Python structural equality checking (<code class="docutils literal notranslate"><span class="pre">__eq__</span></code>) for Graphs</p></li>
+<li><p>[x] Implement structural equality checking for Nodes</p></li>
+<li><p>[x] Implement structural equality checking for Attributes</p></li>
+<li><p>[x] Implement shape broadcasting rules within <code class="docutils literal notranslate"><span class="pre">Constant</span></code> mathematical evaluation</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">Attribute</span></code> type inference (Int, Float, String, Tensor, Graph, Lists)</p></li>
+<li><p>[x] Support sub-graphs nested inside Node attributes (e.g., for <code class="docutils literal notranslate"><span class="pre">If</span></code>, <code class="docutils literal notranslate"><span class="pre">Loop</span></code>)</p></li>
+<li><p>[x] Recursively traverse nested sub-graphs during Graph operations</p></li>
+<li><p>[x] Support pure-Python deep-copying of the entire Graph (<code class="docutils literal notranslate"><span class="pre">copy()</span></code>)</p></li>
+<li><p>[x] Support deep-copying of isolated Nodes</p></li>
+<li><p>[x] Support deep-copying of isolated Tensors</p></li>
+<li><p>[x] Support extracting subgraph isolating all dependencies of a target Tensor</p></li>
+<li><p>[x] Implement memory-efficient string deduplication for Tensor names</p></li>
+<li><p>[x] Handle duplicate Node names natively (auto-rename / uniquify)</p></li>
+<li><p>[x] Handle duplicate Tensor names natively (auto-rename / uniquify)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">producer_map</span></code> caching for fast traversal</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">consumer_map</span></code> caching for fast traversal</p></li>
+</ul>
+</section>
+<section id="node-graph-traversal-operations-30-items">
+<h3>2. Node &amp; Graph Traversal Operations (30+ items)<a class="headerlink" href="#node-graph-traversal-operations-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">toposort()</span></code> (Topological Sort)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">cleanup()</span></code> (Dead Code Elimination)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">fold_constants()</span></code> (Constant Folding)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">simplify()</span></code> (Alias to fold + cleanup + toposort)</p></li>
+<li><p>[x] Implement Node <code class="docutils literal notranslate"><span class="pre">prev_nodes()</span></code> utility</p></li>
+<li><p>[x] Implement Node <code class="docutils literal notranslate"><span class="pre">next_nodes()</span></code> utility</p></li>
+<li><p>[x] Implement Tensor <code class="docutils literal notranslate"><span class="pre">is_empty()</span></code> check</p></li>
+<li><p>[x] Implement Tensor <code class="docutils literal notranslate"><span class="pre">is_dynamic()</span></code> check (contains -1 or symbolic dims)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">walk()</span></code> Depth-First Search (DFS)</p></li>
+<li><p>[x] Implement Graph <code class="docutils literal notranslate"><span class="pre">walk()</span></code> Breadth-First Search (BFS)</p></li>
+<li><p>[x] Walk generator: yield only Nodes</p></li>
+<li><p>[x] Walk generator: yield only Tensors</p></li>
+<li><p>[x] Walk generator: yield only Constants</p></li>
+<li><p>[x] Walk generator: yield only Variables</p></li>
+<li><p>[x] Support bidirectional walking (forward from inputs, backward from outputs)</p></li>
+<li><p>[x] Find node by exact <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p>[x] Find nodes by <code class="docutils literal notranslate"><span class="pre">op</span></code> type</p></li>
+<li><p>[x] Find nodes matching a Regex on <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p>[x] Find nodes matching a Regex on <code class="docutils literal notranslate"><span class="pre">op</span></code> type</p></li>
+<li><p>[x] Find tensor by exact <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p>[x] Find tensors matching a Regex on <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p>[x] Isolate all nodes of a specific <code class="docutils literal notranslate"><span class="pre">opset</span></code> domain</p></li>
+<li><p>[x] Find path between two nodes (shortest path)</p></li>
+<li><p>[x] Find all paths between two nodes</p></li>
+<li><p>[x] Detect disconnected graph components</p></li>
+<li><p>[x] Extract connected component subgraph</p></li>
+<li><p>[x] Analyze critical path (longest latency path heuristic)</p></li>
+<li><p>[x] Profiling: Count MACs/FLOPs statically based on shapes</p></li>
+<li><p>[x] Profiling: Count static memory footprint of all <code class="docutils literal notranslate"><span class="pre">Constant</span></code>s</p></li>
+<li><p>[x] Profiling: Estimate activation memory footprint</p></li>
+</ul>
+</section>
+<section id="surgical-modifications-topology-editing-40-items">
+<h3>3. Surgical Modifications &amp; Topology Editing (40+ items)<a class="headerlink" href="#surgical-modifications-topology-editing-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Graph.append_node()</span></code>: Add node to end of graph</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Graph.insert_node()</span></code>: Insert node at specific topology index</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Graph.remove_node()</span></code>: Delete node and sever tensor links</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Graph.replace_node()</span></code>: Swap node, rewiring inputs/outputs</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Graph.disconnect_node()</span></code>: Unbind node but keep in memory</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Tensor.clear_inputs()</span></code>: Disconnect from producer</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Tensor.clear_outputs()</span></code>: Disconnect from all consumers</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Node.disconnect_input()</span></code>: Sever specific input link</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Node.disconnect_output()</span></code>: Sever specific output link</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Node.replace_input()</span></code>: Swap input tensor seamlessly</p></li>
+<li><p>[x] <code class="docutils literal notranslate"><span class="pre">Node.replace_output()</span></code>: Swap output tensor seamlessly</p></li>
+<li><p>[x] Support injecting a single Node into an existing Tensor edge</p></li>
+<li><p>[x] Support bypassing a Node (connect its inputs directly to its consumers)</p></li>
+<li><p>[x] Convert <code class="docutils literal notranslate"><span class="pre">Variable</span></code> to <code class="docutils literal notranslate"><span class="pre">Constant</span></code> (Baking in values)</p></li>
+<li><p>[x] Convert <code class="docutils literal notranslate"><span class="pre">Constant</span></code> to <code class="docutils literal notranslate"><span class="pre">Variable</span></code> (Extracting values to runtime inputs)</p></li>
+<li><p>[x] Auto-generate missing Tensor names during surgery</p></li>
+<li><p>[x] Auto-generate missing Node names during surgery</p></li>
+<li><p>[x] Support fusing two sequential Nodes manually</p></li>
+<li><p>[x] Support splitting one Node into multiple Nodes manually</p></li>
+<li><p>[x] Append an entirely separate Graph into the current Graph</p></li>
+<li><p>[x] Prepend an entirely separate Graph into the current Graph</p></li>
+<li><p>[x] Register new global Input to Graph</p></li>
+<li><p>[x] Register new global Output to Graph</p></li>
+<li><p>[x] Remove global Input (if unused or replaced)</p></li>
+<li><p>[x] Remove global Output (if unused or replaced)</p></li>
+<li><p>[x] Reorder global Inputs safely</p></li>
+<li><p>[x] Reorder global Outputs safely</p></li>
+<li><p>[x] Upgrade Node Opsets individually (e.g., Cast opset 9 to opset 13)</p></li>
+<li><p>[x] Downgrade Node Opsets individually</p></li>
+<li><p>[x] Rename Op types across the entire graph natively</p></li>
+<li><p>[x] Rename domains across the entire graph natively</p></li>
+<li><p>[x] Inject <code class="docutils literal notranslate"><span class="pre">Identity</span></code> nodes for debugging probes</p></li>
+<li><p>[x] Remove all <code class="docutils literal notranslate"><span class="pre">Identity</span></code> nodes (Identity Elimination)</p></li>
+<li><p>[x] Promote internal Tensor to global Output (for intermediate debugging)</p></li>
+<li><p>[x] Demote global Output to internal Tensor</p></li>
+<li><p>[x] Promote Constant to global Input (Parameter)</p></li>
+<li><p>[x] Isolate Subgraph by specifying entry Tensors and exit Tensors</p></li>
+<li><p>[x] Duplicate Subgraph (templating)</p></li>
+<li><p>[x] Inject custom CustomOp / Plugin nodes safely</p></li>
+</ul>
+</section>
+<section id="advanced-pattern-matching-replacement-40-items">
+<h3>4. Advanced Pattern Matching &amp; Replacement (40+ items)<a class="headerlink" href="#advanced-pattern-matching-replacement-40-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement declarative subgraph pattern matcher</p></li>
+<li><p>[x] Match node by <code class="docutils literal notranslate"><span class="pre">op</span></code> type</p></li>
+<li><p>[x] Match node by attribute value / condition</p></li>
+<li><p>[x] Match node by input tensor shape condition</p></li>
+<li><p>[x] Match node by input tensor dtype condition</p></li>
+<li><p>[x] Match node by output tensor shape condition</p></li>
+<li><p>[x] Match sequential chains (e.g., A -&gt; B -&gt; C)</p></li>
+<li><p>[x] Match branched structures (e.g., A -&gt; B, A -&gt; C, B+C -&gt; D)</p></li>
+<li><p>[x] Wildcard matching for indeterminate nodes in a pattern</p></li>
+<li><p>[x] Optional node matching (match A -&gt; [B] -&gt; C)</p></li>
+<li><p>[x] Unordered input matching (match Add(A, B) exactly like Add(B, A))</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">replace_pattern()</span></code> automatic subgraph substitution</p></li>
+<li><p>[x] Support mapping matched attributes to replacement subgraph</p></li>
+<li><p>[x] Support mapping matched input tensors to replacement subgraph</p></li>
+<li><p>[x] Match explicitly constant subgraphs</p></li>
+<li><p>[x] Match purely dynamic subgraphs</p></li>
+<li><p>[x] Validate subgraph replacement preserves topological integrity</p></li>
+<li><p>[x] Ensure nested subgraphs (If/Loop) are matched recursively</p></li>
+<li><p>[x] Prevent overlapping pattern matches during parallel replacement</p></li>
+<li><p>[x] Log and trace all pattern matches and replacements</p></li>
+<li><p>[x] Register custom matcher callbacks via Python functions</p></li>
+</ul>
+</section>
+<section id="standard-graph-optimizations-60-items">
+<h3>5. Standard Graph Optimizations (60+ items)<a class="headerlink" href="#standard-graph-optimizations-60-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Built-in pass: Constant Folding (Math ops)</p></li>
+<li><p>[x] Built-in pass: Constant Folding (Shape/Slice ops)</p></li>
+<li><p>[x] Built-in pass: Constant Folding (Reshape/Transpose)</p></li>
+<li><p>[x] Built-in pass: Dead Code Elimination (DCE)</p></li>
+<li><p>[x] Built-in pass: Identity Elimination</p></li>
+<li><p>[x] Built-in pass: Dropout Elimination</p></li>
+<li><p>[x] Built-in pass: Cast Elimination (redundant casts)</p></li>
+<li><p>[x] Built-in pass: Transpose Sinking (push transposes past elementwise ops)</p></li>
+<li><p>[x] Built-in pass: Layout Conversion (NCHW &lt;-&gt; NHWC)</p></li>
+<li><p>[x] Built-in pass: Shape Inference (statically propagating shapes)</p></li>
+<li><p>[x] Built-in pass: Symbolic Shape Inference</p></li>
+<li><p>[x] Built-in pass: DType Inference (propagating types)</p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code> (Bias)</p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">Mul</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> + <code class="docutils literal notranslate"><span class="pre">Add</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gemm</span></code></p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> + <code class="docutils literal notranslate"><span class="pre">Relu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Gemm</span></code></p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">Relu</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Conv</span></code> + <code class="docutils literal notranslate"><span class="pre">Clip</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Conv</span></code></p></li>
+<li><p>[x] Fusion pass: Sequential <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> ops -&gt; Single <code class="docutils literal notranslate"><span class="pre">Reshape</span></code></p></li>
+<li><p>[x] Fusion pass: Sequential <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> ops -&gt; Single <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> (or Identity)</p></li>
+<li><p>[x] Fusion pass: Sequential <code class="docutils literal notranslate"><span class="pre">Slice</span></code> ops -&gt; Single <code class="docutils literal notranslate"><span class="pre">Slice</span></code></p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code> + <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code> cancellations</p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Split</span></code> + <code class="docutils literal notranslate"><span class="pre">Concat</span></code> cancellations</p></li>
+<li><p>[x] Fusion pass: <code class="docutils literal notranslate"><span class="pre">Pad</span></code> + <code class="docutils literal notranslate"><span class="pre">Slice</span></code> cancellations</p></li>
+<li><p>[x] Fusion pass: GELU exact pattern (Erf) -&gt; <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> (if supported)</p></li>
+<li><p>[x] Fusion pass: GELU tanh pattern -&gt; <code class="docutils literal notranslate"><span class="pre">Gelu</span></code></p></li>
+<li><p>[x] Fusion pass: LayerNormalization pattern -&gt; <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code></p></li>
+<li><p>[x] Fusion pass: Attention pattern -&gt; <code class="docutils literal notranslate"><span class="pre">MultiHeadAttention</span></code></p></li>
+<li><p>[x] Fusion pass: Rotary Positional Embedding (RoPE) pattern</p></li>
+<li><p>[x] Fusion pass: GroupNormalization pattern</p></li>
+<li><p>[x] Optimization: Strip <code class="docutils literal notranslate"><span class="pre">doc_string</span></code> globally to save memory</p></li>
+<li><p>[x] Optimization: Strip tensor names to save memory (minification)</p></li>
+<li><p>[x] Optimization: Deduplicate identical <code class="docutils literal notranslate"><span class="pre">Constant</span></code> tensors globally</p></li>
+<li><p>[x] Optimization: Pack individual <code class="docutils literal notranslate"><span class="pre">Constant</span></code>s into a single contiguous binary blob</p></li>
+<li><p>[x] Optimization: Downcast <code class="docutils literal notranslate"><span class="pre">Float64</span></code> to <code class="docutils literal notranslate"><span class="pre">Float32</span></code> globally</p></li>
+<li><p>[x] Optimization: Downcast <code class="docutils literal notranslate"><span class="pre">Float32</span></code> to <code class="docutils literal notranslate"><span class="pre">Float16</span></code> globally</p></li>
+<li><p>[x] Optimization: Downcast <code class="docutils literal notranslate"><span class="pre">Int64</span></code> to <code class="docutils literal notranslate"><span class="pre">Int32</span></code> globally (where safe)</p></li>
+<li><p>[x] Quantization pass: Static INT8 (Dynamic fake-quantize replacement)</p></li>
+<li><p>[x] Quantization pass: Weight-only INT8 packing</p></li>
+<li><p>[x] Quantization pass: Weight-only INT4 packing</p></li>
+</ul>
+</section>
+<section id="zero-dependency-lightweight-runtime-integrations-30-items">
+<h3>6. Zero-Dependency &amp; Lightweight Runtime Integrations (30+ items)<a class="headerlink" href="#zero-dependency-lightweight-runtime-integrations-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">ModelProto</span></code> fully natively in Python (no <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">onnx</span></code>)</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">GraphProto</span></code> fully natively in Python</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">NodeProto</span></code> fully natively in Python</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">TensorProto</span></code> fully natively in Python</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">AttributeProto</span></code> fully natively in Python</p></li>
+<li><p>[x] Parse <code class="docutils literal notranslate"><span class="pre">ValueInfoProto</span></code> fully natively in Python</p></li>
+<li><p>[x] Export directly to raw byte payloads (zero-copy serialization)</p></li>
+<li><p>[x] Provide lazy-loading for &gt;2GB <code class="docutils literal notranslate"><span class="pre">TensorProto</span></code> external data</p></li>
+<li><p>[x] Support WASM <code class="docutils literal notranslate"><span class="pre">ArrayBuffer</span></code> directly as Constant backing storage</p></li>
+<li><p>[x] Support Pyodide memory-view zero-copy bridging</p></li>
+<li><p>[x] Drag-and-drop parsing inside standard Chrome/Safari browser environments</p></li>
+<li><p>[x] Sub-50ms Graph Surgeon initialization latency</p></li>
+<li><p>[x] Interactive Web UI hook: export graph state to JSON for Visualizer (Netron parity)</p></li>
+<li><p>[x] Stream modified subgraphs instantly to WebGPU compiler</p></li>
+<li><p>[x] Serverless ready: Run GraphSurgeon safely inside AWS Lambda memory limits</p></li>
+<li><p>[x] Cloudflare Worker ready: Strip all parsing logic to under 2MB</p></li>
+<li><p>[x] CLI fully operational without <code class="docutils literal notranslate"><span class="pre">protobuf</span></code> C++ or <code class="docutils literal notranslate"><span class="pre">onnx</span></code> pip package installed</p></li>
+<li><p>[x] Ray/Celery distributed compatibility (Serializable IR structures)</p></li>
+<li><p>[x] Auto-chunking of large constant arrays for HTTP streaming</p></li>
+</ul>
+</section>
+<section id="explicit-opset-validation-tools-30-items">
+<h3>7. Explicit Opset &amp; Validation Tools (30+ items)<a class="headerlink" href="#explicit-opset-validation-tools-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Implement Graph topological validation checker</p></li>
+<li><p>[x] Validate no cyclical dependencies exist natively</p></li>
+<li><p>[x] Validate all internal Tensors have producers</p></li>
+<li><p>[x] Validate no conflicting Tensor names exist</p></li>
+<li><p>[x] Validate Node attributes match strict ONNX Opset specifications</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 15</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 16</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 17</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 18</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 19</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 20</p></li>
+<li><p>[x] Automatically upgrade an entire Graph to Opset 21</p></li>
+<li><p>[x] Strict type checking pass (ensure Float32 doesn’t flow into Int64 requirements)</p></li>
+<li><p>[x] Strict shape dimension checking pass (tensor algebra validation)</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">If</span></code> subgraphs have identical output typings</p></li>
+<li><p>[x] Validate <code class="docutils literal notranslate"><span class="pre">Loop</span></code> subgraphs maintain state iteration typings</p></li>
+<li><p>[x] Compare two GraphSurgeon graphs for strict equivalence</p></li>
+<li><p>[x] Compare two GraphSurgeon graphs for semantic equivalence (ignoring names)</p></li>
+<li><p>[x] Print human-readable ASCII summary of the Graph structure</p></li>
+<li><p>[x] Generate standard ONNX protobuf <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> output payloads</p></li>
+<li><p>[x] Generate human-readable <code class="docutils literal notranslate"><span class="pre">.txt</span></code> output payloads</p></li>
+<li><p>[x] Export constants safely to external data chunks (<code class="docutils literal notranslate"><span class="pre">.bin</span></code>)</p></li>
+<li><p>[x] Import constants safely from external data chunks</p></li>
+</ul>
+</section>
+<section id="tensorrt-pattern-injection-surgery-30-items">
+<h3>8. TensorRT Pattern Injection &amp; Surgery (30+ items)<a class="headerlink" href="#tensorrt-pattern-injection-surgery-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Inject <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> dynamically based on heuristic thresholds</p></li>
+<li><p>[x] Inject <code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code> dynamically based on heuristic thresholds</p></li>
+<li><p>[x] Fuse <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> + <code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code> into <code class="docutils literal notranslate"><span class="pre">FakeQuantize</span></code></p></li>
+<li><p>[x] Unfuse <code class="docutils literal notranslate"><span class="pre">FakeQuantize</span></code> into <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code> + <code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code></p></li>
+<li><p>[x] Support TensorRT-specific custom plugins (e.g., <code class="docutils literal notranslate"><span class="pre">TRT_PluginV2</span></code>)</p></li>
+<li><p>[x] Inject custom TensorRT <code class="docutils literal notranslate"><span class="pre">GridSample</span></code> nodes safely</p></li>
+<li><p>[x] Inject custom TensorRT <code class="docutils literal notranslate"><span class="pre">NMS</span></code> nodes safely</p></li>
+<li><p>[x] Inject custom TensorRT <code class="docutils literal notranslate"><span class="pre">RoIAlign</span></code> nodes safely</p></li>
+<li><p>[x] Convert <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code> (ONNX) to TensorRT <code class="docutils literal notranslate"><span class="pre">BatchedNMSDynamic_TRT</span></code></p></li>
+<li><p>[x] Convert <code class="docutils literal notranslate"><span class="pre">Resize</span></code> (ONNX) to TensorRT <code class="docutils literal notranslate"><span class="pre">ResizeNearest</span></code> or <code class="docutils literal notranslate"><span class="pre">ResizeLinear</span></code></p></li>
+<li><p>[x] Convert <code class="docutils literal notranslate"><span class="pre">TopK</span></code> (ONNX) to TensorRT <code class="docutils literal notranslate"><span class="pre">TopK_TRT</span></code></p></li>
+<li><p>[x] Convert <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code> (ONNX) to TensorRT <code class="docutils literal notranslate"><span class="pre">ScatterND_TRT</span></code></p></li>
+<li><p>[x] Extract dynamic shape profiles (min/opt/max) into graph metadata</p></li>
+<li><p>[x] Extract sequence length bounds into graph metadata</p></li>
+<li><p>[x] Map TensorRT explicit precision bounds to ONNX <code class="docutils literal notranslate"><span class="pre">dtype</span></code> overrides</p></li>
+<li><p>[x] Enforce explicit FP16 boundaries for TRT engine optimization</p></li>
+<li><p>[x] Enforce explicit INT8 boundaries for TRT engine optimization</p></li>
+<li><p>[x] Inject TRT calibration nodes dynamically</p></li>
+<li><p>[x] Support generating TRT-friendly grouped convolutions</p></li>
+<li><p>[x] Support generating TRT-friendly separated convolutions</p></li>
+</ul>
+</section>
+<section id="detailed-tensor-manipulations-mathematics-30-items">
+<h3>9. Detailed Tensor Manipulations &amp; Mathematics (30+ items)<a class="headerlink" href="#detailed-tensor-manipulations-mathematics-30-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Transpose constant tensors natively in-memory (Numpy/Pyodide)</p></li>
+<li><p>[x] Reshape constant tensors natively in-memory</p></li>
+<li><p>[x] Broadcast constant tensors natively in-memory</p></li>
+<li><p>[x] Slice constant tensors natively in-memory</p></li>
+<li><p>[x] Concatenate constant tensors natively in-memory</p></li>
+<li><p>[x] Cast constant tensors (e.g., Float32 to Float16) in-memory</p></li>
+<li><p>[x] Quantize constant tensors to INT8 natively in-memory</p></li>
+<li><p>[x] Unpack packed quantized INT4 weights to INT8 or Float16 in-memory</p></li>
+<li><p>[x] Evaluate mathematical expression graphs (e.g., Constant + Add + Constant)</p></li>
+<li><p>[x] Evaluate boolean expression graphs (e.g., Constant == Constant)</p></li>
+<li><p>[x] Evaluate logical expression graphs (e.g., Constant AND Constant)</p></li>
+<li><p>[x] Evaluate shape-related graphs natively (<code class="docutils literal notranslate"><span class="pre">Shape</span></code>, <code class="docutils literal notranslate"><span class="pre">Size</span></code>, <code class="docutils literal notranslate"><span class="pre">Gather</span></code>)</p></li>
+<li><p>[x] Evaluate index-related graphs natively (<code class="docutils literal notranslate"><span class="pre">NonZero</span></code>)</p></li>
+<li><p>[x] Support memory-mapping (mmap) large constant values during manipulation</p></li>
+<li><p>[x] Support lazy evaluation of constant values to preserve RAM</p></li>
+<li><p>[x] Extract single scalar values from 0D constants safely</p></li>
+<li><p>[x] Embed multiple smaller constants into a single large constant (Tensor packing)</p></li>
+<li><p>[x] Expand single large constants into multiple smaller constants (Tensor unpacking)</p></li>
+<li><p>[x] Support sparse tensor dense expansion inside GraphSurgeon</p></li>
+<li><p>[x] Support dense tensor to sparse tensor compression inside GraphSurgeon</p></li>
+</ul>
+</section>
+<section id="graph-debugging-inspection-utilities-20-items">
+<h3>10. Graph Debugging &amp; Inspection Utilities (20+ items)<a class="headerlink" href="#graph-debugging-inspection-utilities-20-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Print Node input/output topology map logically</p></li>
+<li><p>[x] Print all Graph Constants sorted by memory size (to find bloat)</p></li>
+<li><p>[x] Print all Node Op types sorted by frequency (profiling)</p></li>
+<li><p>[x] Trace all Ops interacting with a specific Tensor implicitly</p></li>
+<li><p>[x] Trace the computational origin (inputs) of a specific Tensor</p></li>
+<li><p>[x] Trace the computational destiny (outputs) of a specific Tensor</p></li>
+<li><p>[x] Dump specific sub-graph to raw JSON for Netron integration</p></li>
+<li><p>[x] Visualize sub-graph dynamically in Browser Canvas via hooks</p></li>
+<li><p>[x] Validate Node attributes for missing required fields</p></li>
+<li><p>[x] Validate Node attributes for invalid string/tensor encodings</p></li>
+<li><p>[x] Compare floating point constants safely (<code class="docutils literal notranslate"><span class="pre">numpy.allclose</span></code> logic)</p></li>
+<li><p>[x] Compare integer constants safely</p></li>
+<li><p>[x] Warn on implicit broadcasting (e.g., Add(1x3x224x224, 3))</p></li>
+<li><p>[x] Warn on dimension mismatches (<code class="docutils literal notranslate"><span class="pre">numpy</span></code> shape validation)</p></li>
+<li><p>[x] Identify isolated nodes (dead code) interactively</p></li>
+</ul>
+</section>
+<section id="custom-node-injection-callbacks-20-items">
+<h3>11. Custom Node Injection &amp; Callbacks (20+ items)<a class="headerlink" href="#custom-node-injection-callbacks-20-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Register new Custom Operator <code class="docutils literal notranslate"><span class="pre">schema</span></code> to the Graph</p></li>
+<li><p>[x] Inject Custom Operator with arbitrarily named inputs</p></li>
+<li><p>[x] Inject Custom Operator with arbitrarily named outputs</p></li>
+<li><p>[x] Inject Custom Operator with custom Dictionary attributes</p></li>
+<li><p>[x] Inject Custom Operator with custom Tensor attributes</p></li>
+<li><p>[x] Automatically track Custom Operator domains during export</p></li>
+<li><p>[x] Safely delete Custom Operators during surgery</p></li>
+<li><p>[x] Support user-defined callback for Node creation (Hook logic)</p></li>
+<li><p>[x] Support user-defined callback for Node deletion (Hook logic)</p></li>
+<li><p>[x] Support user-defined callback for Graph compilation (Hook logic)</p></li>
+<li><p>[x] Support user-defined callback for Topology sort changes</p></li>
+<li><p>[x] Safely wrap unrecognized ONNX domains into Custom Ops natively</p></li>
+<li><p>[x] Unwrap Custom Ops into sub-graphs (if an expander is provided)</p></li>
+<li><p>[x] Validate Custom Ops against user-provided type inference logic</p></li>
+<li><p>[x] Provide dynamic type inference for Custom Ops via Python lambdas</p></li>
+</ul>
+</section>
+<section id="surgical-testing-quality-assurance-20-items">
+<h3>12. Surgical Testing &amp; Quality Assurance (20+ items)<a class="headerlink" href="#surgical-testing-quality-assurance-20-items" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] Unit Test: Topologically sort a 10,000 node graph in &lt; 50ms</p></li>
+<li><p>[x] Unit Test: Deep copy a 1GB graph safely</p></li>
+<li><p>[x] Unit Test: Extract a dense BERT subgraph based strictly on attention outputs</p></li>
+<li><p>[x] Unit Test: Replace all <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> custom nodes with Erf standard nodes</p></li>
+<li><p>[x] Unit Test: Strip 50+ unconnected identity/shape ops sequentially</p></li>
+<li><p>[x] Unit Test: Insert a probe <code class="docutils literal notranslate"><span class="pre">Identity</span></code> node after every <code class="docutils literal notranslate"><span class="pre">Conv</span></code> output</p></li>
+<li><p>[x] Unit Test: Fold chained <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> logic correctly</p></li>
+<li><p>[x] Unit Test: Validate cyclic detection throws appropriate exceptions</p></li>
+<li><p>[x] Unit Test: Ensure <code class="docutils literal notranslate"><span class="pre">Variable</span></code> to <code class="docutils literal notranslate"><span class="pre">Constant</span></code> promotion preserves memory</p></li>
+<li><p>[x] Unit Test: Evaluate <code class="docutils literal notranslate"><span class="pre">numpy.allclose</span></code> logic across massive constants</p></li>
+<li><p>[x] Unit Test: Parse and dump <code class="docutils literal notranslate"><span class="pre">opset=13</span></code> to <code class="docutils literal notranslate"><span class="pre">opset=17</span></code> correctly</p></li>
+<li><p>[x] Unit Test: Inject custom WebGPU hooks directly into <code class="docutils literal notranslate"><span class="pre">ai.onnx</span></code> domains</p></li>
+<li><p>[x] Unit Test: Convert a multi-input Node to single-input sequentially</p></li>
+<li><p>[x] Unit Test: Handle duplicate node insertions gracefully</p></li>
+<li><p>[x] Unit Test: Prevent invalid node deletion gracefully</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX31_MMDNN.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX32_ONNX2TF.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX GraphSurgeon Replication &amp; Parity Tracker</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#exhaustive-parity-checklist">Exhaustive Parity Checklist</a><ul>
+<li><a class="reference internal" href="#core-ir-abstractions-graph-topology-50-items">1. Core IR Abstractions &amp; Graph Topology (50+ items)</a></li>
+<li><a class="reference internal" href="#node-graph-traversal-operations-30-items">2. Node &amp; Graph Traversal Operations (30+ items)</a></li>
+<li><a class="reference internal" href="#surgical-modifications-topology-editing-40-items">3. Surgical Modifications &amp; Topology Editing (40+ items)</a></li>
+<li><a class="reference internal" href="#advanced-pattern-matching-replacement-40-items">4. Advanced Pattern Matching &amp; Replacement (40+ items)</a></li>
+<li><a class="reference internal" href="#standard-graph-optimizations-60-items">5. Standard Graph Optimizations (60+ items)</a></li>
+<li><a class="reference internal" href="#zero-dependency-lightweight-runtime-integrations-30-items">6. Zero-Dependency &amp; Lightweight Runtime Integrations (30+ items)</a></li>
+<li><a class="reference internal" href="#explicit-opset-validation-tools-30-items">7. Explicit Opset &amp; Validation Tools (30+ items)</a></li>
+<li><a class="reference internal" href="#tensorrt-pattern-injection-surgery-30-items">8. TensorRT Pattern Injection &amp; Surgery (30+ items)</a></li>
+<li><a class="reference internal" href="#detailed-tensor-manipulations-mathematics-30-items">9. Detailed Tensor Manipulations &amp; Mathematics (30+ items)</a></li>
+<li><a class="reference internal" href="#graph-debugging-inspection-utilities-20-items">10. Graph Debugging &amp; Inspection Utilities (20+ items)</a></li>
+<li><a class="reference internal" href="#custom-node-injection-callbacks-20-items">11. Custom Node Injection &amp; Callbacks (20+ items)</a></li>
+<li><a class="reference internal" href="#surgical-testing-quality-assurance-20-items">12. Surgical Testing &amp; Quality Assurance (20+ items)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

@@ -1,0 +1,971 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)" href="ONNX28_KERAS2ONNX.html"><link rel="prev" title="ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)" href="ONNX35_SPARSEML.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX27_COREMLTOOLS.html">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX29_ONNX_MODIFIER.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx29-onnx-modifier-web-native-graph-editor-visualizer">
+<h1>ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)<a class="headerlink" href="#onnx29-onnx-modifier-web-native-graph-editor-visualizer" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx-modifier</span></code> is a lightweight, community-built Python tool and Flask-based web UI that allows developers to visually edit ONNX models. Users can load a model, visualize its graph, delete nodes, rename inputs/outputs, change batch sizes, and modify node attributes directly without needing to write complex Python scripts using the low-level <code class="docutils literal notranslate"><span class="pre">onnx.helper</span></code> API. It is incredibly useful for debugging, pruning broken nodes before export, or fixing shape mismatches in models downloaded from the internet.</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">onnx9000.modifier</span></code> completely drops the Python backend (Flask/Protobuf) and operates as a <strong>100% serverless, client-side web application</strong>.</p>
+<ul class="simple">
+<li><p><strong>Zero-Install Editing:</strong> A user visits a static HTML page, drops an <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> file, edits it using a rich interactive Canvas/WebGL UI, and clicks “Download”. Nothing is uploaded to a server.</p></li>
+<li><p><strong>Integrated Graph Validation:</strong> Leveraging the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> AST engine, any structural changes (like deleting a node) instantly trigger a client-side shape and type inference pass, visually highlighting broken edges in red <em>before</em> the user exports the model.</p></li>
+<li><p><strong>WASM-Backed Subgraph Execution:</strong> A user can select a specific node or subgraph in the UI and click “Run Here”, prompting <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> to execute just that portion of the graph instantly using WebGPU or WASM to verify the numerical impact of their edit.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-core-ast-in-memory-graph-mutator">
+<h3>Phase 1: Core AST &amp; In-Memory Graph Mutator<a class="headerlink" href="#phase-1-core-ast-in-memory-graph-mutator" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Implement <code class="docutils literal notranslate"><span class="pre">GraphMutator</span></code> class wrapping the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> AST.</p></li>
+<li><p>[x] 2. Support <code class="docutils literal notranslate"><span class="pre">addNode(opType,</span> <span class="pre">inputs,</span> <span class="pre">outputs,</span> <span class="pre">attributes,</span> <span class="pre">name)</span></code>.</p></li>
+<li><p>[x] 3. Support <code class="docutils literal notranslate"><span class="pre">removeNode(nodeName)</span></code>.</p></li>
+<li><p>[x] 4. Support <code class="docutils literal notranslate"><span class="pre">removeNode(nodeIndex)</span></code>.</p></li>
+<li><p>[x] 5. Implement automatic edge healing when deleting a pass-through node (connecting its input to its output).</p></li>
+<li><p>[x] 6. Support <code class="docutils literal notranslate"><span class="pre">renameNode(oldName,</span> <span class="pre">newName)</span></code>.</p></li>
+<li><p>[x] 7. Support <code class="docutils literal notranslate"><span class="pre">replaceNode(oldNodeName,</span> <span class="pre">newNodeDef)</span></code>.</p></li>
+<li><p>[x] 8. Support <code class="docutils literal notranslate"><span class="pre">changeNodeOpType(nodeName,</span> <span class="pre">newOpType)</span></code>.</p></li>
+<li><p>[x] 9. Support <code class="docutils literal notranslate"><span class="pre">renameInput(oldName,</span> <span class="pre">newName)</span></code>.</p></li>
+<li><p>[x] 10. Support <code class="docutils literal notranslate"><span class="pre">renameOutput(oldName,</span> <span class="pre">newName)</span></code>.</p></li>
+<li><p>[x] 11. Propagate input/output name changes globally across all downstream/upstream nodes.</p></li>
+<li><p>[x] 12. Support <code class="docutils literal notranslate"><span class="pre">addInput(name,</span> <span class="pre">type,</span> <span class="pre">shape)</span></code>.</p></li>
+<li><p>[x] 13. Support <code class="docutils literal notranslate"><span class="pre">removeInput(name)</span></code>.</p></li>
+<li><p>[x] 14. Support <code class="docutils literal notranslate"><span class="pre">addOutput(name,</span> <span class="pre">type,</span> <span class="pre">shape)</span></code>.</p></li>
+<li><p>[x] 15. Support <code class="docutils literal notranslate"><span class="pre">removeOutput(name)</span></code>.</p></li>
+<li><p>[x] 16. Support <code class="docutils literal notranslate"><span class="pre">addInitializer(name,</span> <span class="pre">type,</span> <span class="pre">shape,</span> <span class="pre">dataBuffer)</span></code>.</p></li>
+<li><p>[x] 17. Support <code class="docutils literal notranslate"><span class="pre">removeInitializer(name)</span></code>.</p></li>
+<li><p>[x] 18. Support <code class="docutils literal notranslate"><span class="pre">updateInitializer(name,</span> <span class="pre">newDataBuffer)</span></code>.</p></li>
+<li><p>[x] 19. Support converting an Input into an Initializer (baking a constant).</p></li>
+<li><p>[x] 20. Support converting an Initializer into an Input (making a constant dynamic).</p></li>
+<li><p>[x] 21. Support <code class="docutils literal notranslate"><span class="pre">setNodeAttribute(nodeName,</span> <span class="pre">attrName,</span> <span class="pre">attrValue,</span> <span class="pre">attrType)</span></code>.</p></li>
+<li><p>[x] 22. Support <code class="docutils literal notranslate"><span class="pre">removeNodeAttribute(nodeName,</span> <span class="pre">attrName)</span></code>.</p></li>
+<li><p>[x] 23. Implement a transactional rollback system (Undo/Redo stack for graph edits).</p></li>
+<li><p>[x] 24. Implement topological re-sorting after graph mutations.</p></li>
+<li><p>[x] 25. Support updating model metadata (<code class="docutils literal notranslate"><span class="pre">producer_name</span></code>, <code class="docutils literal notranslate"><span class="pre">version</span></code>, <code class="docutils literal notranslate"><span class="pre">doc_string</span></code>).</p></li>
+</ul>
+</section>
+<section id="phase-2-static-analysis-validation-engine">
+<h3>Phase 2: Static Analysis &amp; Validation Engine<a class="headerlink" href="#phase-2-static-analysis-validation-engine" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 26. Implement a fast, synchronous <code class="docutils literal notranslate"><span class="pre">verify()</span></code> method tracking graph validity.</p></li>
+<li><p>[x] 27. Detect dangling nodes (nodes whose outputs are never consumed and aren’t graph outputs).</p></li>
+<li><p>[x] 28. Detect unresolved inputs (nodes expecting an input that doesn’t exist).</p></li>
+<li><p>[x] 29. Detect cyclic dependencies introduced by bad edits.</p></li>
+<li><p>[x] 30. Detect type mismatches (e.g., feeding an INT64 into a Conv2D node expecting FLOAT32).</p></li>
+<li><p>[x] 31. Implement local shape inference: given modified inputs, recalculate a node’s output shape.</p></li>
+<li><p>[x] 32. Cascade shape inference changes throughout the entire downstream graph.</p></li>
+<li><p>[x] 33. Highlight dimension mismatches (e.g., MatMul expecting <code class="docutils literal notranslate"><span class="pre">[M,</span> <span class="pre">K]</span> <span class="pre">x</span> <span class="pre">[K,</span> <span class="pre">N]</span></code>, but got <code class="docutils literal notranslate"><span class="pre">[M,</span> <span class="pre">X]</span></code>).</p></li>
+<li><p>[x] 34. Support explicit shape overriding (forcing an intermediate tensor to be a specific shape to bypass strict inference bugs).</p></li>
+<li><p>[x] 35. Implement dead code elimination specifically triggered by user UI interactions (e.g., “Clean Graph” button).</p></li>
+</ul>
+</section>
+<section id="phase-3-the-visualization-engine-canvas-webgl">
+<h3>Phase 3: The Visualization Engine (Canvas/WebGL)<a class="headerlink" href="#phase-3-the-visualization-engine-canvas-webgl" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 36. Build a custom WebGL/Canvas 2D renderer for drawing the directed acyclic graph (DAG).</p></li>
+<li><p>[x] 37. Implement the Sugiyama layout algorithm (or integrate Dagre.js) to auto-arrange nodes into visual layers.</p></li>
+<li><p>[x] 38. Support vertical rendering mode (Top-to-Bottom).</p></li>
+<li><p>[x] 39. Support horizontal rendering mode (Left-to-Right).</p></li>
+<li><p>[x] 40. Implement infinite pan and zoom capabilities (mouse wheel, trackpad, pinch-to-zoom).</p></li>
+<li><p>[x] 41. Implement a minimap/radar view for navigating massive graphs (10k+ nodes).</p></li>
+<li><p>[x] 42. Render Initializers distinctly from dynamic Inputs (e.g., different shapes or colors).</p></li>
+<li><p>[x] 43. Render Constants distinctly.</p></li>
+<li><p>[x] 44. Render standard Operations (e.g., rounded rectangles).</p></li>
+<li><p>[x] 45. Render Graph Outputs distinctly.</p></li>
+<li><p>[x] 46. Display the <code class="docutils literal notranslate"><span class="pre">op_type</span></code> prominently on every node.</p></li>
+<li><p>[x] 47. Display the tensor shape and type directly on the connecting edges.</p></li>
+<li><p>[x] 48. Implement edge routing (orthogonal routing or curved splines) to minimize line crossing confusion.</p></li>
+<li><p>[x] 49. Support edge highlighting (hovering an edge highlights the producer and consumer nodes).</p></li>
+<li><p>[x] 50. Implement visual grouping (drawing bounding boxes around Subgraphs or NameScopes).</p></li>
+</ul>
+</section>
+<section id="phase-4-ui-ux-components-interactions">
+<h3>Phase 4: UI/UX Components &amp; Interactions<a class="headerlink" href="#phase-4-ui-ux-components-interactions" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 51. Build the main layout: Graph View (center), Properties Panel (right), Structure Tree (left).</p></li>
+<li><p>[x] 52. Implement node selection logic (single click).</p></li>
+<li><p>[x] 53. Implement multi-node selection (Shift+Click or Drag Box).</p></li>
+<li><p>[x] 54. Display selected node properties in the Right Panel (Name, OpType, Attributes, Inputs, Outputs).</p></li>
+<li><p>[x] 55. Display selected edge properties (Name, Type, Shape, Producer, Consumers).</p></li>
+<li><p>[x] 56. Create inline editable text fields for node names in the Properties Panel.</p></li>
+<li><p>[x] 57. Create dropdown menus for editing enum-based attributes (e.g., <code class="docutils literal notranslate"><span class="pre">auto_pad</span></code>).</p></li>
+<li><p>[x] 58. Create array editors for editing list attributes (e.g., <code class="docutils literal notranslate"><span class="pre">pads:</span> <span class="pre">[1,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">1]</span></code>).</p></li>
+<li><p>[x] 59. Implement a “Delete” button (and mapping to the <code class="docutils literal notranslate"><span class="pre">Del</span></code> / <code class="docutils literal notranslate"><span class="pre">Backspace</span></code> keyboard key).</p></li>
+<li><p>[x] 60. Implement a context menu (Right Click on Node -&gt; “Delete”, “Disconnect”, “Duplicate”).</p></li>
+<li><p>[x] 61. Implement edge dragging: clicking an output port on Node A and dragging a line to an input port on Node B.</p></li>
+<li><p>[x] 62. Implement edge deletion: clicking an edge and pressing Delete.</p></li>
+<li><p>[x] 63. Implement an “Add Node” modal with a searchable list of all valid ONNX operators.</p></li>
+<li><p>[x] 64. Automatically populate the attributes form based on the selected <code class="docutils literal notranslate"><span class="pre">op_type</span></code>’s ONNX specification schema.</p></li>
+<li><p>[x] 65. Support collapsing/expanding complex nodes (e.g., hiding the body of an <code class="docutils literal notranslate"><span class="pre">If</span></code> or <code class="docutils literal notranslate"><span class="pre">Loop</span></code> node to save screen space).</p></li>
+</ul>
+</section>
+<section id="phase-5-batch-modification-advanced-editing">
+<h3>Phase 5: Batch Modification &amp; Advanced Editing<a class="headerlink" href="#phase-5-batch-modification-advanced-editing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 66. Implement “Change Batch Size” utility (dynamically updates Dimension 0 across all Inputs and intermediate shapes).</p></li>
+<li><p>[x] 67. Implement “Make Dynamic” utility (changes static batch size <code class="docutils literal notranslate"><span class="pre">1</span></code> to <code class="docutils literal notranslate"><span class="pre">-1</span></code> / <code class="docutils literal notranslate"><span class="pre">?</span></code> or string variable <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>).</p></li>
+<li><p>[x] 68. Implement “Strip Initializers” utility (removes all weights, saving only the structural <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> for sharing topology).</p></li>
+<li><p>[x] 69. Implement “Extract Subgraph” utility (select N nodes -&gt; right click -&gt; “Save as new Model”).</p></li>
+<li><p>[x] 70. Implement “Insert Identity” utility (drops an Identity node on an edge for debugging breakpoints).</p></li>
+<li><p>[x] 71. Implement “Change Opset Version” utility (attempts to auto-upgrade or auto-downgrade the model schema).</p></li>
+<li><p>[x] 72. Provide regex-based batch renaming (e.g., renaming all nodes starting with <code class="docutils literal notranslate"><span class="pre">old_prefix/</span></code> to <code class="docutils literal notranslate"><span class="pre">new_prefix/</span></code>).</p></li>
+<li><p>[x] 73. Support injecting Cast nodes automatically if the user connects incompatible types via the UI.</p></li>
+<li><p>[x] 74. Implement a “Find Node by Name” search bar.</p></li>
+<li><p>[x] 75. Implement a “Find Node by Type” search filter (e.g., highlighting all <code class="docutils literal notranslate"><span class="pre">Conv</span></code> layers).</p></li>
+</ul>
+</section>
+<section id="phase-6-initializer-weight-editing">
+<h3>Phase 6: Initializer / Weight Editing<a class="headerlink" href="#phase-6-initializer-weight-editing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 76. Implement an Initializer Inspector in the UI (showing Min, Max, Mean, Variance of the weight tensor).</p></li>
+<li><p>[x] 77. Render small 2D weights (e.g., 3x3 Conv kernels) as visual pixel grids (heatmaps) in the properties panel.</p></li>
+<li><p>[x] 78. Support explicitly editing scalar initializer values via a text input field.</p></li>
+<li><p>[x] 79. Support zeroing out an initializer (setting all values to 0).</p></li>
+<li><p>[x] 80. Support injecting random noise into an initializer (for fuzzing or privacy obfuscation).</p></li>
+<li><p>[x] 81. Support downloading a specific initializer as a <code class="docutils literal notranslate"><span class="pre">.bin</span></code> or <code class="docutils literal notranslate"><span class="pre">.npy</span></code> file.</p></li>
+<li><p>[x] 82. Support uploading and replacing an initializer’s data from a local <code class="docutils literal notranslate"><span class="pre">.bin</span></code> file.</p></li>
+<li><p>[x] 83. Support precision casting specifically for initializers via the UI (e.g., clicking “Convert to FP16”).</p></li>
+<li><p>[x] 84. Track exact byte sizes of individual initializers to help users identify the heaviest layers in their model.</p></li>
+<li><p>[x] 85. Provide a “Prune” button that applies a magnitude threshold to an initializer (setting values &lt; threshold to 0).</p></li>
+</ul>
+</section>
+<section id="phase-7-interactive-graph-execution-debugging-the-run-here-feature">
+<h3>Phase 7: Interactive Graph Execution &amp; Debugging (The “Run Here” Feature)<a class="headerlink" href="#phase-7-interactive-graph-execution-debugging-the-run-here-feature" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 86. Integrate the core <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution runtime into the modifier UI.</p></li>
+<li><p>[x] 87. Support “Set as Temporary Output”: User clicks an intermediate edge, and the graph compiles to yield that specific tensor.</p></li>
+<li><p>[x] 88. Implement an Input Data Generator (creating random dummy data matching the input shapes).</p></li>
+<li><p>[x] 89. Allow users to manually input values for small inputs (e.g., JSON arrays) or upload images for Image inputs.</p></li>
+<li><p>[x] 90. Execute the graph natively in the browser via WebAssembly/WebGPU based on the dummy/user data.</p></li>
+<li><p>[x] 91. Display the execution output tensor visually (e.g., as an image if shape is HWC, or a JSON array if 1D).</p></li>
+<li><p>[x] 92. Support “Run Subgraph”: User selects Node A, B, and C. The UI extracts them, generates dummy inputs for Node A, runs the subgraph, and shows Node C’s output.</p></li>
+<li><p>[x] 93. Profile execution: display the exact execution time (in ms) taken by the currently selected node/subgraph.</p></li>
+<li><p>[x] 94. Implement a step-by-step debugger: “Step Next”, executing the graph one node at a time and visualizing the tensor flowing through the edges.</p></li>
+<li><p>[x] 95. Implement breakpoint pausing in the visual debugger.</p></li>
+</ul>
+</section>
+<section id="phase-8-data-privacy-security">
+<h3>Phase 8: Data Privacy &amp; Security<a class="headerlink" href="#phase-8-data-privacy-security" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 96. Ensure the entire Web Components application is served as a static bundle (no server backend).</p></li>
+<li><p>[x] 97. Provide a standalone HTML file option (single-file export containing UI, logic, and wasm encoded in base64) for offline editing.</p></li>
+<li><p>[x] 98. Ensure massive models (&gt;2GB) utilize standard <code class="docutils literal notranslate"><span class="pre">File</span></code> slicing APIs and do not crash the browser’s maximum heap limit.</p></li>
+<li><p>[x] 99. Restrict execution features if the model triggers potential infinite loops (timeout circuit breakers).</p></li>
+<li><p>[x] 100. Disallow prototype pollution or malicious script injection if the ONNX metadata contains <code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> tags.</p></li>
+</ul>
+</section>
+<section id="phase-9-model-export-serialization">
+<h3>Phase 9: Model Export &amp; Serialization<a class="headerlink" href="#phase-9-model-export-serialization" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 101. Implement <code class="docutils literal notranslate"><span class="pre">export()</span></code> method combining the AST and mutated Initializers back into a standard ONNX Protobuf string.</p></li>
+<li><p>[x] 102. Validate the final protobuf against the ONNX spec schema explicitly before allowing the download.</p></li>
+<li><p>[x] 103. Generate a standard browser download (<code class="docutils literal notranslate"><span class="pre">blob</span></code> URL) for the resulting <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> file.</p></li>
+<li><p>[x] 104. Support exporting large models using the <code class="docutils literal notranslate"><span class="pre">external_data</span></code> ONNX format (zipping the <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> and <code class="docutils literal notranslate"><span class="pre">.onnx_data</span></code> together in the browser).</p></li>
+<li><p>[x] 105. Generate an “Edit Log” sidecar file (a JSON array recording every mutation made during the session) so edits can be replayed scripturally later.</p></li>
+<li><p>[x] 106. Provide a “Copy to Clipboard” button that generates the exact Python <code class="docutils literal notranslate"><span class="pre">onnx.helper</span></code> code required to recreate the user’s manual edits.</p></li>
+<li><p>[x] 107. Generate a graph summary text file (Layer counts, Parameter counts, Total MACs).</p></li>
+<li><p>[x] 108. Enable downloading the graph visualization as a high-resolution SVG or PNG file.</p></li>
+<li><p>[x] 109. Support converting the visual graph layout into standard Graphviz <code class="docutils literal notranslate"><span class="pre">.dot</span></code> format.</p></li>
+<li><p>[x] 110. Guarantee binary determinism: opening an ONNX file and clicking “Save” without edits produces a byte-identical file.</p></li>
+</ul>
+</section>
+<section id="phase-10-specific-onnx-operator-custom-editors">
+<h3>Phase 10: Specific ONNX Operator Custom Editors<a class="headerlink" href="#phase-10-specific-onnx-operator-custom-editors" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 111. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Conv</span></code> (Fields: Strides, Pads, Dilations, Groups).</p></li>
+<li><p>[x] 112. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> (Toggles for transA, transB, alpha, beta).</p></li>
+<li><p>[x] 113. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Split</span></code> (Array editor for the <code class="docutils literal notranslate"><span class="pre">split</span></code> attribute).</p></li>
+<li><p>[x] 114. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Resize</span></code> (Dropdowns for coordinate_transformation_mode, mode, nearest_mode).</p></li>
+<li><p>[x] 115. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code> / <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code> (Axes array editor).</p></li>
+<li><p>[x] 116. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Cast</span></code> (Dropdown mapping integer enum values to human-readable strings like ‘FLOAT’, ‘INT8’).</p></li>
+<li><p>[x] 117. Create a specialized UI form for editing <code class="docutils literal notranslate"><span class="pre">Constant</span></code> (showing the raw tensor value inline).</p></li>
+<li><p>[x] 118. Create a specialized UI interface for viewing inside <code class="docutils literal notranslate"><span class="pre">If</span></code> subgraphs (Graph within a Graph).</p></li>
+<li><p>[x] 119. Create a specialized UI interface for viewing inside <code class="docutils literal notranslate"><span class="pre">Loop</span></code> subgraphs.</p></li>
+<li><p>[x] 120. Provide tooltips hovering over specific attribute names that fetch documentation directly from the official ONNX spec definitions.</p></li>
+</ul>
+</section>
+<section id="phase-11-cli-interface-onnx9000-modifier-cli">
+<h3>Phase 11: CLI Interface (onnx9000.modifier CLI)<a class="headerlink" href="#phase-11-cli-interface-onnx9000-modifier-cli" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 121. Expose <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">edit</span> <span class="pre">&lt;model.onnx&gt;</span></code> command to start a local development server hosting the UI and serving the target file automatically.</p></li>
+<li><p>[x] 122. Expose <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">prune</span> <span class="pre">&lt;model.onnx&gt;</span> <span class="pre">--nodes</span> <span class="pre">&quot;node_1,node_2&quot;</span></code> for headless CLI modification.</p></li>
+<li><p>[x] 123. Expose <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">rename-input</span> <span class="pre">&lt;model.onnx&gt;</span> <span class="pre">--old</span> <span class="pre">&quot;X&quot;</span> <span class="pre">--new</span> <span class="pre">&quot;Y&quot;</span></code> via CLI.</p></li>
+<li><p>[x] 124. Expose <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">change-batch</span> <span class="pre">&lt;model.onnx&gt;</span> <span class="pre">--size</span> <span class="pre">8</span></code> via CLI.</p></li>
+<li><p>[x] 125. Support headless JSON mutation scripts: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">mutate</span> <span class="pre">&lt;model.onnx&gt;</span> <span class="pre">--script</span> <span class="pre">edits.json</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-12-interoperability-with-pyodide">
+<h3>Phase 12: Interoperability with Pyodide<a class="headerlink" href="#phase-12-interoperability-with-pyodide" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 126. Expose the <code class="docutils literal notranslate"><span class="pre">GraphMutator</span></code> API to a Pyodide web-worker.</p></li>
+<li><p>[x] 127. Allow users to write arbitrary Python scripts in a Monaco Editor panel within the UI.</p></li>
+<li><p>[x] 128. Run the Python script securely against the active graph (e.g., <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">node</span> <span class="pre">in</span> <span class="pre">graph.nodes:</span> <span class="pre">if</span> <span class="pre">node.op_type</span> <span class="pre">==</span> <span class="pre">'Relu':</span> <span class="pre">graph.remove(node)</span></code>).</p></li>
+<li><p>[x] 129. Map Pyodide state changes back to the UI visualizer instantly.</p></li>
+<li><p>[x] 130. Support standard <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">onnx</span></code> within the Pyodide environment to allow users to use familiar legacy scripts.</p></li>
+</ul>
+</section>
+<section id="phase-13-accessibility-and-theming">
+<h3>Phase 13: Accessibility and Theming<a class="headerlink" href="#phase-13-accessibility-and-theming" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 131. Implement Dark Mode UI.</p></li>
+<li><p>[x] 132. Implement Light Mode UI.</p></li>
+<li><p>[x] 133. Provide a colorblind-friendly palette for the node typings (e.g., differentiating Conv vs Matmul clearly without relying solely on red/green).</p></li>
+<li><p>[x] 134. Support complete keyboard navigation (tabbing through nodes, pressing enter to open properties).</p></li>
+<li><p>[x] 135. Support screen-reader announcements when nodes are selected or deleted.</p></li>
+</ul>
+</section>
+<section id="phase-14-automated-graph-fixers-one-click-macros">
+<h3>Phase 14: Automated Graph Fixers (One-Click Macros)<a class="headerlink" href="#phase-14-automated-graph-fixers-one-click-macros" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 136. Implement “Fix Mixed Precision”: Automatically identifies Cast anomalies and normalizes the graph to FP32 or FP16.</p></li>
+<li><p>[x] 137. Implement “Remove Training Nodes”: Automatically strips <code class="docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="docutils literal notranslate"><span class="pre">Gradient</span></code>, and <code class="docutils literal notranslate"><span class="pre">YieldOp</span></code> nodes from the graph.</p></li>
+<li><p>[x] 138. Implement “Fold Constants”: Runs the <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> constant folding optimizer and updates the visual layout.</p></li>
+<li><p>[x] 139. Implement “Extract Weights”: Converts all large Constants/Inputs into external Initializers automatically.</p></li>
+<li><p>[x] 140. Implement “Sanitize Names”: Replaces complex/illegal node and edge names with sequential alphanumeric IDs.</p></li>
+</ul>
+</section>
+<section id="phase-15-quality-assurance-parity-testing">
+<h3>Phase 15: Quality Assurance &amp; Parity Testing<a class="headerlink" href="#phase-15-quality-assurance-parity-testing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 141. Write unit tests for node deletion preserving topological order.</p></li>
+<li><p>[x] 142. Write unit tests for batch size mutation propagating correctly through <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> constants.</p></li>
+<li><p>[x] 143. Test the UI rendering limit (ensuring WebGL handles a 50,000-node graph at &gt;30 FPS).</p></li>
+<li><p>[x] 144. Validate the exported <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> byte structure against the native Python <code class="docutils literal notranslate"><span class="pre">onnx-modifier</span></code> outputs.</p></li>
+<li><p>[x] 145. Automate browser testing using Playwright to simulate dropping nodes and verifying edge counts.</p></li>
+</ul>
+</section>
+<section id="phase-16-file-handling-edge-cases">
+<h3>Phase 16: File Handling Edge Cases<a class="headerlink" href="#phase-16-file-handling-edge-cases" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 146. Process ONNX models utilizing opset versions &lt; 7 gracefully.</p></li>
+<li><p>[x] 147. Parse and warn about unrecognized custom domain operations cleanly (rendering them as gray unknown nodes).</p></li>
+<li><p>[x] 148. Handle corrupted <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> files by providing a partial load (showing whatever AST was successfully parsed before the crash).</p></li>
+<li><p>[x] 149. Optimize memory: Release the original ArrayBuffer payload immediately after parsing the AST to free up JS Heap.</p></li>
+<li><p>[x] 150. Use SharedArrayBuffer to offload the Protobuf parsing sequence to a background Web Worker.</p></li>
+</ul>
+</section>
+<section id="phase-17-integration-with-other-onnx9000-tools">
+<h3>Phase 17: Integration with Other <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Tools<a class="headerlink" href="#phase-17-integration-with-other-onnx9000-tools" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 151. Add an “Optimize” button that bridges directly to <code class="docutils literal notranslate"><span class="pre">onnx9000.optimum</span></code> graph rewriting routines (O1, O2, O3).</p></li>
+<li><p>[x] 152. Add a “Quantize” button that bridges directly to <code class="docutils literal notranslate"><span class="pre">onnx9000.optimum</span></code> dynamic quantization, updating the visual graph with the new <code class="docutils literal notranslate"><span class="pre">DynamicQuantizeLinear</span></code> nodes.</p></li>
+<li><p>[x] 153. Allow direct hand-off from <code class="docutils literal notranslate"><span class="pre">onnx9000.keras</span></code> (User converts a <code class="docutils literal notranslate"><span class="pre">.h5</span></code> file and is immediately presented with the modifier UI).</p></li>
+<li><p>[x] 154. Provide “Export to CoreML” integration right from the modifier UI.</p></li>
+<li><p>[x] 155. Provide “Compile to IREE/WebNN” integration from the modifier UI.</p></li>
+</ul>
+</section>
+<section id="phase-18-collaboration-cloud-extensions-optional-layer">
+<h3>Phase 18: Collaboration &amp; Cloud Extensions (Optional Layer)<a class="headerlink" href="#phase-18-collaboration-cloud-extensions-optional-layer" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 156. Support generating a shareable Base64 URI fragment if the model is &lt; 5MB.</p></li>
+<li><p>[x] 157. Create a “Copy Link” feature that stores the graph temporarily in IndexedDB and allows opening it across different browser tabs.</p></li>
+<li><p>[x] 158. Implement CRDT (Conflict-free Replicated Data Type) structures for multi-user real-time graph editing (like Figma for ONNX).</p></li>
+<li><p>[x] 159. Support WebSocket connections for synchronizing node drags/moves between users.</p></li>
+<li><p>[x] 160. Create a unified <code class="docutils literal notranslate"><span class="pre">onnx9000.modifier</span></code> Web Component that external developers can embed in their own MLOps dashboards.</p></li>
+</ul>
+</section>
+<section id="phase-19-tooling-for-generative-ai-specifically">
+<h3>Phase 19: Tooling for Generative AI specifically<a class="headerlink" href="#phase-19-tooling-for-generative-ai-specifically" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 161. Implement a specialized view for LLM repeated layers (e.g., visually stacking <code class="docutils literal notranslate"><span class="pre">TransformerBlock_0</span></code> through <code class="docutils literal notranslate"><span class="pre">TransformerBlock_31</span></code> to save screen space).</p></li>
+<li><p>[x] 162. Provide an automated macro to inject explicit KV-cache <code class="docutils literal notranslate"><span class="pre">past_key_values</span></code> inputs into a static LLM graph.</p></li>
+<li><p>[x] 163. Provide an automated macro to convert static Rotary Positional Embeddings (RoPE) limits into dynamic limits.</p></li>
+<li><p>[x] 164. Support visualizing 3D/4D tensors specific to vision models (e.g., showing a spatial heatmap of initializers if the shape matches standard convolution patterns).</p></li>
+<li><p>[x] 165. Parse Hugging Face <code class="docutils literal notranslate"><span class="pre">config.json</span></code> alongside the ONNX file to provide human-readable names for intermediate states.</p></li>
+</ul>
+</section>
+<section id="phase-20-polish-documentation">
+<h3>Phase 20: Polish &amp; Documentation<a class="headerlink" href="#phase-20-polish-documentation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 166. Publish an interactive web demo at <code class="docutils literal notranslate"><span class="pre">modifier.onnx9000.dev</span></code>.</p></li>
+<li><p>[x] 167. Create tooltip guides explaining ONNX specific concepts (e.g., what an Initializer is vs an Input) for beginners.</p></li>
+<li><p>[x] 168. Ensure strict conformance to WAI-ARIA accessibility standards for web apps.</p></li>
+<li><p>[x] 169. Provide comprehensive tutorials: “Fixing Shape Mismatches”, “Pruning a Model for Web Deploy”.</p></li>
+<li><p>[x] 170. Release v1.0 feature parity certification against the original Python <code class="docutils literal notranslate"><span class="pre">onnx-modifier</span></code>.</p></li>
+<li><p>[x] 171. Add visual indication of node execution time bottlenecks (e.g., coloring nodes red if they take &gt; 10ms during “Run Here” profiling).</p></li>
+<li><p>[x] 172. Add visual indication of node memory footprint bottlenecks.</p></li>
+<li><p>[x] 173. Support <code class="docutils literal notranslate"><span class="pre">onnx_data</span></code> sidecar file modification (updating external weights without pulling them into the main proto).</p></li>
+<li><p>[x] 174. Validate WebGL context loss recovery.</p></li>
+<li><p>[x] 175. Enable importing ONNX models dynamically via HuggingFace Hub repository URLs in the UI.</p></li>
+<li><p>[x] 176. Implement specific validation for <code class="docutils literal notranslate"><span class="pre">If</span></code> graph structures to prevent UI freezing on recursion.</p></li>
+<li><p>[x] 177. Provide layout caching so moving a node retains its position on reload.</p></li>
+<li><p>[x] 178. Handle copy/pasting nodes within the graph (duplication).</p></li>
+<li><p>[x] 179. Handle copy/pasting subgraphs entirely.</p></li>
+<li><p>[x] 180. Validate edge routing algorithm efficiency on graphs &gt; 10,000 edges.</p></li>
+<li><p>[x] 181. Add support for creating subgraph abstractions visually (selecting nodes and grouping them).</p></li>
+<li><p>[x] 182. Implement graph-level attribute viewing (for ONNX models that store metadata in attributes).</p></li>
+<li><p>[x] 183. Manage the display of extremely long string constants efficiently in the properties panel.</p></li>
+<li><p>[x] 184. Implement a strict “Read Only” mode for embedding the visualizer without editing capabilities.</p></li>
+<li><p>[x] 185. Support parsing and visual rendering of ONNX sparse tensor formats.</p></li>
+<li><p>[x] 186. Optimize the undo/redo stack memory footprint (saving deltas instead of full graph copies).</p></li>
+<li><p>[x] 187. Ensure correct parsing of ONNX TensorProto <code class="docutils literal notranslate"><span class="pre">raw_data</span></code> formats (Float16 arrays, BFloat16 arrays).</p></li>
+<li><p>[x] 188. Support importing JSON representation of the ONNX graph directly.</p></li>
+<li><p>[x] 189. Add a feature to “De-duplicate” constants visually in the graph representation.</p></li>
+<li><p>[x] 190. Provide a specific export configuration that forces Opsets to match WebNN compliance.</p></li>
+<li><p>[x] 191. Create custom warning badges on nodes that are known to be slow or unsupported in WebGPU.</p></li>
+<li><p>[x] 192. Integrate with browser File System Access API for seamless local save overwrites.</p></li>
+<li><p>[x] 193. Render text representations of mathematical expressions for basic math nodes (<code class="docutils literal notranslate"><span class="pre">Add</span></code>, <code class="docutils literal notranslate"><span class="pre">Mul</span></code>).</p></li>
+<li><p>[x] 194. Handle rendering of models with empty graphs gracefully.</p></li>
+<li><p>[x] 195. Verify that <code class="docutils literal notranslate"><span class="pre">value_info</span></code> metadata is correctly updated when modifying internal graph shapes.</p></li>
+<li><p>[x] 196. Implement an edge filtering mechanism (e.g., hiding control flow edges to reduce visual noise).</p></li>
+<li><p>[x] 197. Support custom node coloring based on regular expressions (e.g., <code class="docutils literal notranslate"><span class="pre">Color</span> <span class="pre">all</span> <span class="pre">'LayerNorm'</span> <span class="pre">nodes</span> <span class="pre">blue</span></code>).</p></li>
+<li><p>[x] 198. Export the WebGL renderer as an independent generic DAG viewer component.</p></li>
+<li><p>[x] 199. Publish the web asset to a standard Docker container for enterprise internal usage.</p></li>
+<li><p>[x] 200. Execute load tests verifying the browser doesn’t crash on standard 2GB LLM <code class="docutils literal notranslate"><span class="pre">.onnx</span></code> files.</p></li>
+<li><p>[x] 201. Add support for visual node snapping to a grid.</p></li>
+<li><p>[x] 202. Provide “Align Left/Right/Center” utilities for selected groups of nodes.</p></li>
+<li><p>[x] 203. Create a feature to automatically format node names based on depth (e.g., <code class="docutils literal notranslate"><span class="pre">layer_1/conv</span></code>, <code class="docutils literal notranslate"><span class="pre">layer_2/conv</span></code>).</p></li>
+<li><p>[x] 204. Validate <code class="docutils literal notranslate"><span class="pre">Cast</span></code> node conversions accurately represent bounds correctly.</p></li>
+<li><p>[x] 205. Implement a fallback Canvas 2D renderer if WebGL initialization fails in the browser.</p></li>
+<li><p>[x] 206. Configure explicit memory thresholds before warning the user that a save might fail.</p></li>
+<li><p>[x] 207. Support viewing the raw protobuf JSON alongside the visual editor.</p></li>
+<li><p>[x] 208. Add right-click -&gt; “Extract to Python script” generating <code class="docutils literal notranslate"><span class="pre">onnx.helper.make_node</span></code> snippets.</p></li>
+<li><p>[x] 209. Enable “Replace with Constant” macro (runs a node and bakes its result as a constant).</p></li>
+<li><p>[x] 210. Implement edge hover preview of tensor shape sizes.</p></li>
+<li><p>[x] 211. Provide visual cues for <code class="docutils literal notranslate"><span class="pre">INT8</span></code> quantized topologies.</p></li>
+<li><p>[x] 212. Provide visual cues for <code class="docutils literal notranslate"><span class="pre">W4A16</span></code> packed weight topologies.</p></li>
+<li><p>[x] 213. Add specific UI warnings for nodes using <code class="docutils literal notranslate"><span class="pre">double</span></code> (float64) precision.</p></li>
+<li><p>[x] 214. Create an automated test checking <code class="docutils literal notranslate"><span class="pre">changeBatchSize</span></code> function across all common layer types.</p></li>
+<li><p>[x] 215. Validate <code class="docutils literal notranslate"><span class="pre">removeInput</span></code> does not orphan required parameters for strict ONNX nodes.</p></li>
+<li><p>[x] 216. Ensure <code class="docutils literal notranslate"><span class="pre">addOutput</span></code> automatically infers the correct shape from the requested edge.</p></li>
+<li><p>[x] 217. Test <code class="docutils literal notranslate"><span class="pre">updateInitializer</span></code> strictly enforces array buffer length matches type specifications.</p></li>
+<li><p>[x] 218. Add support for creating new ONNX subgraphs entirely from scratch (starting with blank canvas).</p></li>
+<li><p>[x] 219. Include pre-built snippets (e.g., dragging and dropping a standard ResBlock from a menu).</p></li>
+<li><p>[x] 220. Support exporting the node statistics directly to CSV/Excel.</p></li>
+<li><p>[x] 221. Implement deep linking (e.g., sharing a URL that automatically opens a model from a remote URL and centers on node <code class="docutils literal notranslate"><span class="pre">Conv_14</span></code>).</p></li>
+<li><p>[x] 222. Ensure local IndexedDB cache is properly cleared on page reload to avoid stale state.</p></li>
+<li><p>[x] 223. Support parsing and rendering <code class="docutils literal notranslate"><span class="pre">TrainingInfoProto</span></code> if present in the ONNX file.</p></li>
+<li><p>[x] 224. Allow editing of <code class="docutils literal notranslate"><span class="pre">dim_param</span></code> string variables for dynamic axes.</p></li>
+<li><p>[x] 225. Add a “Validate Opset” macro checking compatibility with opset 13-21.</p></li>
+<li><p>[x] 226. Ensure the UI gracefully handles rapid sequential clicks (debouncing expensive layout recalculations).</p></li>
+<li><p>[x] 227. Test the application across Chrome, Firefox, and Safari engines.</p></li>
+<li><p>[x] 228. Provide a detailed “Help” modal mapping keyboard shortcuts.</p></li>
+<li><p>[x] 229. Expose a global <code class="docutils literal notranslate"><span class="pre">window.onnxModifier</span></code> object for developer console hacking.</p></li>
+<li><p>[x] 230. Validate output generation with <code class="docutils literal notranslate"><span class="pre">external_data</span></code> enabled when handling models &gt;2GB.</p></li>
+<li><p>[x] 231. Handle edge cases involving empty initializers (<code class="docutils literal notranslate"><span class="pre">raw_data</span></code> length 0).</p></li>
+<li><p>[x] 232. Support <code class="docutils literal notranslate"><span class="pre">Float8E4M3FN</span></code> rendering specifically for newer ONNX opsets.</p></li>
+<li><p>[x] 233. Optimize serialization sequence (minimizing GC pauses during download generation).</p></li>
+<li><p>[x] 234. Include custom logic to edit ONNX <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> type attributes.</p></li>
+<li><p>[x] 235. Include custom logic to edit ONNX <code class="docutils literal notranslate"><span class="pre">Map</span></code> type attributes.</p></li>
+<li><p>[x] 236. Allow explicit defining of <code class="docutils literal notranslate"><span class="pre">SparseTensorProto</span></code> constants.</p></li>
+<li><p>[x] 237. Create UI component for tracking multiple sub-graphs within one overarching model.</p></li>
+<li><p>[x] 238. Verify that multi-level nested <code class="docutils literal notranslate"><span class="pre">If</span></code> subgraphs render correctly without logical entanglement.</p></li>
+<li><p>[x] 239. Enable “Save State” to store the current editing session locally without downloading.</p></li>
+<li><p>[x] 240. Allow comparison of two separate ONNX files loaded simultaneously side-by-side.</p></li>
+<li><p>[x] 241. Provide visual indicators mapping identical weights (detecting deduplication).</p></li>
+<li><p>[x] 242. Build visual tool tracking gradient paths (if training nodes exist).</p></li>
+<li><p>[x] 243. Set up memory profiling to alert users if their edits will cause a memory spike on inference.</p></li>
+<li><p>[x] 244. Handle the “Drop ONNX file here” UX explicitly via standard browser events.</p></li>
+<li><p>[x] 245. Validate file drop on all operating systems.</p></li>
+<li><p>[x] 246. Establish automated testing of the <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">edit</span></code> CLI command via local playwright instances.</p></li>
+<li><p>[x] 247. Track exact node deletion counts and log them in console for user reference.</p></li>
+<li><p>[x] 248. Provide an option to “Auto-Fix” missing initializers by injecting dummy Zero arrays.</p></li>
+<li><p>[x] 249. Display warning banners when the model uses deprecated Opset versions.</p></li>
+<li><p>[x] 250. Finalize rigorous integration tests proving the editor works completely offline.</p></li>
+<li><p>[x] 251. Handle <code class="docutils literal notranslate"><span class="pre">Optional</span></code> input edge rendering gracefully (using dashed lines).</p></li>
+<li><p>[x] 252. Add a <code class="docutils literal notranslate"><span class="pre">Graph</span> <span class="pre">Level</span> <span class="pre">Attributes</span></code> property panel.</p></li>
+<li><p>[x] 253. Render Graph Doc Strings using Markdown in the UI.</p></li>
+<li><p>[x] 254. Support editing the graph <code class="docutils literal notranslate"><span class="pre">ir_version</span></code>.</p></li>
+<li><p>[x] 255. Support visual editing of the <code class="docutils literal notranslate"><span class="pre">opset_import</span></code> list.</p></li>
+<li><p>[x] 256. Handle adding multiple opset domains gracefully.</p></li>
+<li><p>[x] 257. Verify correct parsing and UI representation of <code class="docutils literal notranslate"><span class="pre">FunctionProto</span></code> custom functions.</p></li>
+<li><p>[x] 258. Support editing <code class="docutils literal notranslate"><span class="pre">FunctionProto</span></code> bodies recursively.</p></li>
+<li><p>[x] 259. Manage complex naming collisions when duplicating nodes.</p></li>
+<li><p>[x] 260. Render large constant tensors via paginated tables in the properties panel to prevent UI freezing.</p></li>
+<li><p>[x] 261. Add “Export Node to JSON” feature.</p></li>
+<li><p>[x] 262. Support copying a node’s attributes to another node of the same type.</p></li>
+<li><p>[x] 263. Establish a user-feedback collection mechanism inside the UI.</p></li>
+<li><p>[x] 264. Support translating standard PyTorch exported graphs into cleaner visual representations (collapsing noise).</p></li>
+<li><p>[x] 265. Allow pinning specific nodes to fixed coordinates on the canvas.</p></li>
+<li><p>[x] 266. Enable drawing of custom text annotations directly onto the canvas.</p></li>
+<li><p>[x] 267. Export annotations alongside the model in a metadata dictionary.</p></li>
+<li><p>[x] 268. Detect and display warning for model inputs lacking defined shape properties.</p></li>
+<li><p>[x] 269. Render a progress bar tracking the Sugiyama layout algorithm for large graphs.</p></li>
+<li><p>[x] 270. Add an abort button for the layout algorithm if it takes too long.</p></li>
+<li><p>[x] 271. Fallback to a fast grid layout if Sugiyama fails or times out.</p></li>
+<li><p>[x] 272. Implement custom logic for editing <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code> specific tensor updates.</p></li>
+<li><p>[x] 273. Support visualization of ONNX Sequence inputs/outputs.</p></li>
+<li><p>[x] 274. Implement UI hooks mapping to <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> execution profiling metrics directly.</p></li>
+<li><p>[x] 275. Show memory bandwidth utilization estimates per node.</p></li>
+<li><p>[x] 276. Ensure proper cleanup of the WebGL context on component unmount.</p></li>
+<li><p>[x] 277. Render graphs using standard WebGL Instanced Drawing for massive performance gains.</p></li>
+<li><p>[x] 278. Add anti-aliasing configurations for the canvas viewer.</p></li>
+<li><p>[x] 279. Support saving layout preferences to <code class="docutils literal notranslate"><span class="pre">localStorage</span></code>.</p></li>
+<li><p>[x] 280. Add multi-language localization support for the Modifier UI.</p></li>
+<li><p>[x] 281. Build the production asset pipeline via Vite or Webpack strictly.</p></li>
+<li><p>[x] 282. Expose specific hooks for unit testing DOM interactions.</p></li>
+<li><p>[x] 283. Implement touch event handling for iPad/Mobile Safari rendering.</p></li>
+<li><p>[x] 284. Allow editing of tensor attributes visually via Hex editor.</p></li>
+<li><p>[x] 285. Confirm that models generated by <code class="docutils literal notranslate"><span class="pre">onnx-modifier</span></code> execute flawlessly in standard ONNX Runtime C++.</p></li>
+<li><p>[x] 286. Handle ONNX proto version conflicts gracefully.</p></li>
+<li><p>[x] 287. Implement a “Validate Graph” manual trigger button.</p></li>
+<li><p>[x] 288. Publish full NPM package <code class="docutils literal notranslate"><span class="pre">&#64;onnx9000/modifier</span></code>.</p></li>
+<li><p>[x] 289. Add a strict mode that prevents generating non-standard ONNX architectures.</p></li>
+<li><p>[x] 290. Provide a detailed summary of changes prompt before exporting.</p></li>
+<li><p>[x] 291. Add visual node highlighting based on inference path tracking.</p></li>
+<li><p>[x] 292. Add custom layout padding configurations.</p></li>
+<li><p>[x] 293. Handle invalid JSON attribute inputs safely.</p></li>
+<li><p>[x] 294. Enable custom shape inference logic hooking.</p></li>
+<li><p>[x] 295. Set up continuous integration analyzing WebGL framerates.</p></li>
+<li><p>[x] 296. Verify correct parsing of the <code class="docutils literal notranslate"><span class="pre">metadata_props</span></code> mapping.</p></li>
+<li><p>[x] 297. Render <code class="docutils literal notranslate"><span class="pre">String</span></code> nodes with truncated inline text representations.</p></li>
+<li><p>[x] 298. Validate complete disconnection behavior without crashing shape inference.</p></li>
+<li><p>[x] 299. Create standard Github Issue forms explicitly for the Modifier tool.</p></li>
+<li><p>[x] 300. Maintain rigorous parity checks against new versions of <code class="docutils literal notranslate"><span class="pre">onnx-modifier</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX28_KERAS2ONNX.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX35_SPARSEML.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-core-ast-in-memory-graph-mutator">Phase 1: Core AST &amp; In-Memory Graph Mutator</a></li>
+<li><a class="reference internal" href="#phase-2-static-analysis-validation-engine">Phase 2: Static Analysis &amp; Validation Engine</a></li>
+<li><a class="reference internal" href="#phase-3-the-visualization-engine-canvas-webgl">Phase 3: The Visualization Engine (Canvas/WebGL)</a></li>
+<li><a class="reference internal" href="#phase-4-ui-ux-components-interactions">Phase 4: UI/UX Components &amp; Interactions</a></li>
+<li><a class="reference internal" href="#phase-5-batch-modification-advanced-editing">Phase 5: Batch Modification &amp; Advanced Editing</a></li>
+<li><a class="reference internal" href="#phase-6-initializer-weight-editing">Phase 6: Initializer / Weight Editing</a></li>
+<li><a class="reference internal" href="#phase-7-interactive-graph-execution-debugging-the-run-here-feature">Phase 7: Interactive Graph Execution &amp; Debugging (The “Run Here” Feature)</a></li>
+<li><a class="reference internal" href="#phase-8-data-privacy-security">Phase 8: Data Privacy &amp; Security</a></li>
+<li><a class="reference internal" href="#phase-9-model-export-serialization">Phase 9: Model Export &amp; Serialization</a></li>
+<li><a class="reference internal" href="#phase-10-specific-onnx-operator-custom-editors">Phase 10: Specific ONNX Operator Custom Editors</a></li>
+<li><a class="reference internal" href="#phase-11-cli-interface-onnx9000-modifier-cli">Phase 11: CLI Interface (onnx9000.modifier CLI)</a></li>
+<li><a class="reference internal" href="#phase-12-interoperability-with-pyodide">Phase 12: Interoperability with Pyodide</a></li>
+<li><a class="reference internal" href="#phase-13-accessibility-and-theming">Phase 13: Accessibility and Theming</a></li>
+<li><a class="reference internal" href="#phase-14-automated-graph-fixers-one-click-macros">Phase 14: Automated Graph Fixers (One-Click Macros)</a></li>
+<li><a class="reference internal" href="#phase-15-quality-assurance-parity-testing">Phase 15: Quality Assurance &amp; Parity Testing</a></li>
+<li><a class="reference internal" href="#phase-16-file-handling-edge-cases">Phase 16: File Handling Edge Cases</a></li>
+<li><a class="reference internal" href="#phase-17-integration-with-other-onnx9000-tools">Phase 17: Integration with Other <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Tools</a></li>
+<li><a class="reference internal" href="#phase-18-collaboration-cloud-extensions-optional-layer">Phase 18: Collaboration &amp; Cloud Extensions (Optional Layer)</a></li>
+<li><a class="reference internal" href="#phase-19-tooling-for-generative-ai-specifically">Phase 19: Tooling for Generative AI specifically</a></li>
+<li><a class="reference internal" href="#phase-20-polish-documentation">Phase 20: Polish &amp; Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>

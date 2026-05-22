@@ -1,0 +1,972 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html"><link rel="next" title="ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)" href="ONNX38_TRITON.html"><link rel="prev" title="ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)" href="ONNX31_MMDNN.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>ONNX27: coremltools (Web-Native Apple Silicon Bridge) - ONNX9000 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/demo-ui/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">ONNX9000  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <span class="sidebar-brand-text">ONNX9000  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Python API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../onnx9000.html">ONNX9000 Internal API Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">JS API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">ONNX9000 🚀</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../GRAPHSURGEON.html">ONNX9000 GraphSurgeon / Optimizer Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JAX_INTEGRATION.html">ONNX9000 JAX &amp; Flax Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRANSFORMERS_JS.html">ONNX9000 Transformers.js Pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../WEBNN_POLYFILL.html">ONNX9000 WebNN API Polyfill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ZOO_API.html">ONNX9000 Model Zoo &amp; Safetensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SERVE_API.html">ONNX9000 Serverless Edge Serving</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARRAY_API.html">ONNX9000 Array API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../JSON_EXTRACT.html">JSON Extraction (<code class="docutils literal notranslate"><span class="pre">json-extract</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PYTORCH_CODEGEN.html">PyTorch Code Generation (<code class="docutils literal notranslate"><span class="pre">pytorch-codegen</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GENAI_MODELS.html">Generative AI Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFJS_SHIM.html">TensorFlow.js Shim (<code class="docutils literal notranslate"><span class="pre">tfjs-shim</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../IREE_INTEGRATION.html">IREE Compiler and Runtime (<code class="docutils literal notranslate"><span class="pre">iree-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">iree-runtime</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_COMPILER.html">Triton Compiler and Code Generation (<code class="docutils literal notranslate"><span class="pre">triton-compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COREML_INTEGRATION.html">CoreML Integration (<code class="docutils literal notranslate"><span class="pre">coreml</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TVM_INTEGRATION.html">Apache TVM Integration (<code class="docutils literal notranslate"><span class="pre">tvm</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TENSORRT_INTEGRATION.html">TensorRT Integration (<code class="docutils literal notranslate"><span class="pre">tensorrt</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../DIFFUSERS_INTEGRATION.html">Diffusers Web Integration (<code class="docutils literal notranslate"><span class="pre">diffusers</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../MMDNN_INTEGRATION.html">MMdnn Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TFLITE_CONVERTER.html">TFLite Converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_CHECKER.html">ONNX Checker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../C_COMPILER.html">C Compiler (onnx2c)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../GGUF_INTEGRATION.html">GGUF Integration (onnx2gguf)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPENVINO_INTEGRATION.html">OpenVINO Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OPTIMUM_INTEGRATION.html">Optimum Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NETRON_UI.html">Netron UI / Model Modifier</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HUMMINGBIRD_INTEGRATION.html">Hummingbird Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../AUTOGRAD.html">Autograd Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ROCM_INTEGRATION.html">ROCm Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../APPLE_METAL.html">Apple Metal Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUDA_INTEGRATION.html">CUDA Backend Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_SCRIPT.html">onnx9000-toolkit: Fluent Scripting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_WEBGPU_SUPPORT.html">WebGPU-Native ONNX Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PROGRESSIVE_LOADING.html">WASM-First: Progressive Model Loading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_MAPPING.html">ONNX to Triton Operator Mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TUTORIAL_SPARSE.html">Tutorial: Pruning and Sparsification with onnx9000-optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../HEADLESS_MODIFIERS.html">Headless Graph Modifiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../EXTENDED_CONVERTERS.html">Extended Format Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CLI_UTILITIES.html">CLI Utility Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ARENA.html">Memory Arena and Profiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CUSTOM_OPS.html">Custom Operations (Custom Ops)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../COMPILE.html">Generic AOT Compiler (<code class="docutils literal notranslate"><span class="pre">compiler</span></code>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../PADDLE2ONNX.html">Paddle2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../KERAS2ONNX.html">Keras2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SKL2ONNX.html">SKL2ONNX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ORT_TRAINING.html">ORT Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OLIVE_OPTIMIZER.html">Olive Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../TRITON_SERVER.html">Triton Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ONNX_TOOL.html">ONNX Tool</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../js-api_toc.html">JS API</a><input aria-label="Toggle navigation of JS API" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">onnx9000-monorepo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/src.html">core/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX08_ONNXSCRIPT_SPOX.html">ONNXScript / Spox Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX06_OLIVE_OPTIMIZER.html">Olive Optimizer Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SUPPORTED_PER_FRAMEWORK.html">Supported Frameworks Coverage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX07_ONNX_SIMPLIFIER.html">ONNX Simplifier Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX17_ONNX_TOOL.html">onnx-tool Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ARCHITECTURE.html">onnx9000: Architecture Deep Dive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX35_SPARSEML.html">ONNX35: SparseML (Web-Native Sparsity &amp; Pruning Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX29_ONNX_MODIFIER.html">ONNX29: onnx-modifier (Web-Native Graph Editor &amp; Visualizer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX28_KERAS2ONNX.html">ONNX28: keras2onnx &amp; tfjs-to-onnx (Web-Native Keras Converter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX41_OPENVINO.html">ONNX41: OpenVINO Exporter (Web-Native OpenVINO IR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX05_TORCH_EXPORTERS.html">Torch &amp; TF Exporters Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX24_OPTIMUM.html">ONNX21: HuggingFace Optimum (Web-Optimized Export &amp; Quantization)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="USAGE.html">onnx9000: Usage Guide &amp; Presentation Handout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX25_WEBNN_EP.html">ONNX25: WebNN API (Native Browser NPU Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX34_ONNX2GGUF.html">ONNX34: onnx2gguf (Web-Native GGUF Compiler &amp; Llama.cpp Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX32_ONNX2TF.html">ONNX32: onnx2tf (Web-Native TFLite &amp; EdgeTPU Exporter)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX14_GRAPHSURGEON.html">ONNX GraphSurgeon Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX31_MMDNN.html">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX38_TRITON.html">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX21_ORT_GENAI.html">ONNX19: ONNX Runtime GenAI (WASM-First Generative Execution)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX26_APACHE_TVM_IREE.html">ONNX26: Apache TVM IREE (WASM-Native MLIR Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX39_WEBNN_POLYFILL.html">ONNX39: WebNN Polyfill (W3C API WebGPU/WASM Shim)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX11_PADDLE2ONNX.html">paddle2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX43_DIFFUSERS.html">ONNX43: Diffusers (Web-Native Diffusion Pipelines &amp; Schedulers)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX42_TRITON_SERVER.html">ONNX42: Triton Inference Server (Web-Native Edge Serving Engine)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX02_ORT_TRAINING.html">ONNX Runtime Training Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX03_ORT_WEB.html">ONNX Runtime Web Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX36_TFJS_SHIM.html">ONNX36: TF.js API Shim (WebGPU ONNX Drop-In Replacement)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX00_RUNTIME.html">ONNX Runtime (Native Exec) Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ROADMAP.html">ONNX9000 Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX16_NETRON.html">Netron Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX10_TF2ONNX.html">tf2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_IN_SPHINX.html">ONNX45: Demo in Sphinx (Vanilla JS, WASM Lazy-Load)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX19_ONNXMLIR.html">onnx-mlir Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX15_HUMMINGBIRD.html">Hummingbird Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX30_ONNX_ARRAY_API.html">ONNX30: onnx-array-api (Web-Native NumPy/Eager API for ONNX)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX04_ORT_EXTENSIONS.html">ONNX Runtime Extensions Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX44_VSCODE_IDE.html">ONNX44: VS Code Machine Learning OS (The Universal Web-Native IDE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX33_ONNX2C.html">ONNX33: onnx2c (Web-Native TinyML &amp; Embedded C99 Generator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX40_ONNX_CHECKER.html">ONNX40: ONNX Checker &amp; Schema Registry (Web-Native Validator)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX13_ONNXMLTOOLS.html">onnxmltools Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX22_SAFETENSORS.html">onnx-safetensors Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX12_SKL2ONNX.html">skl2onnx Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX45_DEMO_EXTENDED_IN_SPHINX.html">ONNX45: Extended Demo in Sphinx (Multi-Step Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX01_COMPLIANCE.html">ONNX Standard Compliance &amp; Testing Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX23_TRANSFORMERS_JS.html">ONNX20: Transformers.js (WASM-Native Auto-Pipelines)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX20_TVM_COMPILER.html">ONNX18: Apache TVM (Ahead-of-Time Web Compiler)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX09_ORT_NATIVE.html">ORT Native Exec &amp; FFI Dispatcher Replication &amp; Parity Tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ONNX37_TENSORRT.html">ONNX37: ONNX-TensorRT (Zero-Build TRT FFI Parser)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformers/src.html">transformers/src</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compiler/src.html">compiler/src</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/js-api/_media/ONNX27_COREMLTOOLS.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="onnx27-coremltools-web-native-apple-silicon-bridge">
+<h1>ONNX27: coremltools (Web-Native Apple Silicon Bridge)<a class="headerlink" href="#onnx27-coremltools-web-native-apple-silicon-bridge" title="Link to this heading">¶</a></h1>
+<section id="original-project-description">
+<h2>Original Project Description<a class="headerlink" href="#original-project-description" title="Link to this heading">¶</a></h2>
+<p>Apple’s <code class="docutils literal notranslate"><span class="pre">coremltools</span></code> is a Python package that converts machine learning models from major frameworks (PyTorch, TensorFlow, ONNX) into the Core ML format (<code class="docutils literal notranslate"><span class="pre">.mlmodel</span></code> and the newer <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code>). This conversion is essential for deploying models natively on Apple hardware (macOS, iOS, iPadOS, watchOS), allowing the operating system to optimally route computations across the CPU, GPU, and the highly efficient Apple Neural Engine (ANE). The tool relies heavily on Python, protobuf generation, and underlying native binaries to optimize the graph intermediate representation (Model Intermediate Language, or MIL).</p>
+</section>
+<section id="how-onnx9000-deviates-the-wasm-first-monolith-approach">
+<h2>How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)<a class="headerlink" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach" title="Link to this heading">¶</a></h2>
+<p>Instead of requiring a local macOS machine with a massive Python environment to generate iOS/macOS payloads, <code class="docutils literal notranslate"><span class="pre">onnx9000.coreml</span></code> is entirely implemented in TypeScript and WebAssembly.</p>
+<ul class="simple">
+<li><p><strong>Browser-Based Generation:</strong> Allows developers to drag-and-drop an ONNX file into a web browser, perform MIL optimizations, and instantly download a signed <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> ready for Xcode, entirely client-side.</p></li>
+<li><p><strong>No Native Dependencies:</strong> Bypasses Apple’s proprietary C++ parsing libraries by implementing the CoreML protobuf schema and MIL AST directly in TypeScript.</p></li>
+<li><p><strong>Bi-directional (CoreML -&gt; ONNX):</strong> While Apple’s tool primarily focuses on <em>exporting</em> to CoreML, <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> natively supports <em>importing</em> existing <code class="docutils literal notranslate"><span class="pre">.mlmodel</span></code> files and lifting them back up to standard ONNX IR to run on non-Apple web environments.</p></li>
+<li><p><strong>WebNN Integration:</strong> Automatically generates WebNN execution hints tailored for Safari’s CoreML-backed WebNN implementation, ensuring the generated graphs hit the ANE fast-paths dynamically in the browser.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="exhaustive-implementation-checklist">
+<h2>Exhaustive Implementation Checklist<a class="headerlink" href="#exhaustive-implementation-checklist" title="Link to this heading">¶</a></h2>
+<section id="phase-1-coreml-schema-serialization-web-native">
+<h3>Phase 1: CoreML Schema &amp; Serialization (Web-Native)<a class="headerlink" href="#phase-1-coreml-schema-serialization-web-native" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 1. Implement CoreML protobuf parser in pure TypeScript/WASM.</p></li>
+<li><p>[x] 2. Implement CoreML protobuf emitter in pure TypeScript/WASM.</p></li>
+<li><p>[x] 3. Support <code class="docutils literal notranslate"><span class="pre">Model</span></code> spec version 1 to 7 compatibility flags.</p></li>
+<li><p>[x] 4. Define <code class="docutils literal notranslate"><span class="pre">NeuralNetwork</span></code> schema structure.</p></li>
+<li><p>[x] 5. Define <code class="docutils literal notranslate"><span class="pre">NeuralNetworkBuilder</span></code> schema structure.</p></li>
+<li><p>[x] 6. Define <code class="docutils literal notranslate"><span class="pre">MILSpec.Program</span></code> schema structure (CoreML v4+).</p></li>
+<li><p>[x] 7. Define <code class="docutils literal notranslate"><span class="pre">MILSpec.Function</span></code> schema structure.</p></li>
+<li><p>[x] 8. Define <code class="docutils literal notranslate"><span class="pre">MILSpec.Block</span></code> schema structure.</p></li>
+<li><p>[x] 9. Implement JSON-to-Protobuf serialization for CoreML definitions.</p></li>
+<li><p>[x] 10. Implement <code class="docutils literal notranslate"><span class="pre">.mlmodel</span></code> flat file generator.</p></li>
+<li><p>[x] 11. Implement <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> directory structure generator.</p></li>
+<li><p>[x] 12. Utilize JSZip (or WASM equivalent) to package the <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> in the browser.</p></li>
+<li><p>[x] 13. Generate <code class="docutils literal notranslate"><span class="pre">Manifest.json</span></code> for <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code>.</p></li>
+<li><p>[x] 14. Generate <code class="docutils literal notranslate"><span class="pre">FeatureDescriptions.json</span></code> for <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code>.</p></li>
+<li><p>[x] 15. Implement <code class="docutils literal notranslate"><span class="pre">weights/weight.bin</span></code> external data writer.</p></li>
+<li><p>[x] 16. Handle chunked writing for <code class="docutils literal notranslate"><span class="pre">weight.bin</span></code> exceeding browser memory limits.</p></li>
+<li><p>[x] 17. Define <code class="docutils literal notranslate"><span class="pre">FeatureType</span></code> representations (Int64, Double, String, Image, MultiArray).</p></li>
+<li><p>[x] 18. Implement <code class="docutils literal notranslate"><span class="pre">ImageFeatureType</span></code> mapping (RGB, BGR, Grayscale).</p></li>
+<li><p>[x] 19. Implement <code class="docutils literal notranslate"><span class="pre">DictionaryFeatureType</span></code> mapping.</p></li>
+<li><p>[x] 20. Implement <code class="docutils literal notranslate"><span class="pre">SequenceFeatureType</span></code> mapping.</p></li>
+<li><p>[x] 21. Parse and preserve model metadata (author, license, description).</p></li>
+<li><p>[x] 22. Serialize user-defined metadata dictionaries.</p></li>
+<li><p>[x] 23. Implement a linter validating the generated CoreML protobuf against Apple’s strict schema.</p></li>
+<li><p>[x] 24. Expose an API to read metadata from an existing <code class="docutils literal notranslate"><span class="pre">.mlmodel</span></code> without parsing weights.</p></li>
+<li><p>[x] 25. Support updating model metadata natively in the browser and re-exporting.</p></li>
+</ul>
+</section>
+<section id="phase-2-model-intermediate-language-mil-ast">
+<h3>Phase 2: Model Intermediate Language (MIL) AST<a class="headerlink" href="#phase-2-model-intermediate-language-mil-ast" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 26. Define base <code class="docutils literal notranslate"><span class="pre">mil.Operation</span></code> AST node.</p></li>
+<li><p>[x] 27. Define base <code class="docutils literal notranslate"><span class="pre">mil.Value</span></code> and <code class="docutils literal notranslate"><span class="pre">mil.Var</span></code> nodes.</p></li>
+<li><p>[x] 28. Implement MIL type system (<code class="docutils literal notranslate"><span class="pre">mil.type.tensor</span></code>, <code class="docutils literal notranslate"><span class="pre">mil.type.scalar</span></code>, <code class="docutils literal notranslate"><span class="pre">mil.type.tuple</span></code>).</p></li>
+<li><p>[x] 29. Implement <code class="docutils literal notranslate"><span class="pre">mil.type.fp16</span></code>, <code class="docutils literal notranslate"><span class="pre">mil.type.fp32</span></code>, <code class="docutils literal notranslate"><span class="pre">mil.type.int32</span></code>, <code class="docutils literal notranslate"><span class="pre">mil.type.bool</span></code>.</p></li>
+<li><p>[x] 30. Implement <code class="docutils literal notranslate"><span class="pre">mil.Builder</span></code> class for programmatic MIL graph construction.</p></li>
+<li><p>[x] 31. Implement <code class="docutils literal notranslate"><span class="pre">mil.Program</span></code> and <code class="docutils literal notranslate"><span class="pre">mil.Function</span></code> containers.</p></li>
+<li><p>[x] 32. Implement graph topological sort utility for MIL operations.</p></li>
+<li><p>[x] 33. Implement MIL constant folding optimization pass.</p></li>
+<li><p>[x] 34. Implement MIL dead code elimination (DCE) pass.</p></li>
+<li><p>[x] 35. Implement MIL common subexpression elimination (CSE).</p></li>
+<li><p>[x] 36. Implement namespace isolation for MIL variables to prevent collision.</p></li>
+<li><p>[x] 37. Create the ONNX-to-MIL high-level translation loop.</p></li>
+<li><p>[x] 38. Map ONNX input tensors to MIL function inputs.</p></li>
+<li><p>[x] 39. Map ONNX initializers to MIL <code class="docutils literal notranslate"><span class="pre">const</span></code> operations.</p></li>
+<li><p>[x] 40. Map ONNX output tensors to MIL function outputs.</p></li>
+<li><p>[x] 41. Implement shape inference within the MIL AST to resolve dynamic boundaries.</p></li>
+<li><p>[x] 42. Translate ONNX dynamic axes to MIL symbolic variables (e.g., <code class="docutils literal notranslate"><span class="pre">isize1</span></code>).</p></li>
+<li><p>[x] 43. Handle type casting implicitly if ONNX types (e.g., int64) aren’t supported natively by MIL.</p></li>
+<li><p>[x] 44. Implement a textual printer for MIL AST debugging (similar to Apple’s PyMIL).</p></li>
+<li><p>[x] 45. Implement AST node replacement utilities for graph rewriting.</p></li>
+<li><p>[x] 46. Validate MIL AST prior to lowering to Protobuf.</p></li>
+<li><p>[x] 47. Track original ONNX node names in MIL metadata for debugging traceability.</p></li>
+<li><p>[x] 48. Implement loop/conditional block unwrapping into standard MIL execution flow.</p></li>
+<li><p>[x] 49. Establish a specific intermediate dialect <code class="docutils literal notranslate"><span class="pre">onnx9000.apple_ane</span></code> for Neural Engine specifics.</p></li>
+<li><p>[x] 50. Implement a topological verifier checking against acyclic directed graph rules.</p></li>
+</ul>
+</section>
+<section id="phase-3-unary-binary-arithmetic-translation-onnx-mil">
+<h3>Phase 3: Unary &amp; Binary Arithmetic Translation (ONNX -&gt; MIL)<a class="headerlink" href="#phase-3-unary-binary-arithmetic-translation-onnx-mil" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 51. Map ONNX <code class="docutils literal notranslate"><span class="pre">Add</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">add</span></code>.</p></li>
+<li><p>[x] 52. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sub</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">sub</span></code>.</p></li>
+<li><p>[x] 53. Map ONNX <code class="docutils literal notranslate"><span class="pre">Mul</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">mul</span></code>.</p></li>
+<li><p>[x] 54. Map ONNX <code class="docutils literal notranslate"><span class="pre">Div</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">real_div</span></code> / <code class="docutils literal notranslate"><span class="pre">floor_div</span></code>.</p></li>
+<li><p>[x] 55. Map ONNX <code class="docutils literal notranslate"><span class="pre">Pow</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">pow</span></code>.</p></li>
+<li><p>[x] 56. Map ONNX <code class="docutils literal notranslate"><span class="pre">Abs</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">abs</span></code>.</p></li>
+<li><p>[x] 57. Map ONNX <code class="docutils literal notranslate"><span class="pre">Ceil</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">ceil</span></code>.</p></li>
+<li><p>[x] 58. Map ONNX <code class="docutils literal notranslate"><span class="pre">Floor</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">floor</span></code>.</p></li>
+<li><p>[x] 59. Map ONNX <code class="docutils literal notranslate"><span class="pre">Round</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">round</span></code>.</p></li>
+<li><p>[x] 60. Map ONNX <code class="docutils literal notranslate"><span class="pre">Exp</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">exp</span></code>.</p></li>
+<li><p>[x] 61. Map ONNX <code class="docutils literal notranslate"><span class="pre">Log</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">log</span></code>.</p></li>
+<li><p>[x] 62. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sqrt</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">sqrt</span></code>.</p></li>
+<li><p>[x] 63. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sin</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">sin</span></code>.</p></li>
+<li><p>[x] 64. Map ONNX <code class="docutils literal notranslate"><span class="pre">Cos</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">cos</span></code>.</p></li>
+<li><p>[x] 65. Map ONNX <code class="docutils literal notranslate"><span class="pre">Tan</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">tan</span></code>.</p></li>
+<li><p>[x] 66. Map ONNX <code class="docutils literal notranslate"><span class="pre">Asin</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">asin</span></code>.</p></li>
+<li><p>[x] 67. Map ONNX <code class="docutils literal notranslate"><span class="pre">Acos</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">acos</span></code>.</p></li>
+<li><p>[x] 68. Map ONNX <code class="docutils literal notranslate"><span class="pre">Atan</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">atan</span></code>.</p></li>
+<li><p>[x] 69. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sign</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">sign</span></code>.</p></li>
+<li><p>[x] 70. Map ONNX <code class="docutils literal notranslate"><span class="pre">Mod</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">mod</span></code>.</p></li>
+<li><p>[x] 71. Map ONNX <code class="docutils literal notranslate"><span class="pre">Max</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">maximum</span></code>.</p></li>
+<li><p>[x] 72. Map ONNX <code class="docutils literal notranslate"><span class="pre">Min</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">minimum</span></code>.</p></li>
+<li><p>[x] 73. Map ONNX <code class="docutils literal notranslate"><span class="pre">Erf</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">erf</span></code>.</p></li>
+<li><p>[x] 74. Map ONNX <code class="docutils literal notranslate"><span class="pre">IsNaN</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">isnan</span></code>.</p></li>
+<li><p>[x] 75. Handle ONNX implicit broadcasting logic mapping to MIL explicit broadcast ops if needed.</p></li>
+</ul>
+</section>
+<section id="phase-4-tensor-manipulation-translation-onnx-mil">
+<h3>Phase 4: Tensor Manipulation Translation (ONNX -&gt; MIL)<a class="headerlink" href="#phase-4-tensor-manipulation-translation-onnx-mil" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 76. Map ONNX <code class="docutils literal notranslate"><span class="pre">Reshape</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reshape</span></code>.</p></li>
+<li><p>[x] 77. Map ONNX <code class="docutils literal notranslate"><span class="pre">Transpose</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">transpose</span></code>.</p></li>
+<li><p>[x] 78. Map ONNX <code class="docutils literal notranslate"><span class="pre">Concat</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">concat</span></code>.</p></li>
+<li><p>[x] 79. Map ONNX <code class="docutils literal notranslate"><span class="pre">Slice</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">slice_by_index</span></code> or <code class="docutils literal notranslate"><span class="pre">slice_by_size</span></code>.</p></li>
+<li><p>[x] 80. Handle dynamic ONNX slice parameters using MIL symbolic bounds.</p></li>
+<li><p>[x] 81. Map ONNX <code class="docutils literal notranslate"><span class="pre">Split</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">split</span></code>.</p></li>
+<li><p>[x] 82. Map ONNX <code class="docutils literal notranslate"><span class="pre">Squeeze</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">squeeze</span></code>.</p></li>
+<li><p>[x] 83. Map ONNX <code class="docutils literal notranslate"><span class="pre">Unsqueeze</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">expand_dims</span></code>.</p></li>
+<li><p>[x] 84. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gather</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">gather</span></code>.</p></li>
+<li><p>[x] 85. Map ONNX <code class="docutils literal notranslate"><span class="pre">GatherElements</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">gather_along_axis</span></code>.</p></li>
+<li><p>[x] 86. Map ONNX <code class="docutils literal notranslate"><span class="pre">GatherND</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">gather_nd</span></code>.</p></li>
+<li><p>[x] 87. Map ONNX <code class="docutils literal notranslate"><span class="pre">Scatter</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">scatter</span></code>.</p></li>
+<li><p>[x] 88. Map ONNX <code class="docutils literal notranslate"><span class="pre">ScatterElements</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">scatter_along_axis</span></code>.</p></li>
+<li><p>[x] 89. Map ONNX <code class="docutils literal notranslate"><span class="pre">ScatterND</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">scatter_nd</span></code>.</p></li>
+<li><p>[x] 90. Map ONNX <code class="docutils literal notranslate"><span class="pre">Tile</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">tile</span></code>.</p></li>
+<li><p>[x] 91. Map ONNX <code class="docutils literal notranslate"><span class="pre">Pad</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">pad</span></code>.</p></li>
+<li><p>[x] 92. Handle <code class="docutils literal notranslate"><span class="pre">constant</span></code> padding mode in MIL.</p></li>
+<li><p>[x] 93. Handle <code class="docutils literal notranslate"><span class="pre">reflect</span></code> padding mode in MIL.</p></li>
+<li><p>[x] 94. Handle <code class="docutils literal notranslate"><span class="pre">edge</span></code> padding mode in MIL.</p></li>
+<li><p>[x] 95. Map ONNX <code class="docutils literal notranslate"><span class="pre">Expand</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">broadcast_to</span></code>.</p></li>
+<li><p>[x] 96. Map ONNX <code class="docutils literal notranslate"><span class="pre">Shape</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">shape</span></code>.</p></li>
+<li><p>[x] 97. Map ONNX <code class="docutils literal notranslate"><span class="pre">Size</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">size</span></code>.</p></li>
+<li><p>[x] 98. Map ONNX <code class="docutils literal notranslate"><span class="pre">Cast</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">cast</span></code>.</p></li>
+<li><p>[x] 99. Identify unsupported ONNX type casting (e.g., float64) and insert warning traces.</p></li>
+<li><p>[x] 100. Resolve negative axes indexing natively within the MIL translation.</p></li>
+</ul>
+</section>
+<section id="phase-5-neural-network-layers-translation-onnx-mil">
+<h3>Phase 5: Neural Network Layers Translation (ONNX -&gt; MIL)<a class="headerlink" href="#phase-5-neural-network-layers-translation-onnx-mil" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 101. Map ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code> (1D/2D/3D) to MIL <code class="docutils literal notranslate"><span class="pre">conv</span></code>.</p></li>
+<li><p>[x] 102. Handle convolution <code class="docutils literal notranslate"><span class="pre">dilations</span></code> translation.</p></li>
+<li><p>[x] 103. Handle convolution <code class="docutils literal notranslate"><span class="pre">strides</span></code> translation.</p></li>
+<li><p>[x] 104. Handle depthwise convolution via <code class="docutils literal notranslate"><span class="pre">groups</span></code> parameter.</p></li>
+<li><p>[x] 105. Handle <code class="docutils literal notranslate"><span class="pre">auto_pad</span></code> string matching in MIL.</p></li>
+<li><p>[x] 106. Map ONNX <code class="docutils literal notranslate"><span class="pre">ConvTranspose</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">conv_transpose</span></code>.</p></li>
+<li><p>[x] 107. Map ONNX <code class="docutils literal notranslate"><span class="pre">MaxPool</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">max_pool</span></code>.</p></li>
+<li><p>[x] 108. Map ONNX <code class="docutils literal notranslate"><span class="pre">AveragePool</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">avg_pool</span></code>.</p></li>
+<li><p>[x] 109. Map ONNX <code class="docutils literal notranslate"><span class="pre">GlobalMaxPool</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">global_max_pool</span></code> (or pool with full spatial kernel).</p></li>
+<li><p>[x] 110. Map ONNX <code class="docutils literal notranslate"><span class="pre">GlobalAveragePool</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">global_avg_pool</span></code> (or pool with full spatial kernel).</p></li>
+<li><p>[x] 111. Map ONNX <code class="docutils literal notranslate"><span class="pre">BatchNormalization</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">batch_norm</span></code>.</p></li>
+<li><p>[x] 112. Map ONNX <code class="docutils literal notranslate"><span class="pre">InstanceNormalization</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">instance_norm</span></code>.</p></li>
+<li><p>[x] 113. Map ONNX <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">layer_norm</span></code>.</p></li>
+<li><p>[x] 114. Parse and apply epsilon values correctly across all norm layers.</p></li>
+<li><p>[x] 115. Map ONNX <code class="docutils literal notranslate"><span class="pre">Dropout</span></code> to a MIL Identity (since CoreML export is inference-only).</p></li>
+<li><p>[x] 116. Map ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">matmul</span></code>.</p></li>
+<li><p>[x] 117. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gemm</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">linear</span></code> (fusing alpha/beta/bias directly).</p></li>
+<li><p>[x] 118. Implement padding conversions (ONNX specific spatial pads to MIL format).</p></li>
+<li><p>[x] 119. Handle asymmetric padding safely within MIL convolution parameters.</p></li>
+<li><p>[x] 120. Emulate ONNX <code class="docutils literal notranslate"><span class="pre">LocalResponseNormalization</span></code> (LRN) if native MIL op varies.</p></li>
+<li><p>[x] 121. Emulate ONNX <code class="docutils literal notranslate"><span class="pre">MaxUnpool</span></code> utilizing indices from previous MaxPool operations.</p></li>
+<li><p>[x] 122. Emulate <code class="docutils literal notranslate"><span class="pre">DepthToSpace</span></code> via MIL <code class="docutils literal notranslate"><span class="pre">pixel_shuffle</span></code>.</p></li>
+<li><p>[x] 123. Emulate <code class="docutils literal notranslate"><span class="pre">SpaceToDepth</span></code> via MIL reshape and transpose sequences.</p></li>
+<li><p>[x] 124. Map ONNX <code class="docutils literal notranslate"><span class="pre">Resize</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">resize_bilinear</span></code> or <code class="docutils literal notranslate"><span class="pre">resize_nearest_neighbor</span></code>.</p></li>
+<li><p>[x] 125. Parse coordinate transformation modes (<code class="docutils literal notranslate"><span class="pre">align_corners</span></code>, <code class="docutils literal notranslate"><span class="pre">half_pixel</span></code>) for <code class="docutils literal notranslate"><span class="pre">Resize</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-6-activations-reduction-ops-translation-onnx-mil">
+<h3>Phase 6: Activations &amp; Reduction Ops Translation (ONNX -&gt; MIL)<a class="headerlink" href="#phase-6-activations-reduction-ops-translation-onnx-mil" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 126. Map ONNX <code class="docutils literal notranslate"><span class="pre">Relu</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">relu</span></code>.</p></li>
+<li><p>[x] 127. Map ONNX <code class="docutils literal notranslate"><span class="pre">LeakyRelu</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">leaky_relu</span></code>.</p></li>
+<li><p>[x] 128. Map ONNX <code class="docutils literal notranslate"><span class="pre">Sigmoid</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">sigmoid</span></code>.</p></li>
+<li><p>[x] 129. Map ONNX <code class="docutils literal notranslate"><span class="pre">Tanh</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">tanh</span></code>.</p></li>
+<li><p>[x] 130. Map ONNX <code class="docutils literal notranslate"><span class="pre">Softmax</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">softmax</span></code>.</p></li>
+<li><p>[x] 131. Map ONNX <code class="docutils literal notranslate"><span class="pre">LogSoftmax</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">log_softmax</span></code>.</p></li>
+<li><p>[x] 132. Map ONNX <code class="docutils literal notranslate"><span class="pre">Elu</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">elu</span></code>.</p></li>
+<li><p>[x] 133. Map ONNX <code class="docutils literal notranslate"><span class="pre">HardSigmoid</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">hard_sigmoid</span></code>.</p></li>
+<li><p>[x] 134. Map ONNX <code class="docutils literal notranslate"><span class="pre">Softplus</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">softplus</span></code>.</p></li>
+<li><p>[x] 135. Map ONNX <code class="docutils literal notranslate"><span class="pre">Softsign</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">softsign</span></code>.</p></li>
+<li><p>[x] 136. Map ONNX <code class="docutils literal notranslate"><span class="pre">PRelu</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">prelu</span></code>.</p></li>
+<li><p>[x] 137. Map ONNX <code class="docutils literal notranslate"><span class="pre">Gelu</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">gelu</span></code>.</p></li>
+<li><p>[x] 138. Map ONNX <code class="docutils literal notranslate"><span class="pre">Clip</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">clip</span></code>.</p></li>
+<li><p>[x] 139. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMean</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reduce_mean</span></code>.</p></li>
+<li><p>[x] 140. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceSum</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reduce_sum</span></code>.</p></li>
+<li><p>[x] 141. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMax</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reduce_max</span></code>.</p></li>
+<li><p>[x] 142. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceMin</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reduce_min</span></code>.</p></li>
+<li><p>[x] 143. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceProd</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reduce_prod</span></code>.</p></li>
+<li><p>[x] 144. Map ONNX <code class="docutils literal notranslate"><span class="pre">ReduceLogSumExp</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">reduce_log_sum_exp</span></code>.</p></li>
+<li><p>[x] 145. Map ONNX <code class="docutils literal notranslate"><span class="pre">ArgMax</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">argmax</span></code>.</p></li>
+<li><p>[x] 146. Map ONNX <code class="docutils literal notranslate"><span class="pre">ArgMin</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">argmin</span></code>.</p></li>
+<li><p>[x] 147. Map ONNX <code class="docutils literal notranslate"><span class="pre">NonMaxSuppression</span></code> (NMS) to MIL NMS implementations.</p></li>
+<li><p>[x] 148. Map ONNX <code class="docutils literal notranslate"><span class="pre">TopK</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">topk</span></code>.</p></li>
+<li><p>[x] 149. Map ONNX <code class="docutils literal notranslate"><span class="pre">NonZero</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">non_zero</span></code>.</p></li>
+<li><p>[x] 150. Handle default <code class="docutils literal notranslate"><span class="pre">keepdims</span></code> behaviors between ONNX and MIL properly.</p></li>
+</ul>
+</section>
+<section id="phase-7-control-flow-logicals-and-rnns-onnx-mil">
+<h3>Phase 7: Control Flow, Logicals, and RNNs (ONNX -&gt; MIL)<a class="headerlink" href="#phase-7-control-flow-logicals-and-rnns-onnx-mil" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 151. Map ONNX <code class="docutils literal notranslate"><span class="pre">Equal</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">equal</span></code>.</p></li>
+<li><p>[x] 152. Map ONNX <code class="docutils literal notranslate"><span class="pre">Greater</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">greater</span></code>.</p></li>
+<li><p>[x] 153. Map ONNX <code class="docutils literal notranslate"><span class="pre">GreaterOrEqual</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">greater_equal</span></code>.</p></li>
+<li><p>[x] 154. Map ONNX <code class="docutils literal notranslate"><span class="pre">Less</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">less</span></code>.</p></li>
+<li><p>[x] 155. Map ONNX <code class="docutils literal notranslate"><span class="pre">LessOrEqual</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">less_equal</span></code>.</p></li>
+<li><p>[x] 156. Map ONNX <code class="docutils literal notranslate"><span class="pre">Not</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">logical_not</span></code>.</p></li>
+<li><p>[x] 157. Map ONNX <code class="docutils literal notranslate"><span class="pre">And</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">logical_and</span></code>.</p></li>
+<li><p>[x] 158. Map ONNX <code class="docutils literal notranslate"><span class="pre">Or</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">logical_or</span></code>.</p></li>
+<li><p>[x] 159. Map ONNX <code class="docutils literal notranslate"><span class="pre">Xor</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">logical_xor</span></code>.</p></li>
+<li><p>[x] 160. Map ONNX <code class="docutils literal notranslate"><span class="pre">Where</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">select</span></code>.</p></li>
+<li><p>[x] 161. Map ONNX <code class="docutils literal notranslate"><span class="pre">If</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">cond</span></code>.</p></li>
+<li><p>[x] 162. Map ONNX <code class="docutils literal notranslate"><span class="pre">Loop</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">while_loop</span></code>.</p></li>
+<li><p>[x] 163. Map ONNX <code class="docutils literal notranslate"><span class="pre">LSTM</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">lstm</span></code>.</p></li>
+<li><p>[x] 164. Parse LSTM direction (forward, reverse, bidirectional).</p></li>
+<li><p>[x] 165. Implement state tracking for LSTM hidden variables.</p></li>
+<li><p>[x] 166. Map ONNX <code class="docutils literal notranslate"><span class="pre">GRU</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">gru</span></code>.</p></li>
+<li><p>[x] 167. Parse GRU sequence layouts cleanly.</p></li>
+<li><p>[x] 168. Map ONNX <code class="docutils literal notranslate"><span class="pre">RNN</span></code> to MIL <code class="docutils literal notranslate"><span class="pre">rnn</span></code>.</p></li>
+<li><p>[x] 169. Support extraction of multiple outputs from RNN layers.</p></li>
+<li><p>[x] 170. Handle static unrolling of loops if MIL dynamic control flow is unsupported in earlier spec versions.</p></li>
+<li><p>[x] 171. Provide warning traces for control flow conversion potentially impacting ANE performance.</p></li>
+<li><p>[x] 172. Implement <code class="docutils literal notranslate"><span class="pre">is_inf</span></code> and <code class="docutils literal notranslate"><span class="pre">is_nan</span></code> boolean mapping.</p></li>
+<li><p>[x] 173. Handle ONNX <code class="docutils literal notranslate"><span class="pre">Scan</span></code> operation by unrolling it dynamically into the MIL AST.</p></li>
+<li><p>[x] 174. Manage scope variables properly across MIL block boundaries.</p></li>
+<li><p>[x] 175. Verify acyclic flow after parsing nested subgraphs from ONNX <code class="docutils literal notranslate"><span class="pre">If</span></code>/<code class="docutils literal notranslate"><span class="pre">Loop</span></code>.</p></li>
+</ul>
+</section>
+<section id="phase-8-apple-neural-engine-ane-specific-optimizations">
+<h3>Phase 8: Apple Neural Engine (ANE) Specific Optimizations<a class="headerlink" href="#phase-8-apple-neural-engine-ane-specific-optimizations" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 176. Identify and rewrite MatMul sequences into 1x1 Convolutions for ANE acceleration.</p></li>
+<li><p>[x] 177. Pad hidden dimensions to multiples of 64 or 32 specifically to satisfy ANE lane requirements.</p></li>
+<li><p>[x] 178. Split massive convolutions (e.g., &gt; 16384 channels) into smaller concatenated blocks to avoid ANE fallback to GPU.</p></li>
+<li><p>[x] 179. Fuse sequence of <code class="docutils literal notranslate"><span class="pre">Split</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Concat</span></code> operations out of the graph if they cancel each other out.</p></li>
+<li><p>[x] 180. Fuse <code class="docutils literal notranslate"><span class="pre">Slice</span></code> operations with adjacent <code class="docutils literal notranslate"><span class="pre">Pad</span></code> operations.</p></li>
+<li><p>[x] 181. Optimize out Gather operations that index into static constants (pre-computing the gather).</p></li>
+<li><p>[x] 182. Replace Swish/SiLU activations with ANE-friendly approximations if requested.</p></li>
+<li><p>[x] 183. Identify LayerNorms and rewrite them into <code class="docutils literal notranslate"><span class="pre">reduce_mean</span></code>, <code class="docutils literal notranslate"><span class="pre">sub</span></code>, <code class="docutils literal notranslate"><span class="pre">pow</span></code>, <code class="docutils literal notranslate"><span class="pre">add</span></code> if explicit layer_norm causes GPU fallback on older iOS devices.</p></li>
+<li><p>[x] 184. Implement an explicit ANE compatibility checker pass before finalizing the MIL AST.</p></li>
+<li><p>[x] 185. Rewrite <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> into explicit Transpose + MatMul + Reshape chains natively.</p></li>
+<li><p>[x] 186. Pre-transpose weight constants offline to match the expected format for ANE.</p></li>
+<li><p>[x] 187. Ensure 5D and 6D tensors are flattened into 4D or lower, as ANE historically struggles with higher rank shapes.</p></li>
+<li><p>[x] 188. Force CAST inputs to FP16 since ANE operates almost exclusively in FP16 precision.</p></li>
+<li><p>[x] 189. Map standard Transformers Attention into the specific <code class="docutils literal notranslate"><span class="pre">scaled_dot_product_attention</span></code> MIL op (requires CoreML v7/iOS 17).</p></li>
+<li><p>[x] 190. Eliminate redundant <code class="docutils literal notranslate"><span class="pre">Cast</span></code> (FP32 -&gt; FP16 -&gt; FP32) boundaries.</p></li>
+</ul>
+</section>
+<section id="phase-9-compression-quantization-coremltools-optimize">
+<h3>Phase 9: Compression &amp; Quantization (<code class="docutils literal notranslate"><span class="pre">coremltools.optimize</span></code>)<a class="headerlink" href="#phase-9-compression-quantization-coremltools-optimize" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 191. Implement FP16 casting pass for all weights and biases.</p></li>
+<li><p>[x] 192. Implement Palettization compression (k-means clustering of weights).</p></li>
+<li><p>[x] 193. Encode LUT (Look-Up Table) weights natively into the CoreML <code class="docutils literal notranslate"><span class="pre">.weight.bin</span></code> format.</p></li>
+<li><p>[x] 194. Implement INT8 Weight Quantization (W8A16) natively generating CoreML <code class="docutils literal notranslate"><span class="pre">constexpr_affine_dequantize</span></code>.</p></li>
+<li><p>[x] 195. Implement INT4 Weight Quantization (W4A16) specific to CoreML iOS 17 features.</p></li>
+<li><p>[x] 196. Implement sparse weight compression (storing non-zero values and bitmasks).</p></li>
+<li><p>[x] 197. Support block-wise quantization grouping (e.g., group_size = 32 or 128).</p></li>
+<li><p>[x] 198. Allow defining a mixed-precision configuration dictionary per layer.</p></li>
+<li><p>[x] 199. Map existing ONNX <code class="docutils literal notranslate"><span class="pre">QuantizeLinear</span></code>/<code class="docutils literal notranslate"><span class="pre">DequantizeLinear</span></code> pairs directly to CoreML quantized weight representations.</p></li>
+<li><p>[x] 200. Execute dynamic quantization statistics gathering natively in JS if an un-quantized model needs compression.</p></li>
+<li><p>[x] 201. Support Joint-Data-Algorithm (JDA) for pruning.</p></li>
+<li><p>[x] 202. Generate a compression report tracking memory reduction per layer.</p></li>
+<li><p>[x] 203. Export multi-bitrate weights allowing the Apple OS to select the precision dynamically.</p></li>
+<li><p>[x] 204. Handle specific iOS 17 stateful KV Cache quantization mappings.</p></li>
+<li><p>[x] 205. Implement decompression validation ensuring the unpacked LUT exactly matches expected logic.</p></li>
+</ul>
+</section>
+<section id="phase-10-input-output-formatting-ios-integration">
+<h3>Phase 10: Input/Output Formatting &amp; iOS Integration<a class="headerlink" href="#phase-10-input-output-formatting-ios-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 206. Support explicitly defining inputs as <code class="docutils literal notranslate"><span class="pre">ImageType</span></code> rather than generic <code class="docutils literal notranslate"><span class="pre">MultiArray</span></code>.</p></li>
+<li><p>[x] 207. Define image scaling properties (<code class="docutils literal notranslate"><span class="pre">blueBias</span></code>, <code class="docutils literal notranslate"><span class="pre">greenBias</span></code>, <code class="docutils literal notranslate"><span class="pre">redBias</span></code>, <code class="docutils literal notranslate"><span class="pre">imageScale</span></code>).</p></li>
+<li><p>[x] 208. Parse ONNX Vision transforms to automatically inject image bias metadata.</p></li>
+<li><p>[x] 209. Map generic integer array outputs to specific iOS <code class="docutils literal notranslate"><span class="pre">DictionaryType</span></code> for classification tasks.</p></li>
+<li><p>[x] 210. Generate the standard Core ML Class Labels file based on ONNX attributes or separate text input.</p></li>
+<li><p>[x] 211. Inject custom Vision Framework descriptions directly into the generated MLModel metadata.</p></li>
+<li><p>[x] 212. Provide configurable outputs mapping (renaming ONNX generic names to Swift-friendly camelCase variables).</p></li>
+<li><p>[x] 213. Support defining specific input sequences as <code class="docutils literal notranslate"><span class="pre">SequenceType</span></code> for CoreML RNN wrappers.</p></li>
+<li><p>[x] 214. Embed custom vocabulary files inside the <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> for internal tokenization usage.</p></li>
+<li><p>[x] 215. Configure the generated package to utilize <code class="docutils literal notranslate"><span class="pre">computeUnits</span> <span class="pre">=</span> <span class="pre">.all</span></code> explicitly by default.</p></li>
+</ul>
+</section>
+<section id="phase-11-bi-directional-conversion-coreml-onnx">
+<h3>Phase 11: Bi-Directional Conversion (CoreML -&gt; ONNX)<a class="headerlink" href="#phase-11-bi-directional-conversion-coreml-onnx" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 216. Implement <code class="docutils literal notranslate"><span class="pre">.mlmodel</span></code> and <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> loader/unzipper in JS.</p></li>
+<li><p>[x] 217. Parse <code class="docutils literal notranslate"><span class="pre">MILSpec.Program</span></code> back into the TypeScript AST representation.</p></li>
+<li><p>[x] 218. Parse Apple NeuralNetwork V1-V3 layers (legacy protobuf) into the AST representation.</p></li>
+<li><p>[x] 219. Inverse Map: MIL <code class="docutils literal notranslate"><span class="pre">conv</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">Conv</span></code>.</p></li>
+<li><p>[x] 220. Inverse Map: MIL <code class="docutils literal notranslate"><span class="pre">matmul</span></code> / <code class="docutils literal notranslate"><span class="pre">linear</span></code> to ONNX <code class="docutils literal notranslate"><span class="pre">MatMul</span></code> / <code class="docutils literal notranslate"><span class="pre">Gemm</span></code>.</p></li>
+<li><p>[x] 221. Inverse Map: MIL <code class="docutils literal notranslate"><span class="pre">scaled_dot_product_attention</span></code> to explicit ONNX Subgraph (MatMul, Div, Softmax, MatMul).</p></li>
+<li><p>[x] 222. Extract <code class="docutils literal notranslate"><span class="pre">weight.bin</span></code> packed data back into ONNX Float32 / Float16 Initializers.</p></li>
+<li><p>[x] 223. Dequantize CoreML INT4/INT8 palettized weights statically during the extraction to ONNX.</p></li>
+<li><p>[x] 224. Rebuild the ONNX standard inputs/outputs definitions from the CoreML <code class="docutils literal notranslate"><span class="pre">FeatureDescription</span></code>.</p></li>
+<li><p>[x] 225. Handle Swift/Apple specific renaming back to standard ONNX tensor naming conventions.</p></li>
+<li><p>[x] 226. Produce a standard valid <code class="docutils literal notranslate"><span class="pre">model.onnx</span></code> payload.</p></li>
+<li><p>[x] 227. Create a visual diff checker comparing the original ONNX vs the Round-Trip ONNX.</p></li>
+</ul>
+</section>
+<section id="phase-12-genai-stateful-models-ios-18-coreml-v8-spec-prep">
+<h3>Phase 12: GenAI &amp; Stateful Models (iOS 18 / CoreML v8 Spec Prep)<a class="headerlink" href="#phase-12-genai-stateful-models-ios-18-coreml-v8-spec-prep" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 228. Implement the newer Core ML Stateful operations mapping (<code class="docutils literal notranslate"><span class="pre">mil.state</span></code>).</p></li>
+<li><p>[x] 229. Translate ONNX Runtime GenAI KV Cache patterns directly into CoreML state variables.</p></li>
+<li><p>[x] 230. Map explicit KV-cache ring buffer updates into MIL <code class="docutils literal notranslate"><span class="pre">read_state</span></code> and <code class="docutils literal notranslate"><span class="pre">write_state</span></code>.</p></li>
+<li><p>[x] 231. Translate LLaMA / Mistral ONNX topologies into stateful MLPackages natively.</p></li>
+<li><p>[x] 232. Support exporting models with <code class="docutils literal notranslate"><span class="pre">Stateful=True</span></code> flags.</p></li>
+<li><p>[x] 233. Generate appropriate Swift/Objective-C boilerplate text for utilizing the generated stateful model.</p></li>
+<li><p>[x] 234. Map Whisper architectures efficiently to CoreML using specialized ANE-friendly audio layers.</p></li>
+<li><p>[x] 235. Map Stable Diffusion UNets to CoreML natively, bypassing standard <code class="docutils literal notranslate"><span class="pre">python-coremltools</span></code> pipelines.</p></li>
+</ul>
+</section>
+<section id="phase-13-browser-cli-execution-environment">
+<h3>Phase 13: Browser CLI &amp; Execution Environment<a class="headerlink" href="#phase-13-browser-cli-execution-environment" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 236. Add CLI command: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">coreml</span> <span class="pre">export</span> <span class="pre">&lt;model.onnx&gt;</span></code>.</p></li>
+<li><p>[x] 237. Add CLI command: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">coreml</span> <span class="pre">import</span> <span class="pre">&lt;model.mlpackage&gt;</span></code>.</p></li>
+<li><p>[x] 238. Provide Node.js API: <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">{</span> <span class="pre">convertToCoreML</span> <span class="pre">}</span> <span class="pre">from</span> <span class="pre">'onnx9000/coreml'</span></code>.</p></li>
+<li><p>[x] 239. Enable streaming conversion for files larger than 2GB (bypassing V8 array limits).</p></li>
+<li><p>[x] 240. Implement Web Worker distribution for MIL AST optimization passes.</p></li>
+<li><p>[x] 241. Provide a UI component: “Drop ONNX -&gt; Get CoreML”.</p></li>
+<li><p>[x] 242. Display progress bars parsing protobufs natively in the browser.</p></li>
+<li><p>[x] 243. Provide WebNN hint generation for macOS Safari utilizing the <code class="docutils literal notranslate"><span class="pre">coreml</span></code> WebNN backend.</p></li>
+<li><p>[x] 244. Create debugging logs showing exactly which layers were offloaded to ANE vs GPU vs CPU (via simulation heuristics).</p></li>
+<li><p>[x] 245. Establish memory bounds checking inside the WASM exporter to prevent browser tab crashes.</p></li>
+</ul>
+</section>
+<section id="phase-14-quality-assurance-parity-testing">
+<h3>Phase 14: Quality Assurance &amp; Parity Testing<a class="headerlink" href="#phase-14-quality-assurance-parity-testing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 246. Validate complete conversion of ResNet50 (ONNX -&gt; CoreML).</p></li>
+<li><p>[x] 247. Validate complete conversion of MobileNetV2 (ONNX -&gt; CoreML).</p></li>
+<li><p>[x] 248. Validate complete conversion of YOLOv8 (ONNX -&gt; CoreML).</p></li>
+<li><p>[x] 249. Validate complete conversion of BERT (ONNX -&gt; CoreML).</p></li>
+<li><p>[x] 250. Validate complete conversion of GPT-2 (ONNX -&gt; CoreML).</p></li>
+<li><p>[x] 251. Validate complete conversion of Whisper-Tiny (ONNX -&gt; CoreML).</p></li>
+<li><p>[x] 252. Extract test outputs from native <code class="docutils literal notranslate"><span class="pre">coremltools</span></code> Python and compare exact tensor outputs.</p></li>
+<li><p>[x] 253. Measure and ensure that generated <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> sizes are within 1% of the Python equivalent.</p></li>
+<li><p>[x] 254. Run automated tests ensuring all generated files successfully load in Xcode without validation errors.</p></li>
+<li><p>[x] 255. Verify output differences of Palettized exports are mathematically acceptable (Cosine Similarity &gt; 0.99).</p></li>
+<li><p>[x] 256. Automate iOS simulator execution checking for the generated packages (using external CI/CD wrappers).</p></li>
+<li><p>[x] 257. Verify that image classification labels are properly surfaced in macOS Quick Look.</p></li>
+</ul>
+</section>
+<section id="phase-15-edge-case-exception-handling">
+<h3>Phase 15: Edge Case &amp; Exception Handling<a class="headerlink" href="#phase-15-edge-case-exception-handling" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 258. Handle parsing of completely unsupported ONNX ops (e.g., custom user ops) by generating clear error traces.</p></li>
+<li><p>[x] 259. Fallback cleanly if an ONNX model utilizes double precision (<code class="docutils literal notranslate"><span class="pre">float64</span></code>), forcibly downcasting to <code class="docutils literal notranslate"><span class="pre">float32</span></code>.</p></li>
+<li><p>[x] 260. Manage ONNX <code class="docutils literal notranslate"><span class="pre">If</span></code>/<code class="docutils literal notranslate"><span class="pre">Loop</span></code> constructs that contain operations incompatible with MIL control flow.</p></li>
+<li><p>[x] 261. Detect and warn users if their dynamic axes definitions exceed Apple’s supported dimension limits.</p></li>
+<li><p>[x] 262. Warn users explicitly if a specific graph topology is known to trigger ANE thermal throttling.</p></li>
+<li><p>[x] 263. Catch and handle Protobuf decode failures gracefully in the browser.</p></li>
+<li><p>[x] 264. Ensure generated filenames for weights inside <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> contain no illegal characters.</p></li>
+<li><p>[x] 265. Strip <code class="docutils literal notranslate"><span class="pre">\0</span></code> null terminators and non-UTF8 characters from ONNX metadata before serializing to CoreML JSON.</p></li>
+</ul>
+</section>
+<section id="phase-16-ecosystem-native-integration">
+<h3>Phase 16: Ecosystem &amp; Native Integration<a class="headerlink" href="#phase-16-ecosystem-native-integration" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 266. Enable importing HuggingFace models seamlessly: <code class="docutils literal notranslate"><span class="pre">onnx9000</span> <span class="pre">coreml</span> <span class="pre">export</span> <span class="pre">hf://gpt2</span></code>.</p></li>
+<li><p>[x] 267. Map Hub models to CoreML instantly using cached ONNX graphs internally.</p></li>
+<li><p>[x] 268. Produce an equivalent to the <code class="docutils literal notranslate"><span class="pre">coremltools</span></code> Python API natively in TypeScript.</p></li>
+<li><p>[x] 269. Support exporting multiple models into a single Pipeline <code class="docutils literal notranslate"><span class="pre">.mlmodelc</span></code> natively.</p></li>
+<li><p>[x] 270. Create custom Xcode playground templates alongside the exported model.</p></li>
+<li><p>[x] 271. Hook into <code class="docutils literal notranslate"><span class="pre">onnx9000.optimum</span></code> to share quantization logic directly with <code class="docutils literal notranslate"><span class="pre">onnx9000.coreml</span></code>.</p></li>
+<li><p>[x] 272. Build integration examples showing the <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code> running in Swift CoreML.</p></li>
+<li><p>[x] 273. Provide a Native WebViews component demonstrating inference on the generated file.</p></li>
+</ul>
+</section>
+<section id="phase-17-deep-coreml-v6-v7-optimization-passes">
+<h3>Phase 17: Deep CoreML v6/v7 Optimization Passes<a class="headerlink" href="#phase-17-deep-coreml-v6-v7-optimization-passes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 274. Implement MIL <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> folding dynamically to resolve constants during the AST building.</p></li>
+<li><p>[x] 275. Translate ONNX <code class="docutils literal notranslate"><span class="pre">Einsum</span></code> into explicit tensor ops, bypassing ANE issues with native einsum mappings.</p></li>
+<li><p>[x] 276. Identify <code class="docutils literal notranslate"><span class="pre">LayerNormalization</span></code> acting on the last dimension and utilize specific CoreML accelerated primitives.</p></li>
+<li><p>[x] 277. Rewrite 1D convolutions into 2D convolutions (with height=1) as ANE highly prefers 2D topologies.</p></li>
+<li><p>[x] 278. Rewrite all grouped convolutions into explicit slices/concats if targeting older iOS versions via backwards compatibility flags.</p></li>
+<li><p>[x] 279. Support explicit definition of the “Compute Precision” (Float16 vs Float32) for the entire package.</p></li>
+<li><p>[x] 280. Extract dynamic sequence padding operations to CPU boundaries to prevent ANE pipeline stalling.</p></li>
+</ul>
+</section>
+<section id="phase-18-security-sandbox-execution">
+<h3>Phase 18: Security &amp; Sandbox Execution<a class="headerlink" href="#phase-18-security-sandbox-execution" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 281. Sandbox the JSZip/Archive generation to ensure no cross-site scripting attacks via malicious model metadata.</p></li>
+<li><p>[x] 282. Prevent local file-system access (except via standard Browser API prompts) during export.</p></li>
+<li><p>[x] 283. Verify that parsing <code class="docutils literal notranslate"><span class="pre">.mlmodel</span></code> files doesn’t trigger JS prototype pollution.</p></li>
+<li><p>[x] 284. Handle extremely large dimensional definitions (e.g., trying to allocate 100GB tensors) safely without crashing the V8 engine.</p></li>
+<li><p>[x] 285. Utilize Subresource Integrity (SRI) on all remote script loading inside the exported HTML demos.</p></li>
+</ul>
+</section>
+<section id="phase-19-documentation-profiling">
+<h3>Phase 19: Documentation &amp; Profiling<a class="headerlink" href="#phase-19-documentation-profiling" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 286. Provide comprehensive API documentation mapping <code class="docutils literal notranslate"><span class="pre">python-coremltools</span></code> functions to their TS equivalents.</p></li>
+<li><p>[x] 287. Publish a migration guide: “Moving from CoreMLTools to <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>”.</p></li>
+<li><p>[x] 288. Generate a summary table during export showing exactly which layers are structurally modified.</p></li>
+<li><p>[x] 289. Develop a mock “Profiler” simulating ANE vs GPU time based on layer topologies in the browser.</p></li>
+<li><p>[x] 290. Provide visual diffing of the ONNX graph vs the generated MIL graph inside the web UI.</p></li>
+</ul>
+</section>
+<section id="phase-20-final-polish-and-release-readiness">
+<h3>Phase 20: Final Polish and Release Readiness<a class="headerlink" href="#phase-20-final-polish-and-release-readiness" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>[x] 291. Implement dynamic graph batching (converting a single-batch ONNX to a multi-batch CoreML package).</p></li>
+<li><p>[x] 292. Add support for specialized Apple Vision Pro (visionOS) deployment targets inside the metadata.</p></li>
+<li><p>[x] 293. Build a WASM fallback for reading/writing Apple’s compiled <code class="docutils literal notranslate"><span class="pre">.mlmodelc</span></code> binary directories directly.</p></li>
+<li><p>[x] 294. Ensure full deterministic compilation (same ONNX + same settings = exactly identical byte output for <code class="docutils literal notranslate"><span class="pre">.mlpackage</span></code>).</p></li>
+<li><p>[x] 295. Add strict linter enforcing that no proprietary/undocumented Apple MIL opcodes are generated unless explicitly requested.</p></li>
+<li><p>[x] 296. Resolve all Typescript strict-mode typing errors inside the CoreML generation logic.</p></li>
+<li><p>[x] 297. Configure automated CI checks running against Xcode command-line tools <code class="docutils literal notranslate"><span class="pre">coremlcompiler</span></code>.</p></li>
+<li><p>[x] 298. Establish telemetry for recording which ONNX operators fail to translate most frequently.</p></li>
+<li><p>[x] 299. Write comprehensive tutorial: “Bringing ONNX LLMs to iOS using <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code>”.</p></li>
+<li><p>[x] 300. Release v1.0 complete feature parity certification matching official Apple <code class="docutils literal notranslate"><span class="pre">coremltools</span></code>.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ONNX38_TRITON.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">ONNX38: Triton Compiler (Web-Native Custom Kernel Generator)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ONNX31_MMDNN.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">ONNX31: MMdnn (Web-Native N-to-N Neural Network Converter)</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Samuel
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">ONNX27: coremltools (Web-Native Apple Silicon Bridge)</a><ul>
+<li><a class="reference internal" href="#original-project-description">Original Project Description</a></li>
+<li><a class="reference internal" href="#how-onnx9000-deviates-the-wasm-first-monolith-approach">How <code class="docutils literal notranslate"><span class="pre">onnx9000</span></code> Deviates (The WASM-First Monolith Approach)</a></li>
+<li><a class="reference internal" href="#exhaustive-implementation-checklist">Exhaustive Implementation Checklist</a><ul>
+<li><a class="reference internal" href="#phase-1-coreml-schema-serialization-web-native">Phase 1: CoreML Schema &amp; Serialization (Web-Native)</a></li>
+<li><a class="reference internal" href="#phase-2-model-intermediate-language-mil-ast">Phase 2: Model Intermediate Language (MIL) AST</a></li>
+<li><a class="reference internal" href="#phase-3-unary-binary-arithmetic-translation-onnx-mil">Phase 3: Unary &amp; Binary Arithmetic Translation (ONNX -&gt; MIL)</a></li>
+<li><a class="reference internal" href="#phase-4-tensor-manipulation-translation-onnx-mil">Phase 4: Tensor Manipulation Translation (ONNX -&gt; MIL)</a></li>
+<li><a class="reference internal" href="#phase-5-neural-network-layers-translation-onnx-mil">Phase 5: Neural Network Layers Translation (ONNX -&gt; MIL)</a></li>
+<li><a class="reference internal" href="#phase-6-activations-reduction-ops-translation-onnx-mil">Phase 6: Activations &amp; Reduction Ops Translation (ONNX -&gt; MIL)</a></li>
+<li><a class="reference internal" href="#phase-7-control-flow-logicals-and-rnns-onnx-mil">Phase 7: Control Flow, Logicals, and RNNs (ONNX -&gt; MIL)</a></li>
+<li><a class="reference internal" href="#phase-8-apple-neural-engine-ane-specific-optimizations">Phase 8: Apple Neural Engine (ANE) Specific Optimizations</a></li>
+<li><a class="reference internal" href="#phase-9-compression-quantization-coremltools-optimize">Phase 9: Compression &amp; Quantization (<code class="docutils literal notranslate"><span class="pre">coremltools.optimize</span></code>)</a></li>
+<li><a class="reference internal" href="#phase-10-input-output-formatting-ios-integration">Phase 10: Input/Output Formatting &amp; iOS Integration</a></li>
+<li><a class="reference internal" href="#phase-11-bi-directional-conversion-coreml-onnx">Phase 11: Bi-Directional Conversion (CoreML -&gt; ONNX)</a></li>
+<li><a class="reference internal" href="#phase-12-genai-stateful-models-ios-18-coreml-v8-spec-prep">Phase 12: GenAI &amp; Stateful Models (iOS 18 / CoreML v8 Spec Prep)</a></li>
+<li><a class="reference internal" href="#phase-13-browser-cli-execution-environment">Phase 13: Browser CLI &amp; Execution Environment</a></li>
+<li><a class="reference internal" href="#phase-14-quality-assurance-parity-testing">Phase 14: Quality Assurance &amp; Parity Testing</a></li>
+<li><a class="reference internal" href="#phase-15-edge-case-exception-handling">Phase 15: Edge Case &amp; Exception Handling</a></li>
+<li><a class="reference internal" href="#phase-16-ecosystem-native-integration">Phase 16: Ecosystem &amp; Native Integration</a></li>
+<li><a class="reference internal" href="#phase-17-deep-coreml-v6-v7-optimization-passes">Phase 17: Deep CoreML v6/v7 Optimization Passes</a></li>
+<li><a class="reference internal" href="#phase-18-security-sandbox-execution">Phase 18: Security &amp; Sandbox Execution</a></li>
+<li><a class="reference internal" href="#phase-19-documentation-profiling">Phase 19: Documentation &amp; Profiling</a></li>
+<li><a class="reference internal" href="#phase-20-final-polish-and-release-readiness">Phase 20: Final Polish and Release Readiness</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script type="module" src="../../_static/demo-ui/pug-wCjO1NX2.js"></script>
+    <script type="module" src="../../_static/demo-ui/freemarker2-BdWYrsNJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/mdx-UOVpRcln.js"></script>
+    <script type="module" src="../../_static/demo-ui/xml-BYzTovcK.js"></script>
+    <script type="module" src="../../_static/demo-ui/typescript-BZudoVDr.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DcFwO9qg.js"></script>
+    <script type="module" src="../../_static/demo-ui/julia-D8wxsVbk.js"></script>
+    <script type="module" src="../../_static/demo-ui/htmlMode-CNjo3GbK.js"></script>
+    <script type="module" src="../../_static/demo-ui/msdax-BmKXrb_F.js"></script>
+    <script type="module" src="../../_static/demo-ui/systemverilog-ByXNYGLF.js"></script>
+    <script type="module" src="../../_static/demo-ui/dart-DaJRvrIu.js"></script>
+    <script type="module" src="../../_static/demo-ui/postiats-qCOBOZxF.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Cpr0ISvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/sb-Dbfibbn2.js"></script>
+    <script type="module" src="../../_static/demo-ui/elixir-BWnp76zc.js"></script>
+    <script type="module" src="../../_static/demo-ui/cpp-Nax-tLe0.js"></script>
+    <script type="module" src="../../_static/demo-ui/powerquery-DwAm_MvG.js"></script>
+    <script type="module" src="../../_static/demo-ui/hcl-BuQW8Q2A.js"></script>
+    <script type="module" src="../../_static/demo-ui/mysql-DBpu5uqz.js"></script>
+    <script type="module" src="../../_static/demo-ui/go-a4f9Uf-F.js"></script>
+    <script type="module" src="../../_static/demo-ui/fsharp-DyPHaXJ9.js"></script>
+    <script type="module" src="../../_static/demo-ui/qsharp-Dl49KUif.js"></script>
+    <script type="module" src="../../_static/demo-ui/swift-B0WL7QEJ.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BabUe71U.js"></script>
+    <script type="module" src="../../_static/demo-ui/pgsql-CFP7_6OU.js"></script>
+    <script type="module" src="../../_static/demo-ui/kotlin-DY9IF-Ts.js"></script>
+    <script type="module" src="../../_static/demo-ui/cypher-D0Mb7lRF.js"></script>
+    <script type="module" src="../../_static/demo-ui/tsMode-u9Mcf0aB.js"></script>
+    <script type="module" src="../../_static/demo-ui/solidity-C6t2cKnp.js"></script>
+    <script type="module" src="../../_static/demo-ui/sql-Bwe7LIYc.js"></script>
+    <script type="module" src="../../_static/demo-ui/twig-JW2CRH1Y.js"></script>
+    <script type="module" src="../../_static/demo-ui/ini-BSYUNLvq.js"></script>
+    <script type="module" src="../../_static/demo-ui/ecl-CFRd1ucq.js"></script>
+    <script type="module" src="../../_static/demo-ui/javascript-sSGkLZQn.js"></script>
+    <script type="module" src="../../_static/demo-ui/redshift-p9-ym5zU.js"></script>
+    <script type="module" src="../../_static/demo-ui/dockerfile-Dn7tZ_7c.js"></script>
+    <script type="module" src="../../_static/demo-ui/sphinx-demo-ui.js"></script>
+    <script type="module" src="../../_static/demo-ui/shell-BcASen3I.js"></script>
+    <script type="module" src="../../_static/demo-ui/cameligo--mnpevC2.js"></script>
+    <script type="module" src="../../_static/demo-ui/mips-Do80UkM_.js"></script>
+    <script type="module" src="../../_static/demo-ui/scala-B42zPLKI.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-ghsBYTPx.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-DLa7yTA-.js"></script>
+    <script type="module" src="../../_static/demo-ui/r-BxHr22ii.js"></script>
+    <script type="module" src="../../_static/demo-ui/liquid-9Ir-ZiXG.js"></script>
+    <script type="module" src="../../_static/demo-ui/razor-CP35zBvM.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-B4AWIpDb.js"></script>
+    <script type="module" src="../../_static/demo-ui/redis-d2SpqvE1.js"></script>
+    <script type="module" src="../../_static/demo-ui/protobuf-Dlfuu2nY.js"></script>
+    <script type="module" src="../../_static/demo-ui/main-Mf2qmUsB.js"></script>
+    <script type="module" src="../../_static/demo-ui/java-DV4mYkM7.js"></script>
+    <script type="module" src="../../_static/demo-ui/clojure-DFTJHX75.js"></script>
+    <script type="module" src="../../_static/demo-ui/m3-BpL4ouTo.js"></script>
+    <script type="module" src="../../_static/demo-ui/scss-COn4tZlM.js"></script>
+    <script type="module" src="../../_static/demo-ui/pla-CQwfaowp.js"></script>
+    <script type="module" src="../../_static/demo-ui/handlebars-BVArrpux.js"></script>
+    <script type="module" src="../../_static/demo-ui/tcl-CZN131IR.js"></script>
+    <script type="module" src="../../_static/demo-ui/azcli-ksZl_VeD.js"></script>
+    <script type="module" src="../../_static/demo-ui/bat-toztT7PN.js"></script>
+    <script type="module" src="../../_static/demo-ui/st-BBLkcnFS.js"></script>
+    <script type="module" src="../../_static/demo-ui/csharp-BK-0kSMg.js"></script>
+    <script type="module" src="../../_static/demo-ui/generator-DrpjOCPB.js"></script>
+    <script type="module" src="../../_static/demo-ui/php-D-l7hR3h.js"></script>
+    <script type="module" src="../../_static/demo-ui/restructuredtext-CEPqZH3y.js"></script>
+    <script type="module" src="../../_static/demo-ui/scheme-qfd7ChH7.js"></script>
+    <script type="module" src="../../_static/demo-ui/flow9-DF9s1zbR.js"></script>
+    <script type="module" src="../../_static/demo-ui/mapper-J9jSnl_3.js"></script>
+    <script type="module" src="../../_static/demo-ui/ruby-DhKNgZEY.js"></script>
+    <script type="module" src="../../_static/demo-ui/graphql-BEbjJbAH.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-CucVkMvE.js"></script>
+    <script type="module" src="../../_static/demo-ui/bicep-jxUtWkEa.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-zNJNl1Ce.js"></script>
+    <script type="module" src="../../_static/demo-ui/wgsl-CW2ZALad.js"></script>
+    <script type="module" src="../../_static/demo-ui/lua-BXM0V2sP.js"></script>
+    <script type="module" src="../../_static/demo-ui/sparql-C7-hgDqj.js"></script>
+    <script type="module" src="../../_static/demo-ui/vb-Ct6nRh19.js"></script>
+    <script type="module" src="../../_static/demo-ui/cssMode-C2RC9pgX.js"></script>
+    <script type="module" src="../../_static/demo-ui/csp-BrKJBURo.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BGr5V3VC.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-BEbL7K3-.js"></script>
+    <script type="module" src="../../_static/demo-ui/lexon-BXIuHDZm.js"></script>
+    <script type="module" src="../../_static/demo-ui/rust-MCnfjcH3.js"></script>
+    <script type="module" src="../../_static/demo-ui/python-BPYShmTV.js"></script>
+    <script type="module" src="../../_static/demo-ui/objective-c-C0rDL9rz.js"></script>
+    <script type="module" src="../../_static/demo-ui/jsonMode-CN6mynD5.js"></script>
+    <script type="module" src="../../_static/demo-ui/sophia-1rZr7F0Q.js"></script>
+    <script type="module" src="../../_static/demo-ui/coffee-sjsjwKFb.js"></script>
+    <script type="module" src="../../_static/demo-ui/html-BoyYTxxY.js"></script>
+    <script type="module" src="../../_static/demo-ui/apex-qisLKCY2.js"></script>
+    <script type="module" src="../../_static/demo-ui/perl-88KpRufU.js"></script>
+    <script type="module" src="../../_static/demo-ui/powershell-DiGfWXCG.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascaligo-BHmIehLY.js"></script>
+    <script type="module" src="../../_static/demo-ui/yaml-YSZcBK5q.js"></script>
+    <script type="module" src="../../_static/demo-ui/markdown-oev5-MzD.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-C1gU20K9.js"></script>
+    <script type="module" src="../../_static/demo-ui/pascal-CEMvCQ86.js"></script>
+    <script type="module" src="../../_static/demo-ui/index-BBElXjUy.js"></script>
+    <script type="module" src="../../_static/demo-ui/parser-Ca8RS6mG.js"></script>
+    <script type="module" src="../../_static/demo-ui/less-AR6TBYns.js"></script>
+    <script type="module" src="../../_static/demo-ui/css-D4SiSmV0.js"></script>
+    <script type="module" src="../../_static/demo-ui/abap-BqcsHm_C.js"></script>
+    </body>
+</html>
